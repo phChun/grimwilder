@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   # Play toolkit (public)
   resource :roll, only: :show
+  resources :crucibles, only: %i[ index show ]
 
   # Passwordless sign-in: emailed code or passkey
   resource :session, only: %i[ new create destroy ] do

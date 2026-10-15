@@ -1,0 +1,73 @@
+<%# herb:slots client %>
+<%# herb:state (show_tables: true) %>
+<% content_for :title, @crucible.name %>
+
+<div class="crucible" data-controller="crucible" data-crucible-key-value="<%= @crucible.key %>">
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to "Crucibles", crucibles_path %> · <%= @crucible.group_name %></p>
+    <h1><%= @crucible.name %></h1>
+    <p class="page-header__lede"><%= @crucible.how %> <small>(pg. <%= @crucible.page %>)</small></p>
+  </header>
+
+  <section class="panel crucible__roller" aria-label="Roll">
+    <div class="crucible__actions">
+      <button type="button" class="button button--primary" data-action="crucible#rollAll">
+        <%= @crucible.tables.size > 1 ? "Roll all #{@crucible.tables.size} tables" : "Roll" %>
+      </button>
+      <button type="button" class="button button--quiet" data-action="crucible#keep" data-crucible-target="keepButton" disabled>Keep these</button>
+    </div>
+
+    <div class="crucible__results" data-crucible-target="results" aria-live="polite">
+      <p class="crucible__hint">Roll to get two readings from each table. Tap a word to choose it, then keep the combinations you like.</p>
+    </div>
+
+    <div class="crucible__kept" data-crucible-target="keptSection" hidden>
+      <h2 class="crucible__kept-title">Kept</h2>
+      <ol class="crucible__kept-list" data-crucible-target="keptList"></ol>
+      <div class="crucible__actions">
+        <button type="button" class="button button--small" data-action="crucible#copyKept">Copy list</button>
+        <button type="button" class="button button--quiet button--small" data-action="crucible#clearKept">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="crucible__toolbar">
+    <h2 class="section-title">Tables</h2>
+    <button type="button" class="button button--quiet button--small" data-herb-toggle="show_tables">
+      <% if show_tables %>Hide tables<% else %>Show tables<% end %>
+    </button>
+  </div>
+
+  <div class="crucible__tables" hidden="<%= !show_tables %>">
+    <% @crucible.tables.each_with_index do |table, index| %>
+      <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" aria-labelledby="table-<%= index %>">
+        <header class="crucible-table__header">
+          <h3 id="table-<%= index %>" class="crucible-table__name"><%= table.name %></h3>
+          <button type="button" class="button button--small" data-action="crucible#rollOne" data-index="<%= index %>">Roll</button>
+        </header>
+        <div class="grid66-wrap">
+        <table class="grid66">
+          <thead>
+            <tr>
+              <th scope="col"><span class="visually-hidden">Row</span></th>
+              <% 6.times do |column| %>
+                <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% table.rows.each_with_index do |row, row_index| %>
+              <tr>
+                <th scope="row"><%= row_index + 1 %></th>
+                <% row.each_with_index do |word, column_index| %>
+                  <td data-row="<%= row_index + 1 %>" data-col="<%= column_index + 1 %>"><%= word %></td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        </div>
+      </section>
+    <% end %>
+  </div>
+</div>

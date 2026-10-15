@@ -1,0 +1,24 @@
+<% content_for :title, "Crucibles" %>
+
+<header class="page-header">
+  <p class="eyebrow">Inspiration</p>
+  <h1>Crucibles</h1>
+  <p class="page-header__lede">Tables of evocative words from the book. Roll, read each result both ways, smash the best ones together and interpret them, literally or figuratively.</p>
+</header>
+
+<% @groups.each do |group, crucibles| %>
+  <section class="crucible-group" aria-labelledby="group-<%= group %>">
+    <h2 id="group-<%= group %>" class="section-title"><%= Crucible::GROUPS.fetch(group) %></h2>
+    <ul class="tool-grid__list">
+      <% crucibles.each do |crucible| %>
+        <li>
+          <%= link_to crucible_path(crucible), class: "tool-card tool-card--ready" do %>
+            <span class="tool-card__name"><%= crucible.name %></span>
+            <span class="tool-card__desc"><%= crucible.blurb %></span>
+            <small><%= pluralize(crucible.tables.size, "table") %> · pg. <%= crucible.page %></small>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

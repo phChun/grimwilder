@@ -541,3 +541,95 @@ form.button_to, .button_to { margin: 0; }
 
 .pool__gm .button { min-height: 2rem; padding: 0 var(--space-2); font-size: 0.85rem; }
 .pool__gm { gap: 0 var(--space-2); }
+
+/* ---------- Crucibles ---------- */
+
+.crucible-group { margin-bottom: var(--space-6); }
+.tool-card small { margin-top: auto; }
+
+.crucible__roller { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); }
+.crucible__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.crucible__hint { margin: 0; color: var(--ink-faint); }
+
+.crucible__results { display: grid; gap: var(--space-3); }
+.roll-result { display: grid; gap: var(--space-1); }
+.roll-result__label { margin: 0; font-size: 0.85rem; color: var(--ink-faint); }
+.roll-result__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.roll-result__smash {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.roll-result__smash:empty { display: none; }
+
+.chip {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.chip[aria-pressed="true"] { background: var(--moss); border-color: var(--moss); color: var(--moss-ink); font-weight: 700; }
+
+.crucible__kept { border-top: 1px solid var(--line); padding-top: var(--space-4); display: grid; gap: var(--space-2); }
+.crucible__kept[hidden] { display: none; }
+.crucible__kept-title { font-size: 1.2rem; margin: 0; }
+.crucible__kept-list { margin: 0; padding-left: 1.4em; }
+
+.crucible__toolbar { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+
+.crucible__tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+  gap: var(--space-5);
+}
+
+.crucible__tables[hidden] { display: none; }
+
+.crucible-table__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
+.crucible-table__name { margin: 0; }
+
+.grid66 {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.85rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.grid66 th,
+.grid66 td {
+  padding: var(--space-1) var(--space-1);
+  border: 1px solid var(--line);
+  text-align: center;
+  hyphens: auto;
+}
+
+.grid66-wrap { overflow-x: auto; }
+.grid66 { min-width: 21rem; }
+
+@media (max-width: 30rem) {
+  .grid66 { font-size: 0.75rem; }
+  .grid66 th,
+  .grid66 td { padding: var(--space-1) 2px; }
+}
+
+.grid66 th { color: var(--ink-faint); font-weight: 600; font-size: 0.75rem; }
+.grid66 thead th:first-child,
+.grid66 tbody th { width: 1.8rem; }
+
+.grid66 td.is-hit {
+  background: color-mix(in srgb, var(--moss) 22%, var(--paper-raised));
+  color: var(--ink);
+  font-weight: 700;
+  outline: 2px solid var(--moss);
+  outline-offset: -2px;
+}

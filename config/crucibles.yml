@@ -1,0 +1,354 @@
+# Crucibles from Grimwild: Community Edition Preview 5.2 (text CC0; based on
+# Grimwild by J. D. Maxwell, Oddity Press, CC BY 4.0). Each table is 6x6: roll
+# 2d6, one die picks the row and the other the column, or switch them (pg. 6).
+#
+# Extracted from the book's text layer. Multi-word cells (e.g. "fortune
+# teller") were split by hand; check new tables against the PDF.
+- key: gm
+  name: GM crucible
+  group: gm
+  page: 93
+  blurb: The seed of an idea when the story needs one.
+  how: 'Roll once on each table. Each roll reads two ways (3 and 1 is 31 or 13): pick the most evocative pair, smash it together, and interpret.'
+  tables:
+  - name: Quality
+    rows:
+    - [tough, quiet, precarious, wild, mysterious, rustic]
+    - [muffled, aged, romantic, menacing, puzzling, eerie]
+    - [broken, dwindling, distant, perilous, bleak, tense]
+    - [forgotten, abundant, hidden, withered, chaotic, looming]
+    - [festive, lost, immense, serene, vibrant, flickering]
+    - [rugged, splintered, sacred, relentless, tangled, twisted]
+  - name: Thing
+    rows:
+    - [journey, juncture, rift, scheme, nexus, team]
+    - [tremor, debris, symbol, scar, archive, chasm]
+    - [sanctuary, betrayal, trail, wasteland, help, mystery]
+    - [peak, threshold, boundary, beacon, secret, wall]
+    - [territory, rumor, standoff, strife, maze, pact]
+    - [dilemma, tradition, jackpot, omen, deception, illusion]
+- key: settlements
+  name: Settlements
+  group: places
+  page: 138
+  blurb: Villages, camps, ports and strongholds.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [bustling, prosperous, ancient, secluded, snowy, dusty]
+    - [quiet, deserted, trade, forgotten, shady, windy]
+    - [walled, fortified, haunted, peaceful, remote, coastal]
+    - [hidden, overgrown, foggy, hilly, barren, flooded]
+    - [sacred, thriving, nomadic, sunlit, rocky, mountainous]
+    - [isolated, ruined, abandoned, forested, sprawling, reclaimed]
+  - name: Settlement
+    rows:
+    - [village, camp, port, base, oasis, watch]
+    - [outpost, settlement, market, stronghold, manor, hideout]
+    - [town, colony, watchtower, ranch, harbor, den]
+    - [encampment, fortress, crossroads, grove, cliffside, homestead]
+    - [trading post, hamlet, sanctuary, plaza, peak, monastery]
+    - [citadel, refuge, commune, farmstead, cavern, bastion]
+- key: sites
+  name: Sites
+  group: places
+  page: 138
+  blurb: Ruins, shrines, tombs and lairs to explore.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [ancient, abandoned, cursed, frozen, charred, silent]
+    - [forgotten, lost, enchanted, mossy, clear, secluded]
+    - [sacred, mystic, weird, moonlit, foggy, collapsed]
+    - [haunted, sunken, buried, ruined, sulfurous, smoldering]
+    - [crumbling, shattered, burned, underground, blessed, windblown]
+    - [hidden, overgrown, desolate, echoing, forgotten, shaded]
+  - name: Site
+    rows:
+    - [altar, circle, well, chamber, labyrinth, archway]
+    - [monument, sanctuary, tower, obelisk, fountain, sanctum]
+    - [temple, catacombs, crypt, cairn, portal, hall]
+    - [grove, shrine, spring, pillar, grotto, mine]
+    - [ruins, cavern, mausoleum, pit, cemetery, lair]
+    - [tomb, statue, gate, throne, dungeon, vault]
+- key: dangers
+  name: Dangers
+  group: places
+  page: 138
+  blurb: What waits out in the wilds.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [savage, foul, vile, twisted, wailing, writhing]
+    - [cursed, haunted, corrupted, reckless, hungry, shrieking]
+    - [raging, chaotic, maddening, brutal, rampaging, vicious]
+    - [hidden, shadowed, darkened, lurking, restless, silent]
+    - [venomous, forbidden, bloodthirsty, forgotten, seething, stalking]
+    - [relentless, feral, ancient, ensnaring, malevolent, violent]
+  - name: Danger
+    rows:
+    - [beasts, monsters, brigands, shadows, specters, demons]
+    - [spirits, bog, cults, crypt, forest, cliffs]
+    - [caverns, abyss, behemoth, fiends, serpents, warriors]
+    - [ruins, wraiths, crevice, wilds, graveyard, shades]
+    - [storm, marsh, gorge, tangle, depths, pathways]
+    - [woods, swarm, mire, mists, crags, fog]
+- key: curiosities
+  name: Curiosities
+  group: places
+  page: 139
+  blurb: Strange sights that hint at more to explore.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [lingering, mysterious, dancing, curious, singing, low]
+    - [strange, distant, soft, melancholy, absurd, twinkling]
+    - [faint, haunting, glowing, humming, pale, hazy]
+    - [echoing, hidden, fading, shadowy, colorful, glittering]
+    - [flickering, pulsing, whispering, radiant, resonant, rumbling]
+    - [shimmering, ethereal, drifting, moving, enveloping, floating]
+  - name: Sight
+    rows:
+    - [smoke, glow, tree line, stone face, monolith, cloud]
+    - [obelisk, spire, ray, silhouette, reflection, canopy]
+    - [tower, waterfall, statue, bridge, bend, wall]
+    - [bonfire, arch, tombstone, gate, light, ravine]
+    - [pillar, ruin, monument, lights, canyon, crater]
+    - [mist, campfire, cliff, spire, cave, hilltop]
+- key: barriers
+  name: Barriers
+  group: places
+  page: 139
+  blurb: Terrain that makes getting around harder.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [jagged, deep, craggy, shadowy, barren, thick]
+    - [steep, narrow, thorny, frozen, marshy, howling]
+    - [muddy, overgrown, dark, misty, choked, sinking]
+    - [twisting, slippery, broken, winding, tangled, rough]
+    - [dense, windy, snow-covered, treacherous, raging, icy]
+    - [rocky, uneven, swampy, shifting, stony, rolling]
+  - name: Terrain
+    rows:
+    - [ravine, forest, hills, swamp, undergrowth, scree]
+    - [cliffs, ridge, valley, crevasse, crags, mire]
+    - [trail, pass, canyon, path, peaks, desert]
+    - [thicket, marsh, river, shale, glacier, brush]
+    - [bog, caves, brambles, mud flats, shoals, ice sheet]
+    - [slopes, scrub, lava, trees, tundra, underbrush]
+- key: factions
+  name: Factions
+  group: places
+  page: 139
+  blurb: Groups with goals of their own.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [fierce, noble, hidden, seeking, sacred, ragtag]
+    - [warlike, shadowed, cunning, relentless, untamed, radiant]
+    - [hostile, zealous, forbidden, guarded, loyal, defiant]
+    - [peaceful, ruthless, honorable, wise, vengeful, forgotten]
+    - [curious, ancient, silent, lost, eternal, secretive]
+    - [mystic, wandering, restless, merciless, patient, unseen]
+  - name: Group
+    rows:
+    - [blades, brotherhood, coven, seekers, cult, envoys]
+    - [order, legion, sentinels, council, guardians, shapers]
+    - [clan, syndicate, alliance, hunters, cadre, misfits]
+    - [keepers, knights, scouts, pilgrims, raiders, brigade]
+    - [guild, society, heralds, companions, guard, cabal]
+    - [circle, band, tribe, wanderers, wardens, watchers]
+- key: buildings
+  name: Buildings
+  group: places
+  page: 135
+  blurb: Notable buildings for a settlement map.
+  how: Roll on each table, smash the results together, and interpret.
+  tables:
+  - name: Quality
+    rows:
+    - [ancient, haunted, sacred, shadowy, festive, seedy]
+    - [crumbling, verdant, sprawling, overgrown, gloomy, opulent]
+    - [ornate, forgotten, mysterious, arcane, immaculate, lonely]
+    - [weathered, sturdy, thriving, bustling, crude, grimy]
+    - [enchanted, humble, dilapidated, secluded, battered, timeworn]
+    - [gilded, hidden, majestic, somber, towering, bleak]
+  - name: Building
+    rows:
+    - [alchemist, shrine, temple, watchtower, gemcutter, observatory]
+    - [docks, barracks, armory, guild hall, scribe, graveyard]
+    - [orphanage, stable, tower, market, library, brewery]
+    - [baker, blacksmith, arena, keep, jail, teahouse]
+    - [herbalist, tavern, inn, fletcher, manor, bathhouse]
+    - [carpenter, fortune teller, weaver, glassblower, warehouse, clocktower]
+- key: heritage
+  name: Heritage
+  group: characters
+  page: 49
+  blurb: Ancestry, culture and homeland.
+  how: Roll on each table, choose two or three results, and combine them, e.g. Orcs of the Verdant Boglands.
+  tables:
+  - name: Folk
+    rows:
+    - [Vagrants, Birdfolk, Wayfarers, Goblins, Islanders, Fisherfolk]
+    - [Riders, Clans, Seafarers, Tribes, Keepers, Settlers]
+    - [Gnomes, Pilgrims, Turtlefolk, Citizens, Marauders, Carvers]
+    - [Dwarves, Tieflings, Giants, Dragonborn, Tradesfolk, Valleyfolk]
+    - [Nomads, Cityfolk, Humans, Halflings, Merchants, Skywatchers]
+    - [Elves, Orcs, Forestfolk, Cavefolk, Raiders, Outcasts]
+  - name: Mood
+    rows:
+    - [Twisted, Steel, Verdant, Golden, Emerald, Burning]
+    - [Lush, Floating, Crimson, Shattered, Haunted, Enchanted]
+    - [Scorched, Echoing, Misty, Glimmering, Distant, Silent]
+    - [Rolling, Bountiful, Great, Sunken, Coastal, Gloomy]
+    - [Abyssal, Desolate, Rocky, Windswept, Howling, Eternal]
+    - [Feral, Serene, Whispering, Grim, Prosperous, Restless]
+  - name: Land
+    rows:
+    - [Peaks, Confederacy, Fjords, Coast, Badlands, Boglands]
+    - [Kingdom, Wilds, Marsh, Isles, Thickets, Jungletown]
+    - [Desert, Canyons, Highlands, Caverns, Fenlands, Borderlands]
+    - [Plains, North, Moors, Ruins, Hollows, Underworld]
+    - [Sea, Meadows, Outposts, Cliffs, Boomtown, Riverlands]
+    - [Glaciers, Sands, Wastelands, Coalition, Blightlands, Groves]
+- key: wises
+  name: Expanded wises
+  group: characters
+  page: 49
+  blurb: Areas of knowledge for backgrounds and heritages.
+  how: 'Roll for a wise: one die picks the column (its area), the other the row.'
+  tables:
+  - name: Wises
+    columns: [Civil, Social, Historical, Natural, Mystical, Practical]
+    rows:
+    - [laws of the land, gambling, notable figures, cartography, arcane theory, cooking]
+    - [bureaucracy, banter, lost relics, natural danger, pacts & binding, smuggling]
+    - [the press, leadership, ceremonial rites, pests & plague, cosmology, clockwork]
+    - [business, showmanship, festivities, overland travel, local spirits, jury-rigging]
+    - [taboo, blending in, architecture, unnatural beasts, divine order, makeshift gear]
+    - [politics, networking, theater & arts, seeds & harvest, esoterica, humors]
+- key: features
+  name: Distinctive features
+  group: characters
+  page: 51
+  blurb: Clothing, voice, eyes, personality and build.
+  how: Roll on the tables you want and pick the two or three features others notice first.
+  tables:
+  - name: Clothing
+    rows:
+    - [ill-fitting, pristine, tight, finely-tailored, frayed, ceremonial]
+    - [loose-fitting, dirty, flowing, threadbare, coarse, fancy]
+    - [outrageous, comfortable, stained, patched, fashionable, exotic]
+    - [faded, patchwork, austere, well-worn, grass-stained, strange]
+    - [plain, flamboyant, mottled, weathered, dusty, practical]
+    - [elaborate, crumpled, out-of-place, rugged, billowing, secondhand]
+  - name: Voice
+    rows:
+    - [lilting, clear, gravelly, pleasant, commanding, piercing]
+    - [melodious, resonant, hearty, sharp, raspy, murmuring]
+    - [soft, rumbling, measured, well-spoken, soothing, shrill]
+    - [crackling, calm, barking, confident, nasally, velvety]
+    - [whispering, booming, growling, earnest, pompous, monotone]
+    - [roaring, carries, sing-song, quiet, breathy, hoarse]
+  - name: Eyes
+    rows:
+    - [tormented, joyous, hard, glowing, stern, calculating]
+    - [haunted, kind, dead, animal, piercing, brooding]
+    - [questioning, sharp, eager, shifty, gentle, lifeless]
+    - [shrouded, sad, smoldering, cunning, hollow, weary]
+    - [knowing, wise, warm, wild, sparkling, bright]
+    - [fiery, haunting, searing, soulful, glassy, unreadable]
+  - name: Personality
+    rows:
+    - [blunt, mellow, astute, fierce, humble, bold]
+    - [curious, formal, pious, stoic, meticulous, severe]
+    - [charming, aloof, jovial, mean, vibrant, careless]
+    - [kind, ambitious, reserved, naive, crafty, timid]
+    - [earnest, solemn, cagey, mysterious, stubborn, sour]
+    - [shrewd, pragmatic, arrogant, lazy, pleasant, cynical]
+  - name: Body
+    rows:
+    - [curvy, scrawny, sturdy, sober, old-timer, sage]
+    - [young, slender, lean, grizzled, beautiful, wrinkled]
+    - [rail-thin, thick, athletic, upstart, over the hill, fresh faced]
+    - [solid, hulking, bony, in their prime, distinguished, hale & hearty]
+    - [lithe, ripped, petite, old & leathery, doddering, venerable]
+    - [gangly, compact, sharp, wizened, spry, distinguished]
+- key: arcana
+  name: Arcana touchstones
+  group: magic
+  page: 43
+  blurb: Touchstones for magic items and spells.
+  how: Pick one or two themes and roll for two touchstones, then assign a function.
+  tables:
+  - name: Divine
+    rows:
+    - [soothe, melody, eternal, plague, justice, heal]
+    - [life, bind, sun, shield, vigor, halo]
+    - [luck, truth, sentinel, rainbow, moon, spirit]
+    - [virtue, sacrifice, wrath, purify, pierce, dead]
+    - [blood, stars, light, blind, reflect, fate]
+    - [beauty, ward, bravery, sorrow, renew, radiant]
+  - name: Arcane
+    rows:
+    - [adapt, curiosity, unstable, mind, water, rune]
+    - [plane, memory, bubble, ethereal, phase, emotion]
+    - [force, scribe, blink, focus, hand, explosion]
+    - [flame, echo, rift, acid, word, float]
+    - [identity, lore, attune, dazzle, thought, sight]
+    - [phantom, vortex, vanish, air, gate, color]
+  - name: Primal
+    rows:
+    - [lush, claw, grow, breeze, shell, ember]
+    - [storm, stone, rot, stone, thorn, blight]
+    - [river, fragrant, frenzy, howl, freeze, beast]
+    - [thunder, horn, flight, tail, lightning, spore]
+    - [poison, swarm, root, bloom, earth, death]
+    - [wither, rain, bone, sting, tree, gust]
+  - name: Technology
+    rows:
+    - [fuse, disk, creativity, song, oil, stasis]
+    - [crystal, cog, keen, smoke, mirror, servant]
+    - [ornate, stitch, slime, pressure, quick, gravity]
+    - [gold, shrapnel, wall, spark, bind, message]
+    - [haven, duty, clock, command, glass, greed]
+    - [dance, ring, guide, shatter, plasma, beacon]
+  - name: Eldritch
+    rows:
+    - [shred, lock, warp, scream, tendril, mask]
+    - [charm, shift, skull, trick, figment, darkness]
+    - [bind, 'false', cold, void, enthrall, chain]
+    - [impulse, curse, shadow, steal, whisper, drain]
+    - [dream, sick, confuse, desire, eye, shroud]
+    - [face, grasp, flesh, silence, madness, lurk]
+- key: wild_surge
+  name: Wild surge
+  group: magic
+  page: 76
+  blurb: When raw magic spirals out of control.
+  how: Roll once on each table, smash the results together, and interpret.
+  tables:
+  - name: Table A
+    rows:
+    - [skin, temperature, icy, smoke, rain, lightning]
+    - [gust, sparks, rattle, tremor, color, scent]
+    - [ground, fire, water, light, debris, flicker]
+    - [creatures, growth, boom, effect, steps, levitation]
+    - [cloud, invisibility, gloom, distortion, metal, eye]
+    - [shadow, clock, twist, laughter, breath, hum]
+  - name: Table B
+    rows:
+    - [birds, whispers, glowing, illusion, rapid, whirlwind]
+    - [smell, static, hunger, image, emotion, glimmer]
+    - [lifted, change, phrase, shock, sound, echo]
+    - [shattering, scatter, feeling, pop, brief, shimmer]
+    - [shift, size, surface, agitation, apparition, sparkle]
+    - [notes, vision, voice, mark, glow, dazzle]
