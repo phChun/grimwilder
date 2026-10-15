@@ -25,8 +25,18 @@ Rails.application.routes.draw do
     scope module: :campaigns do
       resource :join_code, only: :update
       resources :memberships, only: :destroy
+
+      resources :pools, only: %i[ index create update destroy ] do
+        scope module: :pools do
+          resource :roll, only: :create
+          resource :push, only: :create
+          resource :reset, only: :create
+        end
+      end
     end
   end
+
+  resources :pools, only: :index
 
   get "join/:code", to: "joins#show", as: :join
   post "join/:code", to: "joins#create"

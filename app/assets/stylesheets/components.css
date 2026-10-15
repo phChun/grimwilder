@@ -462,3 +462,82 @@ form.button_to, .button_to { margin: 0; }
 .copy-field__input { flex: 1; min-width: 0; font-size: 0.9rem; }
 
 .empty { color: var(--ink-faint); }
+
+/* ---------- Pools ---------- */
+
+.pools { display: grid; gap: var(--space-6); }
+
+@media (min-width: 60rem) {
+  .pools { grid-template-columns: 1fr minmax(18rem, 21rem); align-items: start; }
+}
+
+.pool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-4);
+}
+
+.pool {
+  --pool-color: var(--ink-soft);
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--pool-color);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow);
+  scroll-margin-top: var(--space-6);
+}
+
+.pool--pressure { --pool-color: var(--ember); }
+.pool--timer { --pool-color: var(--messy); }
+.pool--resource { --pool-color: var(--moss); }
+.pool--power { --pool-color: var(--disaster); }
+.pool--campaign { --pool-color: var(--line-strong); }
+
+.pool__name { font-size: 1.5rem; margin: 0; }
+.pool__kind { margin: var(--space-1) 0 0; font-size: 0.85rem; color: var(--ink-faint); }
+
+.pool__meter { display: flex; align-items: center; gap: var(--space-3); }
+.pool__size { font-family: var(--font-display); font-size: 2.6rem; line-height: 1; min-width: 2.5ch; }
+.pool__pips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.pip {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  background: var(--pool-color);
+}
+
+.pip--gone { background: none; box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+
+.pool__outcome {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--pool-color);
+}
+
+.pool--depleted .pool__size { color: var(--ink-faint); }
+
+.pool__last { display: grid; gap: var(--space-2); }
+.pool__dice { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.pool__summary { margin: 0; font-size: 0.85rem; color: var(--ink-faint); }
+
+.die--small { --size: 2rem; font-size: 1rem; border-radius: 6px; animation: none; }
+.die--d6.die--dropped { text-decoration: line-through; opacity: 0.45; }
+
+.pool__actions { display: grid; gap: var(--space-3); margin-top: var(--space-1); }
+.pool__roll { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin: 0; }
+.pool__gm { display: flex; flex-wrap: wrap; gap: var(--space-1); border-top: 1px solid var(--line); padding-top: var(--space-2); }
+
+.check { display: inline-flex; align-items: center; gap: var(--space-2); font-size: 0.95rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; accent-color: var(--moss); }
+
+.size-picker { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.size-picker__input { width: 5rem; min-height: 2.25rem; }
+
+.pool__gm .button { min-height: 2rem; padding: 0 var(--space-2); font-size: 0.85rem; }
+.pool__gm { gap: 0 var(--space-2); }

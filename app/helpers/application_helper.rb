@@ -3,7 +3,7 @@ module ApplicationHelper
   # "soon" so the site map is visible before every tool exists.
   TOOLKIT_NAV = [
     { label: "Roll", path: :roll_path, ready: true },
-    { label: "Pools", path: :pools_path, ready: false },
+    { label: "Pools", path: :pools_path, ready: true },
     { label: "Crucibles", path: :crucibles_path, ready: false },
     { label: "Characters", path: :characters_path, ready: false }
   ].freeze

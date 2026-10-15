@@ -22,11 +22,11 @@
       <% end %>
     </li>
     <li>
-      <div class="tool-card">
+      <%= link_to pools_path, class: "tool-card tool-card--ready" do %>
         <span class="tool-card__glyph" aria-hidden="true">4d</span>
         <span class="tool-card__name">Pools</span>
         <span class="tool-card__desc">Task, pressure, timer and resource pools for your campaign. Roll them, drop the 1–3s, watch them run out.</span>
-      </div>
+      <% end %>
     </li>
     <li>
       <div class="tool-card">

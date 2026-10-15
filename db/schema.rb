@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_15_180100) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_120000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -63,6 +63,24 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_15_180100) do
     t.index ["identity_id"], name: "index_passkeys_on_identity_id"
   end
 
+  create_table "pools", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.string "name", null: false
+    t.string "kind", default: "task", null: false
+    t.integer "starting_size", null: false
+    t.integer "size", null: false
+    t.boolean "hidden", default: false, null: false
+    t.json "last_dice", default: [], null: false
+    t.integer "last_dropped"
+    t.string "last_action"
+    t.integer "last_rolled_by_id"
+    t.datetime "last_rolled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_pools_on_campaign_id"
+    t.index ["last_rolled_by_id"], name: "index_pools_on_last_rolled_by_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "identity_id", null: false
     t.string "ip_address"
@@ -75,5 +93,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_15_180100) do
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"
   add_foreign_key "passkeys", "identities"
+  add_foreign_key "pools", "campaigns"
+  add_foreign_key "pools", "identities", column: "last_rolled_by_id"
   add_foreign_key "sessions", "identities"
 end

@@ -1,0 +1,26 @@
+lookouts:
+  campaign: bramblewood
+  name: Lookouts spot you
+  kind: pressure
+  starting_size: 6
+  size: 6
+
+brawl:
+  campaign: bramblewood
+  name: Barroom brawl
+  kind: task
+  starting_size: 4
+  size: 4
+  last_dice: [6, 5, 4, 4]
+  last_dropped: 0
+  last_action: rolled
+  last_rolled_by: pip
+  last_rolled_at: <%= 5.minutes.ago.to_fs(:db) %>
+
+ambush:
+  campaign: bramblewood
+  name: Goblin ambush
+  kind: timer
+  starting_size: 4
+  size: 4
+  hidden: true

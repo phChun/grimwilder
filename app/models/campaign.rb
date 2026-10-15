@@ -6,6 +6,7 @@ class Campaign < ApplicationRecord
 
   has_many :memberships, dependent: :destroy
   has_many :identities, through: :memberships
+  has_many :pools, dependent: :destroy
 
   normalizes :name, with: ->(value) { value.squish }
 

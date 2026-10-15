@@ -3,6 +3,7 @@
 <header class="page-header">
   <p class="eyebrow"><%= gm? ? "You're the GM" : "You're a player" %></p>
   <h1><%= Current.campaign.name %></h1>
+  <p><%= link_to "Pools", campaign_pools_path(Current.campaign), class: "button" %></p>
 </header>
 
 <div class="campaign">
