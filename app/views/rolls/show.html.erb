@@ -1,0 +1,100 @@
+<%# herb:slots client %>
+<%# herb:state (stat: 2, thorns: 0, mode: "action", outcome: "", critical: false) %>
+<% content_for :title, "Action roll" %>
+
+<div class="roller" data-controller="roller">
+  <header class="page-header">
+    <p class="eyebrow">Dice</p>
+    <h1>Action roll</h1>
+    <p class="page-header__lede">
+      Roll d6s equal to your stat, plus any from spark, assists and talents. Add a thorn (d8) for each
+      difficulty factor. The highest d6 is your result; every 7 or 8 on a thorn cuts it one step.
+    </p>
+  </header>
+
+  <div class="roller__grid">
+    <section class="panel roller__controls" aria-label="Roll setup">
+      <fieldset class="segmented">
+        <legend class="visually-hidden">Roll type</legend>
+        <label class="segmented__option">
+          <input type="radio" name="mode" value="action" checked="<%= mode == "action" %>" data-herb-set="change->mode=action">
+          <span>Action</span>
+        </label>
+        <label class="segmented__option">
+          <input type="radio" name="mode" value="defense" checked="<%= mode == "defense" %>" data-herb-set="change->mode=defense">
+          <span>Defense</span>
+        </label>
+      </fieldset>
+
+      <div class="counter">
+        <span class="counter__label" id="stat-label">Dice <small>d6</small></span>
+        <div class="counter__control" role="group" aria-labelledby="stat-label">
+          <button type="button" class="counter__step" data-herb-decrement="stat" disabled="<%= stat <= 1 %>" aria-label="One fewer die">&minus;</button>
+          <output class="counter__value counter__value--d6" aria-live="polite"><%= stat %></output>
+          <button type="button" class="counter__step" data-herb-increment="stat" disabled="<%= stat >= 8 %>" aria-label="One more die">+</button>
+        </div>
+        <p class="counter__hint">Stat 1–3, plus spark, assists and talents.</p>
+      </div>
+
+      <div class="counter">
+        <span class="counter__label" id="thorns-label">Thorns <small>d8</small></span>
+        <div class="counter__control" role="group" aria-labelledby="thorns-label">
+          <button type="button" class="counter__step" data-herb-decrement="thorns" disabled="<%= thorns <= 0 %>" aria-label="One fewer thorn">&minus;</button>
+          <output class="counter__value counter__value--d8" aria-live="polite"><%= thorns %></output>
+          <button type="button" class="counter__step" data-herb-increment="thorns" disabled="<%= thorns >= 8 %>" aria-label="One more thorn">+</button>
+        </div>
+        <p class="counter__hint">Typical play is 0–2. Odds drop sharply at 3+.</p>
+      </div>
+
+      <div class="roller__actions">
+        <button type="button" class="button button--primary button--wide" data-action="roller#roll">Roll</button>
+        <button type="button" class="button button--quiet" data-action="roller#clear">Clear</button>
+      </div>
+    </section>
+
+    <section class="panel roller__result" aria-label="Result">
+      <div class="tray" data-roller-target="tray" aria-live="polite"></div>
+      <p class="tray__summary" data-roller-target="summary"></p>
+
+      <% case outcome %>
+      <% when "perfect" %>
+        <div class="result result--perfect">
+          <h2 class="result__name">Perfect</h2>
+          <p class="result__text"><% if mode == "defense" %>You avoid the impact move.<% else %>Success, and you avoid trouble.<% end %></p>
+          <% if critical %>
+            <div class="critical">
+              <h3 class="critical__title">Critical</h3>
+              <p>Pick one: <strong>Greater effect</strong> (drop 1d from the task pool before rolling), <strong>Secondary effect</strong> (gain another related perfect), or <strong>Setup</strong> (a riskless assist on a follow-up). If nothing comes to mind, take spark.</p>
+            </div>
+          <% end %>
+        </div>
+      <% when "messy" %>
+        <div class="result result--messy">
+          <h2 class="result__name">Messy</h2>
+          <p class="result__text"><% if mode == "defense" %>You reduce the impact move.<% else %>Success, with an impact move.<% end %></p>
+        </div>
+      <% when "grim" %>
+        <div class="result result--grim">
+          <h2 class="result__name">Grim</h2>
+          <p class="result__text"><% if mode == "defense" %>You take the full impact move.<% else %>Failure, with an impact move.<% end %></p>
+        </div>
+      <% when "disaster" %>
+        <div class="result result--disaster">
+          <h2 class="result__name">Disaster</h2>
+          <p class="result__text"><% if mode == "defense" %>You take a worse impact move, then take spark.<% else %>Failure, with a worse impact move. Take spark.<% end %></p>
+        </div>
+      <% else %>
+        <div class="result result--empty">
+          <p class="result__text">Set your dice and thorns, then roll.</p>
+        </div>
+      <% end %>
+    </section>
+  </div>
+
+  <aside class="ladder" aria-label="Result ladder">
+    <div class="ladder__step ladder__step--perfect"><strong>6</strong> Perfect</div>
+    <div class="ladder__step ladder__step--messy"><strong>4–5</strong> Messy</div>
+    <div class="ladder__step ladder__step--grim"><strong>1–3</strong> Grim</div>
+    <div class="ladder__step ladder__step--disaster"><strong>Grim + cut</strong> Disaster</div>
+  </aside>
+</div>

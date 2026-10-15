@@ -1,0 +1,330 @@
+/* Grimwilder — components. Tokens are in application.css. */
+
+/* ---------- Shared ---------- */
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--ember);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-4);
+}
+
+.page-header { margin-bottom: var(--space-5); }
+.page-header__lede { max-width: var(--measure); color: var(--ink-soft); }
+
+.panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+}
+
+.tag {
+  display: inline-block;
+  margin-left: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink-faint);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* ---------- Buttons ---------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-5);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 120ms, transform 80ms;
+}
+
+.button:hover { background: var(--paper-sunken); color: var(--ink); }
+.button:active { transform: translateY(1px); }
+
+.button--primary {
+  background: var(--moss);
+  border-color: var(--moss);
+  color: var(--moss-ink);
+}
+
+.button--primary:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+.button--quiet { background: none; border-color: transparent; color: var(--ink-soft); }
+.button--quiet:hover { background: var(--paper-sunken); }
+
+.button--wide { flex: 1; }
+
+/* ---------- Home ---------- */
+
+.hero {
+  padding-block: var(--space-5) var(--space-7);
+  max-width: 46rem;
+}
+
+.hero__title { font-size: clamp(3rem, 9vw, 5.5rem); margin-bottom: var(--space-4); }
+.hero__lede { font-size: 1.2rem; color: var(--ink-soft); max-width: var(--measure); }
+.hero__actions { margin-top: var(--space-5); }
+
+.tool-grid__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-4);
+}
+
+.tool-grid__list > li { display: flex; }
+
+.tool-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.tool-card--ready {
+  border-style: solid;
+  border-color: var(--line);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  transition: transform 120ms, border-color 120ms;
+}
+
+.tool-card--ready:hover { color: var(--ink); border-color: var(--moss); transform: translateY(-2px); }
+
+.tool-card__glyph {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ember);
+}
+
+.tool-card__name { font-family: var(--font-display); font-size: 1.4rem; color: var(--ink); }
+.tool-card__desc { font-size: 0.95rem; }
+
+/* ---------- Roller ---------- */
+
+.roller__grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 52rem) {
+  .roller__grid { grid-template-columns: minmax(18rem, 22rem) 1fr; align-items: start; }
+}
+
+.roller__controls { display: grid; gap: var(--space-5); }
+
+.roller__actions { display: flex; gap: var(--space-2); }
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--paper-sunken);
+}
+
+.segmented__option {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.segmented__option input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segmented__option span {
+  display: block;
+  padding: var(--space-2);
+  border-radius: calc(var(--radius-sm) - 2px);
+  text-align: center;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.segmented__option input:checked + span {
+  background: var(--paper-raised);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.segmented__option input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+.counter__label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin-bottom: var(--space-2);
+}
+
+.counter__control {
+  display: grid;
+  grid-template-columns: 3rem 1fr 3rem;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.counter__step {
+  height: 3rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.counter__step:hover:not(:disabled) { background: var(--paper-sunken); }
+.counter__step:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.counter__value {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.counter__value--d8 { color: var(--disaster); }
+
+.counter__hint { margin: var(--space-2) 0 0; font-size: 0.85rem; color: var(--ink-faint); }
+
+/* Result panel */
+
+.roller__result { min-height: 18rem; display: flex; flex-direction: column; }
+
+.tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-height: 3.5rem;
+}
+
+.tray__summary {
+  min-height: 1.55em;
+  margin: var(--space-3) 0 var(--space-4);
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+}
+
+.die {
+  --size: 3.25rem;
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  font-weight: 700;
+  animation: die-in 260ms cubic-bezier(.2,.9,.3,1.3) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.die--d6 {
+  background: var(--d6-face);
+  color: var(--d6-ink);
+  border: 2px solid var(--line-strong);
+  border-radius: 9px;
+  opacity: 0.55;
+}
+
+.die--d6.die--top { opacity: 1; border-color: var(--ink); box-shadow: var(--shadow); }
+
+.die--d8 {
+  background: var(--d8-face);
+  color: var(--d8-ink);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  opacity: 0.55;
+}
+
+.die--d8.die--cut { opacity: 1; }
+
+@keyframes die-in {
+  from { transform: translateY(-8px) rotate(-25deg) scale(0.6); opacity: 0; }
+}
+
+.result {
+  margin-top: auto;
+  padding: var(--space-5);
+  border-radius: var(--radius-sm);
+  border-left: 6px solid var(--result-color, var(--line-strong));
+  background: color-mix(in srgb, var(--result-color, var(--paper-sunken)) 12%, var(--paper-raised));
+}
+
+.result--perfect { --result-color: var(--perfect); }
+.result--messy { --result-color: var(--messy); }
+.result--grim { --result-color: var(--grim); }
+.result--disaster { --result-color: var(--disaster); }
+.result--empty { border-left-color: transparent; background: var(--paper-sunken); color: var(--ink-faint); }
+
+.result__name { font-size: 2.5rem; margin: 0 0 var(--space-1); color: var(--result-color); }
+.result__text { margin: 0; font-size: 1.15rem; }
+
+.critical {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--perfect) 35%, transparent);
+}
+
+.critical__title { color: var(--perfect); margin-bottom: var(--space-1); }
+.critical p { margin: 0; }
+
+.ladder {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.ladder__step {
+  padding: var(--space-2) var(--space-3);
+  border-top: 4px solid var(--step);
+  background: var(--paper-raised);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.ladder__step strong { display: block; color: var(--step); font-size: 1rem; }
+
+.ladder__step--perfect { --step: var(--perfect); }
+.ladder__step--messy { --step: var(--messy); }
+.ladder__step--grim { --step: var(--grim); }
+.ladder__step--disaster { --step: var(--disaster); }

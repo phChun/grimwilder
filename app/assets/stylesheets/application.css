@@ -1,10 +1,265 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * Grimwilder — base styles and design tokens.
+ * Propshaft serves every file in app/assets/stylesheets (alphabetical), so
+ * tokens live here and components in components.css.
  */
+
+:root {
+  /* Type */
+  --font-display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --font-body: "Zilla Slab", "Rockwell", Georgia, serif;
+
+  /* Surfaces & ink (light: parchment) */
+  --paper: #f2ead8;
+  --paper-raised: #faf5e9;
+  --paper-sunken: #e6dbc2;
+  --ink: #29241c;
+  --ink-soft: #5d5446;
+  --ink-faint: #7d7260;
+  --line: #d3c5a6;
+  --line-strong: #b5a47f;
+
+  /* Accents */
+  --moss: #46663a;
+  --moss-ink: #f5f1e4;
+  --ember: #a84a24;
+  --focus: #2f6fb0;
+
+  /* Results ladder */
+  --perfect: #3c7546;
+  --messy: #8f6812;
+  --grim: #8c3a2b;
+  --disaster: #5a2346;
+
+  /* Dice */
+  --d6-face: #fbf7ec;
+  --d6-ink: #29241c;
+  --d8-face: #5a2346;
+  --d8-ink: #f7ecf2;
+
+  /* Shape & rhythm */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 0 rgb(41 36 28 / 0.06), 0 6px 20px -12px rgb(41 36 28 / 0.35);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --measure: 62ch;
+  --page: 70rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #16140f;
+    --paper-raised: #201d16;
+    --paper-sunken: #0f0e0a;
+    --ink: #ece3cf;
+    --ink-soft: #b9ae97;
+    --ink-faint: #8f8571;
+    --line: #362f24;
+    --line-strong: #544a39;
+
+    --moss: #7fa465;
+    --moss-ink: #12150e;
+    --ember: #d9744a;
+    --focus: #7db3ea;
+
+    --perfect: #6fb27a;
+    --messy: #d8a945;
+    --grim: #d06a55;
+    --disaster: #c27aa8;
+
+    --d6-face: #ece3cf;
+    --d6-ink: #1b1813;
+    --d8-face: #6e2d57;
+    --d8-ink: #fbeef6;
+
+    --shadow: 0 1px 0 rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.8);
+  }
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  margin: 0 0 var(--space-3);
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(2.25rem, 5vw, 3.25rem); }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.25rem; }
+
+p { margin: 0 0 var(--space-4); }
+
+a {
+  color: var(--moss);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover { color: var(--ember); }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button,
+input,
+select,
+textarea { font: inherit; }
+
+small { font-size: 0.8em; color: var(--ink-faint); }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -3rem;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-sm);
+  z-index: 10;
+}
+
+.skip-link:focus { top: var(--space-2); }
+
+/* ---------- Layout ---------- */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-raised);
+}
+
+.site-header__inner,
+.site-main,
+.site-footer {
+  width: 100%;
+  max-width: var(--page);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding-block: var(--space-3);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.brand:hover { color: var(--ink); }
+.brand__mark { color: var(--ember); font-size: 1.1em; }
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.site-nav__link {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.site-nav__link:hover { color: var(--ink); background: var(--paper-sunken); }
+
+.site-nav__link[aria-current="page"] {
+  color: var(--moss-ink);
+  background: var(--moss);
+}
+
+.site-nav__link--soon {
+  color: var(--ink-faint);
+  font-weight: 400;
+  cursor: default;
+}
+
+.site-nav__link--soon:hover { background: none; color: var(--ink-faint); }
+
+.site-main {
+  flex: 1;
+  padding-block: var(--space-6) var(--space-7);
+}
+
+.site-footer {
+  padding-block: var(--space-5);
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+}
+
+.site-footer p { max-width: var(--measure); margin: 0; }
+.site-footer a { color: inherit; }
+
+@media (min-width: 48rem) {
+  .site-header__inner,
+  .site-main,
+  .site-footer { padding-inline: var(--space-5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
