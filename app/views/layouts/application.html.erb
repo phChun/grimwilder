@@ -47,10 +47,19 @@
             <% end %>
           <% end %>
         </nav>
+
+        <nav class="account-nav" aria-label="Account">
+          <% if authenticated? %>
+            <%= link_to Current.identity.display_name, profile_path, class: "site-nav__link account-nav__me" %>
+          <% else %>
+            <%= link_to "Sign in", new_session_path, class: "site-nav__link account-nav__signin" %>
+          <% end %>
+        </nav>
       </div>
     </header>
 
     <main id="main" class="site-main">
+      <%= render "shared/flash" %>
       <%= yield %>
     </main>
 

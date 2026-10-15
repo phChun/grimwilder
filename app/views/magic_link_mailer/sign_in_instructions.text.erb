@@ -1,0 +1,6 @@
+Your Grimwilder sign-in code: <%= @magic_link.code %>
+
+Enter it on the page that asked for it, or open this link in the same browser:
+<%= session_magic_link_url(code: @magic_link.code) %>
+
+The code works once and expires in <%= distance_of_time_in_words(MagicLink::EXPIRATION_TIME) %>. If you didn't ask for it, you can ignore this email.

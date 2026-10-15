@@ -1,0 +1,21 @@
+<%# locals: (mode:, challenge_url:, submit_url:, label:) %>
+<%# herb:slots client %>
+<%# herb:state (passkey_status: "idle") %>
+<div class="passkey" data-controller="passkey" data-passkey-mode-value="<%= mode %>" data-passkey-challenge-url-value="<%= challenge_url %>" data-passkey-submit-url-value="<%= submit_url %>">
+  <button type="button" class="button button--wide" data-action="passkey#start" disabled="<%= passkey_status != "idle" %>">
+    <span class="passkey__icon" aria-hidden="true">&#9919;</span>
+    <%= label %>
+  </button>
+
+  <p class="passkey__status" aria-live="polite">
+    <% case passkey_status %>
+    <% when "waiting" %>
+      Follow the prompt from your device or password manager.
+    <% when "verifying" %>
+      Checking your passkey…
+    <% when "unsupported" %>
+      This browser can't use passkeys. Use an emailed code instead.
+    <% end %>
+  </p>
+  <p class="form-error" data-passkey-target="error" hidden></p>
+</div>

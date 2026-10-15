@@ -1,6 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "webauthn/fake_client"
+require_relative "test_helpers/session_test_helper"
 require_relative "test_helpers/rendered_page_test_helper"
 
 module ActiveSupport
@@ -14,5 +16,6 @@ module ActiveSupport
 end
 
 class ActionDispatch::IntegrationTest
+  include SessionTestHelper
   include RenderedPageTestHelper
 end

@@ -1,0 +1,23 @@
+<% content_for :title, "Sign in" %>
+
+<div class="auth">
+  <header class="page-header">
+    <p class="eyebrow">Account</p>
+    <h1>Sign in</h1>
+    <p class="page-header__lede">No passwords. We'll email you a code, or you can use a passkey. New here? Entering your email creates your account.</p>
+  </header>
+
+  <section class="panel auth__panel">
+    <%= form_with url: session_path, class: "stack" do |form| %>
+      <div class="field">
+        <%= form.label :email_address, "Email", class: "field__label" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", class: "field__input" %>
+      </div>
+      <%= form.submit "Email me a code", class: "button button--primary button--wide" %>
+    <% end %>
+
+    <div class="divider" role="separator"><span>or</span></div>
+
+    <%= render "passkeys/button", mode: "get", challenge_url: session_passkey_challenge_path, submit_url: session_passkey_path, label: "Sign in with a passkey" %>
+  </section>
+</div>

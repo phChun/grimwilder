@@ -67,3 +67,6 @@ group :test do
 end
 
 gem "reactionview", "~> 0.6.0"
+
+# Passkeys (WebAuthn) for passwordless sign-in
+gem "webauthn", "~> 3.4"

@@ -1,0 +1,27 @@
+<% content_for :title, "Enter your code" %>
+
+<div class="auth">
+  <header class="page-header">
+    <p class="eyebrow">Account</p>
+    <h1>Check your email</h1>
+    <p class="page-header__lede">
+      We sent a 6-character code to <strong><%= email_address_pending_authentication %></strong>. It works once and expires in 15 minutes.
+    </p>
+  </header>
+
+  <section class="panel auth__panel">
+    <% if flash[:magic_link_code].present? %>
+      <p class="flash flash--dev">Development: your code is <strong><%= flash[:magic_link_code] %></strong></p>
+    <% end %>
+
+    <%= form_with url: session_magic_link_path, class: "stack" do |form| %>
+      <div class="field">
+        <%= form.label :code, "Code", class: "field__label" %>
+        <%= form.text_field :code, value: params[:code], required: true, autofocus: true, autocomplete: "one-time-code", autocapitalize: "characters", spellcheck: false, maxlength: 12, class: "field__input field__input--code" %>
+      </div>
+      <%= form.submit "Sign in", class: "button button--primary button--wide" %>
+    <% end %>
+
+    <p class="auth__aside"><%= link_to "Use a different email", new_session_path %></p>
+  </section>
+</div>

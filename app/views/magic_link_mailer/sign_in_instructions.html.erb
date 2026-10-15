@@ -1,0 +1,7 @@
+<h1 style="font-family: Georgia, serif; font-weight: normal;">Your sign-in code</h1>
+
+<p style="font-size: 32px; letter-spacing: 0.2em; font-family: Menlo, Consolas, monospace; margin: 16px 0;"><strong><%= @magic_link.code %></strong></p>
+
+<p>Enter it on the page that asked for it, or <%= link_to "sign in with this link", session_magic_link_url(code: @magic_link.code) %> in the same browser.</p>
+
+<p style="color: #6b6152;">The code works once and expires in <%= distance_of_time_in_words(MagicLink::EXPIRATION_TIME) %>. If you didn't ask for it, you can ignore this email.</p>

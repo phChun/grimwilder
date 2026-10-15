@@ -1,0 +1,54 @@
+<% content_for :title, "Your profile" %>
+
+<header class="page-header">
+  <p class="eyebrow">Account</p>
+  <% if @identity.profile_complete? %>
+    <h1><%= @identity.display_name %></h1>
+  <% else %>
+    <h1>Welcome to Grimwilder</h1>
+    <p class="page-header__lede">What should your table call you? This is the name other players see.</p>
+  <% end %>
+</header>
+
+<div class="profile">
+  <section class="panel stack" aria-labelledby="profile-name">
+    <h2 id="profile-name" class="panel__title">Name</h2>
+    <%= form_with model: @identity, url: profile_path, method: :patch, class: "stack" do |form| %>
+      <% if @identity.errors.any? %>
+        <p class="form-error"><%= @identity.errors.full_messages.to_sentence %></p>
+      <% end %>
+      <div class="field">
+        <%= form.label :name, "Display name", class: "field__label" %>
+        <%= form.text_field :name, required: true, maxlength: 80, autocomplete: "nickname", class: "field__input" %>
+      </div>
+      <p class="field__hint">Signed in as <%= @identity.email_address %></p>
+      <%= form.submit "Save", class: "button button--primary" %>
+    <% end %>
+  </section>
+
+  <section class="panel stack" aria-labelledby="profile-passkeys">
+    <h2 id="profile-passkeys" class="panel__title">Passkeys</h2>
+    <p class="field__hint">Sign in with your fingerprint, face or device PIN instead of waiting for an email.</p>
+
+    <% if @identity.passkeys.any? %>
+      <ul class="list">
+        <% @identity.passkeys.order(:created_at).each do |passkey| %>
+          <li class="list__item">
+            <span>
+              <strong><%= passkey.name %></strong>
+              <small><%= passkey.last_used_at ? "Last used #{time_ago_in_words(passkey.last_used_at)} ago" : "Not used yet" %></small>
+            </span>
+            <%= button_to "Remove", passkey_path(passkey), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Remove this passkey?" } } %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <%= render "passkeys/button", mode: "create", challenge_url: passkeys_challenge_path, submit_url: passkeys_path, label: "Add a passkey" %>
+  </section>
+
+  <section class="panel stack" aria-labelledby="profile-session">
+    <h2 id="profile-session" class="panel__title">Session</h2>
+    <%= button_to "Sign out", session_path, method: :delete, class: "button" %>
+  </section>
+</div>

@@ -1,0 +1,11 @@
+gwen:
+  email_address: gwen@example.com
+  name: Gwen
+
+pip:
+  email_address: pip@example.com
+  name: Pip
+
+stranger:
+  email_address: stranger@example.com
+  name: Stranger
