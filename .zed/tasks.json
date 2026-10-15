@@ -1,0 +1,124 @@
+[
+    {
+        "label": "🤖 Claude",
+        "command": "claude",
+        "use_new_terminal": true
+    },
+    {
+        "label": "🤖 Claude Resume",
+        "command": "claude",
+        "args": ["--resume"],
+        "use_new_terminal": true
+    },
+    {
+        "label": "💎 Rails Server",
+        "command": "bundle",
+        "args": ["exec", "rails", "server"],
+        "env": {
+            "RAILS_ENV": "development"
+        },
+        "use_new_terminal": true
+    },
+    {
+        "label": "🧑‍🎨 Tailwind CSS Watch",
+        "command": "bundle",
+        "args": ["exec", "rails", "tailwindcss:watch"],
+        "env": {
+            "RAILS_ENV": "development"
+        },
+        "use_new_terminal": true
+    },
+    {
+        "label": "🖥️ Rails Console",
+        "command": "bundle",
+        "args": ["exec", "rails", "console"],
+        "use_new_terminal": true
+    },
+    {
+        "label": "🧪 Run All Tests",
+        "command": "bundle",
+        "args": ["exec", "rspec"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🧪 Run Current Test File",
+        "command": "bundle",
+        "args": ["exec", "rspec", "${ZED_FILE}"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🧪 Run Fast Tests (no DB)",
+        "command": "bundle",
+        "args": ["exec", "rspec", "--tag", "~db"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🗄️ DB Migrate",
+        "command": "bundle",
+        "args": ["exec", "rails", "db:migrate"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🗄️ DB Rollback",
+        "command": "bundle",
+        "args": ["exec", "rails", "db:rollback"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🗄️ DB Reset",
+        "command": "bundle",
+        "args": ["exec", "rails", "db:reset"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🌱 DB Seed",
+        "command": "bundle",
+        "args": ["exec", "rails", "db:seed"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🔧 Standard Fix",
+        "command": "bundle",
+        "args": ["exec", "standardrb", "--fix"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🔍 Standard Check",
+        "command": "bundle",
+        "args": ["exec", "standardrb"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "💎 Bundle Install",
+        "command": "bundle",
+        "args": ["install"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "📊 Coverage Report",
+        "command": "bundle",
+        "args": ["exec", "rspec"],
+        "env": {
+            "COVERAGE": "true"
+        },
+        "use_new_terminal": false
+    },
+    {
+        "label": "🚀 Rails Generate",
+        "command": "bundle",
+        "args": ["exec", "rails", "generate"],
+        "use_new_terminal": true
+    },
+    {
+        "label": "🧹 Clean Logs",
+        "command": "rm",
+        "args": ["-f", "log/*.log"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🪵 Follow Developer Logs",
+        "command": "tail",
+        "args": ["-f", "log/development.log"],
+        "use_new_terminal": false
+    }
+]
