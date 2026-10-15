@@ -1,0 +1,9 @@
+gwen_gm:
+  campaign: bramblewood
+  identity: gwen
+  role: gm
+
+pip_player:
+  campaign: bramblewood
+  identity: pip
+  role: player

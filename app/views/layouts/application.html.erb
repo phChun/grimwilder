@@ -50,6 +50,7 @@
 
         <nav class="account-nav" aria-label="Account">
           <% if authenticated? %>
+            <%= link_to "Campaigns", campaigns_path, class: "site-nav__link", "aria-current": (current_page?(campaigns_path) ? "page" : nil) %>
             <%= link_to Current.identity.display_name, profile_path, class: "site-nav__link account-nav__me" %>
           <% else %>
             <%= link_to "Sign in", new_session_path, class: "site-nav__link account-nav__signin" %>

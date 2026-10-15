@@ -25,7 +25,7 @@ class PasskeyTest < ActionDispatch::IntegrationTest
     post session_passkey_path, params: { credential: assertion }, as: :json
 
     assert_response :success
-    assert_equal profile_path, response.parsed_body["location"]
+    assert_equal campaigns_path, response.parsed_body["location"]
     assert_not_nil identities(:gwen).passkeys.first.last_used_at
   end
 

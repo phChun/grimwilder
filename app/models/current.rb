@@ -1,5 +1,5 @@
 class Current < ActiveSupport::CurrentAttributes
-  attribute :session, :identity
+  attribute :session, :identity, :campaign, :membership
 
   def session=(value)
     super

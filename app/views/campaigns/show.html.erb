@@ -1,0 +1,51 @@
+<% content_for :title, Current.campaign.name %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= gm? ? "You're the GM" : "You're a player" %></p>
+  <h1><%= Current.campaign.name %></h1>
+</header>
+
+<div class="campaign">
+  <section class="panel stack" aria-labelledby="campaign-table">
+    <h2 id="campaign-table" class="panel__title">At the table</h2>
+    <ul class="list">
+      <% @memberships.each do |membership| %>
+        <li class="list__item">
+          <span>
+            <strong><%= membership.identity.display_name %></strong>
+            <small><%= membership.gm? ? "GM" : "Player" %><%= " · you" if membership == Current.membership %></small>
+          </span>
+          <% if membership == Current.membership && membership.player? %>
+            <%= button_to "Leave", campaign_membership_path(Current.campaign, membership), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Leave #{Current.campaign.name}?" } } %>
+          <% elsif gm? && membership.player? %>
+            <%= button_to "Remove", campaign_membership_path(Current.campaign, membership), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Remove #{membership.identity.display_name}?" } } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+
+  <% if gm? %>
+    <section class="panel stack" aria-labelledby="campaign-invite">
+      <h2 id="campaign-invite" class="panel__title">Invite players</h2>
+      <p class="field__hint">Anyone with this link can sign in and join as a player.</p>
+      <%= render "campaigns/join_link", url: join_url(Current.campaign.join_code) %>
+      <%= button_to "Make a new link", campaign_join_code_path(Current.campaign), method: :patch, class: "button button--quiet button--small", form: { data: { turbo_confirm: "The current link will stop working. Continue?" } } %>
+    </section>
+
+    <section class="panel stack" aria-labelledby="campaign-settings">
+      <h2 id="campaign-settings" class="panel__title">Settings</h2>
+      <%= form_with model: Current.campaign, class: "stack" do |form| %>
+        <% if Current.campaign.errors.any? %>
+          <p class="form-error"><%= Current.campaign.errors.full_messages.to_sentence %></p>
+        <% end %>
+        <div class="field">
+          <%= form.label :name, "Campaign name", class: "field__label" %>
+          <%= form.text_field :name, required: true, maxlength: 80, class: "field__input" %>
+        </div>
+        <%= form.submit "Rename", class: "button" %>
+      <% end %>
+      <%= button_to "Delete campaign", campaign_path(Current.campaign), method: :delete, class: "button button--danger button--small", form: { data: { turbo_confirm: "Delete #{Current.campaign.name} for everyone? This can't be undone." } } %>
+    </section>
+  <% end %>
+</div>

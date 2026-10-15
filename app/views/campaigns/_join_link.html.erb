@@ -1,0 +1,9 @@
+<%# locals: (url:) %>
+<%# herb:slots client %>
+<%# herb:state (copied: false) %>
+<div class="copy-field" data-controller="clipboard" data-clipboard-text-value="<%= url %>">
+  <input type="text" class="field__input copy-field__input" value="<%= url %>" readonly autocomplete="off" aria-label="Join link">
+  <button type="button" class="button" data-action="clipboard#copy">
+    <% if copied %>Copied<% else %>Copy<% end %>
+  </button>
+</div>

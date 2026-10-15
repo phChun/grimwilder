@@ -19,16 +19,16 @@ class SignInTest < ActionDispatch::IntegrationTest
     assert_redirected_to profile_path
 
     patch profile_path, params: { identity: { name: "Newcomer" } }
-    assert_redirected_to profile_path
+    assert_redirected_to campaigns_path
     assert_equal "Newcomer", Identity.find_by!(email_address: "newcomer@example.com").name
   end
 
   test "an existing identity signs in and returns to where it was going" do
-    get profile_path
+    get campaign_path(campaigns(:bramblewood))
     assert_redirected_to new_session_path
 
     sign_in_as identities(:gwen)
-    assert_redirected_to profile_path
+    assert_redirected_to campaign_path(campaigns(:bramblewood))
   end
 
   test "a wrong code doesn't sign in" do

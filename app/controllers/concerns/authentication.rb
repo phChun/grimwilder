@@ -46,7 +46,7 @@ module Authentication
       if !Current.identity.profile_complete?
         profile_path
       else
-        session.delete(:return_to_after_authenticating) || profile_path
+        session.delete(:return_to_after_authenticating) || campaigns_path
       end
     end
 

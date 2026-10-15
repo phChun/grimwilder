@@ -1,8 +1,10 @@
 # A person, identified by email. Signs in with an emailed code or a passkey;
-# there are no passwords.
+# there are no passwords. Joins campaigns through memberships.
 class Identity < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :passkeys, dependent: :destroy
+  has_many :memberships, dependent: :destroy
+  has_many :campaigns, through: :memberships
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
   normalizes :name, with: ->(value) { value.squish.presence }
@@ -26,5 +28,9 @@ class Identity < ApplicationRecord
   def webauthn_user_handle!
     update!(webauthn_user_handle: WebAuthn.generate_user_id) if webauthn_user_handle.blank?
     webauthn_user_handle
+  end
+
+  def membership_in(campaign)
+    memberships.find_by(campaign: campaign)
   end
 end

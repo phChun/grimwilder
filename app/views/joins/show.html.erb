@@ -1,0 +1,23 @@
+<% content_for :title, "Join #{@campaign.name}" %>
+
+<div class="auth">
+  <header class="page-header">
+    <p class="eyebrow">You're invited</p>
+    <h1><%= @campaign.name %></h1>
+    <p class="page-header__lede">
+      <% if (gm = @campaign.gms.first) %>Run by <%= gm.display_name %>. <% end %>Join to sit at this table as a player.
+    </p>
+  </header>
+
+  <section class="panel auth__panel stack">
+    <% if @membership %>
+      <p>You're already at this table.</p>
+      <%= link_to "Open campaign", campaign_path(@campaign), class: "button button--primary button--wide" %>
+    <% elsif authenticated? %>
+      <%= button_to "Join as #{Current.identity.display_name}", join_path(@campaign.join_code), class: "button button--primary button--wide" %>
+    <% else %>
+      <%= link_to "Sign in to join", new_session_path, class: "button button--primary button--wide" %>
+      <p class="field__hint">New to Grimwilder? Signing in with your email creates your account.</p>
+    <% end %>
+  </section>
+</div>
