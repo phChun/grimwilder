@@ -1,0 +1,17 @@
+<% content_for :title, "Choose a talent for #{@character.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to @character.name, character_path(@character, anchor: "talents") %></p>
+  <h1>Choose a talent</h1>
+  <p class="page-header__lede">
+    <%= @character.name %> has <%= pluralize(@character.talent_keys.size, "talent") %> besides <%= @character.core_talent %>.
+    <% if @character.talents_to_choose.positive? %>
+      At level <%= @character.level %>, choose <%= @character.talents_to_choose %> more.
+    <% else %>
+      That's the full set for level <%= @character.level %>; you gain another each level.
+    <% end %>
+    <%= @character.path %> talents come first, but any path's are open.
+  </p>
+</header>
+
+<%= render "talents/catalog", groups: @groups, character: @character %>

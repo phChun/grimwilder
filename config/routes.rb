@@ -4,6 +4,16 @@ Rails.application.routes.draw do
   # Play toolkit (public)
   resource :roll, only: :show
   resources :crucibles, only: %i[ index show ]
+  resources :talents, only: :index
+
+  resources :characters do
+    scope module: :characters do
+      resources :rolls, only: :create
+      resource :experience, only: :create
+      resources :conditions, only: %i[ create destroy ]
+      resources :talents, only: %i[ new create destroy ]
+    end
+  end
 
   # Passwordless sign-in: emailed code or passkey
   resource :session, only: %i[ new create destroy ] do

@@ -1,0 +1,24 @@
+<% content_for :title, "Characters" %>
+
+<header class="page-header">
+  <p class="eyebrow">Your adventurers</p>
+  <h1>Characters</h1>
+  <p class="page-header__lede">Keep your sheet here: tap a stat to roll it with the thorns your damage adds, and track spark, harm and XP as you play.</p>
+  <p><%= link_to "New character", new_character_path, class: "button button--primary" %></p>
+</header>
+
+<% if @characters.any? %>
+  <ul class="tool-grid__list">
+    <% @characters.each do |character| %>
+      <li>
+        <%= link_to character_path(character), class: "tool-card tool-card--ready" do %>
+          <span class="tool-card__name"><%= character.name %></span>
+          <span class="tool-card__desc"><%= character.path %> · level <%= character.level %></span>
+          <small><%= character.campaign ? "In #{character.campaign.name}" : "Not in a campaign" %></small>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="empty">No characters yet.</p>
+<% end %>

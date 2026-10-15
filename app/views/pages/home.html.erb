@@ -36,11 +36,11 @@
       <% end %>
     </li>
     <li>
-      <div class="tool-card">
+      <%= link_to characters_path, class: "tool-card tool-card--ready" do %>
         <span class="tool-card__glyph" aria-hidden="true">&#9776;</span>
         <span class="tool-card__name">Characters</span>
         <span class="tool-card__desc">Stats, damage, spark, bonds and talents on a sheet that rolls for you.</span>
-      </div>
+      <% end %>
     </li>
   </ul>
 </section>

@@ -1,0 +1,13 @@
+<% content_for :title, "Edit #{@character.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to @character.name, character_path(@character) %></p>
+  <h1>Edit sheet</h1>
+</header>
+
+<%= render "form", character: @character %>
+
+<section class="panel stack character-danger" aria-labelledby="delete-character">
+  <h2 id="delete-character" class="panel__title">Delete</h2>
+  <%= button_to "Delete #{@character.name}", character_path(@character), method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete #{@character.name} for good?" } } %>
+</section>

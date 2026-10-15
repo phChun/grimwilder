@@ -1,0 +1,195 @@
+<% content_for :title, @character.name %>
+<% content_for :head do %>
+  <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+<% end %>
+<% editable = @character.owned_by?(Current.identity) %>
+
+<header class="page-header sheet-header">
+  <p class="eyebrow">
+    <% if @character.campaign %><%= link_to @character.campaign.name, campaign_path(@character.campaign) %><% else %><%= link_to "Characters", characters_path %><% end %>
+  </p>
+  <h1><%= @character.name %></h1>
+  <p class="page-header__lede">
+    <%= @character.path %> · level <%= @character.level %> · core talent: <strong><%= @character.core_talent %></strong>
+    <% unless editable %> · played by <%= @character.identity.display_name %><% end %>
+  </p>
+  <% if editable %><p><%= link_to "Edit sheet", edit_character_path(@character), class: "button" %></p><% end %>
+</header>
+
+<% if @character.errors.any? %>
+  <p class="flash flash--alert"><%= @character.errors.full_messages.to_sentence %></p>
+<% end %>
+
+<div class="sheet">
+  <div class="sheet__play">
+    <section class="panel stack" aria-labelledby="sheet-stats">
+      <h2 id="sheet-stats" class="panel__title">Stats</h2>
+      <div class="stat-grid">
+        <% Grimwild.stats.each do |stat, description| %>
+          <% thorns = @character.damage_thorns(stat) %>
+          <div class="<%= class_names("stat-card", "stat-card--marked": @character.marked?(stat)) %>">
+            <div class="stat-card__top">
+              <span class="stat-card__name"><%= stat.capitalize %></span>
+              <span class="stat-card__value"><%= @character.stat(stat) %></span>
+            </div>
+            <p class="stat-card__desc"><%= description %></p>
+            <% if editable %>
+              <%= button_to (@character.marked?(stat) ? "Marked" : "Mark"), character_path(@character), method: :patch, params: { quick: 1, character: { "marked_#{stat}" => !@character.marked?(stat) } }, class: "toggle", "aria-pressed": @character.marked?(stat).to_s, title: "A mark adds +1t to the next roll with this stat, then clears" %>
+              <%= button_to "Roll #{@character.stat(stat)}d#{" +#{thorns}t" if thorns.positive?}", character_rolls_path(@character), params: { stat: stat }, class: "button button--primary button--small stat-card__roll" %>
+            <% elsif @character.marked?(stat) %>
+              <span class="tag">Marked</span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section id="damage" class="panel stack" aria-labelledby="sheet-damage">
+      <h2 id="sheet-damage" class="panel__title">Harm and conditions</h2>
+      <div class="toggle-row">
+        <% { "bloodied" => "+1t to Brawn and Agility", "rattled" => "+1t to Wits and Presence", "desperate" => "+1t to every roll; more harm drops you" }.each do |harm, effect| %>
+          <% on = @character.public_send(:"#{harm}?") %>
+          <% if editable %>
+            <%= button_to harm.capitalize, character_path(@character), method: :patch, params: { quick: 1, character: { harm => !on } }, class: "toggle toggle--harm", "aria-pressed": on.to_s, title: effect %>
+          <% elsif on %>
+            <span class="tag"><%= harm.capitalize %></span>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @character.conditions.any? %>
+        <ul class="list">
+          <% @character.conditions.each_with_index do |condition, index| %>
+            <li class="list__item">
+              <span><%= condition %></span>
+              <% if editable %>
+                <%= button_to "Clear", character_condition_path(@character, index), method: :delete, class: "button button--quiet button--small" %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if editable %>
+        <%= form_with url: character_conditions_path(@character), class: "inline-form" do |form| %>
+          <%= form.text_field :condition, placeholder: "4d poisoned, broken arm…", autocomplete: "off", class: "field__input", "aria-label": "New condition" %>
+          <%= form.submit "Add condition", class: "button button--small" %>
+        <% end %>
+      <% end %>
+    </section>
+
+    <section class="panel stack" aria-labelledby="sheet-currency">
+      <h2 id="sheet-currency" class="panel__title">Spark, thread and XP</h2>
+
+      <% { "spark" => "Spend before a roll for +1d each. Hold up to 2.", "thread" => "Spend to add a story detail. Resets to 2 each session." }.each do |currency, hint| %>
+        <div class="tracker">
+          <span class="tracker__name"><%= currency.capitalize %></span>
+          <span class="tracker__pips" aria-label="<%= @character.public_send(currency) %> of 2"><% 2.times do |i| %><span class="<%= class_names("pip", "pip--gone": i >= @character.public_send(currency)) %>"></span><% end %></span>
+          <% if editable %>
+            <%= button_to "−", character_path(@character), method: :patch, params: { quick: 1, character: { currency => @character.public_send(currency) - 1 } }, class: "counter__step counter__step--small", disabled: @character.public_send(currency).zero?, "aria-label": "Spend #{currency}" %>
+            <%= button_to "+", character_path(@character), method: :patch, params: { quick: 1, character: { currency => @character.public_send(currency) + 1 } }, class: "counter__step counter__step--small", disabled: @character.public_send(currency) >= 2, "aria-label": "Take #{currency}" %>
+          <% end %>
+          <p class="field__hint tracker__hint"><%= hint %></p>
+        </div>
+      <% end %>
+
+      <div class="tracker">
+        <span class="tracker__name">XP</span>
+        <% if @character.max_level? %>
+          <span class="field__hint">Level <%= Grimwild::MAX_LEVEL %>: the top. Consider swapping talents at story milestones.</span>
+        <% else %>
+          <span class="tracker__pips" aria-label="<%= @character.xp %> of <%= @character.xp_to_next_level %> XP to level <%= @character.level + 1 %>"><% @character.xp_to_next_level.times do |i| %><span class="<%= class_names("pip", "pip--xp", "pip--gone": i >= @character.xp) %>"></span><% end %></span>
+          <% if editable %>
+            <%= button_to "+1 XP", character_experience_path(@character), class: "button button--small" %>
+          <% end %>
+          <p class="field__hint tracker__hint">Take 1 XP after each session. <%= @character.xp_to_next_level %> fills level <%= @character.level + 1 %>.</p>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <div class="sheet__story">
+    <section class="panel stack" aria-labelledby="sheet-backgrounds">
+      <h2 id="sheet-backgrounds" class="panel__title">Backgrounds</h2>
+      <% if @character.backgrounds.any? %>
+        <% @character.backgrounds.each do |background| %>
+          <div class="sheet-block">
+            <h3 class="sheet-block__title"><%= background["name"] %></h3>
+            <p class="sheet-block__body"><%= background["wises"].join(", ") %></p>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="empty">None yet.</p>
+      <% end %>
+    </section>
+
+    <section class="panel stack" aria-labelledby="sheet-self">
+      <h2 id="sheet-self" class="panel__title">Traits, desires, features</h2>
+      <dl class="sheet-list">
+        <dt>Traits</dt>
+        <dd><%= @character.traits.join(" and ").presence || "—" %><% if @character.not_trait.present? %>, but not <%= @character.not_trait %><% end %></dd>
+        <dt>Desires</dt>
+        <dd><%= @character.desires.join(" and ").presence || "—" %><% if @character.not_desire.present? %>, but not <%= @character.not_desire %><% end %></dd>
+        <dt>Features</dt>
+        <dd><%= @character.features.join(", ").presence || "—" %></dd>
+        <dt>Weapons</dt>
+        <dd><%= @character.weapons.presence || "—" %><% if @character.weapon_styles.any? %> (<%= @character.weapon_styles.join(", ") %>)<% end %></dd>
+      </dl>
+    </section>
+
+    <section class="panel stack" aria-labelledby="sheet-story">
+      <h2 id="sheet-story" class="panel__title">Arcs and bonds</h2>
+      <dl class="sheet-list">
+        <dt>Arcs</dt>
+        <dd><%= @character.arcs.join("; ").presence || "—" %></dd>
+        <% @character.bonds.each do |bond| %>
+          <dt><%= bond["to"] %></dt>
+          <dd><%= bond["bond"] %></dd>
+        <% end %>
+      </dl>
+    </section>
+
+    <section id="talents" class="panel stack" aria-labelledby="sheet-talents">
+      <h2 id="sheet-talents" class="panel__title">Talents</h2>
+      <% if (core = @character.core_talent_entry) %>
+        <details class="talent-entry">
+          <summary><span class="talent-entry__name"><%= core.name %></span> <span class="tag">Core</span></summary>
+          <% core.paragraphs.each do |paragraph| %><p><%= paragraph %></p><% end %>
+        </details>
+      <% end %>
+      <% @character.chosen_talents.each do |talent| %>
+        <details class="talent-entry">
+          <summary><span class="talent-entry__name"><%= talent.name %></span> <small><%= talent.group.path? ? talent.group.name : "Background" %> · pg. <%= talent.page %></small></summary>
+          <% talent.paragraphs.each do |paragraph| %><p><%= paragraph %></p><% end %>
+          <% if talent.note.present? %><p class="talent__note"><%= talent.note %></p><% end %>
+          <% if editable %>
+            <%= button_to "Remove #{talent.name}", character_talent_path(@character, talent.key), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Remove #{talent.name}?" } } %>
+          <% end %>
+        </details>
+      <% end %>
+      <% if editable %>
+        <p class="field__hint">
+          <% if @character.talents_to_choose.positive? %>
+            Level <%= @character.level %>: choose <%= pluralize(@character.talents_to_choose, "more talent") %>.
+          <% else %>
+            One new talent each level.
+          <% end %>
+        </p>
+        <p><%= link_to "Choose a talent", new_character_talent_path(@character), class: "button button--small" %></p>
+      <% end %>
+      <% if @character.talents.present? %>
+        <div class="sheet-block">
+          <h3 class="sheet-block__title">Talent notes</h3>
+          <div class="sheet-prose"><%= simple_format(@character.talents) %></div>
+        </div>
+      <% end %>
+    </section>
+
+    <% if @character.notes.present? %>
+      <section class="panel stack" aria-labelledby="sheet-notes">
+        <h2 id="sheet-notes" class="panel__title">Notes</h2>
+        <div class="sheet-prose"><%= simple_format(@character.notes) %></div>
+      </section>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,147 @@
+<%# locals: (character:) %>
+<%= form_with model: character, class: "character-form" do |form| %>
+  <% if character.errors.any? %>
+    <p class="flash flash--alert"><%= character.errors.full_messages.to_sentence %></p>
+  <% end %>
+
+  <datalist id="traits-list"><% Grimwild.traits.each do |trait| %><option value="<%= trait %>"></option><% end %></datalist>
+  <datalist id="desires-list"><% Grimwild.desires.each do |desire| %><option value="<%= desire %>"></option><% end %></datalist>
+  <datalist id="styles-list"><% Grimwild.weapon_styles.each do |style| %><option value="<%= style %>"></option><% end %></datalist>
+  <datalist id="backgrounds-list"><% Grimwild.backgrounds.each_key do |background| %><option value="<%= background %>"></option><% end %></datalist>
+  <datalist id="arcs-list"><% Grimwild.arcs.values.flatten.each do |arc| %><option value="<%= arc %>"></option><% end %></datalist>
+
+  <section class="panel stack" aria-labelledby="form-basics">
+    <h2 id="form-basics" class="panel__title">Who they are</h2>
+    <div class="field">
+      <%= form.label :name, class: "field__label" %>
+      <%= form.text_field :name, required: true, maxlength: 80, autocomplete: "off", placeholder: "Gibbletibble \"Tibbs\"", class: "field__input" %>
+    </div>
+    <div class="field">
+      <%= form.label :path, "Path", class: "field__label" %>
+      <%= form.select :path, Grimwild.paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
+      <p class="field__hint">Your path gives its core talent. Add another talent from any path below.</p>
+    </div>
+    <div class="field">
+      <%= form.label :campaign_id, "Campaign", class: "field__label" %>
+      <%= form.select :campaign_id, Current.identity.campaigns.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
+    </div>
+    <% if character.persisted? %>
+      <div class="field field--inline">
+        <%= form.label :level, class: "field__label" %>
+        <%= form.number_field :level, min: 1, max: Grimwild::MAX_LEVEL, class: "field__input field__input--short" %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="panel stack" aria-labelledby="form-stats">
+    <h2 id="form-stats" class="panel__title">Stats</h2>
+    <p class="field__hint">Start with 1 in each, then add 4 points, up to 3 in any one stat.</p>
+    <div class="stat-inputs">
+      <% Grimwild.stats.each do |stat, description| %>
+        <div class="field">
+          <%= form.label stat, class: "field__label" %>
+          <%= form.select stat, (1..3).to_a, {}, class: "field__input" %>
+          <p class="field__hint"><%= description %></p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="panel stack" aria-labelledby="form-backgrounds" data-controller="background" data-background-wises-value="<%= Grimwild.backgrounds.to_json %>">
+    <h2 id="form-backgrounds" class="panel__title">Backgrounds</h2>
+    <p class="field__hint">Two backgrounds, each with three wises. Pick a common one to fill in its wises, then make them your own.</p>
+    <div class="two-up">
+      <% 2.times do |i| %>
+        <% background = character.backgrounds[i] || {} %>
+        <fieldset class="fieldset">
+          <legend class="field__label">Background <%= i + 1 %></legend>
+          <input type="text" name="character[backgrounds][<%= i %>][name]" value="<%= background["name"] %>" list="backgrounds-list" placeholder="Charlatan" autocomplete="off" class="field__input" aria-label="Background <%= i + 1 %> name" data-action="change->background#fill" data-index="<%= i %>">
+          <% 3.times do |w| %>
+            <input type="text" name="character[backgrounds][<%= i %>][wises][]" value="<%= background.fetch("wises", [])[w] %>" placeholder="wise" autocomplete="off" class="field__input field__input--small" aria-label="Background <%= i + 1 %> wise <%= w + 1 %>" data-background-target="wise" data-index="<%= i %>">
+          <% end %>
+        </fieldset>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="panel stack" aria-labelledby="form-heart">
+    <h2 id="form-heart" class="panel__title">Traits and desires</h2>
+    <div class="two-up">
+      <fieldset class="fieldset">
+        <legend class="field__label">Traits: 2 you are, 1 you aren't</legend>
+        <% 2.times do |i| %>
+          <input type="text" name="character[traits][]" value="<%= character.traits[i] %>" list="traits-list" autocomplete="off" class="field__input" aria-label="Trait <%= i + 1 %>">
+        <% end %>
+        <%= form.text_field :not_trait, list: "traits-list", autocomplete: "off", placeholder: "but not…", class: "field__input", "aria-label": "Trait you aren't" %>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="field__label">Desires: 2 you want, 1 you don't</legend>
+        <% 2.times do |i| %>
+          <input type="text" name="character[desires][]" value="<%= character.desires[i] %>" list="desires-list" autocomplete="off" class="field__input" aria-label="Desire <%= i + 1 %>">
+        <% end %>
+        <%= form.text_field :not_desire, list: "desires-list", autocomplete: "off", placeholder: "but not…", class: "field__input", "aria-label": "Desire you don't want" %>
+      </fieldset>
+    </div>
+  </section>
+
+  <section class="panel stack" aria-labelledby="form-look">
+    <h2 id="form-look" class="panel__title">Features and weapons</h2>
+    <fieldset class="fieldset">
+      <legend class="field__label">Three distinctive features</legend>
+      <% 3.times do |i| %>
+        <input type="text" name="character[features][]" value="<%= character.features[i] %>" autocomplete="off" placeholder="<%= [ "shock of brown hair", "cane", "kind eyes" ][i] %>" class="field__input" aria-label="Feature <%= i + 1 %>">
+      <% end %>
+      <p class="field__hint"><%= link_to "Roll on the features crucible", crucible_path("features"), target: "_blank" %> for ideas.</p>
+    </fieldset>
+    <div class="field">
+      <%= form.label :weapons, "Weapons", class: "field__label" %>
+      <%= form.text_field :weapons, autocomplete: "off", placeholder: "short sword and buckler", class: "field__input" %>
+    </div>
+    <fieldset class="fieldset">
+      <legend class="field__label">Two weapon styles</legend>
+      <div class="two-up">
+        <% 2.times do |i| %>
+          <input type="text" name="character[weapon_styles][]" value="<%= character.weapon_styles[i] %>" list="styles-list" autocomplete="off" class="field__input" aria-label="Weapon style <%= i + 1 %>">
+        <% end %>
+      </div>
+    </fieldset>
+  </section>
+
+  <section class="panel stack" aria-labelledby="form-story">
+    <h2 id="form-story" class="panel__title">Story</h2>
+    <fieldset class="fieldset">
+      <legend class="field__label">Character arcs (one or two)</legend>
+      <% 2.times do |i| %>
+        <input type="text" name="character[arcs][]" value="<%= character.arcs[i] %>" list="arcs-list" autocomplete="off" class="field__input" aria-label="Arc <%= i + 1 %>">
+      <% end %>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="field__label">Bonds: how you see each other PC</legend>
+      <% (character.bonds + [ {}, {} ]).each_with_index do |bond, i| %>
+        <div class="two-up">
+          <input type="text" name="character[bonds][<%= i %>][to]" value="<%= bond["to"] %>" placeholder="Lillylux" autocomplete="off" class="field__input" aria-label="Bond <%= i + 1 %>: character">
+          <input type="text" name="character[bonds][<%= i %>][bond]" value="<%= bond["bond"] %>" placeholder="lowkey affection" autocomplete="off" class="field__input" aria-label="Bond <%= i + 1 %>: intensity and nature">
+        </div>
+      <% end %>
+      <p class="field__hint">Match an intensity (<%= Grimwild.bond_intensities.to_sentence(last_word_connector: " or ") %>) with a nature like <%= Grimwild.bond_natures.first(6).join(", ") %>.</p>
+    </fieldset>
+  </section>
+
+  <section class="panel stack" aria-labelledby="form-talents">
+    <h2 id="form-talents" class="panel__title">Talents and notes</h2>
+    <div class="field">
+      <%= form.label :talents, "Talent notes", class: "field__label" %>
+      <%= form.text_area :talents, rows: 4, class: "field__input", placeholder: "Choices your talents ask for (skills, spells, tricks), or homebrew talents." %>
+      <p class="field__hint">Pick talents from the catalog on the character sheet; your path's core talent is included.</p>
+    </div>
+    <div class="field">
+      <%= form.label :notes, class: "field__label" %>
+      <%= form.text_area :notes, rows: 4, class: "field__input", placeholder: "Gear, contacts, secrets…" %>
+    </div>
+  </section>
+
+  <div class="character-form__actions">
+    <%= form.submit (character.persisted? ? "Save sheet" : "Create character"), class: "button button--primary" %>
+    <%= link_to "Cancel", (character.persisted? ? character_path(character) : characters_path), class: "button button--quiet" %>
+  </div>
+<% end %>

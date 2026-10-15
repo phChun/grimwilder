@@ -1,0 +1,25 @@
+tibbs:
+  identity: pip
+  campaign: bramblewood
+  name: Gibbletibble "Tibbs"
+  path: Rogue
+  brawn: 1
+  agility: 3
+  wits: 2
+  presence: 2
+  spark: 1
+  thread: 2
+  backgrounds: [{ "name": "Charlatan", "wises": ["social graces", "spotting marks", "timely misdirects"] }]
+  traits: [curious, rash]
+  not_trait: quiet
+  features: [shock of brown hair, cane]
+  talent_keys: [according-to-plan]
+
+loner:
+  identity: stranger
+  name: Wren
+  path: Ranger
+  brawn: 2
+  agility: 3
+  wits: 2
+  presence: 1

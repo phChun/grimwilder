@@ -1,0 +1,30 @@
+<%# locals: (talent:, character: nil) %>
+<article id="talent-<%= talent.key %>" class="<%= class_names("talent", "talent--core": talent.core?) %>" data-talent-filter-target="item" data-search="<%= [ talent.name, talent.group.name, talent.text ].join(" ").downcase %>">
+  <header class="talent__header">
+    <h3 class="talent__name"><%= talent.name %></h3>
+    <span class="talent__meta">
+      <% if talent.core? %><span class="tag">Core</span> <% end %>
+      <% talent.prohibited_paths.each do |path| %><span class="tag" title="Not available to the <%= path %> path">Not for <%= path %></span> <% end %>
+      pg. <%= talent.page %>
+    </span>
+  </header>
+  <div class="talent__text">
+    <% talent.paragraphs.each do |paragraph| %>
+      <p><%= paragraph %></p>
+    <% end %>
+  </div>
+  <% if talent.note.present? %>
+    <p class="talent__note"><%= talent.note %></p>
+  <% end %>
+  <% if character && !talent.core? %>
+    <div class="talent__take">
+      <% if character.has_talent?(talent) %>
+        <span class="tag">Taken</span>
+      <% elsif talent.prohibited_for?(character.path) %>
+        <span class="field__hint">Not available to a <%= character.path %>.</span>
+      <% else %>
+        <%= button_to "Take #{talent.name}", character_talents_path(character), params: { talent: talent.key }, class: "button button--small button--primary" %>
+      <% end %>
+    </div>
+  <% end %>
+</article>

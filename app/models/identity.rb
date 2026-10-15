@@ -5,6 +5,7 @@ class Identity < ApplicationRecord
   has_many :passkeys, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :campaigns, through: :memberships
+  has_many :characters, dependent: :destroy
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
   normalizes :name, with: ->(value) { value.squish.presence }

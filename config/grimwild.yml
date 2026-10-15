@@ -1,0 +1,67 @@
+# Reference lists from Grimwild: Community Edition Preview 5.2 used by the
+# character sheet (text CC0; based on Grimwild by J. D. Maxwell, Oddity Press,
+# CC BY 4.0). Page numbers refer to the book.
+
+stats:
+  brawn: Power, menace and toughness.
+  agility: Precision, athleticism and reflexes.
+  wits: Smarts, trickery and reading situations.
+  presence: Influence, willpower and reading people.
+
+# Path name => core talent (pg. 54–87)
+paths:
+  Artificer: Infusion
+  Bard: Inspiration
+  Berserker: Frenzy
+  Cleric: Channel Divinity
+  Druid: Wild Shape
+  Fighter: Weapon Mastery
+  Monk: Discipline
+  Paladin: Oathsworn
+  Psion: Awakened Mind
+  Ranger: Quarry
+  Rogue: Expertise
+  Sorcerer: Sorcery
+  Summoner: Vassal
+  Swashbuckler: Panache
+  Warlock: Pact
+  Witch: Hidden Magic
+  Wizard: Spellcraft
+
+# Common backgrounds and their wises (pg. 48)
+backgrounds:
+  Charlatan: [social graces, spotting marks, timely misdirects]
+  Clergy: [allegories, signs of sin, faiths of the world]
+  Commoner: [local customs, practical wisdom, superstitions]
+  Crafter: [crafting quality, trade contracts, wear and tear]
+  Drifter: [chance meetings, faraway tales, lay of the land]
+  Eccentric: [hard truths, random facts, strange snacks]
+  Entertainer: [legends & tales, crowd behaviors, stage presence]
+  Healer: [comfort foods, signs of ailment, herbal properties]
+  Hunter: [survival, tracks, wildlife behavior]
+  Investigator: [seedy areas, connecting the dots, body language]
+  Mariner: [nautical lore, seafaring, weather patterns]
+  Mystic: [ancient prophecies, leylines, symbology]
+  Noble: [diplomacy, influential contacts, luxuries]
+  Ragamuffin: [hidden paths, rumors, street smarts]
+  Sage: [ancient histories, peoples of the world, philosophy]
+  Scoundrel: [escape routes, signs of weakness, shady connections]
+  Trader: [cultural tastes, people's desires, rare goods]
+  Warrior: [battle plans, improvised weapons, war stories]
+
+# Choose 2 you are and 1 you aren't (pg. 46)
+traits: [brave, caring, confident, curious, gentle, honest, honorable, persistent, protective, quiet, rash, stubborn]
+desires: [belonging, glory, harmony, honor, justice, knowledge, love, power, renown, thrills, wealth, wisdom]
+
+# Example weapon styles (pg. 20)
+weapon_styles: [precise, quick, bashing, quiet, sweeping, piercing, vicious, entangling, sapping, disarming, heavy, balanced, dazing, nimble, concealable, ornate, brutal, long]
+
+# Bonds: an intensity + a nature (pg. 22)
+bond_intensities: [deep, complex, growing, lowkey, playful, tense]
+bond_natures: [affection, camaraderie, curiosity, doubts, respect, rivalry, ambivalence, annoyance, apprehension, awe, cynicism, devotion, envy, fascination, fear, indifference, kinship, loyalty, obligation, obsession, pity, resentment, reverence, scorn, solidarity, spite, trust]
+
+# Story arcs (pg. 26)
+arcs:
+  ambitions: [build a reputation, explore the world, finish the mission, make things right, satisfy desires, uncover the truth, spread the word, expand power]
+  struggles: [come unraveled, doubt convictions, feed my vices, flirt with betrayal, keep a secret, survive the storm, ignore the problem, burn at both ends]
+  growth: [embrace change, escape my past, find belonging, just enjoy life, prove myself, settle debts, make something new, take charge]

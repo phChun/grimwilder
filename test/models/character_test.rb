@@ -1,0 +1,128 @@
+require "test_helper"
+
+class CharacterTest < ActiveSupport::TestCase
+  setup { @tibbs = characters(:tibbs) }
+
+  test "starting stats add up to 8, 1-3 each" do
+    character = identities(:pip).characters.new(name: "Ash", path: "Fighter", brawn: 3, agility: 3, wits: 3, presence: 1)
+    assert_not character.valid?
+    assert_match(/add up to 8/, character.errors.full_messages.to_sentence)
+
+    character.assign_attributes(brawn: 3, agility: 2, wits: 2, presence: 1)
+    assert character.valid?
+
+    character.brawn = 4
+    assert_not character.valid?
+  end
+
+  test "path must be one of the book's paths, and gives its core talent" do
+    assert_equal "Expertise", @tibbs.core_talent
+    @tibbs.path = "Necromancer"
+    assert_not @tibbs.valid?
+  end
+
+  test "damage adds thorns to the right stats" do
+    assert_equal 0, @tibbs.damage_thorns(:agility)
+
+    @tibbs.update!(marked_agility: true, bloodied: true)
+    assert_equal 2, @tibbs.damage_thorns(:agility)
+    assert_equal 1, @tibbs.damage_thorns(:brawn)
+    assert_equal 0, @tibbs.damage_thorns(:wits)
+
+    @tibbs.update!(rattled: true, desperate: true)
+    assert_equal 2, @tibbs.damage_thorns(:wits)
+    assert_equal %w[marked bloodied desperate], @tibbs.damage_reasons(:agility)
+  end
+
+  test "rolling a marked stat uses the mark, then clears it" do
+    @tibbs.update!(marked_agility: true)
+
+    roll = @tibbs.roll!("agility")
+    assert_equal({ dice: 3, thorns: 1, reasons: [ "marked" ] }, roll)
+    assert_not @tibbs.reload.marked_agility?
+    assert_raises(ArgumentError) { @tibbs.roll!("luck") }
+  end
+
+  test "XP fills level + 1 boxes, then levels up" do
+    assert_equal 2, @tibbs.xp_to_next_level
+
+    assert_not @tibbs.gain_xp!
+    assert @tibbs.gain_xp!
+    assert_equal [ 2, 0 ], [ @tibbs.level, @tibbs.xp ]
+
+    @tibbs.update!(level: 7)
+    assert_not @tibbs.gain_xp!
+    assert_equal 0, @tibbs.xp
+  end
+
+  test "list fields are cleaned and capped" do
+    @tibbs.update!(
+      traits: [ " brave ", "", "rash", "kind" ],
+      features: [ "a", "b", "c", "d" ],
+      backgrounds: { "0" => { "name" => "Sage", "wises" => [ "philosophy", "", " lore " ] }, "1" => { "name" => "", "wises" => [ "", "", "" ] } },
+      bonds: { "0" => { "to" => "Lillylux", "bond" => "lowkey affection" }, "1" => { "to" => "", "bond" => "" } }
+    )
+
+    assert_equal %w[brave rash], @tibbs.traits
+    assert_equal %w[a b c], @tibbs.features
+    assert_equal [ { "name" => "Sage", "wises" => [ "philosophy", "lore" ] } ], @tibbs.backgrounds
+    assert_equal [ { "to" => "Lillylux", "bond" => "lowkey affection" } ], @tibbs.bonds
+  end
+
+  test "can only sit in your own campaigns" do
+    characters(:loner).campaign = campaigns(:bramblewood)
+    assert_not characters(:loner).valid?
+  end
+
+  test "who can see a character" do
+    assert_includes Character.visible_to(identities(:gwen)), @tibbs, "the GM sees characters at their table"
+    assert_not_includes Character.visible_to(identities(:stranger)), @tibbs
+    assert_includes Character.visible_to(identities(:stranger)), characters(:loner)
+  end
+
+  test "leaving a campaign takes your characters with you" do
+    memberships(:pip_player).destroy
+    assert_nil @tibbs.reload.campaign
+  end
+
+  test "conditions" do
+    @tibbs.add_condition!("4d poisoned")
+    @tibbs.add_condition!("broken arm")
+    @tibbs.remove_condition!(0)
+    assert_equal [ "broken arm" ], @tibbs.reload.conditions
+  end
+end
+
+class CharacterTalentsTest < ActiveSupport::TestCase
+  setup { @tibbs = characters(:tibbs) }
+
+  test "core talent comes from the path, chosen talents from the catalog" do
+    assert_equal "Expertise", @tibbs.core_talent_entry.name
+    assert_equal [ "According to Plan" ], @tibbs.chosen_talents.map(&:name)
+    assert_equal 0, @tibbs.talents_to_choose
+
+    @tibbs.update!(level: 2)
+    assert_equal 1, @tibbs.talents_to_choose
+  end
+
+  test "add and remove talents" do
+    @tibbs.add_talent!("lucky")
+    @tibbs.add_talent!("lucky")
+    assert_equal %w[according-to-plan lucky], @tibbs.reload.talent_keys
+
+    @tibbs.remove_talent!("lucky")
+    assert_equal %w[according-to-plan], @tibbs.reload.talent_keys
+  end
+
+  test "can't take a core talent, an unknown one, or one prohibited for the path" do
+    @tibbs.talent_keys = [ "sorcery" ]
+    assert_not @tibbs.valid?
+
+    @tibbs.talent_keys = [ "not-a-talent" ]
+    assert_not @tibbs.valid?
+
+    @tibbs.path = "Sorcerer"
+    @tibbs.talent_keys = [ "eldritch-affinity" ]
+    assert_not @tibbs.valid?
+  end
+end

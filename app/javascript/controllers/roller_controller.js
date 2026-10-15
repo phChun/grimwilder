@@ -8,9 +8,12 @@ import { actionRoll } from "grimwild/dice"
 // template can show the matching result text.
 export default class extends Controller {
   static targets = ["tray", "summary"]
+  static values = { dice: Number, thorns: Number }
 
   connect() {
     useState(this)
+    // Preset from a character sheet: /roll?dice=2&thorns=1
+    if (this.diceValue > 0) this.state.set({ stat: this.diceValue, thorns: this.thornsValue })
   }
 
   roll() {

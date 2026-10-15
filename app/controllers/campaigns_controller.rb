@@ -20,6 +20,7 @@ class CampaignsController < ApplicationController
 
   def show
     @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
+    @characters = Current.campaign.characters.includes(:identity).ordered
   end
 
   def update
@@ -27,7 +28,8 @@ class CampaignsController < ApplicationController
       redirect_to Current.campaign, notice: "Campaign renamed."
     else
       @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
-        render :show, status: :unprocessable_entity
+      @characters = Current.campaign.characters.includes(:identity).ordered
+      render :show, status: :unprocessable_entity
     end
   end
 

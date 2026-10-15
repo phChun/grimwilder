@@ -26,6 +26,25 @@
     </ul>
   </section>
 
+  <section class="panel stack" aria-labelledby="campaign-characters">
+    <h2 id="campaign-characters" class="panel__title">Characters</h2>
+    <% if @characters.any? %>
+      <ul class="list">
+        <% @characters.each do |character| %>
+          <li class="list__item">
+            <span>
+              <%= link_to character.name, character_path(character) %>
+              <small><%= character.path %> · level <%= character.level %> · <%= character.identity.display_name %></small>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="empty">No characters seated yet.</p>
+    <% end %>
+    <p><%= link_to "Add your character", new_character_path(campaign_id: Current.campaign.id), class: "button button--small" %></p>
+  </section>
+
   <% if gm? %>
     <section class="panel stack" aria-labelledby="campaign-invite">
       <h2 id="campaign-invite" class="panel__title">Invite players</h2>

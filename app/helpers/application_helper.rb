@@ -5,7 +5,8 @@ module ApplicationHelper
     { label: "Roll", path: :roll_path, ready: true },
     { label: "Pools", path: :pools_path, ready: true },
     { label: "Crucibles", path: :crucibles_path, ready: true },
-    { label: "Characters", path: :characters_path, ready: false }
+    { label: "Characters", path: :characters_path, ready: true },
+    { label: "Talents", path: :talents_path, ready: true }
   ].freeze
 
   def toolkit_nav

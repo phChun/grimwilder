@@ -2,7 +2,7 @@
 <%# herb:state (stat: 2, thorns: 0, mode: "action", outcome: "", critical: false) %>
 <% content_for :title, "Action roll" %>
 
-<div class="roller" data-controller="roller">
+<div class="roller" data-controller="roller" data-roller-dice-value="<%= @preset&.dig(:dice_count) %>" data-roller-thorns-value="<%= @preset&.dig(:damage_thorns) %>">
   <header class="page-header">
     <p class="eyebrow">Dice</p>
     <h1>Action roll</h1>
@@ -11,6 +11,13 @@
       difficulty factor. The highest d6 is your result; every 7 or 8 on a thorn cuts it one step.
     </p>
   </header>
+
+  <% if @preset %>
+    <p class="flash flash--notice roller__preset">
+      <% if @preset[:for] %><strong><%= @preset[:for] %></strong>: <% end %><%= @preset[:dice_count] %>d<% if @preset[:damage_thorns].positive? %> +<%= @preset[:damage_thorns] %>t from damage (<%= @preset[:reasons] %>)<% end %>. Add any spark, assists and situational thorns, then roll.
+      <% if @preset[:character] %><%= link_to "Back to sheet", character_path(@preset[:character]) %><% end %>
+    </p>
+  <% end %>
 
   <div class="roller__grid">
     <section class="panel roller__controls" aria-label="Roll setup">
