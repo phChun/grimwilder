@@ -20,15 +20,6 @@
         "use_new_terminal": true
     },
     {
-        "label": "🧑‍🎨 Tailwind CSS Watch",
-        "command": "bundle",
-        "args": ["exec", "rails", "tailwindcss:watch"],
-        "env": {
-            "RAILS_ENV": "development"
-        },
-        "use_new_terminal": true
-    },
-    {
         "label": "🖥️ Rails Console",
         "command": "bundle",
         "args": ["exec", "rails", "console"],
@@ -36,20 +27,26 @@
     },
     {
         "label": "🧪 Run All Tests",
-        "command": "bundle",
-        "args": ["exec", "rspec"],
+        "command": "bin/rails",
+        "args": ["test"],
         "use_new_terminal": false
     },
     {
         "label": "🧪 Run Current Test File",
-        "command": "bundle",
-        "args": ["exec", "rspec", "${ZED_FILE}"],
+        "command": "bin/rails",
+        "args": ["test", "${ZED_FILE}"],
         "use_new_terminal": false
     },
     {
-        "label": "🧪 Run Fast Tests (no DB)",
-        "command": "bundle",
-        "args": ["exec", "rspec", "--tag", "~db"],
+        "label": "🧪 Run Test at Cursor",
+        "command": "bin/rails",
+        "args": ["test", "${ZED_FILE}:${ZED_ROW}"],
+        "use_new_terminal": false
+    },
+    {
+        "label": "🎲 Run Dice Tests (JS)",
+        "command": "node",
+        "args": ["--test", "test/javascript/dice.test.mjs"],
         "use_new_terminal": false
     },
     {
@@ -77,30 +74,21 @@
         "use_new_terminal": false
     },
     {
-        "label": "🔧 Standard Fix",
-        "command": "bundle",
-        "args": ["exec", "standardrb", "--fix"],
+        "label": "🔧 RuboCop Fix",
+        "command": "bin/rubocop",
+        "args": ["-a"],
         "use_new_terminal": false
     },
     {
-        "label": "🔍 Standard Check",
-        "command": "bundle",
-        "args": ["exec", "standardrb"],
+        "label": "🔍 RuboCop Check",
+        "command": "bin/rubocop",
+        "args": [],
         "use_new_terminal": false
     },
     {
         "label": "💎 Bundle Install",
         "command": "bundle",
         "args": ["install"],
-        "use_new_terminal": false
-    },
-    {
-        "label": "📊 Coverage Report",
-        "command": "bundle",
-        "args": ["exec", "rspec"],
-        "env": {
-            "COVERAGE": "true"
-        },
         "use_new_terminal": false
     },
     {

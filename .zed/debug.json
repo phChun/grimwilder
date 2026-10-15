@@ -11,11 +11,11 @@
         }
     },
     {
-        "label": "🧪 RSpec Test Debug",
+        "label": "🧪 Minitest Debug",
         "adapter": "rdbg",
         "request": "launch",
-        "program": "$ZED_WORKTREE_ROOT/bin/rspec",
-        "args": ["$ZED_FILE"],
+        "program": "$ZED_WORKTREE_ROOT/bin/rails",
+        "args": ["test", "$ZED_FILE"],
         "cwd": "$ZED_WORKTREE_ROOT",
         "env": {
             "RAILS_ENV": "test"
