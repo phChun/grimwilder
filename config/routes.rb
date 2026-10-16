@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       resource :experience, only: :create
       resources :conditions, only: %i[ create destroy ]
       resources :talents, only: %i[ new create destroy ]
+      resource :talent_uses, only: :update
     end
   end
 

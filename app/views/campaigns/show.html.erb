@@ -59,6 +59,21 @@
                 </div>
                 <% chips = character_chips(character) %>
                 <% if chips.present? %><div class="seat__chips"><%= chips %></div><% end %>
+                <% uses = talent_use_summary(character) %>
+                <% if uses.present? %><p class="seat__uses"><%= uses %></p><% end %>
+                <% if (pools = @talent_pools[character.id]) %>
+                  <ul class="seat__pools">
+                    <% pools.each do |pool| %>
+                      <li class="<%= class_names("seat-pool", "pool--#{pool.kind}") %>">
+                        <span class="seat-pool__name"><%= pool.name.delete_prefix("#{character.name}: ") %></span>
+                        <span class="seat-pool__size"><%= pool.size %>d</span>
+                        <% if pool.rollable? %>
+                          <%= button_to "Roll", campaign_pool_roll_path(Current.campaign, pool), class: "button button--small", "aria-label": "Roll #{pool.name}" %>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
               </li>
             <% end %>
           <% end %>

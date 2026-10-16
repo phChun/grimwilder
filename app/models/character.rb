@@ -1,7 +1,7 @@
 # A player character. Owned by an identity; optionally seated in one of that
 # identity's campaigns, where the table can see it.
 class Character < ApplicationRecord
-  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::Sessions
+  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentUses, Character::Sessions
 
   STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 46)
 
@@ -14,7 +14,7 @@ class Character < ApplicationRecord
   validates :path, inclusion: { in: ->(_) { Grimwild.paths.keys } }
   validates(*Grimwild::STATS, numericality: { only_integer: true, in: 1..3 })
   validates :spark, numericality: { only_integer: true, in: 0..Grimwild::MAX_SPARK }
-  validates :thread, numericality: { only_integer: true, in: 0..2 }
+  validates :thread, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: :session_thread }
   validate :starting_stats_add_up, on: :create
   validate :seated_in_own_campaign
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_200000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_210000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -56,6 +56,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_200000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "talent_keys", default: [], null: false
+    t.json "talent_uses", default: {}, null: false
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"
   end
@@ -142,7 +143,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_200000) do
     t.datetime "updated_at", null: false
     t.json "phases", default: [], null: false
     t.integer "phase", default: 0, null: false
+    t.integer "character_id"
+    t.string "refresh"
+    t.string "use_key"
     t.index ["campaign_id"], name: "index_pools_on_campaign_id"
+    t.index ["character_id", "use_key"], name: "index_pools_on_character_id_and_use_key", unique: true
+    t.index ["character_id"], name: "index_pools_on_character_id"
     t.index ["last_rolled_by_id"], name: "index_pools_on_last_rolled_by_id"
   end
 
@@ -224,6 +230,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_200000) do
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
   add_foreign_key "pools", "campaigns"
+  add_foreign_key "pools", "characters", on_delete: :cascade
   add_foreign_key "pools", "identities", column: "last_rolled_by_id"
   add_foreign_key "rolls", "campaigns"
   add_foreign_key "rolls", "characters", on_delete: :nullify

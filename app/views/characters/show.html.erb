@@ -85,13 +85,13 @@
     <section class="panel stack" aria-labelledby="sheet-currency">
       <h2 id="sheet-currency" class="panel__title">Spark, thread and XP</h2>
 
-      <% { "spark" => "Spend before a roll for +1d each. Hold up to 2.", "thread" => "Spend to add a story detail. Resets to 2 each session." }.each do |currency, hint| %>
+      <% { "spark" => [ Grimwild::MAX_SPARK, "Spend before a roll for +1d each. Hold up to #{Grimwild::MAX_SPARK}." ], "thread" => [ @character.session_thread, "Spend to add a story detail. Resets to #{@character.session_thread} each session." ] }.each do |currency, (most, hint)| %>
         <div class="tracker">
           <span class="tracker__name"><%= currency.capitalize %></span>
-          <span class="tracker__pips" aria-label="<%= @character.public_send(currency) %> of 2"><% 2.times do |i| %><span class="<%= class_names("pip", "pip--gone": i >= @character.public_send(currency)) %>"></span><% end %></span>
+          <span class="tracker__pips" aria-label="<%= @character.public_send(currency) %> of <%= most %>"><% most.times do |i| %><span class="<%= class_names("pip", "pip--gone": i >= @character.public_send(currency)) %>"></span><% end %></span>
           <% if editable %>
             <%= button_to "−", character_path(@character), method: :patch, params: { quick: 1, character: { currency => @character.public_send(currency) - 1 } }, class: "counter__step counter__step--small", disabled: @character.public_send(currency).zero?, "aria-label": "Spend #{currency}" %>
-            <%= button_to "+", character_path(@character), method: :patch, params: { quick: 1, character: { currency => @character.public_send(currency) + 1 } }, class: "counter__step counter__step--small", disabled: @character.public_send(currency) >= 2, "aria-label": "Take #{currency}" %>
+            <%= button_to "+", character_path(@character), method: :patch, params: { quick: 1, character: { currency => @character.public_send(currency) + 1 } }, class: "counter__step counter__step--small", disabled: @character.public_send(currency) >= most, "aria-label": "Take #{currency}" %>
           <% end %>
           <p class="field__hint tracker__hint"><%= hint %></p>
         </div>
@@ -110,6 +110,10 @@
         <% end %>
       </div>
     </section>
+
+    <% if @character.use_counters.any? || @character.pool_uses.any? %>
+      <%= render "characters/talent_uses", character: @character, can_spend: can_spend_talent_uses?(@character) %>
+    <% end %>
   </div>
 
   <div class="sheet__story">

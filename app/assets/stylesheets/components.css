@@ -1128,3 +1128,28 @@ body:has(.gm-table) .site-footer { max-width: 96rem; }
 .scene-form__opening { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .scene-form__opening[open] > .fold__summary { margin-bottom: var(--space-3); }
 .scene-form__opening .fold__title { font-family: var(--font-body); font-size: 1rem; font-weight: 700; }
+
+/* Talent uses: tick boxes on the sheet, a summary and talent pools on the table */
+.use-boxes { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.use-box__form { display: contents; }
+.use-box {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 4px;
+  background: var(--paper);
+}
+button.use-box { cursor: pointer; }
+button.use-box:hover { border-color: var(--moss); }
+button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.use-box--spent { border-color: var(--moss); background: var(--moss); }
+.use-note { font-size: 0.85rem; }
+.pool-rows--sheet { margin-top: var(--space-2); }
+
+.seat__uses { margin: 0; font-size: 0.8rem; color: var(--ink-faint); }
+.seat__pools { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
+.seat-pool { display: flex; align-items: center; gap: var(--space-2); padding-left: var(--space-2); border-left: 3px solid var(--pool-color, var(--ink-soft)); font-size: 0.85rem; }
+.seat-pool__name { flex: 1; }
+.seat-pool__size { font-family: var(--font-display); font-size: 1.1rem; }
+.seat-pool .button { min-height: 1.9rem; padding: 0 var(--space-2); }

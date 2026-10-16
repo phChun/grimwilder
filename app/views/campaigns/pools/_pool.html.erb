@@ -1,4 +1,5 @@
-<%# locals: (pool:, my_characters:, gm:) %>
+<%# locals: (pool:, my_characters:, gm:, return_to: nil) %>
+<% back = { return_to: return_to }.compact %>
 <div id="<%= dom_id(pool) %>" class="<%= class_names("pool-row", "pool--#{pool.kind}", "pool-row--depleted": pool.depleted?) %>">
   <span class="pool-row__stripe" aria-hidden="true"></span>
 
@@ -39,9 +40,9 @@
 
   <div class="pool-row__primary">
     <% if pool.rollable? %>
-      <%= button_to "Roll", campaign_pool_roll_path(Current.campaign, pool), class: "button button--primary button--small", "aria-label": "Roll #{pool.name}" %>
+      <%= button_to "Roll", campaign_pool_roll_path(pool.campaign, pool), params: back, class: "button button--primary button--small", "aria-label": "Roll #{pool.name}" %>
     <% elsif gm && pool.resettable? %>
-      <%= button_to pool_reset_label(pool), campaign_pool_reset_path(Current.campaign, pool), class: "button button--small" %>
+      <%= button_to pool_reset_label(pool), campaign_pool_reset_path(pool.campaign, pool), class: "button button--small" %>
     <% end %>
   </div>
 
@@ -51,24 +52,25 @@
       <div class="pool-row__panel">
         <div class="pool-row__panel-actions">
           <% if pool.rollable? %>
-            <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(Current.campaign, pool), params: { drop_first: "1" }, class: "button button--small" %>
+            <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(pool.campaign, pool), params: { drop_first: "1", **back }, class: "button button--small" %>
           <% end %>
           <% if pool.pushable? %>
-            <%= button_to "Push (take a mark)", campaign_pool_push_path(Current.campaign, pool), class: "button button--small button--push" %>
+            <%= button_to "Push (take a mark)", campaign_pool_push_path(pool.campaign, pool), params: back, class: "button button--small button--push" %>
           <% end %>
           <% if gm %>
             <span class="pool-row__spacer"></span>
             <% if pool.resettable? %>
-              <%= button_to pool_reset_label(pool), campaign_pool_reset_path(Current.campaign, pool), class: "button button--quiet button--small" %>
+              <%= button_to pool_reset_label(pool), campaign_pool_reset_path(pool.campaign, pool), class: "button button--quiet button--small" %>
             <% end %>
-            <%= button_to (pool.hidden? ? "Show" : "Hide"), campaign_pool_path(Current.campaign, pool), method: :patch, params: { pool: { hidden: !pool.hidden? } }, class: "button button--quiet button--small", "aria-label": "#{pool.hidden? ? "Show" : "Hide"} #{pool.name} #{pool.hidden? ? "to" : "from"} players" %>
-            <%= button_to "Delete", campaign_pool_path(Current.campaign, pool), method: :delete, class: "button button--quiet button--small button--danger-text", form: { data: { turbo_confirm: "Delete #{pool.name}?" } } %>
+            <%= button_to (pool.hidden? ? "Show" : "Hide"), campaign_pool_path(pool.campaign, pool), method: :patch, params: { pool: { hidden: !pool.hidden? } }, class: "button button--quiet button--small", "aria-label": "#{pool.hidden? ? "Show" : "Hide"} #{pool.name} #{pool.hidden? ? "to" : "from"} players" %>
+            <%= button_to "Delete", campaign_pool_path(pool.campaign, pool), method: :delete, class: "button button--quiet button--small button--danger-text", form: { data: { turbo_confirm: "Delete #{pool.name}?" } } %>
           <% end %>
         </div>
 
         <% if pool.power? && pool.rollable? %>
-          <%= form_with url: campaign_pool_roll_path(Current.campaign, pool), class: "pool-row__action-roll" do %>
+          <%= form_with url: campaign_pool_roll_path(pool.campaign, pool), class: "pool-row__action-roll" do %>
             <input type="hidden" name="as_action" value="1">
+            <% if return_to %><input type="hidden" name="return_to" value="<%= return_to %>"><% end %>
             <p class="field__hint">Risky use? Roll it as an action, in place of a stat: its highest die is the result, then 1–3s drop. Not risky? Just Roll: it works, and dice still drop.</p>
             <div class="pool-row__fields">
               <div class="field">

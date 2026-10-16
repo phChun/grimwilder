@@ -9,7 +9,8 @@ module CampaignTable
       @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
       @characters = Current.campaign.characters.includes(:identity).ordered
       @my_characters = @characters.select { _1.owned_by?(Current.identity) }
-      @pools = Current.campaign.pools.visible_to(Current.membership).includes(:last_rolled_by).ordered
+      @pools = Current.campaign.pools.shared.visible_to(Current.membership).includes(:last_rolled_by).ordered
+      @talent_pools = Current.campaign.pools.talent.includes(:last_rolled_by).ordered.group_by(&:character_id)
       @pool ||= Current.campaign.pools.new(starting_size: 4)
       @rolls = Current.campaign.rolls.table_log(Current.membership, limit: LOG_SIZE)
       @crucible_groups = Crucible.grouped

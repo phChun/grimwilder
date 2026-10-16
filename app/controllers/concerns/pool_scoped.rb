@@ -12,7 +12,12 @@ module PoolScoped
       @pool = Current.campaign.pools.visible_to(Current.membership).find(params[:pool_id])
     end
 
+    # Back to the table, or to the sheet when a talent pool was rolled there.
     def back_to_pools(**options)
-      redirect_to campaign_path(Current.campaign, anchor: helpers.dom_id(@pool)), **options
+      if params[:return_to] == "character" && @pool.character
+        redirect_to helpers.character_path(@pool.character, anchor: "talent-uses"), **options
+      else
+        redirect_to campaign_path(Current.campaign, anchor: helpers.dom_id(@pool)), **options
+      end
     end
 end

@@ -37,6 +37,7 @@ class Pool < ApplicationRecord
 
   belongs_to :campaign
   belongs_to :last_rolled_by, class_name: "Identity", optional: true
+  belongs_to :character, optional: true # a talent pool (Character::TalentUses)
   has_many :rolls, dependent: :nullify
 
   enum :kind, KINDS.keys.index_by(&:itself), default: "task", validate: true
@@ -50,6 +51,8 @@ class Pool < ApplicationRecord
   before_validation :start_full, on: :create
 
   scope :ordered, -> { order(:created_at, :id) }
+  scope :shared, -> { where(character_id: nil) }
+  scope :talent, -> { where.not(character_id: nil) }
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(hidden: false) }
 
   # Everyone looking at the campaign's pools refetches the page; each viewer's

@@ -55,6 +55,7 @@ class Scene < ApplicationRecord
 
     transaction do
       cleared = clear_conditions(clear)
+      play_session.characters.each(&:end_scene!)
       update!(ended_at: Time.current, notes: notes.to_s.strip.presence, closing_roll: closing_roll)
       play_session.post_marker!("Scene #{number} ends", by: by, scene: self,
         text: [ notes.to_s.strip.presence, *cleared.map { |name, condition| "#{name}: #{condition} cleared." } ].compact.join("\n"))

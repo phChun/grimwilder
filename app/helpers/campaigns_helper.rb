@@ -18,6 +18,11 @@ module CampaignsHelper
     safe_join(harm + marks + conditions)
   end
 
+  # "Inspiration 2/3 · Mastery 1/2": uses left this session or scene.
+  def talent_use_summary(character)
+    character.use_counters.map { "#{_1.label} #{character.uses_left(_1)}/#{_1.count_at(character.level)}" }.join(" · ")
+  end
+
   def spark_dots(character)
     dots = Array.new(Grimwild::MAX_SPARK) { |index| tag.span(class: [ "spark-dot", ("spark-dot--held" if index < character.spark) ]) }
     tag.span(safe_join(dots), class: "spark-dots", role: "img", "aria-label": "#{character.spark} of #{Grimwild::MAX_SPARK} spark")

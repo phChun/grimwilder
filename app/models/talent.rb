@@ -3,7 +3,7 @@
 # any talent (pg. 52) except those marked "[Prohibited: Path]".
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :text, :note, :page, :group, :core)
+class Talent < Data.define(:key, :name, :text, :note, :page, :group, :core, :uses)
   def self.all
     catalog[:talents]
   end
@@ -43,15 +43,21 @@ class Talent < Data.define(:key, :name, :text, :note, :page, :group, :core)
       groups << group
 
       if core = attributes["core"]
-        talents << new(key: keyify(core["name"]), name: core["name"], text: core["text"], note: nil, page: core["page"], group: group, core: true)
+        talents << build(core, group: group, core: true)
       end
 
       attributes["talents"].each do |talent|
-        talents << new(key: keyify(talent["name"]), name: talent["name"], text: talent["text"], note: talent["note"], page: talent["page"], group: group, core: false)
+        talents << build(talent, group: group, core: false)
       end
     end
 
     { groups: groups, talents: talents }
+  end
+
+  def self.build(attributes, group:, core:)
+    key = keyify(attributes["name"])
+    new(key: key, name: attributes["name"], text: attributes["text"], note: (attributes["note"] unless core), page: attributes["page"],
+      group: group, core: core, uses: Array(attributes["uses"]).map { Talent::Use.from(key, _1) })
   end
 
   def self.keyify(name)
