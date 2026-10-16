@@ -194,7 +194,7 @@ In JavaScript:
 The campaign page is where play runs, for the GM and players alike. Three columns from 1100px wide (side: At the table, Roll log, Invite & settings; main: Pools, Story roll; tools: Crucibles), two from 768px, and one on phones with section tabs.
 - Every section is a native `<details>`. `details_memory_controller.js` remembers open/closed per browser in localStorage (keyed by campaign and section). With nothing saved, phones open only Pools. It also restores what people opened after a Turbo morph, because a pool refresh re-renders the page with the server's defaults.
 - `CampaignTable#load_table` (a controller concern) loads everything. `Campaigns::PoolsController#create` uses it too, to show the table again with the form open when a pool doesn't save.
-- **Pools** are compact rows (`campaigns/pools/_pool`). The ⋯ fold-out holds drop-first, push, the power-pool action roll and the GM controls. `GET /campaigns/:id/pools` and the nav's `/pools` redirect to `#pools`, and pool actions redirect back to the table. The new-pool form (`campaigns/pools/_form`) keeps its own herb:state.
+- **Pools** are compact rows (`campaigns/pools/_pool`). The ⋯ fold-out holds drop-first, push, the power-pool action roll and the GM controls. `GET /campaigns/:id/pools` and `/pools` (the home page's Pools card) redirect to `#pools`, and pool actions redirect back to the table. The new-pool form (`campaigns/pools/_form`) keeps its own herb:state.
 - **Crucibles** load in a `turbo_frame_tag "crucible"` from `crucible_path(key, embed: 1)`, which renders `crucibles/_roller` with the unchanged `crucible_controller.js`. `crucible_picker_controller.js` swaps the frame's `src` and keeps three "Recent" chips. The section is `data-turbo-permanent`, so morphs don't wipe a roll.
 - Turbo drops a redirect's `#fragment` after a form post, so pool actions land at the top of the page rather than on the row.
 
@@ -238,7 +238,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 
 - `Pool` belongs to a campaign: `kind` (task/pressure/timer/resource/power/campaign), `starting_size` 1–20, `size` (0 = it happens), `hidden` (GM only), and the last roll (`last_dice` json, `last_dropped`, `last_action` rolled | rolled_after_drop | pushed, `last_rolled_by`).
 - Rolls happen **on the server** (`Pool#roll!`), so the table shares one truth. `Pool#roll!` mirrors `rollPool` in dice.js; tests pass a fake `random:`.
-- Routes: `/campaigns/:id/pools` plus nested `roll`, `push` and `reset` resources. Nav `/pools` redirects to the latest campaign's pools.
+- Routes: `/campaigns/:id/pools` plus nested `roll`, `push` and `reset` resources. `/pools` redirects to the latest campaign's pools.
 - Permissions: members roll and push the pools they can see; the GM adds, resets, hides and deletes (`require_gm`). Players get a 404 for hidden pools.
 - Live updates: `broadcasts_refreshes_to [campaign, :pools]` + `turbo_stream_from` + morph refreshes. Each viewer refetches with their own permissions, so hidden pools never leak.
 - ReActionView: per-row `herb:state (drop_first: false)` under `herb:key pool.id`, and `new_size` bound to the size presets and the number input.

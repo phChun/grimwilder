@@ -82,7 +82,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the nav's Pools link opens your latest campaign's pools" do
+  test "/pools opens your latest campaign's pools" do
     sign_in_as identities(:gwen)
 
     get pools_path
