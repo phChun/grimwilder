@@ -28,16 +28,6 @@ module Character::Damage
     ].compact
   end
 
-  # A mark clears after the next roll with that stat.
-  def roll!(stat_name)
-    stat_name = stat_name.to_s
-    raise ArgumentError, "Unknown stat #{stat_name.inspect}" unless Grimwild::STATS.include?(stat_name)
-
-    roll = { dice: stat(stat_name), thorns: damage_thorns(stat_name), reasons: damage_reasons(stat_name) }
-    update!("marked_#{stat_name}" => false) if marked?(stat_name)
-    roll
-  end
-
   def add_condition!(name)
     name = name.to_s.squish.first(80)
     update!(conditions: conditions + [ name ]) if name.present?

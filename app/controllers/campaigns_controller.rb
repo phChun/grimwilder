@@ -19,16 +19,14 @@ class CampaignsController < ApplicationController
   end
 
   def show
-    @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
-    @characters = Current.campaign.characters.includes(:identity).ordered
+    load_table
   end
 
   def update
     if Current.campaign.update(params.expect(campaign: [ :name ]))
       redirect_to Current.campaign, notice: "Campaign renamed."
     else
-      @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
-      @characters = Current.campaign.characters.includes(:identity).ordered
+      load_table
       render :show, status: :unprocessable_entity
     end
   end
@@ -41,5 +39,11 @@ class CampaignsController < ApplicationController
   private
     def campaign_id_param
       params[:id]
+    end
+
+    def load_table
+      @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
+      @characters = Current.campaign.characters.includes(:identity).ordered
+      @rolls = Current.campaign.rolls.visible_to(Current.membership).includes(:identity, :pool).recent.limit(50)
     end
 end

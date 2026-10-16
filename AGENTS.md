@@ -8,8 +8,8 @@ Guidance for AI coding agents (and humans) working in this repo. Read this befor
 It is **not** a rules reference/SRD. Each tool should quote only as much rule text as a player needs at the table.
 
 Current state:
-- Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`), passwordless accounts (email code + passkeys), campaigns with join links, campaign pools, crucibles, character sheets and the talent catalog.
-- Next: the shared campaign table (see *Roadmap*).
+- Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`), passwordless accounts (email code + passkeys), campaigns with join links, campaign pools, crucibles, character sheets and the talent catalog, and the table log (server-rolled character rolls that spend and award spark, plus pool rolls, live on the campaign page).
+- Next: see *Roadmap*.
 
 Source rulebook: `GWCE P5.2 Pages.pdf` (in the Claude project "Grimwilder", not in the repo). Page numbers below refer to it.
 
@@ -157,11 +157,24 @@ Pattern used here: **the template owns the inputs and the result text; Stimulus 
 
 ## Dice implementation
 
-`app/javascript/grimwild/dice.js` is the single source of truth for dice rules. Keep it **pure**: no DOM or Stimulus, and pass a `random` function in so tests are deterministic.
+The rules live in two places, and both are kept **pure** (no DOM, no database) with the randomness passed in so tests are deterministic:
+- `app/javascript/grimwild/dice.js` for the anonymous `/roll` page, which never touches the server.
+- `app/models/grimwild/dice.rb` (`Grimwild::Dice.roll` / `.interpret`) for rolls the server makes. Character rolls are server-rolled so the shared log can be trusted; `Pool#roll!` rolls its own d6s.
+- Both are tested against the same cases in `test/dice_examples.json`. **Change a rule in both files and add the case to the JSON.**
+
+In JavaScript:
 - `interpretRoll(dice, thorns)` returns `{ result, critical, highest, cuts, appliedCuts, base }`.
 - Extra cuts past disaster have no effect (`appliedCuts` ≤ `cuts`). A critical ignores every cut.
 - `rollPool(size)` returns `{ dice, dropped, remaining }`.
-- New rules go here first, with a test in `test/javascript/dice.test.mjs`. Where you can, use the worked examples in the book as test cases (e.g. pg. 122: `[2,6]` vs a 7 thorn gives messy; `[3,4,2]` vs thorns `7,8` gives disaster).
+- Where you can, use the worked examples in the book as test cases (e.g. pg. 122: `[2,6]` vs a 7 thorn gives messy; `[3,4,2]` vs thorns `7,8` gives disaster).
+
+## Table rolls & the log
+
+- **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, or a `pool` roll, drop-first or push. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
+- `Character#roll!(stat, by:, mode:, spend_spark:, help:, thorns:)` (in `Character::Rolling`) does everything in one transaction: it spends spark (+1d each), adds damage thorns, clears the stat's mark, gives spark on a disaster (capped at `Grimwild::MAX_SPARK`), and records the Roll. Unseated characters' rolls are kept but have no campaign, so they aren't logged.
+- The sheet links to `characters/:id/rolls/new?stat=…` (setup), which posts to `create` and lands on the result (`show`).
+- Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. Pages subscribe with `Roll.streams_for(campaign, membership)`. The partial renders in a job, so it must not use `Current`.
+- In tests, `assert_no_turbo_stream_broadcasts` counts every broadcast so far in the test, not just the ones inside its block. `FixedDice` (test/test_helpers) stands in for `Random`.
 
 ## Accounts & campaigns (passwordless)
 
@@ -228,8 +241,8 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 
 1. **Pools**: built (see above). Next for pools: linked phases.
 2. **Crucibles**: built (see above). Next: path-specific crucibles.
-3. **Characters**: built, with the talent catalog (see above). Next: spark into rolls.
-4. **Campaign play**: accounts and campaigns are built (see above). Next: a shared table with a live roll log (Turbo Streams + Solid Cable), and campaign pools.
+3. **Characters**: built, with the talent catalog and spark spent into rolls (see above).
+4. **Campaign play**: the table log is built (see above). Next ideas: taking spark from a critical when nothing fits, story and quarrel rolls, and showing the log on the pools page.
 
 Open questions: deploy host and domain; whether rolls can be shared without an account.
 

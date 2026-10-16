@@ -6,7 +6,17 @@
   <p><%= link_to "Pools", campaign_pools_path(Current.campaign), class: "button" %></p>
 </header>
 
+<% Roll.streams_for(Current.campaign, Current.membership).each do |stream| %>
+  <%= turbo_stream_from(*stream) %>
+<% end %>
+
 <div class="campaign">
+  <section id="roll-log" class="panel stack" aria-labelledby="campaign-log">
+    <h2 id="campaign-log" class="panel__title">Table log</h2>
+    <ol id="roll_log" class="roll-log" aria-live="polite"><%= render partial: "rolls/roll", collection: @rolls, as: :roll %></ol>
+    <p class="empty roll-log__empty">No rolls yet. Rolls from character sheets and pools land here as they happen.</p>
+  </section>
+
   <section class="panel stack" aria-labelledby="campaign-table">
     <h2 id="campaign-table" class="panel__title">At the table</h2>
     <ul class="list">

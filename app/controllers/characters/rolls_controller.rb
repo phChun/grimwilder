@@ -1,20 +1,23 @@
-# Roll a stat from the sheet: sends its dice and the thorns from damage to the
-# roller, and clears the stat's mark (it only counts for the next roll).
+# Action and defense rolls from the sheet: set up the roll (spark, help,
+# situational thorns), roll it on the server, then show the result. Rolls of a
+# seated character land in the campaign's log for the whole table.
 class Characters::RollsController < ApplicationController
   include CharacterScoped
 
-  def create
-    stat = params.expect(:stat)
-    roll = @character.roll!(stat)
+  def new
+    @stat = params[:stat].presence_in(Grimwild::STATS)
+    redirect_to @character, alert: "Pick Brawn, Agility, Wits or Presence." unless @stat
+  end
 
-    redirect_to roll_path(
-      dice: roll[:dice],
-      thorns: roll[:thorns],
-      for: "#{@character.name}: #{stat.capitalize}",
-      reasons: roll[:reasons].join(", ").presence,
-      character_id: @character.id
-    )
-  rescue ArgumentError
-    redirect_to @character, alert: "Pick Brawn, Agility, Wits or Presence."
+  def create
+    roll = @character.roll!(params.expect(:stat), by: Current.identity, mode: params[:mode].presence || "action",
+      spend_spark: params[:spark].to_i, help: params[:help].to_i, thorns: params[:thorns].to_i)
+    redirect_to character_roll_path(@character, roll)
+  rescue ArgumentError => error
+    redirect_to @character, alert: error.message
+  end
+
+  def show
+    @roll = @character.rolls.find(params[:id])
   end
 end

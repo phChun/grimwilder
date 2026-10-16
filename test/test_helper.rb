@@ -3,6 +3,7 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "webauthn/fake_client"
 require_relative "test_helpers/session_test_helper"
+require_relative "test_helpers/fixed_dice"
 require_relative "test_helpers/rendered_page_test_helper"
 
 module ActiveSupport

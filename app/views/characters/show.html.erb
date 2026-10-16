@@ -35,7 +35,7 @@
             <p class="stat-card__desc"><%= description %></p>
             <% if editable %>
               <%= button_to (@character.marked?(stat) ? "Marked" : "Mark"), character_path(@character), method: :patch, params: { quick: 1, character: { "marked_#{stat}" => !@character.marked?(stat) } }, class: "toggle", "aria-pressed": @character.marked?(stat).to_s, title: "A mark adds +1t to the next roll with this stat, then clears" %>
-              <%= button_to "Roll #{@character.stat(stat)}d#{" +#{thorns}t" if thorns.positive?}", character_rolls_path(@character), params: { stat: stat }, class: "button button--primary button--small stat-card__roll" %>
+              <%= link_to "Roll #{@character.stat(stat)}d#{" +#{thorns}t" if thorns.positive?}", new_character_roll_path(@character, stat: stat), class: "button button--primary button--small stat-card__roll" %>
             <% elsif @character.marked?(stat) %>
               <span class="tag">Marked</span>
             <% end %>

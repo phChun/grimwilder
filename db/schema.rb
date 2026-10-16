@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_140000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_150000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -121,6 +121,36 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_140000) do
     t.index ["last_rolled_by_id"], name: "index_pools_on_last_rolled_by_id"
   end
 
+  create_table "rolls", force: :cascade do |t|
+    t.integer "campaign_id"
+    t.integer "identity_id", null: false
+    t.integer "character_id"
+    t.integer "pool_id"
+    t.string "kind", null: false
+    t.string "name", null: false
+    t.string "stat"
+    t.json "dice", default: [], null: false
+    t.json "thorns", default: [], null: false
+    t.integer "stat_dice", default: 0, null: false
+    t.integer "help_dice", default: 0, null: false
+    t.integer "spark_spent", default: 0, null: false
+    t.json "damage_reasons", default: [], null: false
+    t.string "outcome"
+    t.boolean "critical", default: false, null: false
+    t.boolean "spark_gained", default: false, null: false
+    t.string "pool_action"
+    t.integer "dropped"
+    t.integer "remaining"
+    t.boolean "gm_only", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
+    t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
+    t.index ["character_id"], name: "index_rolls_on_character_id"
+    t.index ["identity_id"], name: "index_rolls_on_identity_id"
+    t.index ["pool_id"], name: "index_rolls_on_pool_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "identity_id", null: false
     t.string "ip_address"
@@ -137,5 +167,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_140000) do
   add_foreign_key "passkeys", "identities"
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "identities", column: "last_rolled_by_id"
+  add_foreign_key "rolls", "campaigns"
+  add_foreign_key "rolls", "characters", on_delete: :nullify
+  add_foreign_key "rolls", "identities"
+  add_foreign_key "rolls", "pools", on_delete: :nullify
   add_foreign_key "sessions", "identities"
 end

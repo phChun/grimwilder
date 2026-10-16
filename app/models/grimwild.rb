@@ -5,6 +5,7 @@ module Grimwild
   PHYSICAL_STATS = %w[ brawn agility ].freeze
   MENTAL_STATS = %w[ wits presence ].freeze
   MAX_LEVEL = 7
+  MAX_SPARK = 2
 
   class << self
     def data

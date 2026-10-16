@@ -36,17 +36,39 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert @tibbs.bloodied?
   end
 
-  test "rolling a stat sends its dice and damage thorns to the roller" do
+  test "roll a stat from the sheet, spending spark" do
     @tibbs.update!(marked_agility: true)
     sign_in_as identities(:pip)
 
-    post character_rolls_path(@tibbs), params: { stat: "agility" }
-    assert_redirected_to roll_path(dice: 3, thorns: 1, for: "Gibbletibble \"Tibbs\": Agility", reasons: "marked", character_id: @tibbs.id)
+    get character_path(@tibbs)
+    assert_select "a[href=?]", new_character_roll_path(@tibbs, stat: "agility"), text: "Roll 3d +1t"
+
+    get new_character_roll_path(@tibbs, stat: "agility")
+    assert_response :success
+    assert_select "input[name=spark]", 2, "0 or the 1 spark Tibbs holds"
+    assert_select ".page-header__lede", /\+1t from damage \(marked\)/
+
+    assert_difference -> { @tibbs.rolls.count }, 1 do
+      post character_rolls_path(@tibbs), params: { stat: "agility", mode: "defense", spark: 1, help: 1, thorns: 2 }
+    end
+    roll = @tibbs.rolls.last
+    assert_redirected_to character_roll_path(@tibbs, roll)
+    assert_equal [ "defense", 5, 3 ], [ roll.kind, roll.dice.size, roll.thorns.size ]
     assert_not @tibbs.reload.marked_agility?
 
     follow_redirect!
-    assert_select "[data-roller-dice-value='3'][data-roller-thorns-value='1']"
-    assert_select "a[href=?]", character_path(@tibbs)
+    assert_select ".result__name", roll.outcome.capitalize
+    assert_select ".page-header__lede", "3d Agility + 1 spark + 1d help, vs 3t (marked, 2 situational)"
+  end
+
+  test "a roll outside the rules goes back to the sheet" do
+    sign_in_as identities(:pip)
+
+    assert_no_difference -> { Roll.count } do
+      post character_rolls_path(@tibbs), params: { stat: "agility", spark: 2 }
+    end
+    assert_redirected_to character_path(@tibbs)
+    assert_equal "Gibbletibble \"Tibbs\" can spend 0–1 spark.", flash[:alert]
   end
 
   test "XP and conditions" do
@@ -67,12 +89,14 @@ class CharactersTest < ActionDispatch::IntegrationTest
 
     get character_path(@tibbs)
     assert_response :success
-    assert_select "button", text: /Roll/, count: 0
+    assert_select ".stat-card__roll", count: 0
 
     patch character_path(@tibbs), params: { character: { spark: 0 } }
     assert_response :forbidden
 
     post character_rolls_path(@tibbs), params: { stat: "agility" }
+    assert_response :not_found
+    get new_character_roll_path(@tibbs, stat: "agility")
     assert_response :not_found
   end
 

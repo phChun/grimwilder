@@ -1,11 +1,6 @@
 require "test_helper"
 
 class PoolTest < ActiveSupport::TestCase
-  # Stands in for Random: returns the given dice in order.
-  FixedDice = Struct.new(:faces) do
-    def rand(_range) = faces.shift
-  end
-
   setup { @pool = pools(:lookouts) }
 
   test "a new pool starts full" do
@@ -58,6 +53,30 @@ class PoolTest < ActiveSupport::TestCase
     assert_equal 6, @pool.size
     assert_empty @pool.last_dice
     assert_not @pool.resettable?
+  end
+
+  test "every roll, drop-first and push goes in the campaign log" do
+    brawl = pools(:brawl)
+
+    assert_difference -> { campaigns(:bramblewood).rolls.pool.count }, 3 do
+      brawl.roll!(by: identities(:pip), random: FixedDice.new([ 4, 5, 6, 6 ]))
+      brawl.push!(by: identities(:pip))
+      brawl.roll!(by: identities(:pip), drop_first: true, random: FixedDice.new([ 1, 6 ]))
+    end
+
+    rolled, pushed, dropped_first = brawl.rolls.order(:id).last(3)
+    assert_equal [ "rolled", [ 4, 5, 6, 6 ], 0, 4 ], rolled.values_at(:pool_action, :dice, :dropped, :remaining)
+    assert_equal [ "pushed", [], 1, 3 ], pushed.values_at(:pool_action, :dice, :dropped, :remaining)
+    assert_equal [ "rolled_after_drop", [ 1, 6 ], 2, 1 ], dropped_first.values_at(:pool_action, :dice, :dropped, :remaining)
+    assert_equal "Barroom brawl", rolled.name
+  end
+
+  test "rolls on a hidden pool are for the GM only" do
+    roll = pools(:ambush).roll!(by: identities(:gwen))
+
+    assert roll.gm_only?
+    assert_includes Roll.visible_to(memberships(:gwen_gm)), roll
+    assert_not_includes Roll.visible_to(memberships(:pip_player)), roll
   end
 
   test "players don't see hidden pools" do

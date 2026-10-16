@@ -1,0 +1,26 @@
+<%# locals: (roll:) %>
+<li id="<%= dom_id(roll) %>" class="<%= class_names("log-entry", "log-entry--#{roll.outcome}": roll.outcome) %>">
+  <div class="log-entry__head">
+    <p class="log-entry__title">
+      <strong><%= roll.name %></strong>
+      <% if roll.pool? %>pool<% else %><%= roll.stat.capitalize %> <%= roll.kind %><% end %>
+      <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+    </p>
+    <% unless roll.pool? %>
+      <span class="log-entry__result"><%= roll.outcome.capitalize %><%= " · critical" if roll.critical? %></span>
+    <% end %>
+  </div>
+
+  <% if roll.dice.any? %>
+    <div class="log-entry__dice"><%= roll_dice_tags(roll, small: true) %></div>
+  <% end %>
+
+  <p class="log-entry__meta">
+    <% if roll.pool? %>
+      <%= pool_roll_summary(roll) %>
+    <% else %>
+      <%= roll_setup(roll) %>.<% if (note = roll_spark_note(roll)) %> <%= note %><% end %>
+    <% end %>
+    <span class="log-entry__who">· <%= roll.identity.display_name %></span>
+  </p>
+</li>

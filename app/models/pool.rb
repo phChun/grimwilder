@@ -35,6 +35,7 @@ class Pool < ApplicationRecord
 
   belongs_to :campaign
   belongs_to :last_rolled_by, class_name: "Identity", optional: true
+  has_many :rolls, dependent: :nullify
 
   enum :kind, KINDS.keys.index_by(&:itself), default: "task", validate: true
 
@@ -104,7 +105,13 @@ class Pool < ApplicationRecord
       self.size ||= starting_size
     end
 
+    # Every roll, drop and push also goes in the campaign's log. A push rolls
+    # nothing, so its entry has no dice.
     def record!(size:, dice:, dropped:, action:, by:)
-      update!(size: size, last_dice: dice, last_dropped: dropped, last_action: action, last_rolled_by: by, last_rolled_at: Time.current)
+      transaction do
+        update!(size: size, last_dice: dice, last_dropped: dropped, last_action: action, last_rolled_by: by, last_rolled_at: Time.current)
+        rolls.create!(campaign: campaign, identity: by, kind: "pool", name: name, dice: (action == "pushed" ? [] : dice),
+          pool_action: action, dropped: dropped, remaining: size, gm_only: hidden?)
+      end
     end
 end

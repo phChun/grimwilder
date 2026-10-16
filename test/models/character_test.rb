@@ -34,13 +34,59 @@ class CharacterTest < ActiveSupport::TestCase
     assert_equal %w[marked bloodied desperate], @tibbs.damage_reasons(:agility)
   end
 
-  test "rolling a marked stat uses the mark, then clears it" do
+  test "rolling a marked stat adds its thorn, then clears the mark" do
     @tibbs.update!(marked_agility: true)
 
-    roll = @tibbs.roll!("agility")
-    assert_equal({ dice: 3, thorns: 1, reasons: [ "marked" ] }, roll)
+    roll = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 5, 2, 1, 7 ]))
+    assert_equal [ 5, 2, 1 ], roll.dice
+    assert_equal [ 7 ], roll.thorns
+    assert_equal "grim", roll.outcome
+    assert_equal [ "marked" ], roll.damage_reasons
     assert_not @tibbs.reload.marked_agility?
-    assert_raises(ArgumentError) { @tibbs.roll!("luck") }
+  end
+
+  test "each spark spent adds 1d" do
+    roll = @tibbs.roll!("wits", by: identities(:pip), spend_spark: 1, help: 1, thorns: 2, random: FixedDice.new([ 1, 2, 4, 6, 3, 3 ]))
+
+    assert_equal 4, roll.dice.size, "2 Wits + 1 spark + 1 help"
+    assert_equal 2, roll.thorns.size
+    assert_equal 1, roll.spark_spent
+    assert_equal "perfect", roll.outcome
+    assert_equal 0, @tibbs.reload.spark
+  end
+
+  test "a disaster gives spark, up to 2" do
+    roll = @tibbs.roll!("brawn", by: identities(:pip), thorns: 1, random: FixedDice.new([ 2, 8 ]))
+    assert_equal "disaster", roll.outcome
+    assert roll.spark_gained?
+    assert_equal 2, @tibbs.reload.spark
+
+    roll = @tibbs.roll!("brawn", by: identities(:pip), thorns: 1, random: FixedDice.new([ 2, 8 ]))
+    assert_not roll.spark_gained?
+    assert_equal 2, @tibbs.reload.spark
+  end
+
+  test "spending spark can set up the disaster that pays it back" do
+    roll = @tibbs.roll!("brawn", by: identities(:pip), spend_spark: 1, thorns: 1, random: FixedDice.new([ 1, 3, 7 ]))
+
+    assert_equal "disaster", roll.outcome
+    assert_equal 1, @tibbs.reload.spark, "spent 1, then took 1"
+  end
+
+  test "a seated character's roll goes in the campaign log; an unseated one's doesn't" do
+    roll = @tibbs.roll!("agility", by: identities(:pip))
+    assert_equal campaigns(:bramblewood), roll.campaign
+    assert_equal @tibbs.name, roll.name
+
+    assert_nil characters(:loner).roll!("agility", by: identities(:stranger)).campaign
+  end
+
+  test "rolls stay within the rules" do
+    assert_raises(ArgumentError) { @tibbs.roll!("luck", by: identities(:pip)) }
+    assert_raises(ArgumentError) { @tibbs.roll!("wits", by: identities(:pip), spend_spark: 2) }
+    assert_raises(ArgumentError) { @tibbs.roll!("wits", by: identities(:pip), mode: "story") }
+    assert_raises(ArgumentError) { @tibbs.roll!("wits", by: identities(:pip), thorns: 9) }
+    assert_equal 1, @tibbs.reload.spark
   end
 
   test "XP fills level + 1 boxes, then levels up" do

@@ -6,6 +6,7 @@ class Campaign < ApplicationRecord
 
   has_many :memberships, dependent: :destroy
   has_many :identities, through: :memberships
+  has_many :rolls, dependent: :delete_all
   has_many :pools, dependent: :destroy
   has_many :characters, dependent: :nullify
 
