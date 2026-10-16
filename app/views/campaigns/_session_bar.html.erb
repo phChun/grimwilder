@@ -1,0 +1,29 @@
+<%# locals: (campaign:, session:, gm:) %>
+<div class="session-bar">
+  <p class="session-bar__status">
+    <% if session %>
+      <strong><%= session.title %></strong> · started <%= time_ago_in_words(session.started_at) %> ago
+    <% else %>
+      Between sessions
+    <% end %>
+  </p>
+
+  <% if gm %>
+    <details id="session-actions" class="session-bar__more" open data-details-memory-target="section" data-section="session" data-phone-open="false">
+      <summary class="session-bar__toggle">Session actions</summary>
+      <div class="session-bar__actions">
+        <% if session %>
+          <%= link_to "End session", new_campaign_play_session_ending_path(campaign, session), class: "button button--small" %>
+        <% else %>
+          <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary button--small" %>
+        <% end %>
+        <span class="suspense" title="Suspense: only you see this">
+          <span class="suspense__label">Suspense</span>
+          <%= button_to "−", campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, class: "counter__step counter__step--small", disabled: campaign.suspense.zero?, "aria-label": "Spend 1 suspense" %>
+          <strong class="suspense__value"><%= campaign.suspense %></strong>
+          <%= button_to "+", campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, class: "counter__step counter__step--small", "aria-label": "Take 1 suspense" %>
+        </span>
+      </div>
+    </details>
+  <% end %>
+</div>

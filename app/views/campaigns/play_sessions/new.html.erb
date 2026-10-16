@@ -1,0 +1,52 @@
+<% content_for :title, "Start session #{@number} · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>Start session <%= @number %></h1>
+  <p class="page-header__lede">
+    <% if @number == 1 %>
+      The first session: thread starts at 2 for everyone here.
+    <% else %>
+      Before every session after the first (pg. 31): everyone here takes spark and resets thread, and you take 1 suspense.
+    <% end %>
+  </p>
+</header>
+
+<% if flash[:alert] %>
+  <p class="flash flash--alert"><%= flash[:alert] %></p>
+<% end %>
+
+<%= form_with url: campaign_play_sessions_path(Current.campaign), class: "panel stack session-form" do %>
+  <fieldset class="roll-setup__group">
+    <legend class="field__label">Who's here?</legend>
+    <% if @characters.any? %>
+      <% @characters.each do |character| %>
+        <label class="check">
+          <%= check_box_tag "character_ids[]", character.id, params[:character_ids].nil? || Array(params[:character_ids]).include?(character.id.to_s), id: "session_character_#{character.id}" %>
+          <span><strong><%= character.name %></strong> <small><%= character.identity.display_name %></small></span>
+        </label>
+      <% end %>
+      <p class="field__hint">Only the characters here get the session's resets and XP.</p>
+    <% else %>
+      <p class="empty">No characters are seated yet.</p>
+    <% end %>
+  </fieldset>
+
+  <% if @number > 1 %>
+    <div class="session-form__recap">
+      <div class="field">
+        <label class="field__label" for="session_recap">Previously on…</label>
+        <textarea id="session_recap" name="recap" rows="6" class="field__input" autocomplete="off"><%= params[:recap] %></textarea>
+      </div>
+      <% if @previous %>
+        <aside class="session-form__prompts" aria-label="Last session">
+          <h2 class="fold__heading"><%= @previous.title %></h2>
+          <% if @previous.notes.present? %><p><%= @previous.notes %></p><% end %>
+          <% if @previous.recap.present? %><p class="field__hint">It began: <%= @previous.recap %></p><% end %>
+        </aside>
+      <% end %>
+    </div>
+  <% end %>
+
+  <button type="submit" class="button button--primary">Start session <%= @number %></button>
+<% end %>

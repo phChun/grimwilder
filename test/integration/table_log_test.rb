@@ -21,13 +21,13 @@ class TableLogTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select "#roll_log > li", 0
-    assert_select "turbo-cable-stream-source", 2, "pool refreshes, plus the open log"
+    assert_select "turbo-cable-stream-source", 3, "pool and table refreshes, plus the open log"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
     assert_select "#roll_log > li", 1
-    assert_select "turbo-cable-stream-source", 3, "pool refreshes, plus both logs"
+    assert_select "turbo-cable-stream-source", 4, "pool and table refreshes, plus both logs"
   end
 
   test "the table shows the newest #{CampaignTable::LOG_SIZE} log entries" do

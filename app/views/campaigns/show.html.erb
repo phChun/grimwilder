@@ -3,6 +3,7 @@
   <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
 <% end %>
 <%= turbo_stream_from Current.campaign, :pools %>
+<%= turbo_stream_from Current.campaign, :table %>
 
 <% seats = table_seats(@memberships, @characters) %>
 <% alert = table_alert(@characters) %>
@@ -14,6 +15,7 @@
     <div class="gm-table__heading">
       <p class="eyebrow"><%= gm? ? "You're the GM" : "You're a player" %></p>
       <h1 class="gm-table__name"><%= Current.campaign.name %></h1>
+      <%= render "campaigns/session_bar", campaign: Current.campaign, session: @session, gm: gm? %>
     </div>
     <div class="gm-table__tools">
       <% if gm? %><%= render "campaigns/copy_join_button", url: join_url(Current.campaign.join_code) %><% end %>

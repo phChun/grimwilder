@@ -1,0 +1,21 @@
+<% content_for :title, "End #{@session.title.downcase} · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>End <%= @session.title.downcase %></h1>
+  <p class="page-header__lede">Everyone here takes 1 XP (pg. 31): <%= @session.characters.map(&:name).to_sentence.presence || "no one was marked present" %>.</p>
+</header>
+
+<%= form_with url: campaign_play_session_ending_path(Current.campaign, @session), class: "panel stack session-form" do %>
+  <label class="check">
+    <%= check_box_tag :standout, "1", false, id: "session_standout" %>
+    <span><strong>Standout session</strong>: +1 bonus XP for everyone here <small>(about 1 session in 4)</small></span>
+  </label>
+
+  <div class="field">
+    <label class="field__label" for="session_notes">Notes</label>
+    <textarea id="session_notes" name="notes" rows="5" class="field__input" autocomplete="off" placeholder="What happened, loose threads, next time…"></textarea>
+  </div>
+
+  <button type="submit" class="button button--primary">End <%= @session.title.downcase %></button>
+<% end %>

@@ -1,70 +1,74 @@
 <%# locals: (roll:) %>
-<li id="<%= dom_id(roll) %>" class="<%= class_names("log-entry", "log-entry--#{roll.outcome}": roll.outcome, "log-entry--quarrel": roll.quarrel?) %>">
-  <div class="log-entry__head">
-    <p class="log-entry__title">
+<% if roll.marker? %>
+  <%= render "rolls/marker", roll: roll %>
+<% else %>
+  <li id="<%= dom_id(roll) %>" class="<%= class_names("log-entry", "log-entry--#{roll.outcome}": roll.outcome, "log-entry--quarrel": roll.quarrel?) %>">
+    <div class="log-entry__head">
+      <p class="log-entry__title">
+        <% case roll.kind %>
+        <% when "pool" %>
+          <strong><%= roll.name %></strong><%= ": #{roll.phase}" if roll.phase %> pool<%= ", as an action" if roll.outcome %>
+        <% when "quarrel" %>
+          <strong>Quarrel</strong> <%= roll.name %>
+        <% when "montage" %>
+          <strong>Montage</strong> <%= roll.name %>
+        <% when "story" %>
+          <strong><%= roll.name %></strong> story roll
+        <% else %>
+          <strong><%= roll.name %></strong> <%= roll.stat.capitalize %> <%= roll.kind %>
+        <% end %>
+        <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+      </p>
+      <% if roll.quarrel? %>
+        <span class="log-entry__result"><%= quarrel_result(roll) %></span>
+      <% elsif roll.outcome %>
+        <span class="log-entry__result"><%= roll.outcome.capitalize %><%= " · critical" if roll.critical? %></span>
+      <% end %>
+    </div>
+
+    <% if roll.question %>
+      <p class="log-entry__question"><%= roll.quarrel? ? "Stakes: #{roll.question}" : roll.question %></p>
+    <% end %>
+
+    <% if roll.montage? %>
+      <ul class="quarrel-sides">
+        <% roll.sides.each do |side| %>
+          <li class="quarrel-side">
+            <span class="quarrel-side__name">
+              <%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %>:
+              <%= side["outcome"] %><%= " (critical)" if side["critical"] %>
+            </span>
+            <span class="log-entry__dice"><%= side_dice_tags(side) %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% elsif roll.quarrel? %>
+      <ul class="quarrel-sides">
+        <% roll.sides.each do |side| %>
+          <li class="<%= class_names("quarrel-side", "quarrel-side--winner": side["name"] == roll.winner) %>">
+            <span class="quarrel-side__name">
+              <%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if side["helpers"].any? %>, helped by <%= side["helpers"].pluck("name").to_sentence %><% end %>
+            </span>
+            <span class="log-entry__dice"><%= side_dice_tags(side) %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% elsif roll.dice.any? %>
+      <div class="log-entry__dice"><%= roll_dice_tags(roll, small: true) %></div>
+    <% end %>
+
+    <p class="log-entry__meta">
       <% case roll.kind %>
       <% when "pool" %>
-        <strong><%= roll.name %></strong><%= ": #{roll.phase}" if roll.phase %> pool<%= ", as an action" if roll.outcome %>
-      <% when "quarrel" %>
-        <strong>Quarrel</strong> <%= roll.name %>
+        <%= pool_roll_summary(roll) %><% if (note = roll_spark_note(roll)) %> <%= note %><% end %>
       <% when "montage" %>
-        <strong>Montage</strong> <%= roll.name %>
-      <% when "story" %>
-        <strong><%= roll.name %></strong> story roll
+        The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.
+      <% when "quarrel" %>
+        <% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %>
       <% else %>
-        <strong><%= roll.name %></strong> <%= roll.stat.capitalize %> <%= roll.kind %>
+        <%= roll_setup(roll) %>.<% if (note = roll_spark_note(roll)) %> <%= note %><% end %>
       <% end %>
-      <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+      <span class="log-entry__who">· <%= roll.identity.display_name %></span>
     </p>
-    <% if roll.quarrel? %>
-      <span class="log-entry__result"><%= quarrel_result(roll) %></span>
-    <% elsif roll.outcome %>
-      <span class="log-entry__result"><%= roll.outcome.capitalize %><%= " · critical" if roll.critical? %></span>
-    <% end %>
-  </div>
-
-  <% if roll.question %>
-    <p class="log-entry__question"><%= roll.quarrel? ? "Stakes: #{roll.question}" : roll.question %></p>
-  <% end %>
-
-  <% if roll.montage? %>
-    <ul class="quarrel-sides">
-      <% roll.sides.each do |side| %>
-        <li class="quarrel-side">
-          <span class="quarrel-side__name">
-            <%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %>:
-            <%= side["outcome"] %><%= " (critical)" if side["critical"] %>
-          </span>
-          <span class="log-entry__dice"><%= side_dice_tags(side) %></span>
-        </li>
-      <% end %>
-    </ul>
-  <% elsif roll.quarrel? %>
-    <ul class="quarrel-sides">
-      <% roll.sides.each do |side| %>
-        <li class="<%= class_names("quarrel-side", "quarrel-side--winner": side["name"] == roll.winner) %>">
-          <span class="quarrel-side__name">
-            <%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if side["helpers"].any? %>, helped by <%= side["helpers"].pluck("name").to_sentence %><% end %>
-          </span>
-          <span class="log-entry__dice"><%= side_dice_tags(side) %></span>
-        </li>
-      <% end %>
-    </ul>
-  <% elsif roll.dice.any? %>
-    <div class="log-entry__dice"><%= roll_dice_tags(roll, small: true) %></div>
-  <% end %>
-
-  <p class="log-entry__meta">
-    <% case roll.kind %>
-    <% when "pool" %>
-      <%= pool_roll_summary(roll) %><% if (note = roll_spark_note(roll)) %> <%= note %><% end %>
-    <% when "montage" %>
-      The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.
-    <% when "quarrel" %>
-      <% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %>
-    <% else %>
-      <%= roll_setup(roll) %>.<% if (note = roll_spark_note(roll)) %> <%= note %><% end %>
-    <% end %>
-    <span class="log-entry__who">· <%= roll.identity.display_name %></span>
-  </p>
-</li>
+  </li>
+<% end %>

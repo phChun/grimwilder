@@ -42,6 +42,11 @@ Rails.application.routes.draw do
       resources :quarrels, only: %i[ new create ]
       resources :montages, only: %i[ new create ]
 
+      resources :play_sessions, only: %i[ new create ] do
+        resource :ending, only: %i[ new create ], module: :play_sessions
+      end
+      resource :suspense, only: :update
+
       resources :pools, only: %i[ index create update destroy ] do
         scope module: :pools do
           resource :roll, only: :create

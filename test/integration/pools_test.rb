@@ -103,7 +103,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_equal [ 5, 1, 1 ], [ roll.dice.size, roll.thorns.size, roll.spark_spent ]
 
     follow_redirect!
-    assert_select "##{dom_id(roll)} .log-entry__result", roll.outcome.capitalize
+    assert_select "##{dom_id(roll)} .log-entry__result", /\A#{roll.outcome.capitalize}/, "a critical adds \" · critical\""
     assert_select "##{dom_id(roll)} .log-entry__meta", /4d \+ 1 spark, vs 1t as an action for Gibbletibble "Tibbs"/
     assert_select "##{dom_id(roll)} .die--spark", 1
   end

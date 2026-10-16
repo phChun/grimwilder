@@ -7,6 +7,7 @@ class Campaign < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :identities, through: :memberships
   has_many :rolls, dependent: :delete_all
+  has_many :play_sessions, dependent: :destroy
   has_many :pools, dependent: :destroy
   has_many :characters, dependent: :nullify
 
@@ -31,6 +32,15 @@ class Campaign < ApplicationRecord
 
   def gms
     identities.merge(Membership.gm)
+  end
+
+  def current_session
+    play_sessions.open.first
+  end
+
+  # Boundaries (a session starting, a rest) change what everyone's table shows.
+  def broadcast_table_refresh
+    ActiveRecord.after_all_transactions_commit { broadcast_refresh_later_to(self, :table) }
   end
 
   private

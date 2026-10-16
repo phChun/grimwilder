@@ -13,5 +13,6 @@ module CampaignTable
       @pool ||= Current.campaign.pools.new(starting_size: 4)
       @rolls = Current.campaign.rolls.table_log(Current.membership, limit: LOG_SIZE)
       @crucible_groups = Crucible.grouped
+      @session = Current.campaign.current_session
     end
 end

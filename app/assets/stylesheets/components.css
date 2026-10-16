@@ -1083,3 +1083,40 @@ form.button_to, .button_to { margin: 0; }
 .crucible__full { margin-left: auto; font-size: 0.85rem; }
 body:has(.gm-table) .site-header__inner,
 body:has(.gm-table) .site-footer { max-width: 96rem; }
+
+/* ---------- Sessions & scenes ---------- */
+
+.session-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-top: var(--space-2); }
+.session-bar__status { margin: 0; color: var(--ink-soft); }
+.session-bar__status a { font-size: 0.9rem; }
+.session-bar__more > .session-bar__toggle { list-style: none; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: var(--moss); }
+.session-bar__more > .session-bar__toggle::-webkit-details-marker { display: none; }
+.session-bar__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.session-bar__actions .button_to { margin: 0; }
+
+/* On wide screens the actions just sit beside the status; on phones they fold away. */
+@media (min-width: 48rem) {
+  .session-bar__more > .session-bar__toggle { display: none; }
+}
+@media (max-width: 47.99rem) {
+  .session-bar__more[open] { flex-basis: 100%; }
+  .session-bar__more[open] > .session-bar__toggle { margin-bottom: var(--space-2); }
+}
+
+.suspense { display: inline-flex; align-items: center; gap: var(--space-1); padding-left: var(--space-2); border-left: 1px solid var(--line); }
+.suspense__label { font-size: 0.85rem; color: var(--ink-faint); }
+.suspense__value { min-width: 1.5ch; text-align: center; font-family: var(--font-display); font-size: 1.3rem; }
+
+.log-entry--marker { --entry-color: var(--ink); gap: var(--space-1); background: var(--paper-sunken); padding-right: var(--space-3); }
+.log-marker__title { margin: 0; font-family: var(--font-display); font-size: 1.15rem; }
+.log-marker__text { margin: 0; font-size: 0.9rem; color: var(--ink-soft); white-space: pre-line; }
+.log-marker__levels { margin: 0; padding-left: 1.2em; font-size: 0.9rem; }
+
+.session-form { max-width: 48rem; }
+.session-form__recap { display: grid; gap: var(--space-4); }
+.session-form__prompts { padding: var(--space-3); border-radius: var(--radius-sm); background: var(--paper-sunken); font-size: 0.9rem; }
+.session-form__prompts p { margin: var(--space-1) 0 0; white-space: pre-line; }
+
+@media (min-width: 48rem) {
+  .session-form__recap { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+}

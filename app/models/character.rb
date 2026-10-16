@@ -1,7 +1,7 @@
 # A player character. Owned by an identity; optionally seated in one of that
 # identity's campaigns, where the table can see it.
 class Character < ApplicationRecord
-  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents
+  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::Sessions
 
   STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 46)
 

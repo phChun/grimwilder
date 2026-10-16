@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_180000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_190000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "suspense", default: 0, null: false
     t.index ["join_code"], name: "index_campaigns_on_join_code", unique: true
   end
 
@@ -103,6 +104,28 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_180000) do
     t.index ["identity_id"], name: "index_passkeys_on_identity_id"
   end
 
+  create_table "play_session_characters", id: false, force: :cascade do |t|
+    t.integer "play_session_id", null: false
+    t.integer "character_id", null: false
+    t.index ["character_id"], name: "index_play_session_characters_on_character_id"
+    t.index ["play_session_id", "character_id"], name: "idx_on_play_session_id_character_id_1d619a4f40", unique: true
+  end
+
+  create_table "play_sessions", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.integer "number", null: false
+    t.datetime "started_at", null: false
+    t.datetime "ended_at"
+    t.text "recap"
+    t.text "notes"
+    t.boolean "standout", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "number"], name: "index_play_sessions_on_campaign_id_and_number", unique: true
+    t.index ["campaign_id"], name: "index_play_sessions_on_campaign_id"
+    t.index ["campaign_id"], name: "index_play_sessions_one_open_per_campaign", unique: true, where: "ended_at IS NULL"
+  end
+
   create_table "pools", force: :cascade do |t|
     t.integer "campaign_id", null: false
     t.string "name", null: false
@@ -152,10 +175,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_180000) do
     t.json "assists", default: [], null: false
     t.string "phase"
     t.string "next_phase"
+    t.integer "play_session_id"
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"
     t.index ["identity_id"], name: "index_rolls_on_identity_id"
+    t.index ["play_session_id"], name: "index_rolls_on_play_session_id"
     t.index ["pool_id"], name: "index_rolls_on_pool_id"
   end
 
@@ -173,11 +198,15 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_180000) do
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"
   add_foreign_key "passkeys", "identities"
+  add_foreign_key "play_session_characters", "characters", on_delete: :cascade
+  add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
+  add_foreign_key "play_sessions", "campaigns"
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "identities", column: "last_rolled_by_id"
   add_foreign_key "rolls", "campaigns"
   add_foreign_key "rolls", "characters", on_delete: :nullify
   add_foreign_key "rolls", "identities"
+  add_foreign_key "rolls", "play_sessions", on_delete: :nullify
   add_foreign_key "rolls", "pools", on_delete: :nullify
   add_foreign_key "sessions", "identities"
 end

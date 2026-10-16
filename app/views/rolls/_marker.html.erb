@@ -1,0 +1,14 @@
+<%# locals: (roll:) %>
+<li id="<%= dom_id(roll) %>" class="log-entry log-entry--marker">
+  <p class="log-marker__title"><%= roll.name %></p>
+  <% if roll.question %>
+    <p class="log-marker__text"><%= roll.question %></p>
+  <% end %>
+  <% if roll.sides.any? %>
+    <ul class="log-marker__levels">
+      <% roll.sides.each do |level_up| %>
+        <li><%= level_up["name"] %> reached level <%= level_up["level"] %>: <%= link_to "choose a talent", new_character_talent_path(level_up["character_id"]) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</li>

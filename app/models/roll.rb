@@ -1,7 +1,8 @@
 # One roll at the table: an action or defense roll from a character sheet, a
-# story roll, a quarrel, a montage, or a pool roll. A campaign's rolls are its
-# shared log, broadcast to everyone at the table as they land; rolls on hidden
-# pools reach only the GM.
+# story roll, a quarrel, a montage, or a pool roll; or a marker for a session
+# boundary. A campaign's rolls are its shared log, broadcast to everyone at
+# the table as they land; rolls on hidden pools reach only the GM. Each is
+# stamped with the session that was going when it was made.
 #
 # Names are copied in when rolled, so the log still reads right after a
 # character or pool is renamed or deleted.
@@ -12,8 +13,9 @@ class Roll < ApplicationRecord
   belongs_to :identity
   belongs_to :character, optional: true
   belongs_to :pool, optional: true
+  belongs_to :play_session, optional: true
 
-  enum :kind, %w[ action defense story quarrel montage pool ].index_by(&:itself), validate: true
+  enum :kind, %w[ action defense story quarrel montage pool marker ].index_by(&:itself), validate: true
 
   validates :name, presence: true
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, if: -> { action? || defense? || story? || montage? }
@@ -23,6 +25,7 @@ class Roll < ApplicationRecord
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(gm_only: false) }
   scope :table_log, ->(membership, limit: 50) { visible_to(membership).includes(:identity, :pool).recent.limit(limit) }
 
+  before_validation :stamp_session, on: :create
   after_create_commit :broadcast_to_table, if: :campaign
   after_update_commit :broadcast_change_to_table, if: :campaign
 
@@ -49,6 +52,10 @@ class Roll < ApplicationRecord
   end
 
   private
+    def stamp_session
+      self.play_session ||= campaign&.current_session
+    end
+
     def broadcast_to_table
       broadcast_prepend_later_to table_stream, target: "roll_log", partial: "rolls/roll", locals: { roll: self }
     end

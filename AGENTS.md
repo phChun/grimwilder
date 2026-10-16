@@ -123,7 +123,13 @@ Pattern used here: **the template owns the inputs and the result text; Stimulus 
 - **Spark**: spend it before any roll for +1d per spark. A character holds at most 2, and it carries over between sessions. Gained from tangles, rolling a disaster, resolving a story arc, quarrels, or an ally changing their bond with you. (pg. 12)
 - **Thread**: 2 per session. Spend it to add story details that go beyond set dressing. (pg. 25)
 - **Tangle**: a complication the player introduces from their own vantage; they take spark for it. (pg. 25)
-- **Suspense**: the GM's currency, used for things like making extra moves or dropping 1d from a pool. (pg. 96)
+- **Suspense**: the GM's currency, used for things like making extra moves or dropping 1d from a pool. The GM gains it by skipping a prompted impact move or making suspense moves, and at the start of each session after the first; spending it prompts an impact move. Some talents give it away (Challenge, Provoke, Wordplay). (pg. 96)
+
+**Play structure**
+- **Session**: one sitting. Before every session after the first, each player takes spark, resets thread and per-session talents, and shares their PC's best moment from last time; the GM takes suspense and recaps ("Previously on…"). After each session, everyone takes 1 XP, or 2 for a standout session (about 1 in 4). (pg. 31)
+- **Scene**: one stretch of action. It opens in the middle of things (with a story roll if the setup is unclear) and closes with a montage once it has served its purpose. Short-term conditions can wear off after a scene, and some talents work "for a scene" or reset each scene. (pg. 29, 95)
+- **Rest**: a significant stretch of time; clears all marks and harm. (pg. 30)
+- **Downtime**: PCs fully heal, including relevant conditions, and reset per-session talents; the GM rolls faction (campaign) pools. (pg. 30)
 
 **Damage** (pg. 27–30)
 - **Mark**: a light hit to one stat. +1t on the next roll with that stat, then the mark clears. A second mark on an already-marked stat becomes harm instead.
@@ -191,6 +197,19 @@ The campaign page is where play runs, for the GM and players alike. Three column
 - **Pools** are compact rows (`campaigns/pools/_pool`). The ⋯ fold-out holds drop-first, push, the power-pool action roll and the GM controls. `GET /campaigns/:id/pools` and the nav's `/pools` redirect to `#pools`, and pool actions redirect back to the table. The new-pool form (`campaigns/pools/_form`) keeps its own herb:state.
 - **Crucibles** load in a `turbo_frame_tag "crucible"` from `crucible_path(key, embed: 1)`, which renders `crucibles/_roller` with the unchanged `crucible_controller.js`. `crucible_picker_controller.js` swaps the frame's `src` and keeps three "Recent" chips. The section is `data-turbo-permanent`, so morphs don't wipe a roll.
 - Turbo drops a redirect's `#fragment` after a form post, so pool actions land at the top of the page rather than on the row.
+
+## Sessions & scenes
+
+Built in steps from a design brief: (1) sessions, (2) scenes, (3) talent uses, (4) history and moments, (5) rest and downtime.
+
+- **`PlaySession`** (table `play_sessions`; `Session` is sign-in). `number` per campaign, `started_at`/`ended_at`, `recap` ("Previously on…", not on session 1), `notes` (from the end form), `standout`. A campaign has at most one open session (validation plus a partial unique index); `Campaign#current_session`.
+- **Attendance** is the `play_session_characters` join table (`PlaySession#characters`, `Character#play_sessions`). Only characters marked present get a session's resets and XP.
+- **`PlaySession.start!(campaign, characters:, recap:, by:)`** runs `Character#start_session!` for each present character: thread resets to `Character#session_thread` and they take spark, but not before session 1. The campaign takes 1 suspense (also not before session 1). **`PlaySession#end!(by:, standout:, notes:)`** gives each present character `gain_xp!`, twice if standout, and returns those who levelled up.
+- **Markers**: boundaries post a `marker` kind of `Roll` ("Session 4 begins", recap in `question`, level-ups in `sides` with links to choose a talent). They broadcast like rolls, and `Campaign#broadcast_table_refresh` refreshes every table over `[campaign, :table]`.
+- **Stamping**: every Roll gets `play_session` from `campaign.current_session` when created. Older rolls have none ("Before sessions").
+- **Suspense** is `campaigns.suspense`: the GM's +/- counter in the session bar. It's never shown to players and never logged.
+- **Session bar**: under the campaign name in the GM table's header. It shows "Session 4 · started 20 min ago" or "Between sessions"; the GM's actions sit beside it, folded away on phones.
+- All boundary actions are GM-only (`require_gm`), and their reset logic lives in the models.
 
 ## Accounts & campaigns (passwordless)
 
