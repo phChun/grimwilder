@@ -11,7 +11,14 @@ module RollsHelper
       "messy" => "You reduce the impact move.",
       "grim" => "You take the full impact move.",
       "disaster" => "You take a worse impact move."
-    }  }.freeze
+    },
+    "story" => {
+      "perfect" => "It goes your way.",
+      "messy" => "It goes your way, with a problem.",
+      "grim" => "It goes against you.",
+      "disaster" => "It goes against you, badly."
+    }
+  }.freeze
 
   def roll_result_text(roll)
     RESULT_TEXT.fetch(roll.kind).fetch(roll.outcome)
@@ -36,9 +43,10 @@ module RollsHelper
     safe_join(d6s + d8s)
   end
 
-  # "3d Agility + 1 spark + 1d help, vs 2t (marked, 1 situational)"
+  # "3d Agility + 1 spark + 1d help, vs 2t (marked, 1 situational)", or for a
+  # story roll "2d (even odds) + 1 spark, vs 1t (1 situational)"
   def roll_setup(roll)
-    dice = [ "#{roll.stat_dice}d #{roll.stat.capitalize}" ]
+    dice = [ roll.story? ? "#{roll.stat_dice}d (#{roll.odds})" : "#{roll.stat_dice}d #{roll.stat.capitalize}" ]
     dice << "#{roll.spark_spent} spark" if roll.spark_spent.positive?
     dice << "#{roll.help_dice}d help" if roll.help_dice.positive?
 
@@ -66,6 +74,27 @@ module RollsHelper
     elsif roll.disaster?
       "Disaster: #{roll.name} already holds #{Grimwild::MAX_SPARK} spark."
     end
+  end
+
+  def quarrel_result(roll)
+    roll.tie? ? "Tie" : "#{roll.winner} wins"
+  end
+
+  # A side's own dice, then each helper's assist die; the side's highest die lights up.
+  def quarrel_side_dice_tags(side)
+    dice = side["dice"] + side["helpers"].pluck("die")
+    top = dice.index(dice.max)
+    tags = dice.map.with_index do |value, index|
+      helper = side["helpers"][index - side["dice"].size] if index >= side["dice"].size
+      tag.span(value, class: [ "die", "die--d6", "die--small", ("die--top" if index == top), ("die--assist" if helper) ],
+        "aria-label": helper ? "#{helper["name"]}'s assist die showing #{value}" : "d6 showing #{value}", title: helper&.dig("name"))
+    end
+    safe_join(tags)
+  end
+
+  def quarrel_spark_note(roll)
+    capped = roll.quarrelers.reject { _1["spark_gained"] }.pluck("name")
+    "Everyone in it takes spark#{" (#{capped.to_sentence} already #{capped.one? ? "holds" : "hold"} #{Grimwild::MAX_SPARK})" if capped.any?}."
   end
 
   def pool_roll_summary(roll)

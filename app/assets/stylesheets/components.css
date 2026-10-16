@@ -820,3 +820,17 @@ form.button_to, .button_to { margin: 0; }
 .log-entry__dice { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .log-entry__meta { margin: 0; font-size: 0.85rem; color: var(--ink-faint); }
 .log-entry__who { white-space: nowrap; }
+
+.log-entry--quarrel { --entry-color: var(--ember); }
+.log-entry__question { margin: 0; font-style: italic; }
+
+.quarrel-sides { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.quarrel-side { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.quarrel-side__name { font-size: 0.95rem; color: var(--ink-soft); }
+.quarrel-side--winner .quarrel-side__name { color: var(--ink); font-weight: 700; }
+.die--assist { border-style: dashed; }
+
+.quarrel-form { max-width: 40rem; }
+.quarrel-form__row { flex-wrap: wrap; }
+.quarrel-form__choices { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.quarrel-form__choices .field__input { width: auto; min-height: 2.25rem; }

@@ -1,19 +1,22 @@
-# One roll at the table: an action or defense roll from a character sheet, or
-# a pool roll. A campaign's rolls are its shared log, broadcast to everyone at
-# the table as they land; rolls on hidden pools reach only the GM.
+# One roll at the table: an action or defense roll from a character sheet, a
+# story roll, a quarrel, or a pool roll. A campaign's rolls are its shared
+# log, broadcast to everyone at the table as they land; rolls on hidden pools
+# reach only the GM.
 #
 # Names are copied in when rolled, so the log still reads right after a
 # character or pool is renamed or deleted.
 class Roll < ApplicationRecord
+  include Story, Quarrel
+
   belongs_to :campaign, optional: true
   belongs_to :identity
   belongs_to :character, optional: true
   belongs_to :pool, optional: true
 
-  enum :kind, %w[ action defense pool ].index_by(&:itself), validate: true
+  enum :kind, %w[ action defense story quarrel pool ].index_by(&:itself), validate: true
 
   validates :name, presence: true
-  validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, unless: :pool?
+  validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, if: -> { action? || defense? || story? }
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(gm_only: false) }

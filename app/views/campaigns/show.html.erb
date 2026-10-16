@@ -17,6 +17,58 @@
     <p class="empty roll-log__empty">No rolls yet. Rolls from character sheets and pools land here as they happen.</p>
   </section>
 
+  <section id="story-roll" class="panel stack" aria-labelledby="campaign-story">
+    <h2 id="campaign-story" class="panel__title">Story roll</h2>
+    <p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster).</p>
+    <%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack" do %>
+      <div class="field">
+        <label class="field__label" for="story_question">Question <small>(optional)</small></label>
+        <input type="text" id="story_question" name="question" maxlength="200" autocomplete="off" placeholder="Do I see any guards?" class="field__input">
+      </div>
+
+      <fieldset class="roll-setup__group">
+        <legend class="field__label">Odds</legend>
+        <div class="segmented segmented--auto">
+          <% Roll::ODDS.each do |dice, odds| %>
+            <label class="segmented__option">
+              <%= radio_button_tag :odds, dice, dice == 2 %>
+              <span><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label class="field__label" for="story_thorns">Thorns <small>d8, rare</small></label>
+        <input type="number" id="story_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+      </div>
+
+      <% if @my_characters.any? %>
+        <div class="field">
+          <label class="field__label" for="story_character">For</label>
+          <select id="story_character" name="character_id" class="field__input">
+            <option value="">No one in particular</option>
+            <% @my_characters.each do |character| %>
+              <option value="<%= character.id %>"><%= character.name %> (<%= pluralize(character.spark, "spark") %>)</option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="story_spark">Spend spark <small>+1d each</small></label>
+          <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+          <p class="field__hint">Only for a character. A disaster gives them spark.</p>
+        </div>
+      <% end %>
+
+      <button type="submit" class="button button--primary">Roll</button>
+    <% end %>
+
+    <% if @characters.size >= 2 %>
+      <p class="field__hint">Characters at odds? <%= link_to "Start a quarrel", new_campaign_quarrel_path(Current.campaign) %>.</p>
+    <% end %>
+  </section>
+
   <section class="panel stack" aria-labelledby="campaign-table">
     <h2 id="campaign-table" class="panel__title">At the table</h2>
     <ul class="list">

@@ -38,6 +38,8 @@ Rails.application.routes.draw do
     scope module: :campaigns do
       resource :join_code, only: :update
       resources :memberships, only: :destroy
+      resources :story_rolls, only: :create
+      resources :quarrels, only: %i[ new create ]
 
       resources :pools, only: %i[ index create update destroy ] do
         scope module: :pools do

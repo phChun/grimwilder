@@ -170,11 +170,14 @@ In JavaScript:
 
 ## Table rolls & the log
 
-- **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, or a `pool` roll, drop-first or push. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
+- **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, a `story` roll, a `quarrel`, or a `pool` roll, drop-first or push. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
 - `Character#roll!(stat, by:, mode:, spend_spark:, help:, thorns:)` (in `Character::Rolling`) does everything in one transaction: it spends spark (+1d each), adds damage thorns, clears the stat's mark, gives spark on a disaster (capped at `Grimwild::MAX_SPARK`), and records the Roll. Unseated characters' rolls are kept but have no campaign, so they aren't logged.
 - The sheet links to `characters/:id/rolls/new?stat=…` (setup), which posts to `create` and lands on the result (`show`).
 - A critical where no effect fits gives spark (`Character#take_spark_for_critical!`, from a button on the result page): owner only, once, on the character's latest roll, below 2 spark. It sets `spark_gained` on the Roll, which then reads "Critical: nothing fit…" instead of "Disaster…".
 - Updating a Roll replaces its log entry live, the same way new rolls are prepended.
+- **Story rolls** (`Roll.story!`, in `Roll::Story`; pg. 16) come from the campaign page: 1d/2d/3d for bad/even/good odds, rare thorns, and a `question`. They're made for one of your own seated characters (spark can go in, and a disaster gives spark) or for no one. `stat_dice` holds the odds.
+- **Quarrels** (`Roll.quarrel!`, in `Roll::Quarrel`; pg. 23) have their own page. Each side rolls 2d plus any spark, and each assist rolls its own 1d (pg. 13). The highest die wins, and a tie has no `winner`. Everyone involved takes spark. Sides go in the `sides` JSON and the stakes in `question`. Any member can record a quarrel, but only a character's own player can spend its spark.
+- `Character#settle_spark(spent:, take:)` is the one place spark is spent before a roll and taken after it, capped at 2. It doesn't save.
 - Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. Pages subscribe with `Roll.streams_for(campaign, membership)`. The partial renders in a job, so it must not use `Current`.
 - In tests, `assert_no_turbo_stream_broadcasts` counts every broadcast so far in the test, not just the ones inside its block. `FixedDice` (test/test_helpers) stands in for `Random`.
 
@@ -244,7 +247,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 1. **Pools**: built (see above). Next for pools: linked phases.
 2. **Crucibles**: built (see above). Next: path-specific crucibles.
 3. **Characters**: built, with the talent catalog and spark spent into rolls (see above).
-4. **Campaign play**: the table log is built (see above). Next ideas: story and quarrel rolls, and showing the log on the pools page.
+4. **Campaign play**: the table log is built (see above). Next ideas: showing the log on the pools page, montage rolls (pg. 16), and assists as separate dice on action rolls.
 
 Open questions: deploy host and domain; whether rolls can be shared without an account.
 

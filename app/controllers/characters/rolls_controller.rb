@@ -18,6 +18,6 @@ class Characters::RollsController < ApplicationController
   end
 
   def show
-    @roll = @character.rolls.find(params[:id])
+    @roll = @character.rolls.where(kind: Character::Rolling::MODES).find(params[:id])
   end
 end
