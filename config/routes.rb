@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       resources :memberships, only: :destroy
       resources :story_rolls, only: :create
       resources :quarrels, only: %i[ new create ]
+      resources :montages, only: %i[ new create ]
 
       resources :pools, only: %i[ index create update destroy ] do
         scope module: :pools do

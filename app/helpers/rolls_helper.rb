@@ -80,8 +80,9 @@ module RollsHelper
     roll.tie? ? "Tie" : "#{roll.winner} wins"
   end
 
-  # A side's own dice, then each helper's assist die; the side's highest die lights up.
-  def quarrel_side_dice_tags(side)
+  # A quarrel side's or montage character's own dice, then any helpers' assist
+  # dice; the highest die lights up.
+  def side_dice_tags(side)
     dice = side["dice"] + side["helpers"].pluck("die")
     top = dice.index(dice.max)
     tags = dice.map.with_index do |value, index|

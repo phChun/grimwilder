@@ -1,6 +1,6 @@
 require "test_helper"
 
-class StoryAndQuarrelTest < ActionDispatch::IntegrationTest
+class GroupRollsTest < ActionDispatch::IntegrationTest
   setup do
     @campaign = campaigns(:bramblewood)
     @tibbs, @bram = characters(:tibbs), characters(:bram)
@@ -89,5 +89,37 @@ class StoryAndQuarrelTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     post campaign_story_rolls_path(@campaign)
     assert_response :not_found
+  end
+
+  test "roll a montage" do
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select "a[href=?]", new_campaign_montage_path(@campaign)
+
+    get new_campaign_montage_path(@campaign)
+    assert_select "input[type=checkbox]", 2
+
+    assert_difference -> { @campaign.rolls.montage.count }, 1 do
+      post campaign_montages_path(@campaign), params: { scene: "The climb", participants: {
+        @tibbs.id => { in: "1", spark: 1 }, @bram.id => { in: "1" }
+      } }
+    end
+    assert_redirected_to campaign_path(@campaign, anchor: "roll-log")
+    assert_equal({ @tibbs.name => 3, "Bram" => 2 }, @campaign.rolls.montage.last.sides.to_h { [ _1["name"], _1["dice"].size ] })
+
+    follow_redirect!
+    assert_select "#roll_log .log-entry__question", "The climb"
+    assert_select "#roll_log .log-entry__meta", /highest result is the scene's outcome/
+  end
+
+  test "a montage needs someone in it, and only your own spark" do
+    sign_in_as identities(:pip)
+
+    post campaign_montages_path(@campaign), params: { participants: { @tibbs.id => { spark: 1 } } }
+    assert_select ".flash--alert", "Pick who takes part in the montage."
+
+    post campaign_montages_path(@campaign), params: { participants: { @bram.id => { in: "1", spark: 1 } } }
+    assert_select ".flash--alert", "Only Bram's player can spend their spark."
+    assert_equal 0, @campaign.rolls.montage.count
   end
 end

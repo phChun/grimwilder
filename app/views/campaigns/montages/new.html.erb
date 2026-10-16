@@ -1,0 +1,46 @@
+<% content_for :title, "Montage · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>Montage</h1>
+  <p class="page-header__lede">
+    Zoom out over a stretch of the story. Everyone taking part makes a 2d action roll, and the highest result is
+    the outcome for the whole scene. Then zoom back in on any unlikely or interesting results.
+  </p>
+</header>
+
+<% if flash[:alert] %>
+  <p class="flash flash--alert"><%= flash[:alert] %></p>
+<% end %>
+
+<%= form_with url: campaign_montages_path(Current.campaign), class: "panel stack quarrel-form" do %>
+  <div class="field">
+    <label class="field__label" for="montage_scene">The scene</label>
+    <input type="text" id="montage_scene" name="scene" value="<%= params[:scene] %>" maxlength="200" autocomplete="off" placeholder="The six-hour climb to the sanctum" class="field__input">
+  </div>
+
+  <fieldset class="roll-setup__group">
+    <legend class="field__label">Who takes part</legend>
+    <ul class="list">
+      <% @characters.each do |character| %>
+        <% choice = params.dig(:participants, character.id.to_s) || {} %>
+        <li class="list__item quarrel-form__row">
+          <label class="check">
+            <%= check_box_tag "participants[#{character.id}][in]", "1", choice[:in] == "1", id: "montage_in_#{character.id}" %>
+            <span>
+              <strong><%= character.name %></strong>
+              <small><%= character.identity.display_name %> · <%= pluralize(character.spark, "spark") %></small>
+            </span>
+          </label>
+          <% if character.owned_by?(Current.identity) && character.spark.positive? %>
+            <span class="quarrel-form__choices">
+              <%= select_tag "participants[#{character.id}][spark]", options_for_select((0..character.spark).map { [ "+#{_1} spark", _1 ] }, choice[:spark].to_i), id: "montage_spark_#{character.id}", class: "field__input", "aria-label": "Spark #{character.name} spends" %>
+            </span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </fieldset>
+
+  <button type="submit" class="button button--primary">Roll the montage</button>
+<% end %>

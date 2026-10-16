@@ -78,4 +78,31 @@ class RollTest < ActiveSupport::TestCase
     end
     assert_equal 1, @tibbs.reload.spark
   end
+
+  test "a montage takes the highest result for the scene" do
+    roll = Roll.montage!(campaign: @campaign, by: identities(:gwen), scene: "The climb",
+      participants: [ { character: @tibbs }, { character: @bram } ], random: FixedDice.new([ 5, 2, 3, 1 ]))
+
+    assert roll.montage?
+    assert_equal "messy", roll.outcome, "Tibbs's messy beats Bram's grim"
+    assert_equal [ "messy", "grim" ], roll.sides.pluck("outcome")
+    assert_equal [ "The climb", "Gibbletibble \"Tibbs\" and Bram" ], [ roll.question, roll.name ]
+  end
+
+  test "spark in a montage adds dice to that character's roll" do
+    roll = Roll.montage!(campaign: @campaign, by: identities(:pip),
+      participants: [ { character: @tibbs, spend_spark: 1 }, { character: @bram } ], random: FixedDice.new([ 1, 2, 6, 6, 6 ]))
+
+    assert_equal [ [ 1, 2, 6 ], [ 6, 6 ] ], roll.sides.pluck("dice")
+    assert_equal [ false, true ], roll.sides.pluck("critical")
+    assert_equal "perfect", roll.outcome
+    assert_equal 0, @tibbs.reload.spark
+  end
+
+  test "montages stay within the rules" do
+    [ [], [ { character: @tibbs }, { character: @tibbs } ], [ { character: characters(:loner) } ], [ { character: @tibbs, spend_spark: 2 } ] ].each do |participants|
+      assert_raises(ArgumentError) { Roll.montage!(campaign: @campaign, by: identities(:pip), participants: participants) }
+    end
+    assert_equal 1, @tibbs.reload.spark
+  end
 end

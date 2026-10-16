@@ -2,7 +2,7 @@
 # so any member can record it, but only a character's own player can spend
 # that character's spark.
 class Campaigns::QuarrelsController < ApplicationController
-  include CampaignScoped
+  include CampaignScoped, SparkSpending
 
   before_action :set_characters
 
@@ -30,9 +30,7 @@ class Campaigns::QuarrelsController < ApplicationController
 
       sides = leads.to_h do |id, choice|
         character = @characters.find { _1.id.to_s == id }
-        spark = choice[:spark].to_i
-        raise ArgumentError, "Only #{character.name}'s player can spend their spark." if spark.positive? && !character.owned_by?(Current.identity)
-        [ id, { character: character, spend_spark: spark, helpers: [] } ]
+        [ id, { character: character, spend_spark: spark_to_spend(character, choice[:spark]), helpers: [] } ]
       end
 
       (chosen.to_a - leads.to_a).each do |id, choice|

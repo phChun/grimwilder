@@ -64,8 +64,11 @@
       <button type="submit" class="button button--primary">Roll</button>
     <% end %>
 
-    <% if @characters.size >= 2 %>
-      <p class="field__hint">Characters at odds? <%= link_to "Start a quarrel", new_campaign_quarrel_path(Current.campaign) %>.</p>
+    <% if @characters.any? %>
+      <p class="field__hint">
+        Zooming out over a stretch of story? <%= link_to "Roll a montage", new_campaign_montage_path(Current.campaign) %>.
+        <% if @characters.size >= 2 %>Characters at odds? <%= link_to "Start a quarrel", new_campaign_quarrel_path(Current.campaign) %>.<% end %>
+      </p>
     <% end %>
   </section>
 
