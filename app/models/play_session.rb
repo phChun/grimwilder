@@ -80,11 +80,8 @@ class PlaySession < ApplicationRecord
     end
   end
 
-  # A boundary in the log ("Session 4 begins"), which also refreshes everyone's table.
-  def post_marker!(name, by:, text: nil, level_ups: [], scene: nil)
-    campaign.rolls.create!(kind: "marker", identity: by, name: name, play_session: self, scene: scene, question: text.to_s.strip.presence,
-      sides: level_ups.map { { "character_id" => _1.id, "name" => _1.name, "level" => _1.level } })
-    campaign.broadcast_table_refresh
+  def post_marker!(name, **options)
+    campaign.post_marker!(name, play_session: self, **options)
   end
 
   private

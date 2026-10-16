@@ -55,6 +55,8 @@ Rails.application.routes.draw do
         resource :ending, only: %i[ new create ], module: :scenes
       end
       resources :notes, only: :create
+      resource :rest, only: :create
+      resource :downtime, only: %i[ new create ]
 
       resources :pools, only: %i[ index create update destroy ] do
         scope module: :pools do

@@ -62,8 +62,12 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
 
   test "players are prompted for a best moment until they've shared one" do
     session = PlaySession.start!(@campaign, characters: [ @tibbs, characters(:bram) ], by: identities(:gwen))
-    sign_in_as identities(:pip)
+    sign_in_as identities(:gwen)
+    get campaign_path(@campaign) # the GM is prompted only for their own character
+    assert_select "#moment-prompt input[name=character_id][value=?]", characters(:bram).id.to_s
 
+    sign_out
+    sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select "#moment-prompt input[name=character_id][value=?]", @tibbs.id.to_s
 

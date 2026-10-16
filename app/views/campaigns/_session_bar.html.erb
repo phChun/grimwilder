@@ -24,6 +24,13 @@
         <% else %>
           <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary button--small" %>
         <% end %>
+        <details class="between-scenes">
+          <summary class="between-scenes__toggle">Between scenes</summary>
+          <div class="between-scenes__actions">
+            <%= button_to "Rest", campaign_rest_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Rest: clear marks and harm for #{campaign.current_session ? "everyone here" : "everyone seated"}?" } } %>
+            <%= link_to "Downtime…", new_campaign_downtime_path(campaign), class: "button button--small" %>
+          </div>
+        </details>
         <span class="suspense" title="Suspense: only you see this">
           <span class="suspense__label">Suspense</span>
           <%= button_to "−", campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, class: "counter__step counter__step--small", disabled: campaign.suspense.zero?, "aria-label": "Spend 1 suspense" %>

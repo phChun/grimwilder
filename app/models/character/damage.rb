@@ -40,6 +40,16 @@ module Character::Damage
     end)
   end
 
+  # A significant rest (pg. 30) clears all marks and harm. Doesn't save.
+  def rest
+    assign_attributes(Grimwild::STATS.to_h { [ "marked_#{_1}", false ] }.merge(bloodied: false, rattled: false, desperate: false))
+  end
+
+  def rest!
+    rest
+    save!
+  end
+
   def add_condition!(name, lasts: nil)
     update!(conditions: conditions + [ { "name" => name, "lasts" => lasts } ])
   end

@@ -1170,3 +1170,10 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .session-page__text { margin: 0; white-space: pre-line; }
 .session-page__edit { font-family: var(--font-body); font-size: 0.95rem; font-weight: 700; color: var(--moss); }
 .session-scene__bookend { margin: 0; font-size: 0.9rem; color: var(--ink-soft); }
+
+.between-scenes { position: relative; }
+.between-scenes__toggle { list-style: none; cursor: pointer; padding: var(--space-1) var(--space-2); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; }
+.between-scenes__toggle::-webkit-details-marker { display: none; }
+.between-scenes[open] > .between-scenes__toggle { background: var(--paper-sunken); }
+.between-scenes__actions { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
+.between-scenes__actions .button_to { margin: 0; }

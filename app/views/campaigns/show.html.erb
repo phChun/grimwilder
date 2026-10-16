@@ -25,7 +25,8 @@
     </div>
   </header>
 
-  <% if @session && (writable = @session.characters_needing_moments(Current.identity)).any? %>
+  <%# The GM can write anyone's moment from the session page; here, only your own characters prompt you. %>
+  <% if @session && (writable = @session.characters_needing_moments(Current.identity).select { _1.owned_by?(Current.identity) }).any? %>
     <details id="moment-prompt" class="fold fold--panel moment-prompt" open data-details-memory-target="section" data-section="moments-<%= @session.id %>" data-phone-open="true">
       <summary class="fold__summary"><span class="fold__title">Best moment from last session</span><span class="fold__meta">close to dismiss</span></summary>
       <p class="field__hint">Recall last session and share your character's best moment (pg. 31).</p>

@@ -1,0 +1,35 @@
+<% content_for :title, "Downtime · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>Downtime</h1>
+  <p class="page-header__lede">
+    Everyone fully heals and resets per-session talents, and you roll the campaign pools (pg. 30).
+    <%= Current.campaign.current_session ? "It applies to the characters at #{Current.campaign.current_session.title.downcase}." : "Between sessions, it applies to everyone seated." %>
+  </p>
+</header>
+
+<%= form_with url: campaign_downtime_path(Current.campaign), class: "panel stack session-form" do %>
+  <fieldset class="roll-setup__group">
+    <legend class="field__label">Conditions that heal</legend>
+    <% conditions = @characters.flat_map { |character| character.conditions.each_with_index.map { |condition, index| [ character, index, condition ] } } %>
+    <% if conditions.any? %>
+      <% conditions.each do |character, index, condition| %>
+        <label class="check">
+          <%= check_box_tag "clear[]", "#{character.id}:#{index}", true, id: "downtime_clear_#{character.id}_#{index}" %>
+          <span><strong><%= character.name %></strong>: <%= condition["name"] %></span>
+        </label>
+      <% end %>
+      <p class="field__hint">Untick anything permanent.</p>
+    <% else %>
+      <p class="field__hint">No one has a condition.</p>
+    <% end %>
+  </fieldset>
+
+  <p class="field__hint">
+    Marks and harm clear for <%= @characters.map(&:name).to_sentence.presence || "no one" %>.
+    <% if @pools.any? %>Campaign pools to roll: <%= @pools.map(&:name).to_sentence %>.<% else %>No campaign pools to roll.<% end %>
+  </p>
+
+  <button type="submit" class="button button--primary">Take downtime</button>
+<% end %>
