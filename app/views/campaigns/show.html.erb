@@ -1,128 +1,148 @@
 <% content_for :title, Current.campaign.name %>
+<% content_for :head do %>
+  <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+<% end %>
+<%= turbo_stream_from Current.campaign, :pools %>
 
-<header class="page-header">
-  <p class="eyebrow"><%= gm? ? "You're the GM" : "You're a player" %></p>
-  <h1><%= Current.campaign.name %></h1>
-  <p><%= link_to "Pools", campaign_pools_path(Current.campaign), class: "button" %></p>
-</header>
+<% seats = table_seats(@memberships, @characters) %>
+<% alert = table_alert(@characters) %>
+<% latest = @rolls.first %>
+<% first_crucible = @crucible_groups.first.last.first %>
 
-<div class="campaign">
-  <%= render "rolls/log", campaign: Current.campaign, membership: Current.membership, rolls: @rolls %>
+<div class="gm-table" data-controller="details-memory" data-details-memory-campaign-value="<%= Current.campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
+  <header class="gm-table__header">
+    <div class="gm-table__heading">
+      <p class="eyebrow"><%= gm? ? "You're the GM" : "You're a player" %></p>
+      <h1 class="gm-table__name"><%= Current.campaign.name %></h1>
+    </div>
+    <div class="gm-table__tools">
+      <% if gm? %><%= render "campaigns/copy_join_button", url: join_url(Current.campaign.join_code) %><% end %>
+      <a href="#settings" class="button button--small gm-table__icon" aria-label="Invite and settings" title="Invite and settings" data-action="details-memory#jump">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>
+      </a>
+    </div>
+  </header>
 
-  <section id="story-roll" class="panel stack" aria-labelledby="campaign-story">
-    <h2 id="campaign-story" class="panel__title">Story roll</h2>
-    <p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster).</p>
-    <%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack" do %>
-      <div class="field">
-        <label class="field__label" for="story_question">Question <small>(optional)</small></label>
-        <input type="text" id="story_question" name="question" maxlength="200" autocomplete="off" placeholder="Do I see any guards?" class="field__input">
-      </div>
+  <nav class="gm-table__tabs" aria-label="Sections">
+    <a href="#pools" class="gm-table__tab" data-action="details-memory#jump">Pools</a>
+    <a href="#crucibles" class="gm-table__tab" data-action="details-memory#jump">Crucibles</a>
+    <a href="#table" class="gm-table__tab" data-action="details-memory#jump">Table</a>
+    <a href="#roll-log" class="gm-table__tab" data-action="details-memory#jump">Log</a>
+  </nav>
 
-      <fieldset class="roll-setup__group">
-        <legend class="field__label">Odds</legend>
-        <div class="segmented segmented--auto">
-          <% Roll::ODDS.each do |dice, odds| %>
-            <label class="segmented__option">
-              <%= radio_button_tag :odds, dice, dice == 2 %>
-              <span><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
-            </label>
-          <% end %>
-        </div>
-      </fieldset>
-
-      <div class="field">
-        <label class="field__label" for="story_thorns">Thorns <small>d8, rare</small></label>
-        <input type="number" id="story_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
-      </div>
-
-      <% if @my_characters.any? %>
-        <div class="field">
-          <label class="field__label" for="story_character">For</label>
-          <select id="story_character" name="character_id" class="field__input">
-            <option value="">No one in particular</option>
-            <% @my_characters.each do |character| %>
-              <option value="<%= character.id %>"><%= character.name %> (<%= pluralize(character.spark, "spark") %>)</option>
+  <div class="gm-table__columns">
+    <div class="gm-table__column gm-table__column--side">
+      <details id="table" class="fold fold--panel gm-table__seats" open data-details-memory-target="section" data-section="table">
+        <summary class="fold__summary">
+          <span class="fold__title">At the table</span>
+          <span class="fold__meta fold__meta--wide"><%= pluralize(seats.count { _1.first.player? }, "player") %></span>
+          <% if alert %><span class="status-chip status-chip--harm fold__meta--phone"><%= alert %></span><% end %>
+        </summary>
+        <ul class="seats">
+          <% seats.each do |membership, seated| %>
+            <% if seated.empty? %>
+              <li class="seat">
+                <div class="seat__line">
+                  <span class="seat__name seat__name--empty"><%= membership.identity.display_name %></span>
+                  <span class="seat__meta">no character yet</span>
+                </div>
+              </li>
             <% end %>
-          </select>
-        </div>
-
-        <div class="field">
-          <label class="field__label" for="story_spark">Spend spark <small>+1d each</small></label>
-          <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
-          <p class="field__hint">Only for a character. A disaster gives them spark.</p>
-        </div>
-      <% end %>
-
-      <button type="submit" class="button button--primary">Roll</button>
-    <% end %>
-
-    <% if @characters.any? %>
-      <p class="field__hint">
-        Zooming out over a stretch of story? <%= link_to "Roll a montage", new_campaign_montage_path(Current.campaign) %>.
-        <% if @characters.size >= 2 %>Characters at odds? <%= link_to "Start a quarrel", new_campaign_quarrel_path(Current.campaign) %>.<% end %>
-      </p>
-    <% end %>
-  </section>
-
-  <section class="panel stack" aria-labelledby="campaign-table">
-    <h2 id="campaign-table" class="panel__title">At the table</h2>
-    <ul class="list">
-      <% @memberships.each do |membership| %>
-        <li class="list__item">
-          <span>
-            <strong><%= membership.identity.display_name %></strong>
-            <small><%= membership.gm? ? "GM" : "Player" %><%= " · you" if membership == Current.membership %></small>
-          </span>
-          <% if membership == Current.membership && membership.player? %>
-            <%= button_to "Leave", campaign_membership_path(Current.campaign, membership), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Leave #{Current.campaign.name}?" } } %>
-          <% elsif gm? && membership.player? %>
-            <%= button_to "Remove", campaign_membership_path(Current.campaign, membership), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Remove #{membership.identity.display_name}?" } } %>
+            <% seated.each do |character| %>
+              <li class="seat">
+                <div class="seat__line">
+                  <%= link_to character.name, character_path(character), class: "seat__name" %>
+                  <span class="seat__meta"><%= character.path %> <%= character.level %> · <%= membership.identity.display_name %></span>
+                  <%= spark_dots(character) %>
+                </div>
+                <% chips = character_chips(character) %>
+                <% if chips.present? %><div class="seat__chips"><%= chips %></div><% end %>
+              </li>
+            <% end %>
           <% end %>
-        </li>
-      <% end %>
-    </ul>
-  </section>
+        </ul>
+        <p class="fold__footer"><%= link_to "Add your character", new_character_path(campaign_id: Current.campaign.id) %></p>
+      </details>
 
-  <section class="panel stack" aria-labelledby="campaign-characters">
-    <h2 id="campaign-characters" class="panel__title">Characters</h2>
-    <% if @characters.any? %>
-      <ul class="list">
-        <% @characters.each do |character| %>
-          <li class="list__item">
-            <span>
-              <%= link_to character.name, character_path(character) %>
-              <small><%= character.path %> · level <%= character.level %> · <%= character.identity.display_name %></small>
-            </span>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p class="empty">No characters seated yet.</p>
-    <% end %>
-    <p><%= link_to "Add your character", new_character_path(campaign_id: Current.campaign.id), class: "button button--small" %></p>
-  </section>
+      <details id="roll-log" class="fold fold--panel gm-table__log" open data-details-memory-target="section" data-section="log">
+        <summary class="fold__summary">
+          <span class="fold__title">Roll log</span>
+          <span class="live fold__meta--wide"><span class="live__dot" aria-hidden="true"></span>Live</span>
+          <% if latest %>
+            <span class="fold__meta fold__meta--phone fold__meta--fill"><%= roll_headline(latest) %></span>
+            <% if latest.outcome %><span class="<%= class_names("result-badge", "result-badge--#{latest.outcome}", "fold__meta--phone") %>"><%= latest.outcome.capitalize %></span><% end %>
+          <% end %>
+        </summary>
+        <%= render "rolls/log", campaign: Current.campaign, membership: Current.membership, rolls: @rolls %>
+      </details>
 
-  <% if gm? %>
-    <section class="panel stack" aria-labelledby="campaign-invite">
-      <h2 id="campaign-invite" class="panel__title">Invite players</h2>
-      <p class="field__hint">Anyone with this link can sign in and join as a player.</p>
-      <%= render "campaigns/join_link", url: join_url(Current.campaign.join_code) %>
-      <%= button_to "Make a new link", campaign_join_code_path(Current.campaign), method: :patch, class: "button button--quiet button--small", form: { data: { turbo_confirm: "The current link will stop working. Continue?" } } %>
-    </section>
-
-    <section class="panel stack" aria-labelledby="campaign-settings">
-      <h2 id="campaign-settings" class="panel__title">Settings</h2>
-      <%= form_with model: Current.campaign, class: "stack" do |form| %>
-        <% if Current.campaign.errors.any? %>
-          <p class="form-error"><%= Current.campaign.errors.full_messages.to_sentence %></p>
-        <% end %>
-        <div class="field">
-          <%= form.label :name, "Campaign name", class: "field__label" %>
-          <%= form.text_field :name, required: true, maxlength: 80, class: "field__input" %>
+      <%= tag.details id: "settings", class: "fold fold--panel gm-table__settings", open: Current.campaign.errors.any?, data: { details_memory_target: "section", section: "settings" } do %>
+        <summary class="fold__summary"><span class="fold__title">Invite &amp; settings</span></summary>
+        <div class="fold__body stack">
+          <%= render "campaigns/settings", memberships: @memberships, gm: gm? %>
         </div>
-        <%= form.submit "Rename", class: "button" %>
       <% end %>
-      <%= button_to "Delete campaign", campaign_path(Current.campaign), method: :delete, class: "button button--danger button--small", form: { data: { turbo_confirm: "Delete #{Current.campaign.name} for everyone? This can't be undone." } } %>
-    </section>
-  <% end %>
+    </div>
+
+    <div class="gm-table__column gm-table__column--main">
+      <details id="pools" class="fold fold--panel gm-table__pools" open data-details-memory-target="section" data-section="pools" data-phone-open="true">
+        <summary class="fold__summary">
+          <span class="fold__title">Pools</span>
+          <span class="fold__meta"><%= @pools.size %></span>
+          <span class="fold__meta fold__meta--wide">Everyone sees rolls live</span>
+        </summary>
+        <div class="pool-rows">
+          <% @pools.each do |pool| %>
+            <%= render "campaigns/pools/pool", pool: pool, my_characters: @my_characters, gm: gm? %>
+          <% end %>
+        </div>
+        <% if @pools.none? %>
+          <p class="empty"><%= gm? ? "No pools yet. Add one when the story needs a clock." : "No pools yet. Your GM adds them as the story needs." %></p>
+        <% end %>
+        <% if gm? %>
+          <%= tag.details id: "pool-new", class: "fold pool-add", open: @pool.errors.any? do %>
+            <summary class="fold__summary pool-add__summary"><span class="fold__title">+ Add pool</span></summary>
+            <%= render "campaigns/pools/form", pool: @pool %>
+          <% end %>
+        <% end %>
+      </details>
+
+      <details id="story-roll" class="fold fold--panel gm-table__story" data-details-memory-target="section" data-section="story">
+        <summary class="fold__summary">
+          <span class="fold__title">Story roll</span>
+          <span class="fold__meta">montage · quarrel</span>
+        </summary>
+        <div class="fold__body">
+          <%= render "campaigns/story_roll", characters: @characters, my_characters: @my_characters %>
+        </div>
+      </details>
+    </div>
+
+    <div class="gm-table__column gm-table__column--tools">
+      <details id="crucibles" class="fold fold--panel gm-table__crucibles" open data-details-memory-target="section" data-section="crucibles" data-turbo-permanent>
+        <summary class="fold__summary">
+          <span class="fold__title">Crucibles</span>
+          <span class="fold__meta" data-crucible-picker-target="current"><%= first_crucible.name %></span>
+        </summary>
+        <div class="fold__body crucible-picker" data-controller="crucible-picker" data-crucible-picker-url-value="<%= crucible_path("__key__", embed: 1) %>">
+          <div class="crucible-picker__choose">
+            <label class="visually-hidden" for="crucible-pick">Crucible</label>
+            <select id="crucible-pick" class="field__input" data-crucible-picker-target="select" data-action="crucible-picker#pick">
+              <% @crucible_groups.each do |group, crucibles| %>
+                <optgroup label="<%= Crucible::GROUPS.fetch(group) %>">
+                  <% crucibles.each do |crucible| %>
+                    <option value="<%= crucible.key %>"><%= crucible.name %></option>
+                  <% end %>
+                </optgroup>
+              <% end %>
+            </select>
+          </div>
+          <p class="crucible-picker__recent" data-crucible-picker-target="recent" hidden></p>
+          <%= turbo_frame_tag "crucible", src: crucible_path(first_crucible, embed: 1), data: { crucible_picker_target: "frame" } do %>
+            <p class="crucible__hint">Loading <%= first_crucible.name %>…</p>
+          <% end %>
+        </div>
+      </details>
+    </div>
+  </div>
 </div>

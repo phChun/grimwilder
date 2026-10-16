@@ -1,0 +1,6 @@
+<%# locals: (url:) %>
+<%# herb:slots client %>
+<%# herb:state (copied: false) %>
+<button type="button" class="button button--small" data-controller="clipboard" data-clipboard-text-value="<%= url %>" data-action="clipboard#copy">
+  <% if copied %>Copied<% else %>Copy join link<% end %>
+</button>

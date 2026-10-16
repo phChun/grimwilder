@@ -21,30 +21,21 @@ class TableLogTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select "#roll_log > li", 0
-    assert_select "turbo-cable-stream-source", 1
+    assert_select "turbo-cable-stream-source", 2, "pool refreshes, plus the open log"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
     assert_select "#roll_log > li", 1
-    assert_select "turbo-cable-stream-source", 2
+    assert_select "turbo-cable-stream-source", 3, "pool refreshes, plus both logs"
   end
 
-  test "the pools page shows the table log too, minus hidden pools for players" do
-    pools(:lookouts).roll!(by: identities(:gwen))
-    pools(:ambush).roll!(by: identities(:gwen))
-    characters(:tibbs).roll!("wits", by: identities(:pip))
+  test "the table shows the newest #{CampaignTable::LOG_SIZE} log entries" do
+    (CampaignTable::LOG_SIZE + 2).times { characters(:tibbs).roll!("wits", by: identities(:pip)) }
 
     sign_in_as identities(:pip)
-    get campaign_pools_path(@campaign)
-    assert_select "#roll_log > li", 2
-    assert_select "#roll_log", text: /Goblin ambush/, count: 0
-    assert_select "turbo-cable-stream-source", 2, "pools refreshes, plus the log"
-
-    sign_out
-    sign_in_as identities(:gwen)
-    get campaign_pools_path(@campaign)
-    assert_select "#roll_log > li", 3
+    get campaign_path(@campaign)
+    assert_select "#roll_log > li", CampaignTable::LOG_SIZE
   end
 
   test "a disaster shows the spark it gave" do

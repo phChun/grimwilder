@@ -180,8 +180,17 @@ In JavaScript:
 - **Quarrels** (`Roll.quarrel!`, in `Roll::Quarrel`; pg. 23) have their own page. Each side rolls 2d plus any spark, and each assist rolls its own 1d (pg. 13). The highest die wins, and a tie has no `winner`. Everyone involved takes spark. Sides go in the `sides` JSON and the stakes in `question`. Any member can record a quarrel, but only a character's own player can spend its spark (the `SparkSpending` controller concern).
 - **Montages** (`Roll.montage!`, in `Roll::Montage`; pg. 16) have their own page too. Each seated character taking part rolls 2d plus any spark, with no thorns, since the book gives montages none. The best single result is the scene's `outcome`, and each character's own result goes in `sides`, so the table can see what to zoom in on. The scene goes in `question`.
 - `Character#settle_spark(spent:, take:)` is the one place spark is spent before a roll and taken after it, capped at 2. It doesn't save.
-- Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. The campaign page and the pools page both render `rolls/_log` (locals `campaign:`, `membership:`, `rolls:`), which subscribes to `Roll.streams_for(campaign, membership)` itself; load the entries with `campaign.rolls.table_log(membership)`. `rolls/_roll` renders in a job, so it must not use `Current`.
+- Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. The GM table renders `rolls/_log` (locals `campaign:`, `membership:`, `rolls:`: the list only, no heading), which subscribes to `Roll.streams_for(campaign, membership)` itself; load the entries with `campaign.rolls.table_log(membership)`. `rolls/_roll` renders in a job, so it must not use `Current`.
 - In tests, `assert_no_turbo_stream_broadcasts` counts every broadcast so far in the test, not just the ones inside its block. `FixedDice` (test/test_helpers) stands in for `Random`.
+
+## The GM table (campaigns#show)
+
+The campaign page is where play runs, for the GM and players alike. Three columns from 1100px wide (side: At the table, Roll log, Invite & settings; main: Pools, Story roll; tools: Crucibles), two from 768px, and one on phones with section tabs.
+- Every section is a native `<details>`. `details_memory_controller.js` remembers open/closed per browser in localStorage (keyed by campaign and section). With nothing saved, phones open only Pools. It also restores what people opened after a Turbo morph, because a pool refresh re-renders the page with the server's defaults.
+- `CampaignTable#load_table` (a controller concern) loads everything. `Campaigns::PoolsController#create` uses it too, to show the table again with the form open when a pool doesn't save.
+- **Pools** are compact rows (`campaigns/pools/_pool`). The ⋯ fold-out holds drop-first, push, the power-pool action roll and the GM controls. `GET /campaigns/:id/pools` and the nav's `/pools` redirect to `#pools`, and pool actions redirect back to the table. The new-pool form (`campaigns/pools/_form`) keeps its own herb:state.
+- **Crucibles** load in a `turbo_frame_tag "crucible"` from `crucible_path(key, embed: 1)`, which renders `crucibles/_roller` with the unchanged `crucible_controller.js`. `crucible_picker_controller.js` swaps the frame's `src` and keeps three "Recent" chips. The section is `data-turbo-permanent`, so morphs don't wipe a roll.
+- Turbo drops a redirect's `#fragment` after a form post, so pool actions land at the top of the page rather than on the row.
 
 ## Accounts & campaigns (passwordless)
 

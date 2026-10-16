@@ -13,6 +13,6 @@ module PoolScoped
     end
 
     def back_to_pools(**options)
-      redirect_to campaign_pools_path(Current.campaign, anchor: helpers.dom_id(@pool)), **options
+      redirect_to campaign_path(Current.campaign, anchor: helpers.dom_id(@pool)), **options
     end
 end

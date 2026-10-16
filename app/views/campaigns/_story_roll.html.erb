@@ -1,0 +1,53 @@
+<%# locals: (characters:, my_characters:) %>
+<p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster).</p>
+<%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack" do %>
+  <div class="field">
+    <label class="field__label" for="story_question">Question <small>(optional)</small></label>
+    <input type="text" id="story_question" name="question" maxlength="200" autocomplete="off" placeholder="Do I see any guards?" class="field__input">
+  </div>
+
+  <fieldset class="roll-setup__group">
+    <legend class="field__label">Odds</legend>
+    <div class="segmented segmented--auto">
+      <% Roll::ODDS.each do |dice, odds| %>
+        <label class="segmented__option">
+          <%= radio_button_tag :odds, dice, dice == 2 %>
+          <span><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <div class="story-roll__fields">
+    <div class="field">
+      <label class="field__label" for="story_thorns">Thorns <small>rare</small></label>
+      <input type="number" id="story_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+    </div>
+
+    <% if my_characters.any? %>
+      <div class="field">
+        <label class="field__label" for="story_character">For</label>
+        <select id="story_character" name="character_id" class="field__input">
+          <option value="">No one in particular</option>
+          <% my_characters.each do |character| %>
+            <option value="<%= character.id %>"><%= character.name %> (<%= pluralize(character.spark, "spark") %>)</option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="story_spark">Spark <small>+1d each</small></label>
+        <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+      </div>
+    <% end %>
+  </div>
+
+  <button type="submit" class="button button--primary">Roll</button>
+<% end %>
+
+<% if characters.any? %>
+  <p class="fold__footer">
+    <%= link_to "Roll a montage", new_campaign_montage_path(Current.campaign) %>
+    <% if characters.size >= 2 %> · <%= link_to "Start a quarrel", new_campaign_quarrel_path(Current.campaign) %><% end %>
+  </p>
+<% end %>

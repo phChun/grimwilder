@@ -9,18 +9,30 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_difference -> { @campaign.pools.count }, 1 do
       post campaign_pools_path(@campaign), params: { pool: { name: "Reinforcements arrive", kind: "pressure", starting_size: 8 } }
     end
-    assert_redirected_to campaign_pools_path(@campaign)
-    assert_equal 8, @campaign.pools.find_by!(name: "Reinforcements arrive").size
+    pool = @campaign.pools.find_by!(name: "Reinforcements arrive")
+    assert_redirected_to campaign_path(@campaign, anchor: dom_id(pool))
+    assert_equal 8, pool.size
   end
 
-  test "a player sees visible pools only, and can't add one" do
+  test "the old pools page sends you to the campaign's pools" do
     sign_in_as identities(:pip)
 
     get campaign_pools_path(@campaign)
+    assert_redirected_to campaign_path(@campaign, anchor: "pools")
+  end
+
+  test "a player sees visible pools only, and no GM controls" do
+    sign_in_as identities(:pip)
+
+    get campaign_path(@campaign)
     assert_response :success
-    assert_select "h2", text: "Lookouts spot you"
-    assert_select "h2", text: "Goblin ambush", count: 0
+    assert_select "#pools .pool-row__name", text: "Lookouts spot you"
+    assert_select "#pools .pool-row__name", text: "Goblin ambush", count: 0
     assert_select "#pool-new", count: 0
+    assert_select "form[action=?]", campaign_pool_reset_path(@campaign, pools(:brawl)), count: 0
+    assert_select "form[action=?]", campaign_pool_path(@campaign, pools(:lookouts)), count: 0
+    assert_select "form[action=?]", campaign_join_code_path(@campaign), count: 0
+    assert_select "button[data-controller=clipboard]", count: 0, text: "Copy join link"
 
     post campaign_pools_path(@campaign), params: { pool: { name: "Mine", starting_size: 2 } }
     assert_response :forbidden
@@ -30,7 +42,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     post campaign_pool_roll_path(@campaign, pools(:lookouts))
-    assert_redirected_to campaign_pools_path(@campaign, anchor: "pool_#{pools(:lookouts).id}")
+    assert_redirected_to campaign_path(@campaign, anchor: "pool_#{pools(:lookouts).id}")
     assert_equal identities(:pip), pools(:lookouts).reload.last_rolled_by
   end
 
@@ -74,19 +86,19 @@ class PoolsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
 
     get pools_path
-    assert_redirected_to campaign_pools_path(@campaign)
+    assert_redirected_to campaign_path(@campaign, anchor: "pools")
   end
 
   test "roll a power pool as an action, spending your own character's spark" do
     wand = @campaign.pools.create!(name: "Blasting Wand", kind: "power", starting_size: 4)
     sign_in_as identities(:pip)
 
-    get campaign_pools_path(@campaign)
-    assert_select "##{dom_id(wand)} details.pool__power select[name=character_id] option", 2, "no one, or Tibbs"
-    assert_select "##{dom_id(pools(:lookouts))} details.pool__power", 0
+    get campaign_path(@campaign)
+    assert_select "##{dom_id(wand)} .pool-row__action-roll select[name=character_id] option", 2, "no one, or Tibbs"
+    assert_select "##{dom_id(pools(:lookouts))} .pool-row__action-roll", 0
 
     post campaign_pool_roll_path(@campaign, wand), params: { as_action: "1", thorns: 1, character_id: characters(:tibbs).id, spark: 1 }
-    assert_redirected_to campaign_pools_path(@campaign, anchor: dom_id(wand))
+    assert_redirected_to campaign_path(@campaign, anchor: dom_id(wand))
     roll = wand.rolls.last
     assert_equal [ 5, 1, 1 ], [ roll.dice.size, roll.thorns.size, roll.spark_spent ]
 
@@ -121,7 +133,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_equal [ 2, "Claws" ], [ ogre.size, ogre.phase_name ]
 
     ogre.roll!(by: identities(:gwen), random: FixedDice.new([ 1, 3 ]))
-    get campaign_pools_path(@campaign)
+    get campaign_path(@campaign)
     assert_select "##{dom_id(ogre)} .pool__phase--done", "2d Claws"
     assert_select "##{dom_id(ogre)} .pool__phase--current[aria-current=step]", "4d Body"
     assert_select "#roll_log .log-entry__meta", /0d: Claws is done\. 4d Body begins\./

@@ -1,0 +1,60 @@
+<%# locals: (crucible:) %>
+<%# The GM table's compact roller. Same crucible_controller as /crucibles/:id, so kept lines are shared with it. %>
+<div class="crucible crucible--compact" data-controller="crucible" data-crucible-key-value="<%= crucible.key %>">
+  <div class="crucible__actions">
+    <button type="button" class="button button--primary button--small" data-action="crucible#rollAll">
+      <%= crucible.tables.size > 1 ? "Roll all #{crucible.tables.size}" : "Roll" %>
+    </button>
+    <button type="button" class="button button--small" data-action="crucible#keep" data-crucible-target="keepButton" disabled>Keep</button>
+    <%= link_to "Full page", crucible_path(crucible), class: "crucible__full", data: { turbo_frame: "_top" } %>
+  </div>
+
+  <div class="crucible__results" data-crucible-target="results" aria-live="polite">
+    <p class="crucible__hint"><%= crucible.how %> <small>(pg. <%= crucible.page %>)</small></p>
+  </div>
+
+  <details class="crucible__kept fold" open data-crucible-target="keptSection" hidden>
+    <summary class="fold__summary"><span class="fold__title">Kept this session</span></summary>
+    <ol class="crucible__kept-list" data-crucible-target="keptList"></ol>
+    <div class="crucible__actions">
+      <button type="button" class="button button--small" data-action="crucible#copyKept">Copy list</button>
+      <button type="button" class="button button--quiet button--small" data-action="crucible#clearKept">Clear</button>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary class="fold__summary"><span class="fold__title">Show the 6×6 tables</span></summary>
+    <div class="crucible__tables">
+      <% crucible.tables.each_with_index do |table, index| %>
+        <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" aria-labelledby="embed-<%= crucible.key %>-<%= index %>">
+          <header class="crucible-table__header">
+            <h3 id="embed-<%= crucible.key %>-<%= index %>" class="crucible-table__name"><%= table.name %></h3>
+            <button type="button" class="button button--small" data-action="crucible#rollOne" data-index="<%= index %>">Roll</button>
+          </header>
+          <div class="grid66-wrap">
+            <table class="grid66">
+              <thead>
+                <tr>
+                  <th scope="col"><span class="visually-hidden">Row</span></th>
+                  <% 6.times do |column| %>
+                    <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
+                  <% end %>
+                </tr>
+              </thead>
+              <tbody>
+                <% table.rows.each_with_index do |row, row_index| %>
+                  <tr>
+                    <th scope="row"><%= row_index + 1 %></th>
+                    <% row.each_with_index do |word, column_index| %>
+                      <td data-row="<%= row_index + 1 %>" data-col="<%= column_index + 1 %>"><%= word %></td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      <% end %>
+    </div>
+  </details>
+</div>

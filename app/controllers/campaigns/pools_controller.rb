@@ -1,36 +1,35 @@
-# A campaign's pools. Every member sees and rolls the visible ones; the GM
-# creates, hides, renames and deletes them.
+# A campaign's pools. They're run from the campaign page (the GM table), so
+# the old pools page sends people there. Every member sees and rolls the
+# visible ones; the GM creates, hides and deletes them.
 class Campaigns::PoolsController < ApplicationController
-  include CampaignScoped
+  include CampaignScoped, CampaignTable
 
   before_action :require_gm, except: :index
   before_action :set_pool, only: %i[ update destroy ]
-  before_action :set_table_log, only: %i[ index create ]
 
   def index
-    @pools = Current.campaign.pools.visible_to(Current.membership).includes(:last_rolled_by).ordered
-    @pool = Current.campaign.pools.new(starting_size: 4)
+    redirect_to campaign_path(Current.campaign, anchor: "pools")
   end
 
   def create
     @pool = Current.campaign.pools.new(pool_params)
 
     if @pool.save
-      redirect_to campaign_pools_path(Current.campaign)
+      redirect_to campaign_path(Current.campaign, anchor: helpers.dom_id(@pool))
     else
-      @pools = Current.campaign.pools.visible_to(Current.membership).includes(:last_rolled_by).ordered
-      render :index, status: :unprocessable_entity
+      load_table
+      render "campaigns/show", status: :unprocessable_entity
     end
   end
 
   def update
     @pool.update!(params.expect(pool: [ :hidden ]))
-    redirect_to campaign_pools_path(Current.campaign)
+    redirect_to campaign_path(Current.campaign, anchor: helpers.dom_id(@pool))
   end
 
   def destroy
     @pool.destroy
-    redirect_to campaign_pools_path(Current.campaign), notice: "#{@pool.name} removed."
+    redirect_to campaign_path(Current.campaign, anchor: "pools"), notice: "#{@pool.name} removed."
   end
 
   private
@@ -40,10 +39,5 @@ class Campaigns::PoolsController < ApplicationController
 
     def pool_params
       params.expect(pool: [ :name, :kind, :starting_size, :phases_text, :hidden ])
-    end
-
-    def set_table_log
-      @rolls = Current.campaign.rolls.table_log(Current.membership, limit: 20)
-      @my_characters = Current.campaign.characters.where(identity: Current.identity).ordered
     end
 end

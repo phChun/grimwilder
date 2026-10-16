@@ -1,0 +1,95 @@
+<%# locals: (pool:, my_characters:, gm:) %>
+<div id="<%= dom_id(pool) %>" class="<%= class_names("pool-row", "pool--#{pool.kind}", "pool-row--depleted": pool.depleted?) %>">
+  <span class="pool-row__stripe" aria-hidden="true"></span>
+
+  <div class="pool-row__main">
+    <p class="pool-row__title">
+      <span class="pool-row__name"><%= pool.name %></span>
+      <span class="pool-row__kind" title="<%= pool.description %>"><%= pool.kind %><%= ", linked" if pool.linked? %></span>
+      <% if pool.hidden? %><span class="tag">GM only</span><% end %>
+      <% if pool.pushable? %><span class="badge badge--push">Nothing dropped: push?</span><% end %>
+      <% if pool.depleted? %><span class="pool-row__outcome"><%= pool.outcome %></span><% end %>
+    </p>
+
+    <% if pool.linked? %>
+      <ol class="pool__phases" aria-label="Phases">
+        <% pool.phases.each_with_index do |entry, index| %>
+          <li class="<%= class_names("pool__phase", "pool__phase--done": index < pool.phase, "pool__phase--current": index == pool.phase) %>"<% if index == pool.phase %> aria-current="step"<% end %>><%= entry["size"] %>d <%= entry["name"] %></li>
+        <% end %>
+      </ol>
+    <% end %>
+
+    <p class="pool-row__last">
+      <% if pool.last_action.blank? %>
+        Not rolled yet
+      <% elsif pool.last_action == "pushed" %>
+        Pushed by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped, take a mark
+      <% else %>
+        <span class="pool-row__dice-line">Last: <% pool.last_dice.each do |die| %><span class="<%= class_names("pool-row__die", "pool-row__die--dropped": die < 4) %>"><%= die %></span> <% end %>·</span>
+        <%= pool.last_dropped.to_i.zero? ? "nothing dropped" : "#{pool.last_dropped}d dropped" %><%= " (1d first)" if pool.last_action == "rolled_after_drop" %>
+        · <%= pool.last_rolled_by&.display_name || "someone" %>, <%= time_ago_in_words(pool.last_rolled_at) %> ago
+      <% end %>
+    </p>
+  </div>
+
+  <div class="pool-row__size" role="img" aria-label="<%= pool.size %> of <%= pool.starting_size %> dice left<%= " in #{pool.phase_name}" if pool.linked? %>">
+    <span class="pool-row__count"><%= pool.size %>d</span>
+    <span class="pool__pips" aria-hidden="true"><% pool.starting_size.times do |i| %><span class="<%= class_names("pip", "pip--gone": i >= pool.size) %>"></span><% end %></span>
+  </div>
+
+  <div class="pool-row__primary">
+    <% if pool.rollable? %>
+      <%= button_to "Roll", campaign_pool_roll_path(Current.campaign, pool), class: "button button--primary button--small", "aria-label": "Roll #{pool.name}" %>
+    <% elsif gm && pool.resettable? %>
+      <%= button_to pool_reset_label(pool), campaign_pool_reset_path(Current.campaign, pool), class: "button button--small" %>
+    <% end %>
+  </div>
+
+  <% if pool.rollable? || pool.pushable? || gm %>
+    <details id="<%= dom_id(pool, :more) %>" class="pool-row__more">
+      <summary class="pool-row__toggle" aria-label="More for <%= pool.name %>">⋯</summary>
+      <div class="pool-row__panel">
+        <div class="pool-row__panel-actions">
+          <% if pool.rollable? %>
+            <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(Current.campaign, pool), params: { drop_first: "1" }, class: "button button--small" %>
+          <% end %>
+          <% if pool.pushable? %>
+            <%= button_to "Push (take a mark)", campaign_pool_push_path(Current.campaign, pool), class: "button button--small button--push" %>
+          <% end %>
+          <% if gm %>
+            <span class="pool-row__spacer"></span>
+            <% if pool.resettable? %>
+              <%= button_to pool_reset_label(pool), campaign_pool_reset_path(Current.campaign, pool), class: "button button--quiet button--small" %>
+            <% end %>
+            <%= button_to (pool.hidden? ? "Show" : "Hide"), campaign_pool_path(Current.campaign, pool), method: :patch, params: { pool: { hidden: !pool.hidden? } }, class: "button button--quiet button--small", "aria-label": "#{pool.hidden? ? "Show" : "Hide"} #{pool.name} #{pool.hidden? ? "to" : "from"} players" %>
+            <%= button_to "Delete", campaign_pool_path(Current.campaign, pool), method: :delete, class: "button button--quiet button--small button--danger-text", form: { data: { turbo_confirm: "Delete #{pool.name}?" } } %>
+          <% end %>
+        </div>
+
+        <% if pool.power? && pool.rollable? %>
+          <%= form_with url: campaign_pool_roll_path(Current.campaign, pool), class: "pool-row__action-roll" do %>
+            <input type="hidden" name="as_action" value="1">
+            <p class="field__hint">Risky use? Roll it as an action, in place of a stat: its highest die is the result, then 1–3s drop. Not risky? Just Roll: it works, and dice still drop.</p>
+            <div class="pool-row__fields">
+              <div class="field">
+                <label class="field__label" for="<%= dom_id(pool, :thorns) %>">Thorns</label>
+                <input type="number" id="<%= dom_id(pool, :thorns) %>" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+              </div>
+              <% if my_characters.any? %>
+                <div class="field">
+                  <label class="field__label" for="<%= dom_id(pool, :character) %>">For</label>
+                  <%= select_tag :character_id, options_for_select(my_characters.map { [ "#{_1.name} (#{pluralize(_1.spark, "spark")})", _1.id ] }), include_blank: "No one in particular", id: dom_id(pool, :character), class: "field__input" %>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="<%= dom_id(pool, :spark) %>">Spark</label>
+                  <input type="number" id="<%= dom_id(pool, :spark) %>" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+                </div>
+              <% end %>
+            </div>
+            <button type="submit" class="button button--primary button--small">Roll as an action</button>
+          <% end %>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+</div>

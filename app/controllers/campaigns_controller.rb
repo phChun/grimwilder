@@ -1,5 +1,5 @@
 class CampaignsController < ApplicationController
-  include CampaignScoped
+  include CampaignScoped, CampaignTable
 
   skip_before_action :set_campaign, only: %i[ index create ]
   before_action :require_gm, only: %i[ update destroy ]
@@ -39,12 +39,5 @@ class CampaignsController < ApplicationController
   private
     def campaign_id_param
       params[:id]
-    end
-
-    def load_table
-      @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
-      @characters = Current.campaign.characters.includes(:identity).ordered
-      @rolls = Current.campaign.rolls.table_log(Current.membership)
-      @my_characters = @characters.select { _1.owned_by?(Current.identity) }
     end
 end
