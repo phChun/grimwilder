@@ -831,6 +831,11 @@ form.button_to, .button_to { margin: 0; }
 .quarrel-side__name { font-size: 0.95rem; color: var(--ink-soft); }
 .quarrel-side--winner .quarrel-side__name { color: var(--ink); font-weight: 700; }
 .die--assist { border-style: dashed; }
+.die--d6.die--spark { opacity: 1; border-style: dashed; border-color: var(--ember); }
+
+.pool__power summary { cursor: pointer; font-weight: 700; color: var(--ink-soft); }
+.pool__power[open] { display: grid; gap: var(--space-3); }
+.pool__power .field__hint { margin-top: var(--space-2); }
 
 .quarrel-form { max-width: 40rem; }
 .quarrel-form__row { flex-wrap: wrap; }

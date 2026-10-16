@@ -27,7 +27,7 @@ module RollsHelper
   # d6s (then any assist dice, dashed and named), then thorns as d8 diamonds.
   # Action and defense rolls light up the die that set the result (every 6 on
   # a critical); pool rolls light up the dice that stay and strike out the ones
-  # that drop.
+  # that drop, and mark a power pool's spark dice, which never drop.
   def roll_dice_tags(roll, small: false)
     highest = roll.all_dice.max
     lit_one = false
@@ -37,7 +37,14 @@ module RollsHelper
       end
     end
 
-    d6s = roll.dice.map { |value| roll_die_tag(value, "d6", light.(value), small) }
+    pool_dice = roll.pool? ? roll.dice.size - roll.spark_spent : roll.dice.size
+    d6s = roll.dice.map.with_index do |value, index|
+      if index < pool_dice
+        roll_die_tag(value, "d6", light.(value), small)
+      else
+        roll_die_tag(value, "d6", "die--spark", small, label: "spark die showing #{value}", title: "Spark")
+      end
+    end
     assists = roll.assists.map do |assist|
       roll_die_tag(assist["die"], "d6", [ light.(assist["die"]), "die--assist" ], small, label: "#{assist["name"]}'s assist die showing #{assist["die"]}", title: assist["name"])
     end
@@ -71,12 +78,15 @@ module RollsHelper
   end
 
   def roll_spark_note(roll)
+    who = roll.pool? ? roll.character&.name : roll.name
+    return unless who
+
     if roll.spark_gained? && roll.critical?
-      "Critical: nothing fit, so #{roll.name} takes spark."
+      "Critical: nothing fit, so #{who} takes spark."
     elsif roll.spark_gained?
-      "Disaster: #{roll.name} takes spark."
+      "Disaster: #{who} takes spark."
     elsif roll.disaster?
-      "Disaster: #{roll.name} already holds #{Grimwild::MAX_SPARK} spark."
+      "Disaster: #{who} already holds #{Grimwild::MAX_SPARK} spark."
     end
   end
 
@@ -104,6 +114,14 @@ module RollsHelper
 
   def pool_roll_summary(roll)
     left = roll.remaining.zero? ? "0d: #{roll.pool&.outcome || "it happens."}" : "#{roll.remaining}d left."
+
+    if roll.outcome
+      rolled = roll.dice.size - roll.spark_spent
+      setup = [ "#{rolled}d", ("#{roll.spark_spent} spark" if roll.spark_spent.positive?) ].compact.join(" + ")
+      setup += ", vs #{roll.thorns.size}t" if roll.thorns.any?
+      first = "1d dropped first, then " if roll.pool_action == "rolled_after_drop"
+      return "#{first}#{setup} as an action#{" for #{roll.character.name}" if roll.character}: #{roll.dropped}d dropped. #{left}"
+    end
 
     case roll.pool_action
     when "pushed" then "Pushed: 1d dropped, take a mark. #{left}"

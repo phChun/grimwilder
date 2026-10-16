@@ -63,14 +63,26 @@ class Pool < ApplicationRecord
   end
 
   # drop_first: Greater effect, potency and some talents drop 1d before rolling.
-  def roll!(by:, drop_first: false, random: Random)
+  #
+  # as_action: a risky use of a power pool (pg. 19) rolls it as an action roll
+  # in place of a stat. The highest die is the result, then 1–3s drop as usual.
+  # Spark dice, spent by a character, count toward the result but never drop
+  # or join the pool. A use that isn't risky just rolls: it works, and dice drop.
+  def roll!(by:, drop_first: false, as_action: false, thorns: 0, character: nil, spend_spark: 0, random: Random)
     raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
+    check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
 
     before = size
     dice = Array.new(drop_first ? size - 1 : size) { random.rand(1..6) }
     kept = dice.count { |die| die >= 4 }
 
-    record!(size: kept, dice: dice, dropped: before - kept, action: drop_first ? "rolled_after_drop" : "rolled", by: by)
+    if as_action
+      spark_dice = Array.new(spend_spark) { random.rand(1..6) }
+      result = Grimwild::Dice.interpret(dice + spark_dice, Array.new(thorns) { random.rand(1..8) })
+    end
+
+    record!(size: kept, dice: dice, dropped: before - kept, action: drop_first ? "rolled_after_drop" : "rolled", by: by,
+      result: result, spark_dice: spark_dice || [], character: character)
   end
 
   # A task pool roll that dropped nothing: the player takes a mark to drop 1d anyway.
@@ -105,13 +117,32 @@ class Pool < ApplicationRecord
       self.size ||= starting_size
     end
 
+    def check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
+      if as_action
+        raise ArgumentError, "Only a power pool is rolled as an action." unless power?
+        raise ArgumentError, "Thorns go from 0 to #{Character::Rolling::MAX_EXTRA}." unless thorns.in?(0..Character::Rolling::MAX_EXTRA)
+        raise ArgumentError, "Only a character can spend spark." if character.nil? && spend_spark != 0
+        raise ArgumentError, "#{character&.name} isn't seated in #{campaign.name}." if character && character.campaign_id != campaign_id
+        character&.check_spark_spend!(spend_spark)
+        raise ArgumentError, "Dropping 1d first leaves nothing to roll." if drop_first && size == 1 && spend_spark.zero?
+      elsif thorns != 0 || spend_spark != 0 || character
+        raise ArgumentError, "Thorns and spark only go into a roll as an action."
+      end
+    end
+
     # Every roll, drop and push also goes in the campaign's log. A push rolls
-    # nothing, so its entry has no dice.
-    def record!(size:, dice:, dropped:, action:, by:)
+    # nothing, so its entry has no dice. An action roll's entry keeps its spark
+    # dice after the pool's own, and its result.
+    def record!(size:, dice:, dropped:, action:, by:, result: nil, spark_dice: [], character: nil)
       transaction do
+        gained = character&.settle_spark(spent: spark_dice.size, take: result&.result == "disaster") || false
+        character&.save!
+
         update!(size: size, last_dice: dice, last_dropped: dropped, last_action: action, last_rolled_by: by, last_rolled_at: Time.current)
-        rolls.create!(campaign: campaign, identity: by, kind: "pool", name: name, dice: (action == "pushed" ? [] : dice),
-          pool_action: action, dropped: dropped, remaining: size, gm_only: hidden?)
+        rolls.create!(campaign: campaign, identity: by, kind: "pool", name: name, dice: (action == "pushed" ? [] : dice + spark_dice),
+          pool_action: action, dropped: dropped, remaining: size, gm_only: hidden?,
+          thorns: result&.thorns || [], outcome: result&.result, critical: result&.critical || false,
+          character: character, spark_spent: spark_dice.size, spark_gained: gained)
       end
     end
 end

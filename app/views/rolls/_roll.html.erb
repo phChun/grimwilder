@@ -4,7 +4,7 @@
     <p class="log-entry__title">
       <% case roll.kind %>
       <% when "pool" %>
-        <strong><%= roll.name %></strong> pool
+        <strong><%= roll.name %></strong> pool<%= ", as an action" if roll.outcome %>
       <% when "quarrel" %>
         <strong>Quarrel</strong> <%= roll.name %>
       <% when "montage" %>
@@ -18,7 +18,7 @@
     </p>
     <% if roll.quarrel? %>
       <span class="log-entry__result"><%= quarrel_result(roll) %></span>
-    <% elsif !roll.pool? %>
+    <% elsif roll.outcome %>
       <span class="log-entry__result"><%= roll.outcome.capitalize %><%= " · critical" if roll.critical? %></span>
     <% end %>
   </div>
@@ -57,7 +57,7 @@
   <p class="log-entry__meta">
     <% case roll.kind %>
     <% when "pool" %>
-      <%= pool_roll_summary(roll) %>
+      <%= pool_roll_summary(roll) %><% if (note = roll_spark_note(roll)) %> <%= note %><% end %>
     <% when "montage" %>
       The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.
     <% when "quarrel" %>

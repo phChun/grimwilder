@@ -76,4 +76,40 @@ class PoolsTest < ActionDispatch::IntegrationTest
     get pools_path
     assert_redirected_to campaign_pools_path(@campaign)
   end
+
+  test "roll a power pool as an action, spending your own character's spark" do
+    wand = @campaign.pools.create!(name: "Blasting Wand", kind: "power", starting_size: 4)
+    sign_in_as identities(:pip)
+
+    get campaign_pools_path(@campaign)
+    assert_select "##{dom_id(wand)} details.pool__power select[name=character_id] option", 2, "no one, or Tibbs"
+    assert_select "##{dom_id(pools(:lookouts))} details.pool__power", 0
+
+    post campaign_pool_roll_path(@campaign, wand), params: { as_action: "1", thorns: 1, character_id: characters(:tibbs).id, spark: 1 }
+    assert_redirected_to campaign_pools_path(@campaign, anchor: dom_id(wand))
+    roll = wand.rolls.last
+    assert_equal [ 5, 1, 1 ], [ roll.dice.size, roll.thorns.size, roll.spark_spent ]
+
+    follow_redirect!
+    assert_select "##{dom_id(roll)} .log-entry__result", roll.outcome.capitalize
+    assert_select "##{dom_id(roll)} .log-entry__meta", /4d \+ 1 spark, vs 1t as an action for Gibbletibble "Tibbs"/
+    assert_select "##{dom_id(roll)} .die--spark", 1
+  end
+
+  test "you can't spend another player's character's spark on a pool" do
+    wand = @campaign.pools.create!(name: "Blasting Wand", kind: "power", starting_size: 4)
+    sign_in_as identities(:pip)
+
+    post campaign_pool_roll_path(@campaign, wand), params: { as_action: "1", character_id: characters(:bram).id, spark: 1 }
+    assert_response :not_found
+    assert_equal 4, wand.reload.size
+  end
+
+  test "a bad action roll on a pool goes back with the reason" do
+    sign_in_as identities(:pip)
+
+    post campaign_pool_roll_path(@campaign, pools(:lookouts)), params: { as_action: "1" }
+    assert_equal "Only a power pool is rolled as an action.", flash[:alert]
+    assert_equal 6, pools(:lookouts).reload.size
+  end
 end

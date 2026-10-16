@@ -79,6 +79,41 @@ class PoolTest < ActiveSupport::TestCase
     assert_not_includes Roll.visible_to(memberships(:pip_player)), roll
   end
 
+  test "a power pool rolls as an action: highest die is the result, then 1-3s drop" do
+    wand = campaigns(:bramblewood).pools.create!(name: "Blasting Wand", kind: "power", starting_size: 4)
+    tibbs = characters(:tibbs)
+
+    roll = wand.roll!(by: identities(:pip), as_action: true, thorns: 1, character: tibbs, spend_spark: 1,
+      random: FixedDice.new([ 5, 2, 1, 4, 6, 3 ]))
+
+    assert_equal 2, wand.size, "the 2 and 1 drop; the spark die never joins the pool"
+    assert_equal [ 5, 2, 1, 4 ], wand.last_dice
+    assert_equal [ [ 5, 2, 1, 4, 6 ], [ 3 ] ], [ roll.dice, roll.thorns ]
+    assert_equal [ "perfect", 2, 1 ], [ roll.outcome, roll.dropped, roll.spark_spent ]
+    assert_equal 0, tibbs.reload.spark
+  end
+
+  test "a disaster on a power pool gives its character spark" do
+    wand = campaigns(:bramblewood).pools.create!(name: "Blasting Wand", kind: "power", starting_size: 2)
+
+    roll = wand.roll!(by: identities(:pip), as_action: true, thorns: 1, character: characters(:tibbs), random: FixedDice.new([ 2, 3, 8 ]))
+    assert_equal "disaster", roll.outcome
+    assert roll.spark_gained?
+    assert_equal 2, characters(:tibbs).reload.spark
+    assert wand.depleted?
+  end
+
+  test "only power pools roll as an action, and only action rolls take thorns and spark" do
+    wand = campaigns(:bramblewood).pools.create!(name: "Blasting Wand", kind: "power", starting_size: 4)
+
+    assert_raises(ArgumentError) { @pool.roll!(by: identities(:gwen), as_action: true) }
+    assert_raises(ArgumentError) { wand.roll!(by: identities(:gwen), thorns: 1) }
+    assert_raises(ArgumentError) { wand.roll!(by: identities(:gwen), as_action: true, spend_spark: 1) }
+    assert_raises(ArgumentError) { wand.roll!(by: identities(:gwen), as_action: true, character: characters(:loner)) }
+    assert_raises(ArgumentError) { wand.roll!(by: identities(:pip), as_action: true, character: characters(:tibbs), spend_spark: 2) }
+    assert_equal 4, wand.reload.size
+  end
+
   test "players don't see hidden pools" do
     assert_includes Pool.visible_to(memberships(:gwen_gm)), pools(:ambush)
     assert_not_includes Pool.visible_to(memberships(:pip_player)), pools(:ambush)

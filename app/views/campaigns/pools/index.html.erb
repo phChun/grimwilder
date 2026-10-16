@@ -63,6 +63,31 @@
                     <% if drop_first %>Drop 1d, then roll<% else %>Roll<% end %>
                   </button>
                 <% end %>
+
+                <% if pool.power? %>
+                  <details class="pool__power">
+                    <summary>Roll as an action</summary>
+                    <p class="field__hint">Risky? Roll the pool in place of a stat: its highest die is the result, then 1–3s drop. Not risky? Just roll it above: it works, and dice still drop.</p>
+                    <%= form_with url: campaign_pool_roll_path(Current.campaign, pool), class: "stack" do %>
+                      <input type="hidden" name="as_action" value="1">
+                      <div class="field">
+                        <label class="field__label" for="<%= dom_id(pool, :thorns) %>">Thorns <small>d8</small></label>
+                        <input type="number" id="<%= dom_id(pool, :thorns) %>" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+                      </div>
+                      <% if @my_characters.any? %>
+                        <div class="field">
+                          <label class="field__label" for="<%= dom_id(pool, :character) %>">For</label>
+                          <%= select_tag :character_id, options_for_select(@my_characters.map { [ "#{_1.name} (#{pluralize(_1.spark, "spark")})", _1.id ] }), include_blank: "No one in particular", id: dom_id(pool, :character), class: "field__input" %>
+                        </div>
+                        <div class="field">
+                          <label class="field__label" for="<%= dom_id(pool, :spark) %>">Spend spark <small>+1d each, tracked apart</small></label>
+                          <input type="number" id="<%= dom_id(pool, :spark) %>" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+                        </div>
+                      <% end %>
+                      <button type="submit" class="button button--primary button--small">Roll as an action</button>
+                    <% end %>
+                  </details>
+                <% end %>
               <% end %>
 
               <% if pool.pushable? %>

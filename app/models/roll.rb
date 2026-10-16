@@ -17,6 +17,7 @@ class Roll < ApplicationRecord
 
   validates :name, presence: true
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, if: -> { action? || defense? || story? || montage? }
+  validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, allow_nil: true, if: :pool? # power pools rolled as an action
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(gm_only: false) }

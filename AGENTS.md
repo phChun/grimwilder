@@ -170,7 +170,8 @@ In JavaScript:
 
 ## Table rolls & the log
 
-- **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, a `story` roll, a `quarrel`, a `montage`, or a `pool` roll, drop-first or push. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
+- **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, a `story` roll, a `quarrel`, a `montage`, or a `pool` roll, drop-first or push.
+- **Power pools** (pg. 19): `Pool#roll!(as_action: true, thorns:, character:, spend_spark:)` rolls the pool as an action roll in place of a stat. The highest die is the `outcome`, then 1–3s drop. Spark dice count toward the result but never drop or join the pool, and they're stored after the pool's own dice in the Roll's `dice` (the last `spark_spent` of them). A disaster gives the character spark. A plain roll is the use that isn't risky: it works, and dice still drop. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
 - `Character#roll!(stat, by:, mode:, spend_spark:, help:, assists:, thorns:)` (in `Character::Rolling`) does everything in one transaction: it spends spark (+1d each), rolls 1d for each assisting character (pg. 13; stored in `assists` and counted via `Roll#all_dice`, so an assist can set the result or make a critical), adds damage thorns, clears the stat's mark, gives spark on a disaster (capped at `Grimwild::MAX_SPARK`), and records the Roll. Unseated characters' rolls are kept but have no campaign, so they aren't logged.
 - The sheet links to `characters/:id/rolls/new?stat=…` (setup), which posts to `create` and lands on the result (`show`).
 - A critical where no effect fits gives spark (`Character#take_spark_for_critical!`, from a button on the result page): owner only, once, on the character's latest roll, below 2 spark. It sets `spark_gained` on the Roll, which then reads "Critical: nothing fit…" instead of "Disaster…".
@@ -248,7 +249,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 1. **Pools**: built (see above). Next for pools: linked phases.
 2. **Crucibles**: built (see above). Next: path-specific crucibles.
 3. **Characters**: built, with the talent catalog and spark spent into rolls (see above).
-4. **Campaign play**: the table log is built (see above). Action, defense, story, montage and quarrel rolls are built, with spark and assists. Next ideas: power pools rolled as action rolls (pg. 19; today a power pool only drops dice), assists on story rolls, and outside help as its own named die.
+4. **Campaign play**: the table log is built (see above). Action, defense, story, montage and quarrel rolls are built, with spark and assists. Power pools roll as action rolls too. Next ideas: assists on story rolls, and outside help as its own named die.
 
 Open questions: deploy host and domain; whether rolls can be shared without an account.
 

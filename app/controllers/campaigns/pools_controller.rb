@@ -44,5 +44,6 @@ class Campaigns::PoolsController < ApplicationController
 
     def set_table_log
       @rolls = Current.campaign.rolls.table_log(Current.membership, limit: 20)
+      @my_characters = Current.campaign.characters.where(identity: Current.identity).ordered
     end
 end
