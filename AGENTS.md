@@ -246,7 +246,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 
 ## Roadmap
 
-1. **Pools**: built (see above). Next for pools: linked phases.
+1. **Pools**: built, with linked phases (`Pool::Phases`: `phases` JSON plus a current `phase` index, entered as the book writes them, e.g. `4d Claws + 4d Tail`; only the current phase rolls, and a 0d phase unlocks the next one; log entries record `phase` and `next_phase`).
 2. **Crucibles**: built (see above). Next: path-specific crucibles.
 3. **Characters**: built, with the talent catalog and spark spent into rolls (see above).
 4. **Campaign play**: the table log is built (see above). Action, defense, story, montage and quarrel rolls are built, with spark and assists. Power pools roll as action rolls too. Next ideas: assists on story rolls, and outside help as its own named die.

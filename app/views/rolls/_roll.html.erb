@@ -4,7 +4,7 @@
     <p class="log-entry__title">
       <% case roll.kind %>
       <% when "pool" %>
-        <strong><%= roll.name %></strong> pool<%= ", as an action" if roll.outcome %>
+        <strong><%= roll.name %></strong><%= ": #{roll.phase}" if roll.phase %> pool<%= ", as an action" if roll.outcome %>
       <% when "quarrel" %>
         <strong>Quarrel</strong> <%= roll.name %>
       <% when "montage" %>

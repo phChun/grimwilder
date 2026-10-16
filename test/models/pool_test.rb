@@ -114,6 +114,47 @@ class PoolTest < ActiveSupport::TestCase
     assert_equal 4, wand.reload.size
   end
 
+  test "a linked pool is written like the book, and starts on its first phase" do
+    ogre = campaigns(:bramblewood).pools.create!(name: "Ogre", kind: "task", starting_size: 99, phases_text: "4d Claws + 2d Tail+ 6D  Body ")
+
+    assert ogre.linked?
+    assert_equal [ { "name" => "Claws", "size" => 4 }, { "name" => "Tail", "size" => 2 }, { "name" => "Body", "size" => 6 } ], ogre.phases
+    assert_equal [ 0, "Claws", 4, 4 ], [ ogre.phase, ogre.phase_name, ogre.starting_size, ogre.size ]
+    assert_equal "4d Claws + 2d Tail + 6d Body", ogre.reload.phases_text
+  end
+
+  test "linked phases need two or more, each with dice and a name" do
+    [ "4d Claws", "4d Claws + Tail", "4d Claws + 0d Tail", "4d Claws + 21d Tail", "4d Claws + 2d " ].each do |text|
+      pool = campaigns(:bramblewood).pools.new(name: "Ogre", starting_size: 4, phases_text: text)
+      assert_not pool.valid?, text
+      assert pool.errors[:phases].any?, text
+    end
+  end
+
+  test "only the current phase drops; at 0d the next begins, and the last ends the pool" do
+    ogre = campaigns(:bramblewood).pools.create!(name: "Ogre", starting_size: 2, phases_text: "2d Claws + 1d Body")
+
+    roll = ogre.roll!(by: identities(:gwen), random: FixedDice.new([ 1, 2 ]))
+    assert_equal [ 1, "Body", 1, 1 ], [ ogre.phase, ogre.phase_name, ogre.starting_size, ogre.size ]
+    assert_not ogre.depleted?
+    assert_equal [ "Claws", "1d Body", 0 ], [ roll.phase, roll.next_phase, roll.remaining ]
+
+    roll = ogre.roll!(by: identities(:gwen), random: FixedDice.new([ 3 ]))
+    assert ogre.depleted?
+    assert_equal [ "Body", nil ], [ roll.phase, roll.next_phase ]
+
+    ogre.reset!
+    assert_equal [ 0, 2, 2 ], [ ogre.phase, ogre.starting_size, ogre.size ]
+  end
+
+  test "pushing a linked task pool's last die unlocks the next phase" do
+    ogre = campaigns(:bramblewood).pools.create!(name: "Ogre", kind: "task", starting_size: 1, phases_text: "1d Claws + 4d Body")
+    ogre.roll!(by: identities(:pip), random: FixedDice.new([ 6 ]))
+
+    ogre.push!(by: identities(:pip))
+    assert_equal [ "Body", 4 ], [ ogre.phase_name, ogre.size ]
+  end
+
   test "players don't see hidden pools" do
     assert_includes Pool.visible_to(memberships(:gwen_gm)), pools(:ambush)
     assert_not_includes Pool.visible_to(memberships(:pip_player)), pools(:ambush)

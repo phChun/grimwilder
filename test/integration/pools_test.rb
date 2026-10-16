@@ -112,4 +112,27 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_equal "Only a power pool is rolled as an action.", flash[:alert]
     assert_equal 6, pools(:lookouts).reload.size
   end
+
+  test "the GM adds a linked pool, and the table sees its phases" do
+    sign_in_as identities(:gwen)
+
+    post campaign_pools_path(@campaign), params: { pool: { name: "Ogre", kind: "task", starting_size: 4, phases_text: "2d Claws + 4d Body" } }
+    ogre = @campaign.pools.find_by!(name: "Ogre")
+    assert_equal [ 2, "Claws" ], [ ogre.size, ogre.phase_name ]
+
+    ogre.roll!(by: identities(:gwen), random: FixedDice.new([ 1, 3 ]))
+    get campaign_pools_path(@campaign)
+    assert_select "##{dom_id(ogre)} .pool__phase--done", "2d Claws"
+    assert_select "##{dom_id(ogre)} .pool__phase--current[aria-current=step]", "4d Body"
+    assert_select "#roll_log .log-entry__meta", /0d: Claws is done\. 4d Body begins\./
+  end
+
+  test "badly written phases show the form again, as typed" do
+    sign_in_as identities(:gwen)
+
+    post campaign_pools_path(@campaign), params: { pool: { name: "Ogre", starting_size: 4, phases_text: "4d Claws + Tail" } }
+    assert_response :unprocessable_entity
+    assert_select ".form-error", /Phases should be two or more/
+    assert_select "input[name='pool[phases_text]'][value=?]", "4d Claws + Tail"
+  end
 end

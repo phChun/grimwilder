@@ -2,6 +2,8 @@
 # toward an event. Rolling drops every die showing 1–3; at 0d the event
 # happens. Mirrors rollPool in app/javascript/grimwild/dice.js.
 class Pool < ApplicationRecord
+  include Phases
+
   KINDS = {
     "task" => "Effort toward a goal, or defeating a foe",
     "pressure" => "A threat closing in",
@@ -97,11 +99,11 @@ class Pool < ApplicationRecord
   end
 
   def resettable?
-    last_action.present? || size != starting_size
+    last_action.present? || size != starting_size || phase.positive?
   end
 
   def reset!
-    update!(size: starting_size, last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil)
+    update!(**first_phase_attributes, last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil)
   end
 
   def outcome
@@ -132,15 +134,20 @@ class Pool < ApplicationRecord
 
     # Every roll, drop and push also goes in the campaign's log. A push rolls
     # nothing, so its entry has no dice. An action roll's entry keeps its spark
-    # dice after the pool's own, and its result.
+    # dice after the pool's own, and its result. A linked pool's entry names the
+    # phase rolled, and the next one if this roll unlocked it.
     def record!(size:, dice:, dropped:, action:, by:, result: nil, spark_dice: [], character: nil)
+      rolled_phase, unlocked = phase_name, (next_phase if size.zero?)
+
       transaction do
         gained = character&.settle_spark(spent: spark_dice.size, take: result&.result == "disaster") || false
         character&.save!
 
-        update!(size: size, last_dice: dice, last_dropped: dropped, last_action: action, last_rolled_by: by, last_rolled_at: Time.current)
+        update!(size: size, last_dice: dice, last_dropped: dropped, last_action: action, last_rolled_by: by, last_rolled_at: Time.current,
+          **next_phase_attributes(size).to_h)
         rolls.create!(campaign: campaign, identity: by, kind: "pool", name: name, dice: (action == "pushed" ? [] : dice + spark_dice),
           pool_action: action, dropped: dropped, remaining: size, gm_only: hidden?,
+          phase: rolled_phase, next_phase: (unlocked && "#{unlocked["size"]}d #{unlocked["name"]}"),
           thorns: result&.thorns || [], outcome: result&.result, critical: result&.critical || false,
           character: character, spark_spent: spark_dice.size, spark_gained: gained)
       end

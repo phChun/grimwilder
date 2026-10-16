@@ -23,11 +23,19 @@
             <header class="pool__header">
               <h2 class="pool__name"><%= pool.name %></h2>
               <p class="pool__kind" title="<%= pool.description %>">
-                <%= pool.kind.humanize %> pool<% if pool.hidden? %> · <span class="tag">GM only</span><% end %>
+                <%= pool.kind.humanize %> pool<% if pool.linked? %>, linked<% end %><% if pool.hidden? %> · <span class="tag">GM only</span><% end %>
               </p>
             </header>
 
-            <div class="pool__meter" aria-label="<%= pool.size %> of <%= pool.starting_size %> dice left">
+            <% if pool.linked? %>
+              <ol class="pool__phases" aria-label="Phases">
+                <% pool.phases.each_with_index do |entry, index| %>
+                  <li class="<%= class_names("pool__phase", "pool__phase--done": index < pool.phase, "pool__phase--current": index == pool.phase) %>"<% if index == pool.phase %> aria-current="step"<% end %>><%= entry["size"] %>d <%= entry["name"] %></li>
+                <% end %>
+              </ol>
+            <% end %>
+
+            <div class="pool__meter" aria-label="<%= pool.size %> of <%= pool.starting_size %> dice left<%= " in #{pool.phase_name}" if pool.linked? %>">
               <span class="pool__size"><%= pool.size %>d</span>
               <span class="pool__pips" aria-hidden="true"><% pool.starting_size.times do |i| %><span class="pip<%= " pip--gone" if i >= pool.size %>"></span><% end %></span>
             </div>
@@ -97,7 +105,7 @@
               <% if gm? %>
                 <div class="pool__gm">
                   <% if pool.resettable? %>
-                    <%= button_to "Reset to #{pool.starting_size}d", campaign_pool_reset_path(Current.campaign, pool), class: "button button--quiet button--small" %>
+                    <%= button_to (pool.linked? ? "Reset to #{pool.phases.first["size"]}d #{pool.phases.first["name"]}" : "Reset to #{pool.starting_size}d"), campaign_pool_reset_path(Current.campaign, pool), class: "button button--quiet button--small" %>
                   <% end %>
                   <%= button_to (pool.hidden? ? "Show to players" : "Hide from players"), campaign_pool_path(Current.campaign, pool), method: :patch, params: { pool: { hidden: !pool.hidden? } }, class: "button button--quiet button--small" %>
                   <%= button_to "Delete", campaign_pool_path(Current.campaign, pool), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Delete #{pool.name}?" } } %>
@@ -141,6 +149,12 @@
               <input type="number" id="pool_starting_size" name="pool[starting_size]" class="field__input size-picker__input" min="1" max="<%= Pool::MAX_SIZE %>" step="1" required autocomplete="off" value="<%= new_size %>" data-herb-set="new_size=$value">
             </div>
             <p class="field__hint">2d short, 4d medium, 8d long. Bigger pools take only a little longer to clear.</p>
+          </div>
+
+          <div class="field">
+            <%= form.label :phases_text, "Linked phases", class: "field__label" %>
+            <%= form.text_field :phases_text, maxlength: 200, autocomplete: "off", placeholder: "4d Claws + 4d Tail + 4d Body", class: "field__input" %>
+            <p class="field__hint">Optional. Only the current phase rolls; the next unlocks at 0d. Replaces the dice above.</p>
           </div>
 
           <label class="check">

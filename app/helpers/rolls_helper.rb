@@ -113,7 +113,11 @@ module RollsHelper
   end
 
   def pool_roll_summary(roll)
-    left = roll.remaining.zero? ? "0d: #{roll.pool&.outcome || "it happens."}" : "#{roll.remaining}d left."
+    left =
+      if roll.next_phase then "0d: #{roll.phase} is done. #{roll.next_phase} begins."
+      elsif roll.remaining.zero? then "0d: #{roll.pool&.outcome || "it happens."}"
+      else "#{roll.remaining}d left."
+      end
 
     if roll.outcome
       rolled = roll.dice.size - roll.spark_spent
