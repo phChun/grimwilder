@@ -56,6 +56,40 @@ class TableLogTest < ActionDispatch::IntegrationTest
     assert_no_turbo_stream_broadcasts [ @campaign, :rolls ]
   end
 
+  test "taking spark from a critical updates the log entry live" do
+    tibbs = characters(:tibbs)
+    roll = tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 2 ]))
+
+    sign_in_as identities(:pip)
+    get character_roll_path(tibbs, roll)
+    assert_select "form[action=?] button", character_roll_critical_spark_path(tibbs, roll), text: "Nothing fits: take spark"
+
+    perform_enqueued_jobs do
+      assert_turbo_stream_broadcasts [ @campaign, :rolls ], count: 1 do
+        post character_roll_critical_spark_path(tibbs, roll)
+      end
+    end
+    assert_redirected_to character_roll_path(tibbs, roll)
+    assert_equal 2, tibbs.reload.spark
+
+    follow_redirect!
+    assert_select "form[action=?]", character_roll_critical_spark_path(tibbs, roll), count: 0
+    assert_select ".roll-outcome__spark", "Critical: nothing fit, so Gibbletibble \"Tibbs\" takes spark."
+
+    post character_roll_critical_spark_path(tibbs, roll)
+    assert_equal 2, tibbs.reload.spark
+    assert flash[:alert].present?
+  end
+
+  test "only the owner takes spark for a critical" do
+    roll = characters(:tibbs).roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 2 ]))
+
+    sign_in_as identities(:gwen)
+    post character_roll_critical_spark_path(characters(:tibbs), roll)
+    assert_response :not_found
+    assert_equal 1, characters(:tibbs).reload.spark
+  end
+
   test "unseated characters roll without a log" do
     perform_enqueued_jobs do
       assert_no_turbo_stream_broadcasts [ @campaign, :rolls ] do

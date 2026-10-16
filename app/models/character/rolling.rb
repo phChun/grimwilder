@@ -4,7 +4,9 @@
 #
 # - each spark spent before the roll adds 1d (pg. 12);
 # - damage adds its thorns, and a mark on the stat clears once rolled (pg. 27);
-# - a disaster gives spark, up to the 2 a character can hold (pg. 10, 15).
+# - a disaster gives spark, up to the 2 a character can hold (pg. 10, 15);
+# - so does a critical when none of its effects fit (pg. 10), if the player
+#   takes it right away: only on the character's latest roll.
 module Character::Rolling
   extend ActiveSupport::Concern
 
@@ -39,6 +41,19 @@ module Character::Rolling
         dice: result.dice, thorns: result.thorns, outcome: result.result, critical: result.critical,
         stat_dice: stat(stat_name), help_dice: help, spark_spent: spend_spark, damage_reasons: reasons, spark_gained: gained
       )
+    end
+  end
+
+  def can_take_spark_for?(roll)
+    roll.critical? && !roll.spark_gained? && spark < Grimwild::MAX_SPARK && rolls.recent.first == roll
+  end
+
+  def take_spark_for_critical!(roll)
+    raise ArgumentError, "Spark from a critical is for #{name}'s latest critical, once, below #{Grimwild::MAX_SPARK} spark." unless can_take_spark_for?(roll)
+
+    transaction do
+      increment!(:spark)
+      roll.update!(spark_gained: true)
     end
   end
 end

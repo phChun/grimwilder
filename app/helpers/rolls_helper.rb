@@ -59,7 +59,9 @@ module RollsHelper
   end
 
   def roll_spark_note(roll)
-    if roll.spark_gained?
+    if roll.spark_gained? && roll.critical?
+      "Critical: nothing fit, so #{roll.name} takes spark."
+    elsif roll.spark_gained?
       "Disaster: #{roll.name} takes spark."
     elsif roll.disaster?
       "Disaster: #{roll.name} already holds #{Grimwild::MAX_SPARK} spark."

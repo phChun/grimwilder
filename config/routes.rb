@@ -8,7 +8,9 @@ Rails.application.routes.draw do
 
   resources :characters do
     scope module: :characters do
-      resources :rolls, only: %i[ new create show ]
+      resources :rolls, only: %i[ new create show ] do
+        resource :critical_spark, only: :create, module: :rolls
+      end
       resource :experience, only: :create
       resources :conditions, only: %i[ create destroy ]
       resources :talents, only: %i[ new create destroy ]

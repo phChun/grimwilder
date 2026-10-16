@@ -73,6 +73,29 @@ class CharacterTest < ActiveSupport::TestCase
     assert_equal 1, @tibbs.reload.spark, "spent 1, then took 1"
   end
 
+  test "a critical where nothing fits gives spark, once, on the latest roll" do
+    critical = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 1 ]))
+    assert @tibbs.can_take_spark_for?(critical)
+
+    @tibbs.take_spark_for_critical!(critical)
+    assert_equal 2, @tibbs.reload.spark
+    assert critical.reload.spark_gained?
+    assert_raises(ArgumentError) { @tibbs.take_spark_for_critical!(critical) }
+  end
+
+  test "no critical spark for a plain perfect, an older roll, or at 2 spark" do
+    perfect = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 5, 1 ]))
+    assert_not @tibbs.can_take_spark_for?(perfect)
+
+    older = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 1 ]))
+    @tibbs.roll!("wits", by: identities(:pip))
+    assert_not @tibbs.can_take_spark_for?(older)
+
+    @tibbs.update!(spark: 2)
+    latest = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 1 ]))
+    assert_not @tibbs.can_take_spark_for?(latest)
+  end
+
   test "a seated character's roll goes in the campaign log; an unseated one's doesn't" do
     roll = @tibbs.roll!("agility", by: identities(:pip))
     assert_equal campaigns(:bramblewood), roll.campaign

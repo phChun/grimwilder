@@ -17,6 +17,11 @@
       <div class="critical">
         <h3 class="critical__title">Critical</h3>
         <p>Pick one: <strong>Greater effect</strong> (drop 1d from the task pool before rolling), <strong>Secondary effect</strong> (gain another related perfect), or <strong>Setup</strong> (a riskless assist on a follow-up). If nothing comes to mind, take spark.</p>
+        <% if @character.can_take_spark_for?(@roll) %>
+          <%= button_to "Nothing fits: take spark", character_roll_critical_spark_path(@character, @roll), class: "button button--small critical__spark" %>
+        <% elsif !@roll.spark_gained? && @character.spark >= Grimwild::MAX_SPARK %>
+          <p class="field__hint"><%= @character.name %> already holds <%= Grimwild::MAX_SPARK %> spark.</p>
+        <% end %>
       </div>
     <% end %>
     <% if (note = roll_spark_note(@roll)) %>

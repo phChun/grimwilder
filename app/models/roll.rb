@@ -19,6 +19,7 @@ class Roll < ApplicationRecord
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(gm_only: false) }
 
   after_create_commit :broadcast_to_table, if: :campaign
+  after_update_commit :broadcast_change_to_table, if: :campaign
 
   # Players follow the open log; the GM also follows the GM-only one.
   def self.streams_for(campaign, membership)
@@ -39,6 +40,14 @@ class Roll < ApplicationRecord
 
   private
     def broadcast_to_table
-      broadcast_prepend_later_to campaign, (gm_only? ? :gm_rolls : :rolls), target: "roll_log", partial: "rolls/roll", locals: { roll: self }
+      broadcast_prepend_later_to table_stream, target: "roll_log", partial: "rolls/roll", locals: { roll: self }
+    end
+
+    def broadcast_change_to_table
+      broadcast_replace_later_to table_stream, partial: "rolls/roll", locals: { roll: self }
+    end
+
+    def table_stream
+      [ campaign, (gm_only? ? :gm_rolls : :rolls) ]
     end
 end

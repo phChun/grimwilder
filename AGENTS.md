@@ -173,6 +173,8 @@ In JavaScript:
 - **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, or a `pool` roll, drop-first or push. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
 - `Character#roll!(stat, by:, mode:, spend_spark:, help:, thorns:)` (in `Character::Rolling`) does everything in one transaction: it spends spark (+1d each), adds damage thorns, clears the stat's mark, gives spark on a disaster (capped at `Grimwild::MAX_SPARK`), and records the Roll. Unseated characters' rolls are kept but have no campaign, so they aren't logged.
 - The sheet links to `characters/:id/rolls/new?stat=…` (setup), which posts to `create` and lands on the result (`show`).
+- A critical where no effect fits gives spark (`Character#take_spark_for_critical!`, from a button on the result page): owner only, once, on the character's latest roll, below 2 spark. It sets `spark_gained` on the Roll, which then reads "Critical: nothing fit…" instead of "Disaster…".
+- Updating a Roll replaces its log entry live, the same way new rolls are prepended.
 - Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. Pages subscribe with `Roll.streams_for(campaign, membership)`. The partial renders in a job, so it must not use `Current`.
 - In tests, `assert_no_turbo_stream_broadcasts` counts every broadcast so far in the test, not just the ones inside its block. `FixedDice` (test/test_helpers) stands in for `Random`.
 
@@ -242,7 +244,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 1. **Pools**: built (see above). Next for pools: linked phases.
 2. **Crucibles**: built (see above). Next: path-specific crucibles.
 3. **Characters**: built, with the talent catalog and spark spent into rolls (see above).
-4. **Campaign play**: the table log is built (see above). Next ideas: taking spark from a critical when nothing fits, story and quarrel rolls, and showing the log on the pools page.
+4. **Campaign play**: the table log is built (see above). Next ideas: story and quarrel rolls, and showing the log on the pools page.
 
 Open questions: deploy host and domain; whether rolls can be shared without an account.
 
