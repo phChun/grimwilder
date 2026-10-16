@@ -1,0 +1,16 @@
+<%# locals: (scene:) %>
+<% lingering = scene.lingering_conditions %>
+<fieldset class="roll-setup__group">
+  <legend class="field__label">Conditions that clear after the scene</legend>
+  <% if lingering.any? %>
+    <% lingering.each do |character, index, condition| %>
+      <label class="check">
+        <%= check_box_tag "clear[]", "#{character.id}:#{index}", true, id: "clear_#{character.id}_#{index}" %>
+        <span><strong><%= character.name %></strong>: <%= condition["name"] %></span>
+      </label>
+    <% end %>
+    <p class="field__hint">Untick any that linger. To downgrade one ("drunk" to "tipsy"), untick it and rename it on the sheet.</p>
+  <% else %>
+    <p class="field__hint">No one here has a condition that clears after the scene.</p>
+  <% end %>
+</fieldset>

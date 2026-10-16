@@ -1,0 +1,36 @@
+<%# locals: (my_characters:) %>
+<fieldset class="roll-setup__group">
+  <legend class="field__label">Odds</legend>
+  <div class="segmented segmented--auto">
+    <% Roll::ODDS.each do |dice, odds| %>
+      <label class="segmented__option">
+        <%= radio_button_tag :odds, dice, dice == 2 %>
+        <span><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
+      </label>
+    <% end %>
+  </div>
+</fieldset>
+
+<div class="story-roll__fields">
+  <div class="field">
+    <label class="field__label" for="story_thorns">Thorns <small>rare</small></label>
+    <input type="number" id="story_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+  </div>
+
+  <% if my_characters.any? %>
+    <div class="field">
+      <label class="field__label" for="story_character">For</label>
+      <select id="story_character" name="character_id" class="field__input">
+        <option value="">No one in particular</option>
+        <% my_characters.each do |character| %>
+          <option value="<%= character.id %>"><%= character.name %> (<%= pluralize(character.spark, "spark") %>)</option>
+        <% end %>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="story_spark">Spark <small>+1d each</small></label>
+      <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+    </div>
+  <% end %>
+</div>

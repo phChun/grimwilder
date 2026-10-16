@@ -14,7 +14,7 @@ module CampaignsHelper
   def character_chips(character)
     harm = HARM.select { character.public_send(:"#{_1}?") }.map { tag.span(_1.capitalize, class: "status-chip status-chip--harm") }
     marks = Grimwild::STATS.select { character.marked?(_1) }.map { tag.span("#{_1.capitalize} marked", class: "status-chip status-chip--mark") }
-    conditions = character.conditions.map { tag.span(_1, class: "status-chip") }
+    conditions = character.conditions.map { tag.span(_1["name"], class: "status-chip", title: ("Clears after scene" if _1["lasts"] == "scene")) }
     safe_join(harm + marks + conditions)
   end
 

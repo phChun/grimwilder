@@ -1,6 +1,8 @@
 <%# locals: (roll:) %>
 <% if roll.marker? %>
   <%= render "rolls/marker", roll: roll %>
+<% elsif roll.note? %>
+  <%= render "rolls/note", roll: roll %>
 <% else %>
   <li id="<%= dom_id(roll) %>" class="<%= class_names("log-entry", "log-entry--#{roll.outcome}": roll.outcome, "log-entry--quarrel": roll.quarrel?) %>">
     <div class="log-entry__head">

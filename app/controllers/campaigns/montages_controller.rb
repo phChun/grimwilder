@@ -9,7 +9,11 @@ class Campaigns::MontagesController < ApplicationController
 
   def create
     Roll.montage!(campaign: Current.campaign, by: Current.identity, scene: params[:scene], participants: participants)
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+    if params[:then] == "end_scene" && (scene = Current.campaign.current_scene)
+      redirect_to new_campaign_scene_ending_path(Current.campaign, scene)
+    else
+      redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+    end
   rescue ArgumentError => error
     flash.now[:alert] = error.message
     render :new, status: :unprocessable_entity

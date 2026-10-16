@@ -92,7 +92,9 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_equal 2, @tibbs.reload.level
 
     post character_conditions_path(@tibbs), params: { condition: "4d poisoned" }
-    assert_equal [ "4d poisoned" ], @tibbs.reload.conditions
+    post character_conditions_path(@tibbs), params: { condition: "twisted ankle", lasts: "scene" }
+    assert_equal [ { "name" => "4d poisoned", "lasts" => nil }, { "name" => "twisted ankle", "lasts" => "scene" } ], @tibbs.reload.conditions
+    delete character_condition_path(@tibbs, 1)
     delete character_condition_path(@tibbs, 0)
     assert_empty @tibbs.reload.conditions
   end

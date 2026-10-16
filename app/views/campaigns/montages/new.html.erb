@@ -14,6 +14,7 @@
 <% end %>
 
 <%= form_with url: campaign_montages_path(Current.campaign), class: "panel stack quarrel-form" do %>
+  <% if params[:then] == "end_scene" %><input type="hidden" name="then" value="end_scene"><% end %>
   <div class="field">
     <label class="field__label" for="montage_scene">The scene</label>
     <input type="text" id="montage_scene" name="scene" value="<%= params[:scene] %>" maxlength="200" autocomplete="off" placeholder="The six-hour climb to the sanctum" class="field__input">

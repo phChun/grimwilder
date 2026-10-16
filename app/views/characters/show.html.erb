@@ -61,7 +61,7 @@
         <ul class="list">
           <% @character.conditions.each_with_index do |condition, index| %>
             <li class="list__item">
-              <span><%= condition %></span>
+              <span><%= condition["name"] %><% if condition["lasts"] == "scene" %> <span class="tag">clears after scene</span><% end %></span>
               <% if editable %>
                 <%= button_to "Clear", character_condition_path(@character, index), method: :delete, class: "button button--quiet button--small" %>
               <% end %>
@@ -73,6 +73,10 @@
       <% if editable %>
         <%= form_with url: character_conditions_path(@character), class: "inline-form" do |form| %>
           <%= form.text_field :condition, placeholder: "4d poisoned, broken arm…", autocomplete: "off", class: "field__input", "aria-label": "New condition" %>
+          <label class="check">
+            <%= check_box_tag :lasts, "scene", false, id: "condition_lasts" %>
+            Clears after scene
+          </label>
           <%= form.submit "Add condition", class: "button button--small" %>
         <% end %>
       <% end %>

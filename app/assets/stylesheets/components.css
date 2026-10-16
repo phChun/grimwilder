@@ -1120,3 +1120,11 @@ body:has(.gm-table) .site-footer { max-width: 96rem; }
 @media (min-width: 48rem) {
   .session-form__recap { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
 }
+
+.log-entry--note { --entry-color: var(--line-strong); padding-block: var(--space-1); }
+.log-note__text { color: var(--ink-soft); }
+.log-note-form { margin-top: var(--space-3); }
+.log-note-form .field__input { min-width: 0; }
+.scene-form__opening { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.scene-form__opening[open] > .fold__summary { margin-bottom: var(--space-3); }
+.scene-form__opening .fold__title { font-family: var(--font-body); font-size: 1rem; font-weight: 700; }

@@ -1,7 +1,9 @@
 <%# locals: (campaign:, session:, gm:) %>
 <div class="session-bar">
   <p class="session-bar__status">
-    <% if session %>
+    <% if session && (scene = session.current_scene) %>
+      <strong><%= session.title %> · Scene <%= scene.number %>: <%= scene.title %></strong> · started <%= time_ago_in_words(scene.started_at) %> ago
+    <% elsif session %>
       <strong><%= session.title %></strong> · started <%= time_ago_in_words(session.started_at) %> ago
     <% else %>
       Between sessions
@@ -12,7 +14,11 @@
     <details id="session-actions" class="session-bar__more" open data-details-memory-target="section" data-section="session" data-phone-open="false">
       <summary class="session-bar__toggle">Session actions</summary>
       <div class="session-bar__actions">
-        <% if session %>
+        <% if session&.current_scene %>
+          <%= link_to "End scene", new_campaign_scene_ending_path(campaign, session.current_scene), class: "button button--primary button--small" %>
+          <%= link_to "End session", new_campaign_play_session_ending_path(campaign, session), class: "button button--small" %>
+        <% elsif session %>
+          <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--primary button--small" %>
           <%= link_to "End session", new_campaign_play_session_ending_path(campaign, session), class: "button button--small" %>
         <% else %>
           <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary button--small" %>

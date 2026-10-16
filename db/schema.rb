@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_190000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_200000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -176,12 +176,34 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_190000) do
     t.string "phase"
     t.string "next_phase"
     t.integer "play_session_id"
+    t.integer "scene_id"
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"
     t.index ["identity_id"], name: "index_rolls_on_identity_id"
     t.index ["play_session_id"], name: "index_rolls_on_play_session_id"
     t.index ["pool_id"], name: "index_rolls_on_pool_id"
+    t.index ["scene_id"], name: "index_rolls_on_scene_id"
+  end
+
+  create_table "scenes", force: :cascade do |t|
+    t.integer "play_session_id", null: false
+    t.integer "campaign_id", null: false
+    t.integer "number", null: false
+    t.string "title", null: false
+    t.text "notes"
+    t.datetime "started_at", null: false
+    t.datetime "ended_at"
+    t.integer "opening_roll_id"
+    t.integer "closing_roll_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_scenes_on_campaign_id"
+    t.index ["closing_roll_id"], name: "index_scenes_on_closing_roll_id"
+    t.index ["opening_roll_id"], name: "index_scenes_on_opening_roll_id"
+    t.index ["play_session_id", "number"], name: "index_scenes_on_play_session_id_and_number", unique: true
+    t.index ["play_session_id"], name: "index_scenes_on_play_session_id"
+    t.index ["play_session_id"], name: "index_scenes_one_open_per_session", unique: true, where: "ended_at IS NULL"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -208,5 +230,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_190000) do
   add_foreign_key "rolls", "identities"
   add_foreign_key "rolls", "play_sessions", on_delete: :nullify
   add_foreign_key "rolls", "pools", on_delete: :nullify
+  add_foreign_key "rolls", "scenes", on_delete: :nullify
+  add_foreign_key "scenes", "campaigns"
+  add_foreign_key "scenes", "play_sessions", on_delete: :cascade
+  add_foreign_key "scenes", "rolls", column: "closing_roll_id", on_delete: :nullify
+  add_foreign_key "scenes", "rolls", column: "opening_roll_id", on_delete: :nullify
   add_foreign_key "sessions", "identities"
 end

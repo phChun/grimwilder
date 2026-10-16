@@ -8,6 +8,7 @@ class Campaign < ApplicationRecord
   has_many :identities, through: :memberships
   has_many :rolls, dependent: :delete_all
   has_many :play_sessions, dependent: :destroy
+  has_many :scenes
   has_many :pools, dependent: :destroy
   has_many :characters, dependent: :nullify
 
@@ -36,6 +37,10 @@ class Campaign < ApplicationRecord
 
   def current_session
     play_sessions.open.first
+  end
+
+  def current_scene
+    scenes.open.first
   end
 
   # Boundaries (a session starting, a rest) change what everyone's table shows.

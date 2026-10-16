@@ -12,6 +12,11 @@
     <span><strong>Standout session</strong>: +1 bonus XP for everyone here <small>(about 1 session in 4)</small></span>
   </label>
 
+  <% if (scene = @session.current_scene) %>
+    <p class="field__hint">This also ends scene <%= scene.number %>: <%= scene.title %>.</p>
+    <%= render "campaigns/scenes/lingering_conditions", scene: scene %>
+  <% end %>
+
   <div class="field">
     <label class="field__label" for="session_notes">Notes</label>
     <textarea id="session_notes" name="notes" rows="5" class="field__input" autocomplete="off" placeholder="What happened, loose threads, next time…"></textarea>

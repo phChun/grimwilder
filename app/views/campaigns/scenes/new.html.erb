@@ -1,0 +1,45 @@
+<% content_for :title, "Start a scene · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>Start a scene</h1>
+  <p class="page-header__lede">Open in the middle of the action (pg. 95). If the setup is unclear, open with a story roll.</p>
+</header>
+
+<% if flash[:alert] %>
+  <p class="flash flash--alert"><%= flash[:alert] %></p>
+<% end %>
+
+<% if @session %>
+  <%= form_with url: campaign_scenes_path(Current.campaign), class: "panel stack session-form" do %>
+    <div class="field">
+      <label class="field__label" for="scene_title">Title</label>
+      <input type="text" id="scene_title" name="title" value="<%= params[:title] %>" required maxlength="120" autocomplete="off" placeholder="The bridge at Mirefall" class="field__input">
+      <p class="field__hint">Scene <%= @session.scenes.maximum(:number).to_i + 1 %> of <%= @session.title.downcase %>.</p>
+    </div>
+
+    <details class="fold scene-form__opening">
+      <summary class="fold__summary">
+        <span class="fold__title">Open with a story roll</span>
+      </summary>
+      <div class="stack">
+        <label class="check">
+          <%= check_box_tag :open_with_story, "1", params[:open_with_story] == "1", id: "scene_open_with_story" %>
+          Roll it as the scene opens
+        </label>
+        <div class="field">
+          <label class="field__label" for="story_question">Question <small>(optional)</small></label>
+          <input type="text" id="story_question" name="question" maxlength="200" autocomplete="off" placeholder="Are the guards awake?" class="field__input">
+        </div>
+        <%= render "campaigns/story_fields", my_characters: @my_characters %>
+      </div>
+    </details>
+
+    <button type="submit" class="button button--primary">Start the scene</button>
+  <% end %>
+<% else %>
+  <div class="panel stack">
+    <p>No session is going. A scene happens within a session.</p>
+    <p><%= link_to "Start a session first", new_campaign_play_session_path(Current.campaign), class: "button button--primary" %></p>
+  </div>
+<% end %>

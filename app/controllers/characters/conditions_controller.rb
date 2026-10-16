@@ -2,7 +2,7 @@ class Characters::ConditionsController < ApplicationController
   include CharacterScoped
 
   def create
-    @character.add_condition!(params.expect(:condition))
+    @character.add_condition!(params.expect(:condition), lasts: params[:lasts])
     redirect_to character_path(@character, anchor: "damage")
   end
 

@@ -1,8 +1,8 @@
 # One roll at the table: an action or defense roll from a character sheet, a
-# story roll, a quarrel, a montage, or a pool roll; or a marker for a session
-# boundary. A campaign's rolls are its shared log, broadcast to everyone at
+# story roll, a quarrel, a montage, or a pool roll; a marker for a session or
+# scene boundary; or a short note ("Tibbs enters a frenzy"). A campaign's rolls are its shared log, broadcast to everyone at
 # the table as they land; rolls on hidden pools reach only the GM. Each is
-# stamped with the session that was going when it was made.
+# stamped with the session and scene that were going when it was made.
 #
 # Names are copied in when rolled, so the log still reads right after a
 # character or pool is renamed or deleted.
@@ -14,10 +14,12 @@ class Roll < ApplicationRecord
   belongs_to :character, optional: true
   belongs_to :pool, optional: true
   belongs_to :play_session, optional: true
+  belongs_to :scene, optional: true
 
-  enum :kind, %w[ action defense story quarrel montage pool marker ].index_by(&:itself), validate: true
+  enum :kind, %w[ action defense story quarrel montage pool marker note ].index_by(&:itself), validate: true
 
   validates :name, presence: true
+  validates :question, presence: true, length: { maximum: 200 }, if: :note?
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, if: -> { action? || defense? || story? || montage? }
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, allow_nil: true, if: :pool? # power pools rolled as an action
 
@@ -28,6 +30,12 @@ class Roll < ApplicationRecord
   before_validation :stamp_session, on: :create
   after_create_commit :broadcast_to_table, if: :campaign
   after_update_commit :broadcast_change_to_table, if: :campaign
+
+  # A short line in the log, by someone at the table or about a character.
+  def self.note!(campaign:, by:, text:, character: nil)
+    create!(campaign: campaign, identity: by, kind: "note", character: character,
+      name: character&.name || by.display_name, question: text.to_s.squish.first(200))
+  end
 
   # Players follow the open log; the GM also follows the GM-only one.
   def self.streams_for(campaign, membership)
@@ -54,6 +62,7 @@ class Roll < ApplicationRecord
   private
     def stamp_session
       self.play_session ||= campaign&.current_session
+      self.scene ||= campaign&.current_scene if play_session&.open?
     end
 
     def broadcast_to_table

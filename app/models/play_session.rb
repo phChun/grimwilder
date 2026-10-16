@@ -8,6 +8,7 @@ class PlaySession < ApplicationRecord
   belongs_to :campaign
   has_and_belongs_to_many :characters, join_table: :play_session_characters
   has_many :rolls, dependent: :nullify
+  has_many :scenes, dependent: :destroy
 
   validates :number, numericality: { only_integer: true, greater_than: 0 }, uniqueness: { scope: :campaign_id }
   validate :one_open_per_campaign, on: :create
@@ -43,11 +44,17 @@ class PlaySession < ApplicationRecord
     ended_at.nil?
   end
 
-  # Returns the characters who reached a new level.
-  def end!(by:, standout: false, notes: nil)
+  def current_scene
+    scenes.open.first
+  end
+
+  # Closes any open scene first, clearing the scene conditions picked (see
+  # Scene#end!). Returns the characters who reached a new level.
+  def end!(by:, standout: false, notes: nil, clear: [])
     raise ArgumentError, "#{title} has already ended." unless open?
 
     transaction do
+      current_scene&.end!(by: by, clear: clear)
       update!(ended_at: Time.current, standout: standout, notes: notes.to_s.strip.presence)
       levelled = characters.select { |character| Array.new(standout ? 2 : 1) { character.gain_xp! }.any? }
       post_marker!("#{title} ends", by: by, text: notes, level_ups: levelled)
@@ -56,8 +63,8 @@ class PlaySession < ApplicationRecord
   end
 
   # A boundary in the log ("Session 4 begins"), which also refreshes everyone's table.
-  def post_marker!(name, by:, text: nil, level_ups: [])
-    campaign.rolls.create!(kind: "marker", identity: by, name: name, play_session: self, question: text.to_s.strip.presence,
+  def post_marker!(name, by:, text: nil, level_ups: [], scene: nil)
+    campaign.rolls.create!(kind: "marker", identity: by, name: name, play_session: self, scene: scene, question: text.to_s.strip.presence,
       sides: level_ups.map { { "character_id" => _1.id, "name" => _1.name, "level" => _1.level } })
     campaign.broadcast_table_refresh
   end

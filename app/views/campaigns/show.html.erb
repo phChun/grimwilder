@@ -76,6 +76,10 @@
           <% end %>
         </summary>
         <%= render "rolls/log", campaign: Current.campaign, membership: Current.membership, rolls: @rolls %>
+        <%= form_with url: campaign_notes_path(Current.campaign), class: "inline-form log-note-form" do %>
+          <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="Add a note to the log">
+          <button type="submit" class="button button--small">Note</button>
+        <% end %>
       </details>
 
       <%= tag.details id: "settings", class: "fold fold--panel gm-table__settings", open: Current.campaign.errors.any?, data: { details_memory_target: "section", section: "settings" } do %>

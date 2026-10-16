@@ -179,7 +179,15 @@ class CharacterTest < ActiveSupport::TestCase
     @tibbs.add_condition!("4d poisoned")
     @tibbs.add_condition!("broken arm")
     @tibbs.remove_condition!(0)
-    assert_equal [ "broken arm" ], @tibbs.reload.conditions
+    assert_equal [ { "name" => "broken arm", "lasts" => nil } ], @tibbs.reload.conditions
+
+    @tibbs.add_condition!("twisted ankle", lasts: "scene")
+    @tibbs.add_condition!("drunk", lasts: "forever")
+    assert_equal [ [ 1, { "name" => "twisted ankle", "lasts" => "scene" } ] ], @tibbs.scene_conditions
+    assert_nil @tibbs.conditions.last["lasts"], "only scene-length conditions are tracked"
+
+    @tibbs.update!(conditions: [ "a plain string", { name: "  " } ])
+    assert_equal [ { "name" => "a plain string", "lasts" => nil } ], @tibbs.reload.conditions
   end
 end
 

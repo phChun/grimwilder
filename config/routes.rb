@@ -47,6 +47,11 @@ Rails.application.routes.draw do
       end
       resource :suspense, only: :update
 
+      resources :scenes, only: %i[ new create ] do
+        resource :ending, only: %i[ new create ], module: :scenes
+      end
+      resources :notes, only: :create
+
       resources :pools, only: %i[ index create update destroy ] do
         scope module: :pools do
           resource :roll, only: :create

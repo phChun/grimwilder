@@ -28,12 +28,32 @@ module Character::Damage
     ].compact
   end
 
-  def add_condition!(name)
-    name = name.to_s.squish.first(80)
-    update!(conditions: conditions + [ name ]) if name.present?
+  # Conditions are { "name", "lasts" }: lasts "scene" for short-term ones that
+  # clear after a scene (pg. 29), nil for ordinary ones.
+  CONDITION_LASTS = %w[ scene ].freeze
+
+  def conditions=(value)
+    super(Array(value).filter_map do |condition|
+      condition = condition.is_a?(Hash) ? condition.stringify_keys : { "name" => condition }
+      name = condition["name"].to_s.squish.first(80)
+      { "name" => name, "lasts" => condition["lasts"].presence_in(CONDITION_LASTS) } if name.present?
+    end)
+  end
+
+  def add_condition!(name, lasts: nil)
+    update!(conditions: conditions + [ { "name" => name, "lasts" => lasts } ])
   end
 
   def remove_condition!(index)
-    update!(conditions: conditions.reject.with_index { |_, i| i == index.to_i })
+    clear_conditions!([ index.to_i ])
+  end
+
+  def clear_conditions!(indexes)
+    update!(conditions: conditions.reject.with_index { |_, i| indexes.include?(i) })
+  end
+
+  # [index, condition] for each "clears after scene" condition.
+  def scene_conditions
+    conditions.each_with_index.filter_map { |condition, index| [ index, condition ] if condition["lasts"] == "scene" }
   end
 end
