@@ -30,6 +30,11 @@ class Roll < ApplicationRecord
     [ [ campaign, :rolls ], ([ campaign, :gm_rolls ] if membership&.gm?) ].compact
   end
 
+  # The roller's own d6s plus any assist dice: together they set the result.
+  def all_dice
+    dice + assists.pluck("die")
+  end
+
   def damage_thorns
     damage_reasons.size
   end

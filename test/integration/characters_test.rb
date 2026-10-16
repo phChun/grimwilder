@@ -47,18 +47,31 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "input[name=spark]", 2, "0 or the 1 spark Tibbs holds"
     assert_select ".page-header__lede", /\+1t from damage \(marked\)/
+    assert_select "input[name='assists[]'][value=?]", characters(:bram).id.to_s
 
     assert_difference -> { @tibbs.rolls.count }, 1 do
-      post character_rolls_path(@tibbs), params: { stat: "agility", mode: "defense", spark: 1, help: 1, thorns: 2 }
+      post character_rolls_path(@tibbs), params: { stat: "agility", mode: "defense", spark: 1, help: 1, thorns: 2, assists: [ characters(:bram).id ] }
     end
     roll = @tibbs.rolls.last
     assert_redirected_to character_roll_path(@tibbs, roll)
     assert_equal [ "defense", 5, 3 ], [ roll.kind, roll.dice.size, roll.thorns.size ]
+    assert_equal [ "Bram" ], roll.assists.pluck("name")
     assert_not @tibbs.reload.marked_agility?
 
     follow_redirect!
     assert_select ".result__name", roll.outcome.capitalize
-    assert_select ".page-header__lede", "3d Agility + 1 spark + 1d help, vs 3t (marked, 2 situational)"
+    assert_select ".page-header__lede", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
+    assert_select ".tray .die--assist[title=Bram]", 1
+  end
+
+  test "only characters seated alongside can assist" do
+    sign_in_as identities(:pip)
+
+    assert_no_difference -> { Roll.count } do
+      post character_rolls_path(@tibbs), params: { stat: "agility", assists: [ characters(:loner).id ] }
+    end
+    assert_redirected_to character_path(@tibbs)
+    assert_match(/can assist/, flash[:alert])
   end
 
   test "a roll outside the rules goes back to the sheet" do

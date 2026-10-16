@@ -24,6 +24,9 @@
         <% end %>
       </div>
     <% end %>
+    <% if @roll.assists.any? && @roll.outcome != "perfect" %>
+      <p class="roll-outcome__assists"><%= @roll.assists.pluck("name").to_sentence %> assisted, so the impact move can hit them too.</p>
+    <% end %>
     <% if (note = roll_spark_note(@roll)) %>
       <p class="roll-outcome__spark"><%= note %></p>
     <% end %>

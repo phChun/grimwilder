@@ -24,31 +24,35 @@ module RollsHelper
     RESULT_TEXT.fetch(roll.kind).fetch(roll.outcome)
   end
 
-  # d6s, then thorns as d8 diamonds. Action and defense rolls light up the die
-  # that set the result (every 6 on a critical); pool rolls light up the dice
-  # that stay and strike out the ones that drop.
+  # d6s (then any assist dice, dashed and named), then thorns as d8 diamonds.
+  # Action and defense rolls light up the die that set the result (every 6 on
+  # a critical); pool rolls light up the dice that stay and strike out the ones
+  # that drop.
   def roll_dice_tags(roll, small: false)
-    highest = roll.dice.max
+    highest = roll.all_dice.max
     lit_one = false
+    light = ->(value) do
+      if roll.pool? then value >= 4 ? "die--top" : "die--dropped"
+      elsif value == highest && (!lit_one || roll.critical?) then lit_one = true; "die--top"
+      end
+    end
 
-    d6s = roll.dice.map do |value|
-      modifier =
-        if roll.pool? then value >= 4 ? "die--top" : "die--dropped"
-        elsif value == highest && (!lit_one || roll.critical?) then lit_one = true; "die--top"
-        end
-      roll_die_tag(value, "d6", modifier, small)
+    d6s = roll.dice.map { |value| roll_die_tag(value, "d6", light.(value), small) }
+    assists = roll.assists.map do |assist|
+      roll_die_tag(assist["die"], "d6", [ light.(assist["die"]), "die--assist" ], small, label: "#{assist["name"]}'s assist die showing #{assist["die"]}", title: assist["name"])
     end
     d8s = roll.thorns.map { |value| roll_die_tag(value, "d8", ("die--cut" if value >= 7), small) }
 
-    safe_join(d6s + d8s)
+    safe_join(d6s + assists + d8s)
   end
 
-  # "3d Agility + 1 spark + 1d help, vs 2t (marked, 1 situational)", or for a
-  # story roll "2d (even odds) + 1 spark, vs 1t (1 situational)"
+  # "3d Agility + 1 spark + 1d extra + Wren assisting, vs 2t (marked, 1 situational)",
+  # or for a story roll "2d (even odds) + 1 spark, vs 1t (1 situational)"
   def roll_setup(roll)
     dice = [ roll.story? ? "#{roll.stat_dice}d (#{roll.odds})" : "#{roll.stat_dice}d #{roll.stat.capitalize}" ]
     dice << "#{roll.spark_spent} spark" if roll.spark_spent.positive?
-    dice << "#{roll.help_dice}d help" if roll.help_dice.positive?
+    dice << "#{roll.help_dice}d extra" if roll.help_dice.positive?
+    dice << "#{roll.assists.pluck("name").to_sentence} assisting" if roll.assists.any?
 
     thorns = roll.damage_reasons.dup
     thorns << "#{roll.situational_thorns} situational" if roll.situational_thorns.positive?
@@ -57,7 +61,7 @@ module RollsHelper
   end
 
   def roll_summary(roll)
-    result = Grimwild::Dice.interpret(roll.dice, roll.thorns)
+    result = Grimwild::Dice.interpret(roll.all_dice, roll.thorns)
 
     if result.critical?
       "Multiple 6s: a critical, so thorns can't cut it."
@@ -109,7 +113,7 @@ module RollsHelper
   end
 
   private
-    def roll_die_tag(value, kind, modifier, small)
-      tag.span(value, class: [ "die", "die--#{kind}", modifier, ("die--small" if small) ], "aria-label": "#{kind} showing #{value}")
+    def roll_die_tag(value, kind, modifier, small, label: "#{kind} showing #{value}", title: nil)
+      tag.span(value, class: [ "die", "die--#{kind}", *modifier, ("die--small" if small) ], "aria-label": label, title: title)
     end
 end

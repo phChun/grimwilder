@@ -55,6 +55,27 @@ class CharacterTest < ActiveSupport::TestCase
     assert_equal 0, @tibbs.reload.spark
   end
 
+  test "an assist rolls its own die, which counts toward the result" do
+    roll = @tibbs.roll!("wits", by: identities(:pip), assists: [ characters(:bram) ], random: FixedDice.new([ 2, 3, 6 ]))
+
+    assert_equal [ 2, 3 ], roll.dice
+    assert_equal [ { "character_id" => characters(:bram).id, "name" => "Bram", "die" => 6 } ], roll.assists
+    assert_equal "perfect", roll.outcome, "Bram's 6 sets the result"
+    assert_equal [ 2, 3, 6 ], roll.all_dice
+  end
+
+  test "an assist's 6 can make a critical" do
+    roll = @tibbs.roll!("wits", by: identities(:pip), assists: [ characters(:bram) ], random: FixedDice.new([ 6, 1, 6 ]))
+    assert roll.critical?
+  end
+
+  test "only other characters seated alongside can assist" do
+    [ [ @tibbs ], [ characters(:loner) ], [ characters(:bram), characters(:bram) ] ].each do |assists|
+      assert_raises(ArgumentError) { @tibbs.roll!("wits", by: identities(:pip), assists: assists) }
+    end
+    assert_raises(ArgumentError) { characters(:loner).roll!("wits", by: identities(:stranger), assists: [ characters(:bram) ]) }
+  end
+
   test "a disaster gives spark, up to 2" do
     roll = @tibbs.roll!("brawn", by: identities(:pip), thorns: 1, random: FixedDice.new([ 2, 8 ]))
     assert_equal "disaster", roll.outcome

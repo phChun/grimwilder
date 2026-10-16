@@ -42,10 +42,24 @@
     <% end %>
   </fieldset>
 
+  <% allies = @character.campaign ? @character.campaign.characters.excluding(@character).ordered : [] %>
+  <% if allies.any? %>
+    <fieldset class="roll-setup__group">
+      <legend class="field__label">Assists <small>1d each</small></legend>
+      <% allies.each do |ally| %>
+        <label class="check">
+          <%= check_box_tag "assists[]", ally.id, false, id: "roll_assist_#{ally.id}" %>
+          <%= ally.name %>
+        </label>
+      <% end %>
+      <p class="field__hint">Each ally who helps rolls their own die, and shares the risk.</p>
+    </fieldset>
+  <% end %>
+
   <div class="field">
-    <label class="field__label" for="roll_help">Help <small>d6</small></label>
+    <label class="field__label" for="roll_help">Extra dice <small>d6</small></label>
     <input type="number" id="roll_help" name="help" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
-    <p class="field__hint">Extra dice from assists and talents.</p>
+    <p class="field__hint">From talents, or outside help like an NPC or the scene.</p>
   </div>
 
   <div class="field">

@@ -1,5 +1,5 @@
-# Action and defense rolls from the sheet: set up the roll (spark, help,
-# situational thorns), roll it on the server, then show the result. Rolls of a
+# Action and defense rolls from the sheet: set up the roll (spark, assists,
+# extra dice, situational thorns), roll it on the server, then show the result. Rolls of a
 # seated character land in the campaign's log for the whole table.
 class Characters::RollsController < ApplicationController
   include CharacterScoped
@@ -11,7 +11,7 @@ class Characters::RollsController < ApplicationController
 
   def create
     roll = @character.roll!(params.expect(:stat), by: Current.identity, mode: params[:mode].presence || "action",
-      spend_spark: params[:spark].to_i, help: params[:help].to_i, thorns: params[:thorns].to_i)
+      spend_spark: params[:spark].to_i, help: params[:help].to_i, thorns: params[:thorns].to_i, assists: assists)
     redirect_to character_roll_path(@character, roll)
   rescue ArgumentError => error
     redirect_to @character, alert: error.message
@@ -20,4 +20,10 @@ class Characters::RollsController < ApplicationController
   def show
     @roll = @character.rolls.where(kind: Character::Rolling::MODES).find(params[:id])
   end
+
+  private
+    # The model checks that every assist is seated alongside this character.
+    def assists
+      Character.where(id: Array(params[:assists]).compact_blank).to_a
+    end
 end

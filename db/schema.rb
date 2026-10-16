@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_160000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_170000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -147,6 +147,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_160000) do
     t.string "question"
     t.json "sides", default: [], null: false
     t.string "winner"
+    t.json "assists", default: [], null: false
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"

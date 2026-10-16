@@ -791,6 +791,8 @@ form.button_to, .button_to { margin: 0; }
 .critical .button_to { margin-top: var(--space-3); }
 .critical .field__hint { margin-top: var(--space-3); }
 
+.roll-outcome__assists { margin: var(--space-3) 0 0; }
+
 .roll-outcome__spark { margin: var(--space-3) 0 0; font-weight: 700; color: var(--disaster); }
 
 .roll-next { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
