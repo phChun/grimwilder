@@ -6,7 +6,7 @@ WebAuthn.configure do |config|
   default_origin = {
     "development" => "http://localhost:3000",
     "test" => "http://www.example.com"
-  }.fetch(Rails.env, "https://example.com")
+  }.fetch(Rails.env, "https://grimwilder.com")
 
   origin = ENV.fetch("APP_ORIGIN", default_origin)
 

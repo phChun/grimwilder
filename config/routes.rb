@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  # One canonical origin: passkeys and cookies are bound to grimwilder.com.
+  constraints(host: "www.grimwilder.com") do
+    match "(*path)", to: redirect { |_params, request| "https://grimwilder.com#{request.fullpath}" }, via: :all
+  end
+
   root "pages#home"
 
   # Play toolkit (public)
