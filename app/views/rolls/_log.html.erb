@@ -1,0 +1,10 @@
+<%# locals: (campaign:, membership:, rolls:) %>
+<% Roll.streams_for(campaign, membership).each do |stream| %>
+  <%= turbo_stream_from(*stream) %>
+<% end %>
+
+<section id="roll-log" class="panel stack" aria-labelledby="roll-log-title">
+  <h2 id="roll-log-title" class="panel__title">Table log</h2>
+  <ol id="roll_log" class="roll-log" aria-live="polite"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>
+  <p class="empty roll-log__empty">No rolls yet. Rolls from character sheets and pools land here as they happen.</p>
+</section>

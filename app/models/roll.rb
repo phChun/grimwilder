@@ -20,6 +20,7 @@ class Roll < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(gm_only: false) }
+  scope :table_log, ->(membership, limit: 50) { visible_to(membership).includes(:identity, :pool).recent.limit(limit) }
 
   after_create_commit :broadcast_to_table, if: :campaign
   after_update_commit :broadcast_change_to_table, if: :campaign

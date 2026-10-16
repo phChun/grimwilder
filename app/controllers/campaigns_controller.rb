@@ -44,7 +44,7 @@ class CampaignsController < ApplicationController
     def load_table
       @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
       @characters = Current.campaign.characters.includes(:identity).ordered
-      @rolls = Current.campaign.rolls.visible_to(Current.membership).includes(:identity, :pool).recent.limit(50)
+      @rolls = Current.campaign.rolls.table_log(Current.membership)
       @my_characters = @characters.select { _1.owned_by?(Current.identity) }
     end
 end

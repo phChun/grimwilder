@@ -179,7 +179,7 @@ In JavaScript:
 - **Quarrels** (`Roll.quarrel!`, in `Roll::Quarrel`; pg. 23) have their own page. Each side rolls 2d plus any spark, and each assist rolls its own 1d (pg. 13). The highest die wins, and a tie has no `winner`. Everyone involved takes spark. Sides go in the `sides` JSON and the stakes in `question`. Any member can record a quarrel, but only a character's own player can spend its spark (the `SparkSpending` controller concern).
 - **Montages** (`Roll.montage!`, in `Roll::Montage`; pg. 16) have their own page too. Each seated character taking part rolls 2d plus any spark, with no thorns, since the book gives montages none. The best single result is the scene's `outcome`, and each character's own result goes in `sides`, so the table can see what to zoom in on. The scene goes in `question`.
 - `Character#settle_spark(spent:, take:)` is the one place spark is spent before a roll and taken after it, capped at 2. It doesn't save.
-- Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. Pages subscribe with `Roll.streams_for(campaign, membership)`. The partial renders in a job, so it must not use `Current`.
+- Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. The campaign page and the pools page both render `rolls/_log` (locals `campaign:`, `membership:`, `rolls:`), which subscribes to `Roll.streams_for(campaign, membership)` itself; load the entries with `campaign.rolls.table_log(membership)`. `rolls/_roll` renders in a job, so it must not use `Current`.
 - In tests, `assert_no_turbo_stream_broadcasts` counts every broadcast so far in the test, not just the ones inside its block. `FixedDice` (test/test_helpers) stands in for `Random`.
 
 ## Accounts & campaigns (passwordless)
@@ -248,7 +248,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 1. **Pools**: built (see above). Next for pools: linked phases.
 2. **Crucibles**: built (see above). Next: path-specific crucibles.
 3. **Characters**: built, with the talent catalog and spark spent into rolls (see above).
-4. **Campaign play**: the table log is built (see above). Next ideas: showing the log on the pools page, and assists as separate dice on action rolls.
+4. **Campaign play**: the table log is built (see above). Next idea: assists as separate dice on action rolls (pg. 13).
 
 Open questions: deploy host and domain; whether rolls can be shared without an account.
 

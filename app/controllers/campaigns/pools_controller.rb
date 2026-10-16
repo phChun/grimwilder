@@ -5,6 +5,7 @@ class Campaigns::PoolsController < ApplicationController
 
   before_action :require_gm, except: :index
   before_action :set_pool, only: %i[ update destroy ]
+  before_action :set_table_log, only: %i[ index create ]
 
   def index
     @pools = Current.campaign.pools.visible_to(Current.membership).includes(:last_rolled_by).ordered
@@ -39,5 +40,9 @@ class Campaigns::PoolsController < ApplicationController
 
     def pool_params
       params.expect(pool: [ :name, :kind, :starting_size, :hidden ])
+    end
+
+    def set_table_log
+      @rolls = Current.campaign.rolls.table_log(Current.membership, limit: 20)
     end
 end

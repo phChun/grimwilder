@@ -87,43 +87,47 @@
     <% end %>
   </section>
 
-  <% if gm? %>
-    <section class="panel stack" aria-labelledby="pool-new">
-      <h2 id="pool-new" class="panel__title">New pool</h2>
-      <%= form_with model: [ Current.campaign, @pool ], class: "stack" do |form| %>
-        <% if @pool.errors.any? %>
-          <p class="form-error"><%= @pool.errors.full_messages.to_sentence %></p>
-        <% end %>
+  <div class="pools__side stack">
+    <% if gm? %>
+      <section class="panel stack" aria-labelledby="pool-new">
+        <h2 id="pool-new" class="panel__title">New pool</h2>
+        <%= form_with model: [ Current.campaign, @pool ], class: "stack" do |form| %>
+          <% if @pool.errors.any? %>
+            <p class="form-error"><%= @pool.errors.full_messages.to_sentence %></p>
+          <% end %>
 
-        <div class="field">
-          <%= form.label :name, "Name", class: "field__label" %>
-          <%= form.text_field :name, required: true, maxlength: 80, autocomplete: "off", placeholder: "Lookouts spot you", class: "field__input" %>
-        </div>
-
-        <div class="field">
-          <%= form.label :kind, "Type", class: "field__label" %>
-          <%= form.select :kind, Pool::LABELS.invert, {}, class: "field__input" %>
-        </div>
-
-        <div class="field">
-          <label class="field__label" for="pool_starting_size">Dice</label>
-          <div class="size-picker">
-            <button type="button" class="button button--small" data-herb-set="new_size=2" aria-label="2 dice, short">2d</button>
-            <button type="button" class="button button--small" data-herb-set="new_size=4" aria-label="4 dice, medium">4d</button>
-            <button type="button" class="button button--small" data-herb-set="new_size=6" aria-label="6 dice">6d</button>
-            <button type="button" class="button button--small" data-herb-set="new_size=8" aria-label="8 dice, long">8d</button>
-            <input type="number" id="pool_starting_size" name="pool[starting_size]" class="field__input size-picker__input" min="1" max="<%= Pool::MAX_SIZE %>" step="1" required autocomplete="off" value="<%= new_size %>" data-herb-set="new_size=$value">
+          <div class="field">
+            <%= form.label :name, "Name", class: "field__label" %>
+            <%= form.text_field :name, required: true, maxlength: 80, autocomplete: "off", placeholder: "Lookouts spot you", class: "field__input" %>
           </div>
-          <p class="field__hint">2d short, 4d medium, 8d long. Bigger pools take only a little longer to clear.</p>
-        </div>
 
-        <label class="check">
-          <%= form.check_box :hidden %>
-          Hide from players
-        </label>
+          <div class="field">
+            <%= form.label :kind, "Type", class: "field__label" %>
+            <%= form.select :kind, Pool::LABELS.invert, {}, class: "field__input" %>
+          </div>
 
-        <%= form.submit "Add pool", class: "button button--primary" %>
-      <% end %>
-    </section>
-  <% end %>
+          <div class="field">
+            <label class="field__label" for="pool_starting_size">Dice</label>
+            <div class="size-picker">
+              <button type="button" class="button button--small" data-herb-set="new_size=2" aria-label="2 dice, short">2d</button>
+              <button type="button" class="button button--small" data-herb-set="new_size=4" aria-label="4 dice, medium">4d</button>
+              <button type="button" class="button button--small" data-herb-set="new_size=6" aria-label="6 dice">6d</button>
+              <button type="button" class="button button--small" data-herb-set="new_size=8" aria-label="8 dice, long">8d</button>
+              <input type="number" id="pool_starting_size" name="pool[starting_size]" class="field__input size-picker__input" min="1" max="<%= Pool::MAX_SIZE %>" step="1" required autocomplete="off" value="<%= new_size %>" data-herb-set="new_size=$value">
+            </div>
+            <p class="field__hint">2d short, 4d medium, 8d long. Bigger pools take only a little longer to clear.</p>
+          </div>
+
+          <label class="check">
+            <%= form.check_box :hidden %>
+            Hide from players
+          </label>
+
+          <%= form.submit "Add pool", class: "button button--primary" %>
+        <% end %>
+      </section>
+    <% end %>
+
+    <%= render "rolls/log", campaign: Current.campaign, membership: Current.membership, rolls: @rolls %>
+  </div>
 </div>
