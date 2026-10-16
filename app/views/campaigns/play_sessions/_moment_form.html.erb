@@ -1,0 +1,17 @@
+<%# locals: (session:, characters:, return_to: nil) %>
+<%= form_with url: campaign_play_session_moments_path(session.campaign, session), class: "stack moment-form" do %>
+  <% if return_to %><input type="hidden" name="return_to" value="<%= return_to %>"><% end %>
+  <% if characters.one? %>
+    <input type="hidden" name="character_id" value="<%= characters.first.id %>">
+  <% else %>
+    <div class="field">
+      <label class="field__label" for="<%= dom_id(session, :moment_character) %>">Whose moment</label>
+      <%= select_tag :character_id, options_for_select(characters.map { [ _1.name, _1.id ] }), id: dom_id(session, :moment_character), class: "field__input" %>
+    </div>
+  <% end %>
+  <div class="field">
+    <label class="field__label" for="<%= dom_id(session, :moment_text) %>"><%= characters.one? ? "#{characters.first.name}'s best moment" : "Best moment" %></label>
+    <textarea id="<%= dom_id(session, :moment_text) %>" name="text" rows="2" maxlength="500" required class="field__input" autocomplete="off"></textarea>
+  </div>
+  <button type="submit" class="button button--small">Share it</button>
+<% end %>

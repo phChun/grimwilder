@@ -43,12 +43,15 @@ Rails.application.routes.draw do
       resources :quarrels, only: %i[ new create ]
       resources :montages, only: %i[ new create ]
 
-      resources :play_sessions, only: %i[ new create ] do
-        resource :ending, only: %i[ new create ], module: :play_sessions
+      resources :play_sessions, only: %i[ index show new create update ] do
+        scope module: :play_sessions do
+          resource :ending, only: %i[ new create ]
+          resources :moments, only: :create
+        end
       end
       resource :suspense, only: :update
 
-      resources :scenes, only: %i[ new create ] do
+      resources :scenes, only: %i[ new create update ] do
         resource :ending, only: %i[ new create ], module: :scenes
       end
       resources :notes, only: :create

@@ -1153,3 +1153,20 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .seat-pool__name { flex: 1; }
 .seat-pool__size { font-family: var(--font-display); font-size: 1.1rem; }
 .seat-pool .button { min-height: 1.9rem; padding: 0 var(--space-2); }
+
+.moment-form { max-width: 36rem; }
+.session-form__scenes { margin: var(--space-1) 0 0; padding-left: 1.3em; }
+
+.session-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); max-width: 48rem; }
+.session-card { display: grid; gap: var(--space-1); }
+.session-card__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.session-card__title { margin: 0; font-size: 1.4rem; }
+.session-card__date,
+.session-card__meta { margin: 0; font-size: 0.9rem; color: var(--ink-faint); }
+.session-card__recap { margin: 0; color: var(--ink-soft); }
+.session-before { margin-top: var(--space-5); max-width: 48rem; }
+
+.session-page { display: grid; gap: var(--space-4); max-width: 48rem; }
+.session-page__text { margin: 0; white-space: pre-line; }
+.session-page__edit { font-family: var(--font-body); font-size: 0.95rem; font-weight: 700; color: var(--moss); }
+.session-scene__bookend { margin: 0; font-size: 0.9rem; color: var(--ink-soft); }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_210000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_16_220000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -110,6 +110,19 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_210000) do
     t.integer "character_id", null: false
     t.index ["character_id"], name: "index_play_session_characters_on_character_id"
     t.index ["play_session_id", "character_id"], name: "idx_on_play_session_id_character_id_1d619a4f40", unique: true
+  end
+
+  create_table "play_session_moments", force: :cascade do |t|
+    t.integer "play_session_id", null: false
+    t.integer "character_id", null: false
+    t.integer "identity_id", null: false
+    t.text "text", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id"], name: "index_play_session_moments_on_character_id"
+    t.index ["identity_id"], name: "index_play_session_moments_on_identity_id"
+    t.index ["play_session_id", "character_id"], name: "index_play_session_moments_on_play_session_id_and_character_id", unique: true
+    t.index ["play_session_id"], name: "index_play_session_moments_on_play_session_id"
   end
 
   create_table "play_sessions", force: :cascade do |t|
@@ -228,6 +241,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_210000) do
   add_foreign_key "passkeys", "identities"
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
+  add_foreign_key "play_session_moments", "characters", on_delete: :cascade
+  add_foreign_key "play_session_moments", "identities"
+  add_foreign_key "play_session_moments", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade

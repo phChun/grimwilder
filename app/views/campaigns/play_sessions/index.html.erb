@@ -1,0 +1,36 @@
+<% content_for :title, "Sessions · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>Sessions</h1>
+</header>
+
+<% if @sessions.any? %>
+  <ol class="session-list">
+    <% @sessions.each do |session| %>
+      <li class="panel session-card">
+        <div class="session-card__head">
+          <h2 class="session-card__title"><%= link_to session.title, campaign_play_session_path(Current.campaign, session) %></h2>
+          <span class="session-card__date"><%= l(session.started_at.to_date, format: :long) %><%= " · going now" if session.open? %></span>
+        </div>
+        <% if session.recap.present? %><p class="session-card__recap"><%= truncate(session.recap, length: 180) %></p><% end %>
+        <p class="session-card__meta">
+          <%= pluralize(session.scenes.size, "scene") %> · <%= pluralize(session.characters.size, "character") %> there
+          <% unless session.open? %>
+            · <%= session.standout? ? "+2 XP (standout)" : "+1 XP" %>
+            <% session.level_ups.each do |level_up| %> · <%= level_up["name"] %> reached level <%= level_up["level"] %><% end %>
+          <% end %>
+        </p>
+      </li>
+    <% end %>
+  </ol>
+<% else %>
+  <p class="empty">No sessions yet.<% if gm? %> <%= link_to "Start the first one", new_campaign_play_session_path(Current.campaign) %>.<% end %></p>
+<% end %>
+
+<% if @before.any? %>
+  <details class="fold fold--panel session-before">
+    <summary class="fold__summary"><span class="fold__title">Before sessions</span><span class="fold__meta"><%= pluralize(@before.size, "entry") %></span></summary>
+    <ol class="roll-log"><%= render partial: "rolls/roll", collection: @before, as: :roll %></ol>
+  </details>
+<% end %>

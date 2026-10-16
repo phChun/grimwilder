@@ -9,6 +9,7 @@ class PlaySession < ApplicationRecord
   has_and_belongs_to_many :characters, join_table: :play_session_characters
   has_many :rolls, dependent: :nullify
   has_many :scenes, dependent: :destroy
+  has_many :moments, dependent: :destroy
 
   validates :number, numericality: { only_integer: true, greater_than: 0 }, uniqueness: { scope: :campaign_id }
   validate :one_open_per_campaign, on: :create
@@ -46,6 +47,23 @@ class PlaySession < ApplicationRecord
 
   def current_scene
     scenes.open.first
+  end
+
+  def previous
+    campaign.play_sessions.where(number: ...number).order(:number).last
+  end
+
+  # Present characters with no best moment yet, of those this identity may write for.
+  def characters_needing_moments(identity)
+    return [] if first?
+
+    characters.ordered.reject { |character| moments.any? { _1.character_id == character.id } }
+      .select { PlaySession::Moment.writable_by?(identity, _1, campaign) }
+  end
+
+  # Level-ups recorded when the session ended: [{ "name", "level", "character_id" }].
+  def level_ups
+    rolls.marker.where(name: "#{title} ends").last&.sides || []
   end
 
   # Closes any open scene first, clearing the scene conditions picked (see
