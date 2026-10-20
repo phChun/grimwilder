@@ -200,9 +200,15 @@ In JavaScript:
 - `messages/_chat` (locals `campaign:`, `messages:`, `speakers:`, `speaker:`) is on the GM table (`#chat`) and in the character view's rail. `Message.chat_for(campaign)` gives the newest 40, oldest first. Newest is at the bottom; a `column-reverse` scroller keeps it pinned without JS.
 - Times are `<time datetime>` shown in the viewer's zone by `local_time_controller.js` (re-run after a morph); the server fallback is UTC.
 
-## The GM table (campaigns#show)
+## The GM table (campaigns/tables#show)
 
-The campaign page is where play runs, for the GM and players alike. Three columns from 1100px wide (side: At the table, Roll log, Chat, Invite & settings; main: Pools, Story roll; tools: Crucibles), two from 768px, and one on phones with section tabs.
+Night-table phase 3. **`/campaigns/:id/table`** (`Campaigns::TablesController`, `require_gm`) is the GM table, built from `CampaignTable#load_table` like the old page: a scene bar ("Session 8 · live 1h 12m · Scene 2 of 2", the scene title, Story roll / Montage / Quarrel, then Cut to new scene, End session, and a "Rest or downtime" fold-out) beside a suspense panel (− diamonds +, "players can see it"); party cards (`harm_line`, spark and thread, talent uses and talent pools; a member without a character gets a dashed card); pools as cards (`campaigns/pools/_card`); the story roll fold; the crucible; and a rail with the log, a note box and chat.
+- Pool cards: the dice count, a track (`shared/_pool_track`) or the last roll's dice when rolled this scene (`pool_card_shows_last_roll?`, "6d → 4d · 2 minutes ago"), a ⋯ menu (drop-first, push, reset, hide, delete, the power-pool action roll) and "Roll Nd". Hidden pools are dashed purple with an eye-off icon, a purple Roll and **Reveal** (PATCH `hidden: false`). An empty resource pool dims, says "All gone." and offers **Restock to Nd** (the reset).
+- "Cut to new scene" opens the end-scene form with `then=new_scene`; ending it then redirects to the new-scene form.
+- Redirects: campaign controllers send people back with `back_to_table` (`CampaignScoped#table_path_for_viewer`): the GM to the GM table, a player to `campaign_path`. `/pools` and `campaign_play_path` follow the same rule. A pool that fails to save renders `campaigns/tables/show`.
+- **`campaigns#show` is still the old shared table** below until phase 4 turns it into the campaign overview; players use it for pools, story rolls and notes, and settings live there.
+
+The old shared table (campaigns#show), until phase 4: Three columns from 1100px wide (side: At the table, Roll log, Chat, Invite & settings; main: Pools, Story roll; tools: Crucibles), two from 768px, and one on phones with section tabs.
 - Every section is a native `<details>`. `details_memory_controller.js` remembers open/closed per browser in localStorage (keyed by campaign and section). With nothing saved, phones open only Pools. It also restores what people opened after a Turbo morph, because a pool refresh re-renders the page with the server's defaults.
 - `CampaignTable#load_table` (a controller concern) loads everything. `Campaigns::PoolsController#create` uses it too, to show the table again with the form open when a pool doesn't save.
 - **Pools** are compact rows (`campaigns/pools/_pool`). The ⋯ fold-out holds drop-first, push, the power-pool action roll and the GM controls. `GET /campaigns/:id/pools` and `/pools` (the home page's Pools card) redirect to `#pools`, and pool actions redirect back to the table. The new-pool form (`campaigns/pools/_form`) keeps its own herb:state.
@@ -292,7 +298,7 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 
 ## Design system (the night-table direction)
 
-The UI rethink (brief "Grimwilder: night-table UI", 2026-10-20; mockups in the local, git-ignored `docs/design/ui-rethink/`) is being built in five phases: (1) tokens and shell, (2) character view, (3) GM table, (4) campaign page, (5) chat. Phases 1 (shell) and 2 (character view) are done; screens not yet rebuilt still use their older class names in the new palette.
+The UI rethink (brief "Grimwilder: night-table UI", 2026-10-20; mockups in the local, git-ignored `docs/design/ui-rethink/`) is being built in five phases: (1) tokens and shell, (2) character view, (3) GM table, (4) campaign page, (5) chat. Phases 1 (shell), 2 (character view) and 3 (GM table) are done; screens not yet rebuilt still use their older class names in the new palette.
 
 - **Dark only.** Every color, font and radius is a custom property in `:root` in `application.css`; templates and components use only the variables. The older names (`--paper`, `--ink`, `--moss`, `--font-body`…) are aliases kept until each screen is rebuilt. Don't use them in new work.
 - Fonts are self-hosted through Propshaft (`app/assets/fonts`, `@font-face` in `application.css`): **Spectral** (500, 700, italic 500) for names, headings and in-character speech (`--font-display`); **IBM Plex Sans** (400, 500, 600) for UI (`--font-ui`); **IBM Plex Mono** (500, 600) for dice and counts (`--font-dice`). No Google Fonts.

@@ -1,0 +1,199 @@
+<% content_for :title, "Table · #{Current.campaign.name}" %>
+<% content_for :head do %>
+  <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+<% end %>
+<%= turbo_stream_from Current.campaign, :pools %>
+<%= turbo_stream_from Current.campaign, :table %>
+
+<% campaign = Current.campaign %>
+<% scene = @session&.current_scene %>
+<% seats = table_seats(@memberships, @characters) %>
+<% first_crucible = @crucible_groups.first.last.first %>
+
+<%# The GM table: the scene and suspense on top, the party, pools as cards and the crucible, with the table's log and chat in the rail. %>
+<div class="fluid gm-view" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
+  <div class="fluid__main gm-view__main">
+    <section class="scene-bar" aria-labelledby="scene-title">
+      <div class="scene-bar__scene">
+        <p class="scene-bar__status">
+          <% if @session %>
+            <span class="live-banner__dot" aria-hidden="true"></span>
+            <%= @session.title %> · live <%= running_for(@session.started_at) %><% if scene %> · Scene <%= scene.number %> of <%= @session.scenes.size %><% end %>
+          <% else %>
+            Between sessions
+          <% end %>
+          · <%= link_to "History", campaign_play_sessions_path(campaign) %>
+        </p>
+        <h1 id="scene-title" class="scene-bar__title"><%= scene&.title || (@session ? "Between scenes" : campaign.name) %></h1>
+
+        <div class="scene-bar__actions">
+          <% if @session.nil? %>
+            <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary" %>
+            <a href="#story-roll" class="button" data-action="details-memory#jump">Story roll</a>
+          <% else %>
+            <a href="#story-roll" class="button button--primary" data-action="details-memory#jump">Story roll</a>
+          <% end %>
+          <%= link_to "Montage", new_campaign_montage_path(campaign), class: "button" %>
+          <%= link_to "Quarrel", new_campaign_quarrel_path(campaign), class: "button" %>
+          <span class="scene-bar__spacer"></span>
+          <% if scene %>
+            <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost" %>
+          <% elsif @session %>
+            <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--ghost" %>
+          <% end %>
+          <% if @session %>
+            <%= link_to "End session", new_campaign_play_session_ending_path(campaign, @session), class: "button button--ghost" %>
+          <% end %>
+          <details class="between-scenes">
+            <summary class="button button--ghost between-scenes__toggle">Rest or downtime</summary>
+            <div class="between-scenes__actions">
+              <%= button_to "Rest", campaign_rest_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Rest: clear marks and harm for #{@session ? "everyone here" : "everyone seated"}?" } } %>
+              <%= link_to "Downtime…", new_campaign_downtime_path(campaign), class: "button button--small" %>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="suspense-panel">
+        <div class="suspense-panel__head">
+          <span class="suspense-panel__label">Suspense</span>
+          <span class="suspense-panel__note">players can see it</span>
+        </div>
+        <div class="suspense-panel__control">
+          <%= button_to "−", campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, class: "suspense-panel__step", disabled: campaign.suspense.zero?, "aria-label": "Spend 1 suspense" %>
+          <% if campaign.suspense.positive? %>
+            <%= render "shared/pips", kind: "suspense", value: campaign.suspense %>
+          <% else %>
+            <span class="suspense-panel__none" aria-label="0 suspense">0</span>
+          <% end %>
+          <%= button_to "+", campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, class: "suspense-panel__step", "aria-label": "Take 1 suspense" %>
+        </div>
+      </div>
+    </section>
+
+    <% if @session && (writable = @session.characters_needing_moments(Current.identity).select { _1.owned_by?(Current.identity) }).any? %>
+      <details id="moment-prompt" class="card moment-prompt" open data-details-memory-target="section" data-section="moments-<%= @session.id %>" data-phone-open="true">
+        <summary class="fold__summary"><span class="fold__title">Best moment from last session</span><span class="fold__meta">close to dismiss</span></summary>
+        <p class="field__hint">Recall last session and share your character's best moment (pg. 31).</p>
+        <%= render "campaigns/play_sessions/moment_form", session: @session, characters: writable %>
+      </details>
+    <% end %>
+
+    <section id="table" class="gm-section" aria-labelledby="party-title">
+      <div class="gm-section__head">
+        <h2 id="party-title" class="gm-section__title">Party</h2>
+        <%= link_to "Add your character", new_character_path(campaign_id: campaign.id), class: "button button--ghost button--small" %>
+      </div>
+      <div class="party-grid">
+        <% seats.each do |membership, seated| %>
+          <% if seated.empty? %>
+            <div class="party-card party-card--empty">
+              <span class="party-card__name"><%= membership.identity.display_name %></span>
+              <span class="party-card__meta">Making a character</span>
+            </div>
+          <% end %>
+          <% seated.each do |character| %>
+            <article class="party-card">
+              <div class="party-card__head">
+                <%= link_to character.name, character_path(character), class: "party-card__name" %>
+                <span class="party-card__meta"><%= character.path %> <%= character.level %> · <%= membership.identity.display_name %></span>
+              </div>
+              <p class="<%= class_names("party-card__harm", "party-card__harm--none": harm_line(character).nil?) %>"><%= harm_line(character) || "No harm" %></p>
+              <p class="party-card__currency">Spark <%= character.spark %> · Thread <%= character.thread %></p>
+              <% uses = talent_use_summary(character) %>
+              <% if uses.present? %><p class="party-card__uses"><%= uses %></p><% end %>
+              <% if (pools = @talent_pools[character.id]) %>
+                <ul class="party-card__pools">
+                  <% pools.each do |pool| %>
+                    <li class="seat-pool">
+                      <span class="seat-pool__name"><%= pool.name.delete_prefix("#{character.name}: ") %></span>
+                      <span class="seat-pool__size"><%= pool.size %>d</span>
+                      <% if pool.rollable? %>
+                        <%= button_to "Roll", campaign_pool_roll_path(campaign, pool), class: "button button--small", "aria-label": "Roll #{pool.name}" %>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </article>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <section id="pools" class="gm-section" aria-labelledby="pools-title">
+      <div class="gm-section__head">
+        <h2 id="pools-title" class="gm-section__title">Pools</h2>
+        <%= tag.details id: "pool-new", class: "pool-new", open: @pool.errors.any? do %>
+          <summary class="button pool-new__toggle">+ New pool</summary>
+          <div class="pool-new__panel card"><%= render "campaigns/pools/form", pool: @pool %></div>
+        <% end %>
+      </div>
+      <% if @pools.any? %>
+        <div class="pool-grid">
+          <% @pools.each do |pool| %>
+            <%= render "campaigns/pools/card", pool: pool, my_characters: @my_characters, scene: scene %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="empty">No pools yet. Add one when the story needs a clock.</p>
+      <% end %>
+    </section>
+
+    <details id="story-roll" class="card gm-fold" data-details-memory-target="section" data-section="story">
+      <summary class="gm-fold__summary"><span class="gm-section__title">Story roll</span></summary>
+      <%= render "campaigns/story_roll", characters: @characters, my_characters: @my_characters %>
+    </details>
+
+    <section id="crucibles" class="card crucible-row" aria-labelledby="crucible-title" data-turbo-permanent>
+      <div class="crucible-picker" data-controller="crucible-picker" data-crucible-picker-url-value="<%= crucible_path("__key__", embed: 1) %>">
+        <div class="crucible-row__head">
+          <h2 id="crucible-title" class="gm-section__title">Crucible</h2>
+          <label class="visually-hidden" for="crucible-pick">Crucible table</label>
+          <select id="crucible-pick" class="field__input crucible-row__pick" data-crucible-picker-target="select" data-action="crucible-picker#pick">
+            <% @crucible_groups.each do |group, crucibles| %>
+              <optgroup label="<%= Crucible::GROUPS.fetch(group) %>">
+                <% crucibles.each do |crucible| %>
+                  <option value="<%= crucible.key %>"><%= crucible.name %></option>
+                <% end %>
+              </optgroup>
+            <% end %>
+          </select>
+          <span class="visually-hidden" data-crucible-picker-target="current"><%= first_crucible.name %></span>
+        </div>
+        <p class="crucible-picker__recent" data-crucible-picker-target="recent" hidden></p>
+        <%= turbo_frame_tag "crucible", src: crucible_path(first_crucible, embed: 1), data: { crucible_picker_target: "frame" } do %>
+          <p class="crucible__hint">Loading <%= first_crucible.name %>…</p>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <aside class="fluid__rail table-rail" aria-labelledby="table-rail-title">
+    <div class="table-rail__head">
+      <h2 id="table-rail-title" class="table-rail__title">The table</h2>
+    </div>
+
+    <details id="roll-log" class="table-rail__section" open data-details-memory-target="section" data-section="log">
+      <summary class="table-rail__summary">
+        <span>Roll log</span>
+        <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
+      </summary>
+      <div class="play-view__scroll">
+        <%= render "rolls/log", campaign: campaign, membership: Current.membership, rolls: @rolls %>
+      </div>
+      <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
+        <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="Add a note to the log">
+        <button type="submit" class="button button--small">Note</button>
+      <% end %>
+    </details>
+
+    <details id="chat" class="table-rail__section" open data-details-memory-target="section" data-section="chat">
+      <summary class="table-rail__summary">
+        <span>Chat</span>
+        <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
+      </summary>
+      <%= render "messages/chat", campaign: campaign, messages: @messages, speakers: @my_characters, speaker: nil %>
+    </details>
+  </aside>
+</div>

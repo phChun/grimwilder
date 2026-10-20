@@ -12,6 +12,6 @@ class Campaigns::DowntimesController < ApplicationController
 
   def create
     Current.campaign.downtime!(by: Current.identity, clear: Array(params[:clear]))
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log"), notice: "Downtime: everyone heals."
+    back_to_table(anchor: "roll-log", notice: "Downtime: everyone heals.")
   end
 end

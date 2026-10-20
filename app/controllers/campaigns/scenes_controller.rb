@@ -12,7 +12,7 @@ class Campaigns::ScenesController < ApplicationController
     raise ArgumentError, "Start a session first." unless @session
 
     Scene.start!(@session, title: params[:title], by: Current.identity, opening: (story_roll_args if params[:open_with_story] == "1"))
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+    back_to_table(anchor: "roll-log")
   rescue ArgumentError, ActiveRecord::RecordInvalid => error
     flash.now[:alert] = error.message
     render :new, status: :unprocessable_entity

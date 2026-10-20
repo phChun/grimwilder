@@ -16,8 +16,9 @@ class AppShellTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 3
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 4
     assert_select ".tabs__link[aria-current=page]", "Campaign"
+    assert_select ".tabs__link[href=?]", campaign_table_path(@campaign), "Table"
     assert_select ".tabs__link", "Characters"
     assert_select ".tabs__link[href=?]", campaign_play_sessions_path(@campaign), "Log"
     assert_select ".switcher__name", @campaign.name
@@ -46,7 +47,8 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_match "Live now", banner.text
     assert_match "Session 1 · Scene 1, The mill fire · 2 at the table", banner.text.squish
     assert_equal campaign_play_path(@campaign), banner["href"]
-    assert_nil get_banner.(campaign_path(@campaign)), "the GM is already at the table"
+    assert get_banner.(campaign_path(@campaign)), "the campaign page isn't the table"
+    assert_nil get_banner.(campaign_table_path(@campaign)), "the GM is already at the table"
 
     sign_out
     sign_in_as identities(:pip)
@@ -57,7 +59,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
   test "back to the table: the GM goes to the table, a player to their sheet" do
     sign_in_as identities(:gwen)
     get campaign_play_path(@campaign)
-    assert_redirected_to campaign_path(@campaign)
+    assert_redirected_to campaign_table_path(@campaign)
 
     sign_out
     sign_in_as identities(:pip)

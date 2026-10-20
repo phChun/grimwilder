@@ -10,7 +10,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
       post campaign_pools_path(@campaign), params: { pool: { name: "Reinforcements arrive", kind: "pressure", starting_size: 8 } }
     end
     pool = @campaign.pools.find_by!(name: "Reinforcements arrive")
-    assert_redirected_to campaign_path(@campaign, anchor: dom_id(pool))
+    assert_redirected_to campaign_table_path(@campaign, anchor: dom_id(pool))
     assert_equal 8, pool.size
   end
 
@@ -86,7 +86,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
 
     get pools_path
-    assert_redirected_to campaign_path(@campaign, anchor: "pools")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "pools")
   end
 
   test "roll a power pool as an action, spending your own character's spark" do

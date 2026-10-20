@@ -1,0 +1,93 @@
+<%# locals: (pool:, my_characters:, scene:) %>
+<%# A pool on the GM table: name, kind and who sees it, the dice left, a track or the last roll, the overflow menu, and "Roll Nd". Hidden pools are dashed purple with a Reveal button; an empty resource offers a restock. %>
+<% restock = pool.depleted? && pool.resource? %>
+<article id="<%= dom_id(pool) %>" class="<%= class_names("pool-card", "pool-card--hidden": pool.hidden?, "pool-card--empty": pool.depleted?) %>">
+  <div class="pool-card__head">
+    <div class="pool-card__titles">
+      <h3 class="pool-card__name"><%= pool.name %></h3>
+      <p class="pool-card__meta"><% if pool.hidden? %><%= icon(:eye_off, size: 14) %><% end %><%= pool_card_meta(pool) %></p>
+    </div>
+    <span class="pool-card__size" aria-label="<%= pool.size %> of <%= pool.starting_size %> dice left<%= " in #{pool.phase_name}" if pool.linked? %>"><%= pool.size %>d</span>
+  </div>
+
+  <% if pool.linked? %>
+    <ol class="pool__phases" aria-label="Phases">
+      <% pool.phases.each_with_index do |entry, index| %>
+        <li class="<%= class_names("pool__phase", "pool__phase--done": index < pool.phase, "pool__phase--current": index == pool.phase) %>"<% if index == pool.phase %> aria-current="step"<% end %>><%= entry["size"] %>d <%= entry["name"] %></li>
+      <% end %>
+    </ol>
+  <% end %>
+
+  <% if pool.depleted? %>
+    <p class="pool-card__outcome"><%= restock ? "All gone." : pool.outcome %></p>
+  <% elsif pool_card_shows_last_roll?(pool, scene) %>
+    <div class="pool-card__last">
+      <div class="pool-card__dice" role="img" aria-label="Last roll: <%= pool.last_dice.to_sentence %>. <%= pluralize(pool.last_dropped.to_i, "die") %> dropped.">
+        <% pool.last_dice.each do |die| %>
+          <%= die_tag(die, state: (:dropped if die < 4), size: 32) %>
+        <% end %>
+      </div>
+      <p class="pool-card__change"><%= pool_card_change(pool) %><%= " · nothing dropped" if pool.last_dropped.to_i.zero? %></p>
+    </div>
+  <% else %>
+    <%= render "shared/pool_track", pool: pool %>
+  <% end %>
+
+  <div class="pool-card__actions">
+    <% if pool.hidden? %>
+      <%= button_to "Reveal", campaign_pool_path(pool.campaign, pool), method: :patch, params: { pool: { hidden: false } }, class: "button button--ghost pool-card__reveal", "aria-label": "Reveal #{pool.name} to players" %>
+    <% elsif pool.last_action.blank? %>
+      <span class="pool-card__note">Not rolled yet</span>
+    <% elsif pool.last_action == "pushed" %>
+      <span class="pool-card__note">Pushed: 1d dropped, take a mark</span>
+    <% elsif scene && !pool.depleted? && pool.last_rolled_at < scene.started_at %>
+      <span class="pool-card__note">Not rolled this scene</span>
+    <% end %>
+    <span class="pool-card__spacer"></span>
+
+    <% if pool.rollable? || pool.pushable? || pool.resettable? %>
+      <details id="<%= dom_id(pool, :more) %>" class="pool-card__more">
+        <summary class="button pool-card__toggle" aria-label="More for <%= pool.name %>"><%= icon(:more, size: 18) %></summary>
+        <div class="pool-card__menu">
+          <% if pool.rollable? %>
+            <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(pool.campaign, pool), params: { drop_first: "1" }, class: "button button--small" %>
+          <% end %>
+          <% if pool.pushable? %>
+            <%= button_to "Push (take a mark)", campaign_pool_push_path(pool.campaign, pool), class: "button button--small button--push" %>
+          <% end %>
+          <% if pool.resettable? && !restock %>
+            <%= button_to pool_reset_label(pool), campaign_pool_reset_path(pool.campaign, pool), class: "button button--ghost button--small" %>
+          <% end %>
+          <% unless pool.hidden? %>
+            <%= button_to "Hide from players", campaign_pool_path(pool.campaign, pool), method: :patch, params: { pool: { hidden: true } }, class: "button button--ghost button--small", "aria-label": "Hide #{pool.name} from players" %>
+          <% end %>
+          <%= button_to "Delete", campaign_pool_path(pool.campaign, pool), method: :delete, class: "button button--ghost button--small button--danger-text", "aria-label": "Delete #{pool.name}", form: { data: { turbo_confirm: "Delete #{pool.name}?" } } %>
+
+          <% if pool.power? && pool.rollable? %>
+            <%= form_with url: campaign_pool_roll_path(pool.campaign, pool), class: "pool-card__action-roll" do %>
+              <input type="hidden" name="as_action" value="1">
+              <p class="field__hint">Risky use? Roll it as an action, in place of a stat: its highest die is the result, then 1–3s drop.</p>
+              <%= render "shared/stepper", text: "Thorns", name: "thorns", id: dom_id(pool, :thorns), max: Character::Rolling::MAX_EXTRA %>
+              <% if my_characters.any? %>
+                <div class="field">
+                  <label class="field__label" for="<%= dom_id(pool, :character) %>">For</label>
+                  <%= select_tag :character_id, options_for_select(my_characters.map { [ "#{_1.name} (#{pluralize(_1.spark, "spark")})", _1.id ] }), include_blank: "No one in particular", id: dom_id(pool, :character), class: "field__input" %>
+                </div>
+                <%= render "shared/stepper", text: "Spark", name: "spark", id: dom_id(pool, :spark), max: Grimwild::MAX_SPARK %>
+              <% end %>
+              <button type="submit" class="button button--small">Roll as an action</button>
+            <% end %>
+          <% end %>
+        </div>
+      </details>
+    <% end %>
+
+    <% if pool.rollable? %>
+      <%= button_to "Roll #{pool.size}d", campaign_pool_roll_path(pool.campaign, pool), class: class_names("button", "button--primary": !pool.hidden?, "button--suspense": pool.hidden?), "aria-label": "Roll #{pool.name}, #{pool.size}d" %>
+    <% elsif restock %>
+      <%= button_to "Restock to #{pool.starting_size}d", campaign_pool_reset_path(pool.campaign, pool), class: "button", "aria-label": "Restock #{pool.name} to #{pool.starting_size}d" %>
+    <% elsif pool.resettable? %>
+      <%= button_to pool_reset_label(pool), campaign_pool_reset_path(pool.campaign, pool), class: "button" %>
+    <% end %>
+  </div>
+</article>

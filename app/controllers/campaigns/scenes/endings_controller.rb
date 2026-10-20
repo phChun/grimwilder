@@ -13,9 +13,14 @@ class Campaigns::Scenes::EndingsController < ApplicationController
   def create
     closing = @scene.rolls.montage.find(params[:closing_roll_id]) if params[:closing_roll_id].present?
     @scene.end!(by: Current.identity, clear: Array(params[:clear]), notes: params[:notes], closing_roll: closing)
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+    # "Cut to new scene" ends this one, then opens the next.
+    if params[:then] == "new_scene"
+      redirect_to new_campaign_scene_path(Current.campaign)
+    else
+      back_to_table(anchor: "roll-log")
+    end
   rescue ArgumentError => error
-    redirect_to campaign_path(Current.campaign), alert: error.message
+    back_to_table(alert: error.message)
   end
 
   private

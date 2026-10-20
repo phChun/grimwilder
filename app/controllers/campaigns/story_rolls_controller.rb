@@ -5,8 +5,8 @@ class Campaigns::StoryRollsController < ApplicationController
 
   def create
     Roll.story!(campaign: Current.campaign, by: Current.identity, **story_roll_args)
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+    back_to_table(anchor: "roll-log")
   rescue ArgumentError => error
-    redirect_to campaign_path(Current.campaign, anchor: "story-roll"), alert: error.message
+    back_to_table(anchor: "story-roll", alert: error.message)
   end
 end

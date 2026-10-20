@@ -11,7 +11,7 @@ class Campaigns::QuarrelsController < ApplicationController
 
   def create
     Roll.quarrel!(campaign: Current.campaign, by: Current.identity, stakes: params[:stakes], sides: sides)
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+    back_to_table(anchor: "roll-log")
   rescue ArgumentError => error
     flash.now[:alert] = error.message
     render :new, status: :unprocessable_entity

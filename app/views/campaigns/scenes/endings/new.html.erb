@@ -24,5 +24,7 @@
 
   <%= render "campaigns/scenes/lingering_conditions", scene: @scene %>
 
-  <button type="submit" class="button button--primary">End the scene</button>
+  <% cut = params[:then] == "new_scene" %>
+  <% if cut %><input type="hidden" name="then" value="new_scene"><% end %>
+  <button type="submit" class="button button--primary"><%= cut ? "End it and start the next scene" : "End the scene" %></button>
 <% end %>

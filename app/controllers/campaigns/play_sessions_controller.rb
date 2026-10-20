@@ -22,7 +22,7 @@ class Campaigns::PlaySessionsController < ApplicationController
   def create
     characters = Current.campaign.characters.where(id: Array(params[:character_ids]).compact_blank).to_a
     session = PlaySession.start!(Current.campaign, characters: characters, recap: params[:recap], by: Current.identity)
-    redirect_to campaign_path(Current.campaign), notice: "#{session.title} begins."
+    back_to_table(notice: "#{session.title} begins.")
   rescue ArgumentError => error
     flash.now[:alert] = error.message
     render :new, status: :unprocessable_entity

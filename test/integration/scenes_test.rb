@@ -18,17 +18,18 @@ class ScenesTest < ActionDispatch::IntegrationTest
     @tibbs.update!(conditions: [ { name: "twisted ankle", lasts: "scene" } ])
     sign_in_as identities(:gwen)
 
-    get campaign_path(@campaign)
-    assert_select ".session-bar a[href=?]", new_campaign_scene_path(@campaign), text: "Start scene"
+    get campaign_table_path(@campaign)
+    assert_select ".scene-bar a[href=?]", new_campaign_scene_path(@campaign), text: "Start scene"
 
     post campaign_scenes_path(@campaign), params: { title: "The bridge at Mirefall", open_with_story: "1", question: "Is it guarded?", odds: 2 }
     scene = @campaign.current_scene
-    assert_redirected_to campaign_path(@campaign, anchor: "roll-log")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "roll-log")
     assert scene.opening_roll.story?
 
     follow_redirect!
-    assert_select ".session-bar__status", /Session 1 · Scene 1: The bridge at Mirefall · started/
-    assert_select ".session-bar a[href=?]", new_campaign_scene_ending_path(@campaign, scene), text: "End scene"
+    assert_select ".scene-bar__status", /Session 1 · live \d+m · Scene 1 of 1/
+    assert_select ".scene-bar__title", "The bridge at Mirefall"
+    assert_select ".scene-bar a[href=?]", new_campaign_scene_ending_path(@campaign, scene, then: "new_scene"), text: "Cut to new scene"
 
     get new_campaign_scene_ending_path(@campaign, scene)
     assert_select "a[href=?]", new_campaign_montage_path(@campaign, then: "end_scene", scene: scene.title)

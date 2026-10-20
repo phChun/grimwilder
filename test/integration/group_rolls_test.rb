@@ -33,7 +33,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
 
     post campaign_story_rolls_path(@campaign), params: { odds: 5 }
-    assert_redirected_to campaign_path(@campaign, anchor: "story-roll")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "story-roll")
     assert_equal "Pick 1d, 2d or 3d for the odds.", flash[:alert]
   end
 

@@ -10,9 +10,9 @@ class Campaigns::PlaySessions::EndingsController < ApplicationController
 
   def create
     levelled = @session.end!(by: Current.identity, standout: params[:standout] == "1", notes: params[:notes], clear: Array(params[:clear]))
-    redirect_to campaign_path(Current.campaign), notice: [ "#{@session.title} ends.", *levelled.map { "#{_1.name} reached level #{_1.level}." } ].join(" ")
+    back_to_table(notice: [ "#{@session.title} ends.", *levelled.map { "#{_1.name} reached level #{_1.level}." } ].join(" "))
   rescue ArgumentError => error
-    redirect_to campaign_path(Current.campaign), alert: error.message
+    back_to_table(alert: error.message)
   end
 
   private

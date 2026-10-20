@@ -17,7 +17,7 @@ module PoolScoped
       if params[:return_to] == "character" && @pool.character
         redirect_to helpers.character_path(@pool.character, anchor: "talent-uses"), **options
       else
-        redirect_to campaign_path(Current.campaign, anchor: helpers.dom_id(@pool)), **options
+        back_to_table(anchor: helpers.dom_id(@pool), **options)
       end
     end
 end

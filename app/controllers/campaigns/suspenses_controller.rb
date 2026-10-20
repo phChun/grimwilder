@@ -9,6 +9,6 @@ class Campaigns::SuspensesController < ApplicationController
   def update
     step = params[:by].to_i.clamp(-1, 1)
     Current.campaign.update!(suspense: [ Current.campaign.suspense + step, 0 ].max)
-    redirect_to campaign_path(Current.campaign)
+    back_to_table
   end
 end

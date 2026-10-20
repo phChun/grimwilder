@@ -12,7 +12,7 @@ class Campaigns::MontagesController < ApplicationController
     if params[:then] == "end_scene" && (scene = Current.campaign.current_scene)
       redirect_to new_campaign_scene_ending_path(Current.campaign, scene)
     else
-      redirect_to campaign_path(Current.campaign, anchor: "roll-log")
+      back_to_table(anchor: "roll-log")
     end
   rescue ArgumentError => error
     flash.now[:alert] = error.message

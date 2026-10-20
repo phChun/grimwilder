@@ -6,6 +6,6 @@ class Campaigns::RestsController < ApplicationController
 
   def create
     Current.campaign.rest!(by: Current.identity)
-    redirect_to campaign_path(Current.campaign, anchor: "roll-log"), notice: "Everyone rests."
+    back_to_table(anchor: "roll-log", notice: "Everyone rests.")
   end
 end

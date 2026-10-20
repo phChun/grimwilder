@@ -15,7 +15,7 @@ class BreaksTest < ActionDispatch::IntegrationTest
     assert_select ".between-scenes a[href=?]", new_campaign_downtime_path(@campaign)
 
     post campaign_rest_path(@campaign)
-    assert_redirected_to campaign_path(@campaign, anchor: "roll-log")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "roll-log")
     assert_not @tibbs.reload.bloodied?
 
     get new_campaign_downtime_path(@campaign)

@@ -52,4 +52,39 @@ module CampaignsHelper
     else roll.name
     end
   end
+
+  # "1h 12m", "8m": how long something has been going.
+  def running_for(time)
+    hours, minutes = ((Time.current - time) / 60).floor.divmod(60)
+    hours.positive? ? "#{hours}h #{minutes}m" : "#{minutes}m"
+  end
+
+  # A party card's harm line: "Bloodied · Agility marked · 4d poisoned", or "No harm".
+  def harm_line(character)
+    harm = HARM.select { character.public_send(:"#{_1}?") }.map(&:capitalize)
+    marks = Grimwild::STATS.select { character.marked?(_1) }.map { "#{_1.capitalize} marked" }
+    (harm + marks + character.conditions.pluck("name")).join(" · ").presence
+  end
+
+  # "Pressure · everyone sees", "Timer · hidden from players", "Resource · ran out 20 minutes ago"
+  def pool_card_meta(pool)
+    seen = pool.hidden? ? "hidden from players" : "everyone sees"
+    if pool.depleted? && pool.resource? && pool.last_rolled_at
+      "#{pool.kind.capitalize} · ran out #{time_ago_in_words(pool.last_rolled_at)} ago"
+    else
+      "#{pool.kind.capitalize}#{" · linked" if pool.linked?} · #{seen}"
+    end
+  end
+
+  # A card shows the last roll's dice when it was rolled (not pushed) this scene.
+  def pool_card_shows_last_roll?(pool, scene)
+    pool.last_dice.any? && pool.last_action != "pushed" && (scene.nil? || pool.last_rolled_at >= scene.started_at)
+  end
+
+  # "6d → 4d · 2 minutes ago" after a roll; nil when the pool hasn't changed hands.
+  def pool_card_change(pool)
+    return if pool.last_action.blank? || pool.last_rolled_at.nil?
+    before = pool.linked? ? nil : pool.size + pool.last_dropped.to_i
+    [ ("#{before}d → #{pool.size}d" if before), "#{time_ago_in_words(pool.last_rolled_at)} ago" ].compact.join(" · ")
+  end
 end

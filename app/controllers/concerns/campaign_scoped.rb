@@ -7,7 +7,7 @@ module CampaignScoped
   included do
     require_authentication
     before_action :set_campaign
-    helper_method :gm?
+    helper_method :gm?, :table_path_for_viewer
   end
 
   private
@@ -26,5 +26,14 @@ module CampaignScoped
 
     def require_gm
       head :forbidden unless gm?
+    end
+
+    # Where play happens for this viewer: the GM table, or the campaign page.
+    def table_path_for_viewer(anchor: nil)
+      gm? ? campaign_table_path(Current.campaign, anchor: anchor) : campaign_path(Current.campaign, anchor: anchor)
+    end
+
+    def back_to_table(anchor: nil, **options)
+      redirect_to table_path_for_viewer(anchor: anchor), **options
     end
 end

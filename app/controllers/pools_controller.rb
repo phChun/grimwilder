@@ -5,7 +5,7 @@ class PoolsController < ApplicationController
 
   def index
     if membership = Current.identity.memberships.includes(:campaign).order(created_at: :desc).first
-      redirect_to campaign_path(membership.campaign, anchor: "pools")
+      redirect_to membership.gm? ? campaign_table_path(membership.campaign, anchor: "pools") : campaign_path(membership.campaign, anchor: "pools")
     else
       redirect_to campaigns_path, notice: "Pools live in a campaign. Start one, or join with a link from your GM."
     end

@@ -69,7 +69,7 @@ class GmTableTest < ActionDispatch::IntegrationTest
     post campaign_pools_path(@campaign), params: { pool: { name: "", starting_size: 4 } }
     assert_response :unprocessable_entity
     assert_select "details#pool-new[open] .form-error", /Name can't be blank/
-    assert_select "details#pools .pool-row", 3
+    assert_select "#pools .pool-card", 3
   end
 
   test "a crucible embeds in the table's frame" do

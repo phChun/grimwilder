@@ -28,6 +28,7 @@ module ApplicationHelper
     if membership.gm?
       [
         [ "Campaign", campaign_path(campaign), on_campaign ],
+        [ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ],
         [ "Characters", campaign_path(campaign, anchor: "table"), false ],
         log
       ]
@@ -43,9 +44,9 @@ module ApplicationHelper
   end
 
   # The live banner shows on campaign pages other than the one it links to:
-  # the GM's table, or a player's own sheet.
+  # the GM table, or a player's own sheet.
   def live_banner?(membership)
-    on_table = membership.gm? && controller_path == "campaigns" && action_name == "show"
+    on_table = membership.gm? && controller_path == "campaigns/tables"
     on_own_sheet = controller_path == "characters" && @character&.campaign_id == membership.campaign_id && @character.owned_by?(Current.identity)
     !(on_table || on_own_sheet)
   end

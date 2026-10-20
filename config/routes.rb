@@ -46,6 +46,7 @@ Rails.application.routes.draw do
     scope module: :campaigns do
       resource :join_code, only: :update
       resource :play, only: :show
+      resource :table, only: :show
       resources :memberships, only: :destroy
       resources :story_rolls, only: :create
       resources :quarrels, only: %i[ new create ]
