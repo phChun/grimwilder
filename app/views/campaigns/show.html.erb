@@ -179,7 +179,7 @@
 
       <% unless gm %>
         <details id="story-roll" class="card side-card" data-details-memory-target="section" data-section="story">
-          <summary class="gm-fold__summary"><span class="side-card__title">Story roll</span></summary>
+          <summary class="gm-fold__summary"><span class="side-card__title">Story roll</span><%= icon(:chevron, size: 18) %></summary>
           <%= render "campaigns/story_roll", characters: @characters, my_characters: @my_characters %>
         </details>
       <% end %>

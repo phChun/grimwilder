@@ -62,8 +62,6 @@
   transition: background 120ms, transform 80ms;
 }
 
-.button:hover { background: var(--surface-2); color: var(--text); }
-.button:active { transform: translateY(1px); }
 
 /* One primary per area. Secondary is the outline above; ghost is text only. */
 .button--primary {
@@ -72,16 +70,12 @@
   color: var(--ember-ink);
 }
 
-.button--primary:hover { background: var(--link); border-color: var(--link); color: var(--ember-ink); }
 
 .button--ghost,
 .button--quiet { background: none; border-color: transparent; color: var(--muted); }
 
-.button--ghost:hover,
-.button--quiet:hover { background: var(--surface-2); color: var(--text); }
 
 .button--suspense { background: var(--suspense); border-color: var(--suspense); color: var(--ember-ink); }
-.button--suspense:hover { background: var(--suspense-text); border-color: var(--suspense-text); color: var(--ember-ink); }
 
 .button--wide { flex: 1; }
 
@@ -157,11 +151,12 @@
 .segmented {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 2px;
   margin: 0;
-  padding: var(--space-1);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--paper-sunken);
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--bg);
 }
 
 .segmented__option {
@@ -180,20 +175,24 @@
 
 .segmented__option span {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
-  min-height: calc(var(--tap) - 2 * var(--space-1));
+  gap: 0.35em;
+  min-height: calc(var(--tap) - 8px);
   padding: 0 var(--space-3);
-  border-radius: calc(var(--radius-sm) - 2px);
+  line-height: calc(var(--tap) - 8px);
+  border-radius: calc(var(--radius-control) - 3px);
   text-align: center;
-  font-weight: 700;
-  color: var(--ink-soft);
+  font-weight: 600;
+  color: var(--muted);
+  transition: background 120ms, color 120ms, box-shadow 120ms;
 }
 
+/* The chosen one: an ember ring and fill, so it reads by shape as well as color. */
 .segmented__option input:checked + span {
-  background: var(--paper-raised);
-  color: var(--ink);
-  box-shadow: var(--shadow);
+  background: color-mix(in srgb, var(--ember) 22%, var(--surface));
+  color: var(--text);
+  box-shadow: inset 0 0 0 2px var(--ember);
 }
 
 .segmented__option input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
@@ -384,11 +383,14 @@
   min-height: var(--tap);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  background: var(--paper);
-  color: var(--ink);
+  border-radius: var(--radius-control);
+  background-color: var(--bg);
+  color: var(--text);
   font: inherit;
 }
+
+/* Room for the chevron the base select style draws. */
+select.field__input { padding-right: 2.5rem; }
 
 .field__input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: transparent; }
 
@@ -545,6 +547,7 @@ form.button_to, .button_to { margin: 0; }
 .check input { width: 1.1rem; height: 1.1rem; accent-color: var(--moss); }
 
 .size-picker { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.size-picker__presets { flex: 1 1 16rem; }
 .size-picker__input { width: 5rem; min-height: var(--tap); }
 
 .pool__gm .button { min-height: var(--tap); padding: 0 var(--space-2); font-size: 0.85rem; }
@@ -1859,3 +1862,112 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 
 .table-rail__note { padding: 0 14px 6px; }
 .table-rail__note[open] { padding-bottom: 14px; }
+
+/* ---------- Interaction states ----------
+   Every clickable control says so: hover adds a ring (where there's a pointer,
+   so a tap on a phone doesn't stick), pressing darkens and shrinks it, and a
+   form Turbo is submitting dims its button until the page answers. */
+
+.button,
+.segmented__option span,
+.harm-toggle,
+.mark-toggle,
+.stepper__step,
+.counter__step {
+  transition: background 120ms, border-color 120ms, color 120ms, box-shadow 120ms, transform 80ms, filter 120ms;
+}
+
+@media (hover: hover) {
+  .button:hover:not(:disabled),
+  .stepper__step:hover:not(:disabled),
+  .counter__step:hover:not(:disabled) {
+    border-color: var(--text-soft);
+    background: var(--surface-2);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text-soft);
+  }
+
+  .button--ghost:hover:not(:disabled),
+  .button--quiet:hover:not(:disabled) { border-color: var(--line-strong); box-shadow: none; }
+
+  .button--primary:hover:not(:disabled) {
+    border-color: var(--link);
+    background: var(--link);
+    color: var(--ember-ink);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ember) 35%, transparent);
+  }
+
+  .button--suspense:hover:not(:disabled) {
+    border-color: var(--suspense-text);
+    background: var(--suspense-text);
+    color: var(--ember-ink);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--suspense) 35%, transparent);
+  }
+
+  .segmented__option:hover input:not(:checked) + span {
+    background: var(--surface-2);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+
+  .segmented__option:hover input:checked + span { box-shadow: inset 0 0 0 2px var(--link); background: color-mix(in srgb, var(--ember) 30%, var(--surface)); }
+
+  .harm-toggle:hover:not([aria-pressed="true"]),
+  .mark-toggle:hover:not([aria-pressed="true"]) {
+    border-color: var(--text-soft);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text-soft);
+  }
+
+  .harm-toggle[aria-pressed="true"]:hover,
+  .mark-toggle[aria-pressed="true"]:hover { box-shadow: 0 0 0 3px color-mix(in srgb, var(--grim-ring) 40%, transparent); }
+}
+
+/* Pressed: darker, a touch smaller. */
+.button:active:not(:disabled),
+.stepper__step:active:not(:disabled),
+.counter__step:active:not(:disabled),
+.harm-toggle:active,
+.mark-toggle:active {
+  transform: scale(0.97);
+  filter: brightness(0.85);
+}
+
+.segmented__option:active input:not(:checked) + span {
+  transform: scale(0.96);
+  background: var(--line-soft);
+}
+
+/* Submitting: Turbo marks the form aria-busy until the response lands. */
+form[aria-busy="true"] :is(.button, button, .harm-toggle, .mark-toggle) {
+  cursor: progress;
+  opacity: 0.6;
+  transform: scale(0.97);
+}
+
+/* Folds (Story roll, Log a game event): a chevron that turns when open, and a hover. */
+.gm-fold__summary,
+.table-rail__summary {
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-control);
+  transition: background 120ms, color 120ms;
+}
+
+.gm-fold__summary .icon,
+.table-rail__summary .icon { color: var(--muted); transition: transform 160ms; }
+details[open] > .gm-fold__summary .icon,
+details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
+
+@media (hover: hover) {
+  .gm-fold__summary:hover,
+  .table-rail__summary:hover { background: var(--surface-2); }
+  .gm-fold__summary:hover .icon,
+  .table-rail__summary:hover .icon { color: var(--text); }
+}
+
+.gm-fold__summary:active,
+.table-rail__summary:active { background: var(--line-soft); }
+

@@ -18,14 +18,19 @@
 
   <div class="field">
     <label class="field__label" for="pool_starting_size">Dice</label>
+    <%# The presets are radios bound to new_size, so the chosen one shows like any button group, and typing a size lights its preset. Written out, not looped: herb:state compares only against literals. %>
     <div class="size-picker">
-      <button type="button" class="button button--small" data-herb-set="new_size=2" aria-label="2 dice, short">2d</button>
-      <button type="button" class="button button--small" data-herb-set="new_size=4" aria-label="4 dice, medium">4d</button>
-      <button type="button" class="button button--small" data-herb-set="new_size=6" aria-label="6 dice">6d</button>
-      <button type="button" class="button button--small" data-herb-set="new_size=8" aria-label="8 dice, long">8d</button>
+      <fieldset class="segmented segmented--auto size-picker__presets">
+        <legend class="visually-hidden">Common sizes</legend>
+        <label class="segmented__option"><input type="radio" name="pool_size_preset" value="2" checked="<%= new_size == 2 %>" data-herb-set="change->new_size=2"><span>2d <small>short</small></span></label>
+        <label class="segmented__option"><input type="radio" name="pool_size_preset" value="4" checked="<%= new_size == 4 %>" data-herb-set="change->new_size=4"><span>4d <small>medium</small></span></label>
+        <label class="segmented__option"><input type="radio" name="pool_size_preset" value="6" checked="<%= new_size == 6 %>" data-herb-set="change->new_size=6"><span>6d</span></label>
+        <label class="segmented__option"><input type="radio" name="pool_size_preset" value="8" checked="<%= new_size == 8 %>" data-herb-set="change->new_size=8"><span>8d <small>long</small></span></label>
+      </fieldset>
+      <label class="visually-hidden" for="pool_starting_size">Dice</label>
       <input type="number" id="pool_starting_size" name="pool[starting_size]" class="field__input size-picker__input" min="1" max="<%= Pool::MAX_SIZE %>" step="1" required autocomplete="off" value="<%= new_size %>" data-herb-set="new_size=$value">
     </div>
-    <p class="field__hint">2d short, 4d medium, 8d long. Bigger pools take only a little longer to clear.</p>
+    <p class="field__hint">Or any size up to <%= Pool::MAX_SIZE %>d. Bigger pools take only a little longer to clear.</p>
   </div>
 
   <div class="field">
