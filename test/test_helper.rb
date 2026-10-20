@@ -5,6 +5,7 @@ require "webauthn/fake_client"
 require_relative "test_helpers/session_test_helper"
 require_relative "test_helpers/fixed_dice"
 require_relative "test_helpers/rendered_page_test_helper"
+require "turbo/broadcastable/test_helper"
 
 module ActiveSupport
   class TestCase
@@ -13,6 +14,10 @@ module ActiveSupport
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
+
+    # Turbo only adds its broadcast assertions once Action Cable has loaded,
+    # which a parallel worker running just model tests may never do.
+    include Turbo::Broadcastable::TestHelper
   end
 end
 
