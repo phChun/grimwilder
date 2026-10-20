@@ -21,6 +21,9 @@ class Campaign < ApplicationRecord
   validates :join_code, presence: true, uniqueness: true
 
   before_validation :generate_join_code, on: :create
+  # Everyone at the table sees suspense; pages update it in place, without a reload.
+  after_update_commit -> { broadcast_replace_later_to self, :live, target: suspense_meter_id, partial: "campaigns/suspense_meter", locals: { campaign: self } },
+    if: :saved_change_to_suspense?
 
   def self.create_with_gm!(name:, gm:)
     transaction do
@@ -65,6 +68,10 @@ class Campaign < ApplicationRecord
 
   def live_banner_id
     ActionView::RecordIdentifier.dom_id(self, :live_banner)
+  end
+
+  def suspense_meter_id
+    ActionView::RecordIdentifier.dom_id(self, :suspense)
   end
 
   private

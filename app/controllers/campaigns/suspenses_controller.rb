@@ -1,5 +1,6 @@
-# The GM's suspense (pg. 96): a +/- counter only the GM sees. Starting a
-# session adds 1; everything else is by hand, and none of it goes in the log.
+# The GM's suspense (pg. 96): a +/- counter everyone at the table sees but
+# only the GM changes. Starting a session adds 1; everything else is by hand,
+# and none of it goes in the log.
 class Campaigns::SuspensesController < ApplicationController
   include CampaignScoped
 

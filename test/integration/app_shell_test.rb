@@ -81,4 +81,26 @@ class AppShellTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "players see suspense read-only in the sheet's rail, and it updates live" do
+    @campaign.update!(suspense: 3)
+    sign_in_as identities(:pip)
+    get character_path(characters(:tibbs))
+
+    assert_select ".table-rail__head ##{@campaign.suspense_meter_id} .pips--suspense[aria-label=?]", "3 suspense"
+    assert_select ".table-rail__head button", 0, "nothing to change it with"
+
+    perform_enqueued_jobs do
+      assert_turbo_stream_broadcasts [ @campaign, :live ], count: 1 do
+        @campaign.update!(suspense: 2)
+      end
+    end
+  end
+
+  test "only the GM changes suspense" do
+    sign_in_as identities(:pip)
+    patch campaign_suspense_path(@campaign), params: { by: 1 }
+    assert_response :forbidden
+    assert_equal 0, @campaign.reload.suspense
+  end
 end

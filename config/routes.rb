@@ -17,7 +17,9 @@ Rails.application.routes.draw do
         resource :critical_spark, only: :create, module: :rolls
       end
       resource :experience, only: :create
-      resources :conditions, only: %i[ create destroy ]
+      resources :conditions, only: %i[ create destroy ] do
+        resource :roll, only: :create, module: :conditions
+      end
       resources :talents, only: %i[ new create destroy ]
       resource :talent_uses, only: :update
     end

@@ -17,7 +17,7 @@ module Campaign::Breaks
 
   def rest!(by:)
     transaction do
-      resting = resting_characters.each(&:rest!)
+      resting = resting_characters.each { _1.rest!(by: by) }
       post_marker!("Rest", by: by, text: ("Marks and harm cleared for #{resting.map(&:name).to_sentence}." if resting.any?))
     end
   end
@@ -33,7 +33,7 @@ module Campaign::Breaks
 
       resting.each do |character|
         cleared = picks.fetch(character.id.to_s, [])
-        character.rest
+        character.rest(by: by)
         character.conditions = character.conditions.reject.with_index { |_, index| cleared.include?(index) }
         character.reset_talent_uses(per: :session)
         character.save!

@@ -1,5 +1,7 @@
-<%# locals: (text:, name:, id:, value: 0, min: 0, max: nil, suffix: nil) %>
+<%# locals: (text:, name:, id:, value: nil, min: nil, max: nil, suffix: nil) %>
 <%# − value +: a real number input (so it submits and types like one) with step buttons. stepper_controller.js does the stepping. %>
+<% value ||= 0 %>
+<% min ||= 0 %>
 <div class="stepper" data-controller="stepper">
   <label class="stepper__label" for="<%= id %>"><%= text %></label>
   <div class="stepper__control">

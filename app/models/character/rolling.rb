@@ -37,6 +37,7 @@ module Character::Rolling
 
     transaction do
       gained = settle_spark(spent: spend_spark, take: result.result == "disaster")
+      self.changed_by = by
       self[:"marked_#{stat_name}"] = false
       save!
 

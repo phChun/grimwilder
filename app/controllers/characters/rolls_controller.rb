@@ -6,14 +6,29 @@ class Characters::RollsController < ApplicationController
   include CharacterScoped
 
   def create
-    @character.roll!(params.expect(:stat), by: Current.identity, mode: params[:mode].presence || "action",
-      spend_spark: params[:spark].to_i, help: params[:help].to_i, thorns: params[:thorns].to_i, assists: assists)
+    stat = params.expect(:stat)
+    @character.roll!(stat, by: Current.identity, mode: params[:mode].presence || "action",
+      spend_spark: params[:spark].to_i, help: help(stat), thorns: situational_thorns(stat), assists: assists)
     redirect_to @character
   rescue ArgumentError => error
     redirect_to @character, alert: error.message
   end
 
   private
+    # The stat card's steppers show totals: dice with the stat's own, thorns
+    # with the ones damage adds. The roll takes what's on top of those. (Only
+    # for a real stat: Character#stat is a public_send, and roll! checks the
+    # name after these run.)
+    def help(stat)
+      return params[:help].to_i unless params[:dice].present? && Grimwild::STATS.include?(stat)
+      params[:dice].to_i - @character.stat(stat)
+    end
+
+    def situational_thorns(stat)
+      return params[:thorns].to_i unless params[:total_thorns].present? && Grimwild::STATS.include?(stat)
+      params[:total_thorns].to_i - @character.damage_thorns(stat)
+    end
+
     # The model checks that every assist is seated alongside this character.
     def assists
       Character.where(id: Array(params[:assists]).compact_blank).to_a

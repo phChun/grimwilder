@@ -1,3 +1,5 @@
-<%# locals: (dashed: false, element: "section", classes: nil, attributes: {}) %>
+<%# locals: (dashed: nil, element: nil, classes: nil, attributes: nil) %>
 <%# A surface with a 1px border. Dashed means "empty or not yet": a player still making a character, an open talent slot. Use it with a block: render "shared/card" do ... end. %>
+<% element ||= "section" %>
+<% attributes ||= {} %>
 <%= content_tag element, yield, class: class_names("card", classes, "card--dashed": dashed), **attributes %>

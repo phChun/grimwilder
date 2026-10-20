@@ -1,0 +1,10 @@
+<%# locals: (campaign:) %>
+<%# The GM's suspense, read-only: everyone at the table sees it, only the GM changes it. Replaced live over [campaign, :live] when it changes. %>
+<span id="<%= campaign.suspense_meter_id %>" class="suspense-meter">
+  <span class="suspense-meter__label">Suspense</span>
+  <% if campaign.suspense.positive? %>
+    <%= render "shared/pips", kind: "suspense", value: campaign.suspense %>
+  <% else %>
+    <span class="suspense-meter__none">none</span>
+  <% end %>
+</span>

@@ -1,5 +1,7 @@
-<%# locals: (value:, kind: "d6", state: nil, size: 44, aria_label: nil, title: nil, extra: nil) %>
-<%# One die face in mono. d6 states: nil (plain), :highest (filled with its own result's color), :dropped (struck through). A d8 is a thorn: a ring, red when it cuts (7–8). Sizes: 28, 32, 44. %>
+<%# locals: (value:, kind: nil, state: nil, size: nil, aria_label: nil, title: nil, extra: nil) %>
+<%# One die face in mono. d6 states: nil (plain), :highest (filled with its own result's color), :dropped (struck through). A d8 is a thorn: a ring, red when it cuts (7–8). Sizes: 28, 32, 44 (default). Defaults are nil in the locals line and filled in below: Herb prints non-nil defaults from a locals comment into the output. %>
+<% kind ||= "d6" %>
+<% size ||= 44 %>
 <% tier = kind == "d6" ? (value == 6 ? "perfect" : value >= 4 ? "messy" : "grim") : nil %>
 <% classes = class_names("die", "die--#{kind}", "die--#{size}", extra, "die--#{tier}": tier, "die--top": state == :highest, "die--dropped": state == :dropped, "die--cut": kind == "d8" && value >= 7) %>
 <span class="<%= classes %>" aria-label="<%= aria_label || "#{kind == "d8" ? "thorn" : kind} showing #{value}" %>"<% if title %> title="<%= title %>"<% end %>><%= value %></span>

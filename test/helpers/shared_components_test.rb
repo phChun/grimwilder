@@ -4,6 +4,15 @@ require "test_helper"
 class SharedComponentsTest < ActionView::TestCase
   include RollsHelper, IconsHelper
 
+  test "partials print nothing but their markup (Herb prints non-nil locals defaults)" do
+    assert_equal "5", Nokogiri::HTML.fragment(render("shared/die", value: 5)).text.strip
+    assert_equal "", Nokogiri::HTML.fragment(render("shared/stepper", text: "", name: "n", id: "n")).text.gsub(/[−+\s]/, "")
+    assert_equal "Yes", Nokogiri::HTML.fragment(render("shared/segmented", name: "x", legend: "", options: [ %w[ y Yes ] ], checked: "y")).text.strip
+    assert_equal "Mags", Nokogiri::HTML.fragment(render("shared/card") { "Mags" }).text.strip
+    roll = Roll.new(kind: "action", outcome: "messy", dice: [ 5 ])
+    assert_equal "5MessyHighestdie5.", Nokogiri::HTML.fragment(render("shared/roll_result", roll: roll)).text.gsub(/\s/, "")
+  end
+
   test "a die shows its state, tier and size" do
     render "shared/die", value: 5, state: :highest, size: 32
     assert_select "span.die.die--d6.die--messy.die--top.die--32[aria-label=?]", "d6 showing 5", "5"
@@ -22,7 +31,7 @@ class SharedComponentsTest < ActionView::TestCase
     assert_select ".roll-result.roll-result--grim .roll-result__word", "Grim"
     assert_select ".roll-result__dice .die--top", "5"
     assert_select ".roll-result__dice .die--cut", "7"
-    assert_select ".roll-result__reason", "Messy, cut to grim by a thorn"
+    assert_select ".roll-result__reason", "Messy, cut to grim by a thorn."
   end
 
   test "reasons for criticals, uncut thorns and plain rolls" do

@@ -54,7 +54,7 @@ class Scene < ApplicationRecord
     raise ArgumentError, "That closing roll isn't a montage from this scene." if closing_roll && !(closing_roll.montage? && closing_roll.scene_id == id)
 
     transaction do
-      cleared = clear_conditions(clear)
+      cleared = clear_conditions(clear, by: by)
       play_session.characters.each(&:end_scene!)
       update!(ended_at: Time.current, notes: notes.to_s.strip.presence, closing_roll: closing_roll)
       play_session.post_marker!("Scene #{number} ends", by: by, scene: self,
@@ -63,12 +63,13 @@ class Scene < ApplicationRecord
   end
 
   private
-    def clear_conditions(picks)
+    def clear_conditions(picks, by:)
       chosen = Array(picks).map { _1.to_s.split(":", 2) }.group_by(&:first).transform_values { |pairs| pairs.map { _2.to_i } }
 
       play_session.characters.flat_map do |character|
         indexes = chosen.fetch(character.id.to_s, []) & character.scene_conditions.map(&:first)
         names = indexes.map { character.conditions[_1]["name"] }
+        character.changed_by = by
         character.clear_conditions!(indexes) if indexes.any?
         names.map { [ character.name, _1 ] }
       end

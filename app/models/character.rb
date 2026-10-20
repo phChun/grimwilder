@@ -60,6 +60,11 @@ class Character < ApplicationRecord
     Grimwild.core_talent(path)
   end
 
+  # What the table calls them: a quoted nickname (Gibbletibble "Tibbs"), or the first name.
+  def short_name
+    name[/["“]([^"”]+)["”]/, 1]&.strip.presence || name.split.first
+  end
+
   def stat(name)
     public_send(name)
   end

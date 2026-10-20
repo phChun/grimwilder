@@ -52,9 +52,9 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select "#chat select[name=character_id] option", 2, "yourself, or Tibbs"
 
     get character_path(characters(:tibbs))
-    assert_select ".play-view__rail #chat_messages .chat-line__body", "Welcome to Bramblewood."
-    assert_select ".play-view__rail select[name=character_id] option[selected]", characters(:tibbs).name
-    assert_select ".play-view__rail #roll_log", 1
+    assert_select ".table-rail #chat_messages .chat-line__body", "Welcome to Bramblewood."
+    assert_select ".table-rail select[name=character_id] option[selected]", characters(:tibbs).name
+    assert_select ".table-rail #roll_log", 1
   end
 
   test "an unseated character's sheet has no table rail" do
@@ -62,6 +62,6 @@ class ChatTest < ActionDispatch::IntegrationTest
 
     get character_path(characters(:loner))
     assert_select ".play-view--solo", 1
-    assert_select ".play-view__rail", 0
+    assert_select ".table-rail", 0
   end
 end

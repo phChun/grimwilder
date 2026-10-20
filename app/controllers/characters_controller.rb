@@ -34,6 +34,7 @@ class CharactersController < ApplicationController
   end
 
   def update
+    @character.changed_by = Current.identity
     if @character.update(character_params)
       redirect_to @character
     else
