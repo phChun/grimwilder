@@ -10,13 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_20_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_20_140000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "suspense", default: 0, null: false
+    t.string "pitch"
+    t.string "setting"
+    t.json "party_is", default: [], null: false
+    t.string "party_never"
+    t.string "group_arc"
     t.index ["join_code"], name: "index_campaigns_on_join_code", unique: true
   end
 
@@ -60,6 +65,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_20_120000) do
     t.string "harm_change"
     t.datetime "harm_changed_at"
     t.integer "harm_changed_by_id"
+    t.string "status", default: "active", null: false
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"

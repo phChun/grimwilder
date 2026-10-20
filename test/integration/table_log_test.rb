@@ -25,7 +25,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
 
     sign_out
     sign_in_as identities(:gwen)
-    get campaign_path(@campaign)
+    get campaign_table_path(@campaign)
     assert_select "#roll_log > li", 1
     assert_select "turbo-cable-stream-source", 6, "pool and table refreshes, both logs, the chat and the live banner"
   end
@@ -42,7 +42,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
     characters(:tibbs).roll!("brawn", by: identities(:pip), thorns: 1, random: FixedDice.new([ 2, 8 ]))
 
     sign_in_as identities(:gwen)
-    get campaign_path(@campaign)
+    get campaign_table_path(@campaign)
     assert_select ".log-entry--disaster", /Disaster: Gibbletibble "Tibbs" takes spark\./
   end
 

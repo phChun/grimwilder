@@ -1,6 +1,8 @@
 class CampaignsController < ApplicationController
   include CampaignScoped, CampaignTable
 
+  OLDER_SESSIONS = 2
+
   skip_before_action :set_campaign, only: %i[ index create ]
   before_action :require_gm, only: %i[ update destroy ]
 
@@ -18,16 +20,24 @@ class CampaignsController < ApplicationController
     render :index, status: :unprocessable_entity
   end
 
+  # The campaign overview: what it's about, who's in it, what happened last
+  # time. Players also roll pools and story rolls here, and follow the log.
   def show
     load_table
+    load_overview
+  end
+
+  # Settings: the pitch, members and the invite link (the GM's), or leaving.
+  def edit
+    load_settings
   end
 
   def update
-    if Current.campaign.update(params.expect(campaign: [ :name ]))
-      redirect_to Current.campaign, notice: "Campaign renamed."
+    if Current.campaign.update(campaign_params)
+      redirect_to Current.campaign, notice: "Campaign saved."
     else
-      load_table
-      render :show, status: :unprocessable_entity
+      load_settings
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -39,5 +49,24 @@ class CampaignsController < ApplicationController
   private
     def campaign_id_param
       params[:id]
+    end
+
+    def campaign_params
+      params.expect(campaign: [ :name, :pitch, :setting, :party_never, :group_arc, party_is: [] ])
+    end
+
+    def load_settings
+      @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
+    end
+
+    def load_overview
+      @party = @characters.select(&:active?)
+      @gone = @characters.reject(&:active?)
+      ended = Current.campaign.play_sessions.ended.order(number: :desc).includes(scenes: [ :opening_roll, :closing_roll ])
+      @previous = ended.first
+      @older = ended.offset(1).limit(OLDER_SESSIONS).to_a
+      @session_count = Current.campaign.play_sessions.count
+      @hidden_pools = gm? ? @pools.count(&:hidden?) : 0
+      @mine = Current.membership.seated_character
     end
 end

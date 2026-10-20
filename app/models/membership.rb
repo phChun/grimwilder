@@ -10,9 +10,9 @@ class Membership < ApplicationRecord
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
 
-  # The character this member plays here, if they've seated one.
+  # The character this member plays here, if they've seated one that's still playing.
   def seated_character
-    identity.characters.where(campaign: campaign).ordered.first
+    identity.characters.where(campaign: campaign).active.ordered.first
   end
 
   private

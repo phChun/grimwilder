@@ -16,6 +16,7 @@ class PlaySession < ApplicationRecord
 
   scope :ordered, -> { order(:number) }
   scope :open, -> { where(ended_at: nil) }
+  scope :ended, -> { where.not(ended_at: nil) }
 
   def self.start!(campaign, characters:, by:, recap: nil)
     raise ArgumentError, "#{campaign.current_session.title} is still going." if campaign.current_session
@@ -51,6 +52,15 @@ class PlaySession < ApplicationRecord
 
   def previous
     campaign.play_sessions.where(number: ...number).order(:number).last
+  end
+
+  def following
+    campaign.play_sessions.find_by(number: number + 1)
+  end
+
+  # Best moments are written at the start of the next session (pg. 31).
+  def moments_about
+    following&.moments&.includes(:character, :identity) || PlaySession::Moment.none
   end
 
   # Present characters with no best moment yet, of those this identity may write for.

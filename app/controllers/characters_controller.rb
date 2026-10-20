@@ -72,7 +72,7 @@ class CharactersController < ApplicationController
 
     def character_params
       params.require(:character).permit(
-        :name, :path, :campaign_id, :level, :xp,
+        :name, :path, :campaign_id, :status, :level, :xp,
         :brawn, :agility, :wits, :presence, :spark, :thread,
         :marked_brawn, :marked_agility, :marked_wits, :marked_presence, :bloodied, :rattled, :desperate,
         :not_trait, :not_desire, :weapons, :talents, :notes,

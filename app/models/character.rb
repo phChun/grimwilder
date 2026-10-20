@@ -18,6 +18,9 @@ class Character < ApplicationRecord
   validate :starting_stats_add_up, on: :create
   validate :seated_in_own_campaign
 
+  # Fallen and retired characters stay on the campaign page, under the party.
+  enum :status, %w[ active fallen retired ].index_by(&:itself), default: "active", validate: true
+
   scope :ordered, -> { order(:name) }
 
   # Characters a person may look at: their own, plus those seated in campaigns they belong to.

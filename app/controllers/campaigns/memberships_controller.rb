@@ -14,10 +14,10 @@ class Campaigns::MembershipsController < ApplicationController
       if leaving
         redirect_to campaigns_path, notice: "You left #{Current.campaign.name}."
       else
-        redirect_to Current.campaign, notice: "#{membership.identity.display_name} was removed."
+        redirect_to edit_campaign_path(Current.campaign), notice: "#{membership.identity.display_name} was removed."
       end
     else
-      redirect_to Current.campaign, alert: membership.errors.full_messages.to_sentence
+      redirect_to edit_campaign_path(Current.campaign), alert: membership.errors.full_messages.to_sentence
     end
   end
 end

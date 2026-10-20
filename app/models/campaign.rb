@@ -15,9 +15,12 @@ class Campaign < ApplicationRecord
   has_many :pools, dependent: :destroy
   has_many :characters, dependent: :nullify
 
-  normalizes :name, with: ->(value) { value.squish }
+  normalizes :name, :setting, :party_never, :group_arc, with: ->(value) { value.squish.presence }
+  normalizes :pitch, with: ->(value) { value.strip.presence }
 
   validates :name, presence: true, length: { maximum: 80 }
+  validates :pitch, length: { maximum: 200 }
+  validates :setting, :party_never, :group_arc, length: { maximum: 80 }
   validates :join_code, presence: true, uniqueness: true
 
   before_validation :generate_join_code, on: :create
@@ -39,6 +42,16 @@ class Campaign < ApplicationRecord
 
   def gms
     identities.merge(Membership.gm)
+  end
+
+  # The party is (pg. 26): two concepts, cleaned and capped.
+  def party_is=(value)
+    list = value.is_a?(Hash) || value.is_a?(ActionController::Parameters) ? value.to_h.values : Array(value)
+    super(list.map { _1.to_s.squish.first(40) }.compact_blank.first(2))
+  end
+
+  def pitched?
+    [ pitch, setting, party_never, group_arc ].any?(&:present?) || party_is.any?
   end
 
   def current_session

@@ -10,47 +10,14 @@ module CampaignsHelper
     end
   end
 
-  # Chips under a character: harm (filled), marked stats, then conditions.
-  def character_chips(character)
-    harm = HARM.select { character.public_send(:"#{_1}?") }.map { tag.span(_1.capitalize, class: "status-chip status-chip--harm") }
-    marks = Grimwild::STATS.select { character.marked?(_1) }.map { tag.span("#{_1.capitalize} marked", class: "status-chip status-chip--mark") }
-    conditions = character.conditions.map { tag.span(_1["name"], class: "status-chip", title: ("Clears after scene" if _1["lasts"] == "scene")) }
-    safe_join(harm + marks + conditions)
-  end
-
   # "Inspiration 2/3 · Mastery 1/2": uses left this session or scene.
   def talent_use_summary(character)
     character.use_counters.map { "#{_1.label} #{character.uses_left(_1)}/#{_1.count_at(character.level)}" }.join(" · ")
   end
 
-  def spark_dots(character)
-    dots = Array.new(Grimwild::MAX_SPARK) { |index| tag.span(class: [ "spark-dot", ("spark-dot--held" if index < character.spark) ]) }
-    tag.span(safe_join(dots), class: "spark-dots", role: "img", "aria-label": "#{character.spark} of #{Grimwild::MAX_SPARK} spark")
-  end
-
-  # The first harm at the table, for a collapsed summary: "Tibbs bloodied".
-  def table_alert(characters)
-    characters.each do |character|
-      harm = HARM.find { character.public_send(:"#{_1}?") }
-      return "#{character.name} #{harm}" if harm
-    end
-    nil
-  end
-
   def pool_reset_label(pool)
     first = pool.phases.first
     pool.linked? ? "Reset to #{first["size"]}d #{first["name"]}" : "Reset to #{pool.starting_size}d"
-  end
-
-  # A log entry in a few words, for a collapsed summary: "Tibbs, Agility".
-  def roll_headline(roll)
-    case roll.kind
-    when "action", "defense" then "#{roll.name}, #{roll.stat.capitalize}"
-    when "story" then "#{roll.name}, story roll"
-    when "quarrel" then "Quarrel: #{quarrel_result(roll)}"
-    when "montage" then "Montage"
-    else roll.name
-    end
   end
 
   # "1h 12m", "8m": how long something has been going.
@@ -86,5 +53,42 @@ module CampaignsHelper
     return if pool.last_action.blank? || pool.last_rolled_at.nil?
     before = pool.linked? ? nil : pool.size + pool.last_dropped.to_i
     [ ("#{before}d → #{pool.size}d" if before), "#{time_ago_in_words(pool.last_rolled_at)} ago" ].compact.join(" · ")
+  end
+
+  # --- the campaign page ----------------------------------------------------
+
+  # A scene's outcome in a few words, for "Previously on…": how it closed, a
+  # quarrel or a pool running out in it, or how it opened.
+  def scene_outcome(scene)
+    if (closing = scene.closing_roll)
+      "montage · #{closing.outcome}"
+    elsif (quarrel = scene.rolls.quarrel.recent.first)
+      "quarrel · #{quarrel.tie? ? "a tie" : "#{quarrel.winner} won"}"
+    elsif (ran_out = scene.rolls.pool.where(remaining: 0).recent.first)
+      "#{ran_out.name} ran out"
+    elsif (opening = scene.opening_roll)
+      "story roll · #{opening.outcome}"
+    end
+  end
+
+  def session_date(session)
+    session.started_at.strftime("%a, %b %-d")
+  end
+
+  # "4 scenes · 31 rolls"
+  def session_counts(session)
+    rolls = session.rolls.where.not(kind: %w[ marker note ]).count
+    [ pluralize(session.scenes.size, "scene"), pluralize(rolls, "roll") ].join(" · ")
+  end
+
+  # Who a member is at the table: "GM", the character they play, or "making one".
+  def member_role(membership, characters)
+    return "GM" if membership.gm?
+    characters.find { _1.identity_id == membership.identity_id && _1.active? }&.short_name || "making one"
+  end
+
+  # "Brother Oake, Cleric 3, fallen"
+  def gone_line(character)
+    "#{character.path} #{character.level}, #{character.status}"
   end
 end

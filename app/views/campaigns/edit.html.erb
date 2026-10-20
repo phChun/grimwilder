@@ -1,0 +1,57 @@
+<% content_for :title, "Settings · #{Current.campaign.name}" %>
+<% campaign = Current.campaign %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to campaign.name, campaign_path(campaign) %></p>
+  <h1>Campaign settings</h1>
+</header>
+
+<div class="settings">
+  <% if gm? %>
+    <section class="card stack" aria-labelledby="settings-pitch">
+      <h2 id="settings-pitch" class="card__title">The pitch</h2>
+      <p class="field__hint">What the campaign page leads with. Settle these at session zero (pg. 26).</p>
+      <datalist id="group-arcs"><% Grimwild.arcs.values.flatten.each do |arc| %><option value="<%= arc %>"></option><% end %></datalist>
+      <%= form_with model: campaign, class: "stack" do |form| %>
+        <% if campaign.errors.any? %>
+          <p class="form-error"><%= campaign.errors.full_messages.to_sentence %></p>
+        <% end %>
+        <div class="field">
+          <%= form.label :name, "Campaign name", class: "field__label" %>
+          <%= form.text_field :name, required: true, maxlength: 80, class: "field__input" %>
+        </div>
+        <div class="field">
+          <%= form.label :pitch, "One-line pitch", class: "field__label" %>
+          <%= form.text_field :pitch, maxlength: 200, autocomplete: "off", placeholder: "Toll-roads, drowned villages, and an accord that's quietly coming apart.", class: "field__input" %>
+        </div>
+        <fieldset class="fieldset">
+          <legend class="field__label">The party is <small>two concepts</small></legend>
+          <div class="two-up">
+            <% 2.times do |index| %>
+              <input type="text" name="campaign[party_is][]" value="<%= campaign.party_is[index] %>" maxlength="40" autocomplete="off" class="field__input" aria-label="Party concept <%= index + 1 %>" placeholder="<%= index.zero? ? "Wardens" : "Outsiders" %>">
+            <% end %>
+          </div>
+        </fieldset>
+        <div class="two-up">
+          <div class="field">
+            <%= form.label :party_never, "Never", class: "field__label" %>
+            <%= form.text_field :party_never, maxlength: 80, autocomplete: "off", placeholder: "Mercenaries", class: "field__input" %>
+          </div>
+          <div class="field">
+            <%= form.label :group_arc, "Group arc", class: "field__label" %>
+            <%= form.text_field :group_arc, maxlength: 80, autocomplete: "off", list: "group-arcs", placeholder: "uncover the truth", class: "field__input" %>
+          </div>
+        </div>
+        <div class="field">
+          <%= form.label :setting, "Setting", class: "field__label" %>
+          <%= form.text_field :setting, maxlength: 80, autocomplete: "off", placeholder: "The Bramble Marches", class: "field__input" %>
+        </div>
+        <%= form.submit "Save", class: "button button--primary" %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section id="settings" class="card stack" aria-label="Invite and members">
+    <%= render "campaigns/settings", memberships: @memberships, gm: gm? %>
+  </section>
+</div>

@@ -52,12 +52,17 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
     @fen.update!(talent_keys: [ "bardic-lore", "lucky" ])
     PlaySession.start!(@campaign, characters: [ @fen ], by: identities(:gwen))
     luck = @fen.talent_pools.sole
-    sign_in_as identities(:pip)
+    sign_in_as identities(:gwen)
 
-    get campaign_path(@campaign)
-    assert_select "#table .seat__uses", "Inspiration 3/3"
+    get campaign_table_path(@campaign)
+    assert_select "#table .party-card__uses", "Inspiration 3/3"
     assert_select "#table .seat-pool__name", "Luck"
     assert_select "#pools ##{dom_id(luck)}", 0
+
+    sign_out
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select "#pools ##{dom_id(luck)}", 0, "talent pools stay on the sheet"
 
     post campaign_pool_roll_path(@campaign, luck), params: { return_to: "character" }
     assert_redirected_to character_path(@fen, anchor: "talent-uses")

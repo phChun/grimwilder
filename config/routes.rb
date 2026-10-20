@@ -42,7 +42,7 @@ Rails.application.routes.draw do
   resources :passkeys, only: %i[ create destroy ]
 
   # Campaigns: the shared table a GM runs and players join
-  resources :campaigns, except: %i[ new edit ] do
+  resources :campaigns, except: :new do
     scope module: :campaigns do
       resource :join_code, only: :update
       resource :play, only: :show

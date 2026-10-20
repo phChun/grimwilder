@@ -12,7 +12,8 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert identities(:stranger).membership_in(campaign).gm?
 
     follow_redirect!
-    assert_select "input[value=?]", join_url(campaign.join_code)
+    assert_select "button[data-clipboard-text-value=?]", join_url(campaign.join_code), text: /Copy invite link/
+    assert_select "a[href=?]", campaign_table_path(campaign), text: "Open the GM table"
   end
 
   test "non-members get a 404" do
@@ -79,7 +80,7 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
 
     delete campaign_membership_path(campaign, memberships(:gwen_gm))
-    assert_redirected_to campaign_path(campaign)
+    assert_redirected_to edit_campaign_path(campaign)
     assert memberships(:gwen_gm).reload
   end
 end

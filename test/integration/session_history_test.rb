@@ -100,11 +100,12 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     assert_select ".session-form__prompts", /Talked the troll down\./
   end
 
-  test "the status line links to the history" do
-    sign_in_as identities(:pip)
+  test "the GM table and the Log tab link to the history" do
+    sign_in_as identities(:gwen)
 
-    get campaign_path(@campaign)
-    assert_select ".session-bar__status", /Between sessions/
-    assert_select ".session-bar__status a[href=?]", campaign_play_sessions_path(@campaign), text: "History"
+    get campaign_table_path(@campaign)
+    assert_select ".scene-bar__status", /Between sessions/
+    assert_select ".scene-bar__status a[href=?]", campaign_play_sessions_path(@campaign), text: "History"
+    assert_select ".tabs__link[href=?]", campaign_play_sessions_path(@campaign), text: "Log"
   end
 end

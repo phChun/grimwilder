@@ -133,7 +133,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_equal [ 2, "Claws" ], [ ogre.size, ogre.phase_name ]
 
     ogre.roll!(by: identities(:gwen), random: FixedDice.new([ 1, 3 ]))
-    get campaign_path(@campaign)
+    get campaign_table_path(@campaign)
     assert_select "##{dom_id(ogre)} .pool__phase--done", "2d Claws"
     assert_select "##{dom_id(ogre)} .pool__phase--current[aria-current=step]", "4d Body"
     assert_select "#roll_log .log-entry__meta", /0d: Claws is done\. 4d Body begins\./

@@ -72,9 +72,14 @@ class PlaySessionsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get campaign_path(@campaign)
-    assert_select ".session-bar__status", /Session 1/
-    assert_select ".session-bar__actions", 0
-    assert_select ".suspense", 0
+    assert_select ".live-banner", /Session 1/
+    assert_select ".scene-bar", 0
+    assert_select ".suspense-panel", 0
+    assert_select ".table-rail__head .suspense-meter", 1, "suspense, read-only"
+    assert_select "form[action=?]", campaign_suspense_path(@campaign), 0
+
+    get campaign_table_path(@campaign)
+    assert_response :forbidden
 
     get new_campaign_play_session_path(@campaign)
     assert_response :forbidden

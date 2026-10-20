@@ -10,7 +10,7 @@ class BreaksTest < ActionDispatch::IntegrationTest
   test "the GM rests and takes downtime from the between-scenes fold-out" do
     sign_in_as identities(:gwen)
 
-    get campaign_path(@campaign)
+    get campaign_table_path(@campaign)
     assert_select ".between-scenes form[action=?]", campaign_rest_path(@campaign)
     assert_select ".between-scenes a[href=?]", new_campaign_downtime_path(@campaign)
 

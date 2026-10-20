@@ -29,17 +29,7 @@
 
 <% if gm %>
   <div class="stack">
-    <h3 class="fold__heading">Campaign</h3>
-    <%= form_with model: Current.campaign, class: "stack" do |form| %>
-      <% if Current.campaign.errors.any? %>
-        <p class="form-error"><%= Current.campaign.errors.full_messages.to_sentence %></p>
-      <% end %>
-      <div class="field">
-        <%= form.label :name, "Campaign name", class: "field__label" %>
-        <%= form.text_field :name, required: true, maxlength: 80, class: "field__input" %>
-      </div>
-      <%= form.submit "Rename", class: "button button--small" %>
-    <% end %>
+    <h3 class="fold__heading">Delete</h3>
     <%= button_to "Delete campaign", campaign_path(Current.campaign), method: :delete, class: "button button--danger button--small", form: { data: { turbo_confirm: "Delete #{Current.campaign.name} for everyone? This can't be undone." } } %>
   </div>
 <% end %>
