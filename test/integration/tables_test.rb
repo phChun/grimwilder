@@ -99,14 +99,14 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_not scene.reload.open?
   end
 
-  test "the rail has the log, a note box and the chat" do
+  test "the rail has the feed, the composer and a note box" do
     @campaign.messages.create!(identity: identities(:pip), body: "Ready.")
     sign_in_as identities(:gwen)
 
     get campaign_table_path(@campaign)
-    assert_select ".table-rail #roll_log"
+    assert_select ".table-rail #table_feed"
     assert_select ".table-rail form[action=?]", campaign_notes_path(@campaign)
-    assert_select ".table-rail #chat_messages .chat-line__body", "Ready."
+    assert_select ".table-rail #table_feed .chat-line__body", "Ready."
     assert_select "#crucibles turbo-frame#crucible"
   end
 end

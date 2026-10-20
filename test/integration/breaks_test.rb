@@ -25,7 +25,7 @@ class BreaksTest < ActionDispatch::IntegrationTest
     assert_equal [ "4d poisoned" ], @tibbs.reload.conditions.pluck("name")
 
     follow_redirect!
-    assert_select "#roll_log .log-entry--marker", /Downtime/
+    assert_select "#table_feed .feed-item--marker", /Downtime/
   end
 
   test "players can't rest or take downtime" do

@@ -56,9 +56,8 @@ class CharactersController < ApplicationController
 
       if (campaign = @character.campaign)
         @membership = Current.identity.memberships.find_by!(campaign: campaign)
-        @log_rolls = campaign.rolls.table_log(@membership, limit: LOG_SIZE)
-        @messages = Message.chat_for(campaign)
-        @speakers = Current.identity.characters.where(campaign: campaign).ordered
+        @feed = TableFeed.new(campaign, @membership, rolls: LOG_SIZE)
+        @speakers = Current.identity.characters.where(campaign: campaign).active.ordered
       end
     end
 

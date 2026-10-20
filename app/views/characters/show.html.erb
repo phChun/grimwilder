@@ -69,7 +69,7 @@
       <p class="flash flash--alert"><%= @character.errors.full_messages.to_sentence %></p>
     <% end %>
 
-    <section class="stat-grid" aria-label="Stats">
+    <section id="stats" class="stat-grid" aria-label="Stats">
       <% Grimwild.stats.each do |stat, description| %>
         <article class="<%= class_names("stat-card", "stat-card--marked": @character.marked?(stat)) %>">
           <div class="stat-card__head">
@@ -250,29 +250,6 @@
   </div>
 
   <% if campaign %>
-    <aside class="fluid__rail table-rail" aria-labelledby="table-rail-title">
-      <div class="table-rail__head">
-        <h2 id="table-rail-title" class="table-rail__title">The table</h2>
-        <%= render "campaigns/suspense_meter", campaign: campaign %>
-      </div>
-
-      <details id="sheet-log" class="table-rail__section" open data-details-memory-target="section" data-section="sheet-log" data-phone-open="true">
-        <summary class="table-rail__summary">
-          <span>Roll log</span>
-          <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
-        </summary>
-        <div class="play-view__scroll">
-          <%= render "rolls/log", campaign: campaign, membership: @membership, rolls: @log_rolls %>
-        </div>
-      </details>
-
-      <details id="sheet-chat" class="table-rail__section" open data-details-memory-target="section" data-section="sheet-chat" data-phone-open="true">
-        <summary class="table-rail__summary">
-          <span>Chat</span>
-          <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
-        </summary>
-        <%= render "messages/chat", campaign: campaign, messages: @messages, speakers: @speakers, speaker: (@character if editable) %>
-      </details>
-    </aside>
+    <%= render "campaigns/table_rail", campaign: campaign, membership: @membership, feed: @feed, speakers: @speakers, speaker: (@character if editable && @character.active?), suspense: true, quick_roll: ("#stats" if editable), classes: "fluid__rail" %>
   <% end %>
 </div>

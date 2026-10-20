@@ -205,33 +205,8 @@
       </section>
 
       <% unless gm %>
-        <div class="table-rail">
-          <div class="table-rail__head">
-            <h2 class="table-rail__title">The table</h2>
-            <%= render "campaigns/suspense_meter", campaign: campaign %>
-          </div>
-          <details id="roll-log" class="table-rail__section" open data-details-memory-target="section" data-section="log">
-            <summary class="table-rail__summary">
-              <span>Roll log</span>
-              <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
-            </summary>
-            <div class="play-view__scroll">
-              <%= render "rolls/log", campaign: campaign, membership: Current.membership, rolls: @rolls %>
-            </div>
-            <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
-              <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="Add a note to the log">
-              <button type="submit" class="button button--small">Note</button>
-            <% end %>
-          </details>
-          <details id="chat" class="table-rail__section" open data-details-memory-target="section" data-section="chat">
-            <summary class="table-rail__summary">
-              <span>Chat</span>
-              <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
-            </summary>
-            <%= render "messages/chat", campaign: campaign, messages: @messages, speakers: @my_characters, speaker: nil %>
-          </details>
-          <p class="table-rail__links"><%= link_to "Montage", new_campaign_montage_path(campaign) %> · <%= link_to "Quarrel", new_campaign_quarrel_path(campaign) %></p>
-        </div>
+        <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: @my_characters.select(&:active?), suspense: true, quick_roll: (character_path(@mine, anchor: "stats") if @mine) %>
+        <p class="side-card__note"><%= link_to "Montage", new_campaign_montage_path(campaign) %> · <%= link_to "Quarrel", new_campaign_quarrel_path(campaign) %></p>
       <% end %>
     </aside>
   </div>

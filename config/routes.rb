@@ -64,7 +64,9 @@ Rails.application.routes.draw do
         resource :ending, only: %i[ new create ], module: :scenes
       end
       resources :notes, only: :create
-      resources :messages, only: :create
+      resources :messages, only: :create do
+        resource :nomination, only: :create, module: :messages
+      end
       resource :rest, only: :create
       resource :downtime, only: %i[ new create ]
 

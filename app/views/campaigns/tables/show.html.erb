@@ -169,31 +169,5 @@
     </section>
   </div>
 
-  <aside class="fluid__rail table-rail" aria-labelledby="table-rail-title">
-    <div class="table-rail__head">
-      <h2 id="table-rail-title" class="table-rail__title">The table</h2>
-    </div>
-
-    <details id="roll-log" class="table-rail__section" open data-details-memory-target="section" data-section="log">
-      <summary class="table-rail__summary">
-        <span>Roll log</span>
-        <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
-      </summary>
-      <div class="play-view__scroll">
-        <%= render "rolls/log", campaign: campaign, membership: Current.membership, rolls: @rolls %>
-      </div>
-      <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
-        <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="Add a note to the log">
-        <button type="submit" class="button button--small">Note</button>
-      <% end %>
-    </details>
-
-    <details id="chat" class="table-rail__section" open data-details-memory-target="section" data-section="chat">
-      <summary class="table-rail__summary">
-        <span>Chat</span>
-        <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
-      </summary>
-      <%= render "messages/chat", campaign: campaign, messages: @messages, speakers: @my_characters, speaker: nil %>
-    </details>
-  </aside>
+  <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [], quick_roll: "#story-roll", classes: "fluid__rail" %>
 </div>

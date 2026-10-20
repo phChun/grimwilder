@@ -10,6 +10,7 @@ class PlaySession < ApplicationRecord
   has_many :rolls, dependent: :nullify
   has_many :scenes, dependent: :destroy
   has_many :moments, dependent: :destroy
+  has_many :nominations, dependent: :delete_all
 
   validates :number, numericality: { only_integer: true, greater_than: 0 }, uniqueness: { scope: :campaign_id }
   validate :one_open_per_campaign, on: :create

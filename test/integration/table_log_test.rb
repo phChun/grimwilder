@@ -3,16 +3,16 @@ require "test_helper"
 class TableLogTest < ActionDispatch::IntegrationTest
   setup { @campaign = campaigns(:bramblewood) }
 
-  test "the table sees character and pool rolls, newest first" do
+  test "the table sees character and pool rolls in the order they happened" do
     characters(:tibbs).roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 2 ]))
     pools(:lookouts).roll!(by: identities(:gwen), random: FixedDice.new([ 1, 2, 4, 5, 6, 6 ]))
 
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
 
-    assert_select "#roll_log > li", 2
-    assert_select "#roll_log > li:first-child", /Lookouts spot you.*Rolled 6d: 2d dropped\. 4d left\./m
-    assert_select "#roll_log > li:last-child .log-entry__result", "Perfect · critical"
+    assert_select "#table_feed > li", 2
+    assert_select "#table_feed > li:first-child .roll-result__word", "Critical"
+    assert_select "#table_feed > li:last-child.feed-pool", /Lookouts spot you.*6d → 4d.*Rolled 6d: 2d dropped\. 4d left\./m
   end
 
   test "a player doesn't see rolls on hidden pools; the GM does" do
@@ -20,14 +20,14 @@ class TableLogTest < ActionDispatch::IntegrationTest
 
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select "#roll_log > li", 0
-    assert_select "turbo-cable-stream-source", 5, "pool and table refreshes, the open log, the chat and the live banner"
+    assert_select "#table_feed > li", 0
+    assert_select "turbo-cable-stream-source", 6, "pool and table refreshes, the live banner, the open log, the chat and your own whispers"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
-    assert_select "#roll_log > li", 1
-    assert_select "turbo-cable-stream-source", 6, "pool and table refreshes, both logs, the chat and the live banner"
+    assert_select "#table_feed > li", 1
+    assert_select "turbo-cable-stream-source", 7, "pool and table refreshes, the live banner, both logs, the chat and the GM's stream"
   end
 
   test "the table shows the newest #{CampaignTable::LOG_SIZE} log entries" do
@@ -35,7 +35,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
 
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select "#roll_log > li", CampaignTable::LOG_SIZE
+    assert_select "#table_feed > li", CampaignTable::LOG_SIZE
   end
 
   test "a disaster shows the spark it gave" do
@@ -43,7 +43,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
 
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
-    assert_select ".log-entry--disaster", /Disaster: Gibbletibble "Tibbs" takes spark\./
+    assert_select ".feed-item--disaster", /Disaster: Gibbletibble "Tibbs" takes spark\./
   end
 
   test "new rolls reach the table live" do

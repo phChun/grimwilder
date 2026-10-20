@@ -91,4 +91,13 @@ module CampaignsHelper
   def gone_line(character)
     "#{character.path} #{character.level}, #{character.status}"
   end
+
+  # The composer's first speak-as choice: the GM narrates during a session; a
+  # player speaks as their character if they have one here.
+  def default_voice(membership, speakers, speaker)
+    if membership.gm? then membership.campaign.current_session ? "narration" : "table_talk"
+    elsif (character = speaker || speakers.first) then "character:#{character.id}"
+    else "table_talk"
+    end
+  end
 end

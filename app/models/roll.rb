@@ -65,12 +65,13 @@ class Roll < ApplicationRecord
       self.scene ||= campaign&.current_scene if play_session&.open?
     end
 
+    # Into the table's rail (TableFeed), after the newest line.
     def broadcast_to_table
-      broadcast_prepend_later_to table_stream, target: "roll_log", partial: "rolls/roll", locals: { roll: self }
+      broadcast_append_later_to table_stream, target: "table_feed", partial: "rolls/feed_item", locals: { roll: self }
     end
 
     def broadcast_change_to_table
-      broadcast_replace_later_to table_stream, partial: "rolls/roll", locals: { roll: self }
+      broadcast_replace_later_to table_stream, partial: "rolls/feed_item", locals: { roll: self }
     end
 
     def table_stream

@@ -68,7 +68,7 @@ class ScenesTest < ActionDispatch::IntegrationTest
     assert_redirected_to campaign_path(@campaign, anchor: "roll-log")
 
     follow_redirect!
-    assert_select "#roll_log .log-entry--note", /Pip\s+Tibbs enters a frenzy/
+    assert_select "#table_feed .feed-item--note", /Pip\s+Tibbs enters a frenzy/
   end
 
   test "players can't start or end scenes" do

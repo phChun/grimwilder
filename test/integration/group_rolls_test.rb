@@ -18,8 +18,8 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     assert_equal 2, @campaign.rolls.story.last.dice.size
 
     follow_redirect!
-    assert_select "#roll_log .log-entry__question", "Is the bridge out?"
-    assert_select "#roll_log .log-entry__meta", /1d \(bad odds\) \+ 1 spark/
+    assert_select "#table_feed .feed-item__question", "Is the bridge out?"
+    assert_select "#table_feed .feed-item__meta", /1d \(bad odds\) \+ 1 spark/
   end
 
   test "a story roll can't be for someone else's character" do
@@ -56,8 +56,8 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     assert_equal 1, @tibbs.reload.spark, "spent 1, then took 1"
 
     follow_redirect!
-    assert_select "#roll_log .log-entry__question", "Stakes: Who keeps the map?"
-    assert_select "#roll_log .log-entry__meta", /Bram already holds 2/
+    assert_select "#table_feed .feed-item__question", "Stakes: Who keeps the map?"
+    assert_select "#table_feed .feed-item__meta", /Bram already holds 2/
   end
 
   test "you can't spend someone else's spark in a quarrel" do
@@ -108,8 +108,8 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     assert_equal({ @tibbs.name => 3, "Bram" => 2 }, @campaign.rolls.montage.last.sides.to_h { [ _1["name"], _1["dice"].size ] })
 
     follow_redirect!
-    assert_select "#roll_log .log-entry__question", "The climb"
-    assert_select "#roll_log .log-entry__meta", /highest result is the scene's outcome/
+    assert_select "#table_feed .feed-item__question", "The climb"
+    assert_select "#table_feed .feed-item__meta", /highest result is the scene's outcome/
   end
 
   test "a montage needs someone in it, and only your own spark" do

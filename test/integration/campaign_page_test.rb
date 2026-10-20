@@ -104,7 +104,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select "#{brawl} details.pool-row__more form[action=?]", campaign_pool_push_path(@campaign, pools(:brawl))
     assert_select "#{brawl} details.pool-row__more form[action=?] input[name=drop_first][value='1']", campaign_pool_roll_path(@campaign, pools(:brawl))
     assert_select "#story-roll form[action=?]", campaign_story_rolls_path(@campaign)
-    assert_select ".table-rail #roll_log"
+    assert_select ".table-rail #table_feed"
     assert_select ".table-rail form[action=?]", campaign_notes_path(@campaign)
   end
 

@@ -25,7 +25,7 @@ class PlaySessionsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select ".scene-bar__status", /Session 1 · live/
     assert_select ".scene-bar__title", "Between scenes"
-    assert_select "#roll_log .log-entry--marker", /Session 1 begins/
+    assert_select "#table_feed .feed-item--marker", /Session 1 begins/
 
     get new_campaign_play_session_ending_path(@campaign, session)
     post campaign_play_session_ending_path(@campaign, session), params: { standout: "1", notes: "A good one." }
@@ -35,7 +35,7 @@ class PlaySessionsTest < ActionDispatch::IntegrationTest
     assert_match "Gibbletibble \"Tibbs\" reached level 2", flash[:notice]
 
     follow_redirect!
-    assert_select "#roll_log .log-entry--marker a[href=?]", new_character_talent_path(@tibbs), text: "choose a talent"
+    assert_select "#table_feed .feed-item--marker a[href=?]", new_character_talent_path(@tibbs), text: "choose a talent"
   end
 
   test "session 2 asks for a recap and shows what happened last time" do

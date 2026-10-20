@@ -1,0 +1,65 @@
+<%# locals: (roll:) %>
+<%# A log entry in the table's rail. Character rolls are small result cards, pool rolls one line, and markers and notes centered game events (a scene start is a divider). Renders in broadcasts, so no Current. The session pages keep the fuller rolls/_roll. %>
+<% time = capture do %><time class="feed-item__time" datetime="<%= roll.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= roll.created_at.utc.strftime("%H:%M UTC") %></time><% end %>
+<% if roll.marker? && roll.scene && roll.name.include?("Scene #{roll.scene.number}:") %>
+  <li id="<%= dom_id(roll) %>" class="feed-item feed-item--event feed-item--marker feed-divider"><span class="feed-divider__text">Scene <%= roll.scene.number %> · <%= roll.scene.title %></span></li>
+<% elsif roll.marker? || roll.note? %>
+  <li id="<%= dom_id(roll) %>" class="<%= class_names("feed-item", "feed-item--event", "feed-item--marker": roll.marker?, "feed-item--note": roll.note?) %>">
+    <% if roll.marker? %>
+      <p class="feed-event"><strong><%= roll.name %></strong><% if roll.question %> · <%= roll.question %><% end %></p>
+      <% roll.sides.each do |level_up| %>
+        <p class="feed-event"><%= level_up["name"] %> reached level <%= level_up["level"] %>: <%= link_to "choose a talent", new_character_talent_path(level_up["character_id"]) %></p>
+      <% end %>
+    <% else %>
+      <p class="feed-event"><strong class="log-note__who"><%= roll.name %></strong> <%= roll.question %></p>
+    <% end %>
+  </li>
+<% elsif roll.pool? && roll.outcome.nil? %>
+  <li id="<%= dom_id(roll) %>" class="feed-item feed-item--dice feed-pool">
+    <p class="feed-pool__line">
+      <span class="feed-pool__name"><%= roll.name %><%= ": #{roll.phase}" if roll.phase %></span>
+      <span class="feed-pool__change"><% if roll.dropped %><%= roll.remaining + roll.dropped.to_i %>d → <strong><%= roll.remaining %>d</strong><% end %></span>
+      <span class="feed-pool__who"><%= roll.identity.display_name %></span>
+      <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+    </p>
+    <p class="feed-item__meta"><%= pool_roll_summary(roll) %></p>
+  </li>
+<% else %>
+  <li id="<%= dom_id(roll) %>" class="<%= class_names("feed-item", "feed-item--dice", "feed-roll", "feed-item--#{roll.outcome}": roll.outcome, "feed-roll--#{roll_result_tier(roll)}": roll.outcome) %>">
+    <p class="feed-roll__head">
+      <% case roll.kind %>
+      <% when "pool" %>
+        <strong><%= roll.name %></strong> pool, as an action
+      <% when "quarrel" %>
+        <strong>Quarrel</strong> <%= roll.name %>
+      <% when "montage" %>
+        <strong>Montage</strong> <%= roll.name %>
+      <% when "story" %>
+        <strong><%= roll.name %></strong> story roll
+      <% else %>
+        <strong><%= roll.name %></strong> <%= roll.stat.capitalize %><%= " defense" if roll.defense? %>
+      <% end %>
+      <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+      <%= time %>
+    </p>
+    <% if roll.question %>
+      <p class="feed-item__question"><%= roll.quarrel? ? "Stakes: #{roll.question}" : roll.question %></p>
+    <% end %>
+
+    <% if roll.quarrel? || roll.montage? %>
+      <ul class="quarrel-sides">
+        <% roll.sides.each do |side| %>
+          <li class="<%= class_names("quarrel-side", "quarrel-side--winner": roll.quarrel? && side["name"] == roll.winner) %>">
+            <span class="quarrel-side__name"><%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if roll.montage? %>: <%= side["outcome"] %><%= " (critical)" if side["critical"] %><% end %></span>
+            <span class="feed-roll__dice"><%= side_dice_tags(side) %></span>
+          </li>
+        <% end %>
+      </ul>
+      <p class="feed-item__result"><%= roll.quarrel? ? quarrel_result(roll) : "Montage: #{roll.outcome}" %></p>
+      <p class="feed-item__meta"><% if roll.montage? %>The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.<% else %><% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %><% end %></p>
+    <% else %>
+      <%= render "shared/roll_result", roll: roll, size: 32 %>
+      <p class="feed-item__meta"><%= roll.pool? ? pool_roll_summary(roll) : "#{roll_setup(roll)}." %><% if (note = roll_spark_note(roll)) %> <%= note %><% end %> · <%= roll.identity.display_name %></p>
+    <% end %>
+  </li>
+<% end %>

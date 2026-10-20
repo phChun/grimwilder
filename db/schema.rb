@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_20_140000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_20_160000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -110,7 +110,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_20_140000) do
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "kind", default: "table_talk", null: false
+    t.string "speaker_name"
     t.index ["campaign_id", "created_at"], name: "index_messages_on_campaign_id_and_created_at"
+    t.index ["campaign_id", "kind"], name: "index_messages_on_campaign_id_and_kind"
     t.index ["campaign_id"], name: "index_messages_on_campaign_id"
     t.index ["character_id"], name: "index_messages_on_character_id"
     t.index ["identity_id"], name: "index_messages_on_identity_id"
@@ -147,6 +150,21 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_20_140000) do
     t.index ["identity_id"], name: "index_play_session_moments_on_identity_id"
     t.index ["play_session_id", "character_id"], name: "index_play_session_moments_on_play_session_id_and_character_id", unique: true
     t.index ["play_session_id"], name: "index_play_session_moments_on_play_session_id"
+  end
+
+  create_table "play_session_nominations", force: :cascade do |t|
+    t.integer "play_session_id", null: false
+    t.integer "character_id", null: false
+    t.integer "identity_id", null: false
+    t.integer "message_id"
+    t.text "text", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id"], name: "index_play_session_nominations_on_character_id"
+    t.index ["identity_id"], name: "index_play_session_nominations_on_identity_id"
+    t.index ["message_id"], name: "index_play_session_nominations_on_message_id"
+    t.index ["play_session_id", "character_id", "identity_id"], name: "index_nominations_one_per_nominator", unique: true
+    t.index ["play_session_id"], name: "index_play_session_nominations_on_play_session_id"
   end
 
   create_table "play_sessions", force: :cascade do |t|
@@ -272,6 +290,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_20_140000) do
   add_foreign_key "play_session_moments", "characters", on_delete: :cascade
   add_foreign_key "play_session_moments", "identities"
   add_foreign_key "play_session_moments", "play_sessions", on_delete: :cascade
+  add_foreign_key "play_session_nominations", "characters", on_delete: :cascade
+  add_foreign_key "play_session_nominations", "identities"
+  add_foreign_key "play_session_nominations", "messages", on_delete: :nullify
+  add_foreign_key "play_session_nominations", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade

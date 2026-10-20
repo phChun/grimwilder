@@ -103,8 +103,8 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_equal [ 5, 1, 1 ], [ roll.dice.size, roll.thorns.size, roll.spark_spent ]
 
     follow_redirect!
-    assert_select "##{dom_id(roll)} .log-entry__result", /\A#{roll.outcome.capitalize}/, "a critical adds \" · critical\""
-    assert_select "##{dom_id(roll)} .log-entry__meta", /4d \+ 1 spark, vs 1t as an action for Gibbletibble "Tibbs"/
+    assert_select "##{dom_id(roll)} .roll-result__word", roll.critical? ? "Critical" : roll.outcome.capitalize
+    assert_select "##{dom_id(roll)} .feed-item__meta", /4d \+ 1 spark, vs 1t as an action for Gibbletibble "Tibbs"/
     assert_select "##{dom_id(roll)} .die--spark", 1
   end
 
@@ -136,7 +136,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     get campaign_table_path(@campaign)
     assert_select "##{dom_id(ogre)} .pool__phase--done", "2d Claws"
     assert_select "##{dom_id(ogre)} .pool__phase--current[aria-current=step]", "4d Body"
-    assert_select "#roll_log .log-entry__meta", /0d: Claws is done\. 4d Body begins\./
+    assert_select "#table_feed .feed-item__meta", /0d: Claws is done\. 4d Body begins\./
   end
 
   test "badly written phases show the form again, as typed" do

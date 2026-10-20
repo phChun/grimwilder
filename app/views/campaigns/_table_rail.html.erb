@@ -1,0 +1,68 @@
+<%# locals: (campaign:, membership:, feed:, speakers:, speaker: nil, suspense: nil, quick_roll: nil, classes: nil) %>
+<%# The table's rail: chat and log in one time-ordered stream (TableFeed), filtered in the browser, with the composer. speakers: the active characters this member can speak as; speaker: the one picked first; quick_roll: where the die button goes. %>
+<% feed.streams.each do |stream| %>
+  <%= turbo_stream_from(*stream) %>
+<% end %>
+<% session = campaign.current_session %>
+<% scene = session&.current_scene %>
+<% gm = membership.gm? %>
+<% prefix = "rail_#{campaign.id}" %>
+
+<section class="<%= class_names("table-rail", classes) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-gm-value="<%= gm %>" data-feed-session-value="<%= session.present? %>">
+  <div class="table-rail__head">
+    <div class="table-rail__titles">
+      <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>
+      <p class="table-rail__where"><%= session ? [ session.title, scene&.title ].compact.join(" · ") : "Between sessions" %></p>
+    </div>
+    <% if suspense %><%= render "campaigns/suspense_meter", campaign: campaign %><% end %>
+    <span class="avatars" role="img" aria-label="At the table: <%= campaign.identities.map(&:display_name).to_sentence %>">
+      <% campaign.memberships.includes(:identity).order(:role, :created_at).first(5).each do |member| %>
+        <span class="<%= class_names("avatar", "avatar--gm": member.gm?) %>" aria-hidden="true"><%= initial(member.identity.display_name) %></span>
+      <% end %>
+    </span>
+  </div>
+
+  <div class="feed">
+    <%= render "shared/segmented", name: "#{prefix}_filter", legend: "Show", options: [ %w[ all Everything ], %w[ story Story ], %w[ dice Dice ] ], checked: "all", id_prefix: "#{prefix}_filter", classes: "feed__filter" %>
+
+    <div class="feed__scroller">
+      <div>
+        <ol id="table_feed" class="feed__items" aria-live="polite" aria-label="Table chat and log">
+          <% feed.entries.each do |entry| %>
+            <% if entry.is_a?(Message) %>
+              <%= render "messages/message", message: entry %>
+            <% else %>
+              <%= render "rolls/feed_item", roll: entry %>
+            <% end %>
+          <% end %>
+        </ol>
+        <p class="empty feed__empty">Nothing yet. Rolls, scenes and talk land here as they happen.</p>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
+    <% voices = gm ? [ %w[ narration Narrate ], [ "npc", "As NPC" ], [ "table_talk", "Table talk" ] ] : speakers.map { [ "character:#{_1.id}", "As #{_1.short_name}" ] } + [ [ "table_talk", "Table talk" ], [ "whisper", "To GM" ] ] %>
+    <%= render "shared/segmented", name: "speak_as", legend: "Speak as", options: voices, checked: default_voice(membership, speakers, speaker), id_prefix: "#{prefix}_voice", classes: "composer__voices" %>
+    <div class="composer__npc">
+      <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
+      <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
+    </div>
+    <div class="composer__row">
+      <% if quick_roll %>
+        <%= link_to quick_roll, class: "button composer__roll", "aria-label": "Roll", title: "Roll" do %><%= icon(:die, size: 18) %><% end %>
+      <% end %>
+      <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
+      <textarea id="<%= prefix %>_body" name="body" rows="1" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" class="field__input composer__input" data-chat-form-target="body"></textarea>
+      <button type="submit" class="button button--primary composer__send" aria-label="Send"><%= icon(:send, size: 18) %></button>
+    </div>
+  <% end %>
+
+  <details class="table-rail__note" data-details-memory-target="section" data-section="note">
+    <summary class="table-rail__summary"><span>Log a game event</span></summary>
+    <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
+      <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="A game event for the log">
+      <button type="submit" class="button button--small">Log it</button>
+    <% end %>
+  </details>
+</section>

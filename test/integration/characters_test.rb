@@ -71,7 +71,7 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_select "#last-roll .roll-result__reason", /#{Regexp.escape(RollsHelper::RESULT_TEXT["defense"][roll.outcome])}/
     assert_select "#last-roll .last-roll__setup", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
     assert_select "#last-roll .roll-result__dice .die--assist[title=Bram]", 1
-    assert_select "#roll_log ##{ActionView::RecordIdentifier.dom_id(roll)}", 1, "the table's log sits beside the sheet"
+    assert_select "#table_feed ##{ActionView::RecordIdentifier.dom_id(roll)}", 1, "the table's log sits beside the sheet"
   end
 
   test "the steppers send totals: the roll takes what's on top of the stat and the damage" do
