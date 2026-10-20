@@ -173,7 +173,7 @@
   cursor: pointer;
 }
 
-.segmented__option span {
+.segmented__text {
   display: flex;
   align-items: baseline;
   justify-content: center;
@@ -188,14 +188,16 @@
   transition: background 120ms, color 120ms, box-shadow 120ms;
 }
 
-/* The chosen one: an ember ring and fill, so it reads by shape as well as color. */
-.segmented__option input:checked + span {
+/* The chosen one: an ember ring and fill, so it reads by shape as well as color.
+   Matched with :has() rather than input + span, because in development Herb's
+   debug mode wraps ERB output (a radio_button_tag) in a span of its own. */
+.segmented__option:has(input:checked) .segmented__text {
   background: color-mix(in srgb, var(--ember) 22%, var(--surface));
   color: var(--text);
   box-shadow: inset 0 0 0 2px var(--ember);
 }
 
-.segmented__option input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 1px; }
+.segmented__option:has(input:focus-visible) .segmented__text { outline: 2px solid var(--focus); outline-offset: 1px; }
 
 .counter__label {
   display: block;
@@ -1869,7 +1871,7 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
    form Turbo is submitting dims its button until the page answers. */
 
 .button,
-.segmented__option span,
+.segmented__text,
 .harm-toggle,
 .mark-toggle,
 .stepper__step,
@@ -1904,13 +1906,13 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--suspense) 35%, transparent);
   }
 
-  .segmented__option:hover input:not(:checked) + span {
+  .segmented__option:hover:not(:has(input:checked)) .segmented__text {
     background: var(--surface-2);
     color: var(--text);
     box-shadow: inset 0 0 0 1px var(--line-strong);
   }
 
-  .segmented__option:hover input:checked + span { box-shadow: inset 0 0 0 2px var(--link); background: color-mix(in srgb, var(--ember) 30%, var(--surface)); }
+  .segmented__option:hover:has(input:checked) .segmented__text { box-shadow: inset 0 0 0 2px var(--link); background: color-mix(in srgb, var(--ember) 30%, var(--surface)); }
 
   .harm-toggle:hover:not([aria-pressed="true"]),
   .mark-toggle:hover:not([aria-pressed="true"]) {
@@ -1933,7 +1935,7 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
   filter: brightness(0.85);
 }
 
-.segmented__option:active input:not(:checked) + span {
+.segmented__option:active:not(:has(input:checked)) .segmented__text {
   transform: scale(0.96);
   background: var(--line-soft);
 }

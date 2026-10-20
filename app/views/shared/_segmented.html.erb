@@ -7,7 +7,7 @@
   <% options.each do |value, text| %>
     <label class="segmented__option">
       <%= radio_button_tag name, value, value.to_s == checked.to_s, id: "#{id_prefix}_#{value}", data: input_data %>
-      <span><%= text %></span>
+      <span class="segmented__text"><%= text %></span>
     </label>
   <% end %>
 </fieldset>

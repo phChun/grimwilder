@@ -5,7 +5,7 @@
     <% Roll::ODDS.each do |dice, odds| %>
       <label class="segmented__option">
         <%= radio_button_tag :odds, dice, dice == 2 %>
-        <span><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
+        <span class="segmented__text"><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
       </label>
     <% end %>
   </div>
