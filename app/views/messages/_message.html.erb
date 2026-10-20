@@ -11,23 +11,23 @@
   <% when "narration" %>
     <div class="chat-line__card chat-line__card--narration">
       <p class="chat-line__label">GM · Cut to <%= time %></p>
-      <p class="chat-line__body chat-line__body--voice"><%= message.body %></p>
+      <p class="chat-line__body chat-line__body--voice"><%= chat_format(message.body) %></p>
     </div>
     <%= star %>
   <% when "npc" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--npc"><%= message.name %></strong> <span class="chat-line__note">voiced by GM</span> <%= time %></p>
-    <p class="chat-line__bubble chat-line__bubble--npc chat-line__body chat-line__body--voice">“<%= message.body %>”</p>
+    <p class="chat-line__bubble chat-line__bubble--npc chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
   <% when "in_character" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--character"><%= message.name %></strong> <span class="chat-line__note">in character · <%= message.identity.display_name %></span> <%= time %></p>
-    <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= message.body %>”</p>
+    <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
     <%= star %>
   <% when "whisper" %>
     <div class="chat-line__card chat-line__card--whisper">
       <p class="chat-line__label"><%= icon(:lock, size: 13) %> <%= message.name %> to the GM · only you and the GM <%= time %></p>
-      <p class="chat-line__body"><%= message.body %></p>
+      <p class="chat-line__body"><%= chat_format(message.body) %></p>
     </div>
   <% else %>
     <p class="chat-line__head"><strong class="chat-line__who"><%= message.name %></strong> <%= time %></p>
-    <p class="chat-line__bubble chat-line__body"><%= message.body %></p>
+    <p class="chat-line__bubble chat-line__body"><%= chat_format(message.body) %></p>
   <% end %>
 </li>

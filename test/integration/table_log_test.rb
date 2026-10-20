@@ -82,7 +82,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select "form[action=?]", character_roll_critical_spark_path(tibbs, roll), count: 0
-    assert_select "#last-roll .last-roll__note--spark", "Critical: nothing fit, so Gibbletibble \"Tibbs\" takes spark."
+    assert_select "#roll-toast .roll-toast__note--spark", "Critical: nothing fit, so Gibbletibble \"Tibbs\" takes spark."
 
     post character_roll_critical_spark_path(tibbs, roll)
     assert_equal 2, tibbs.reload.spark

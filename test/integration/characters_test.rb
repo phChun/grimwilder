@@ -54,7 +54,7 @@ class CharactersTest < ActionDispatch::IntegrationTest
       assert agility.at_css("button[name=mode][value=defense]")
       assert agility.at_css("input[name='assists[]'][value='#{characters(:bram).id}']")
     end
-    assert_select "#last-roll", 0, "no roll yet"
+    assert_select "#roll-toast", 0, "no roll yet"
 
     assert_difference -> { @tibbs.rolls.count }, 1 do
       post character_rolls_path(@tibbs), params: { stat: "agility", mode: "defense", spark: 1, help: 1, thorns: 2, assists: [ characters(:bram).id ] }
@@ -66,12 +66,31 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_not @tibbs.reload.marked_agility?
 
     follow_redirect!
-    assert_select "#last-roll .last-roll__title", "Last roll · Agility defense · just now"
-    assert_select "#last-roll .roll-result__word", roll.critical? ? "Critical" : roll.outcome.capitalize
-    assert_select "#last-roll .roll-result__reason", /#{Regexp.escape(RollsHelper::RESULT_TEXT["defense"][roll.outcome])}/
-    assert_select "#last-roll .last-roll__setup", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
-    assert_select "#last-roll .roll-result__dice .die--assist[title=Bram]", 1
+    assert_select "#roll-toast .roll-toast__title", "Agility defense · just now"
+    assert_select "#roll-toast .roll-result__word", roll.critical? ? "Critical" : roll.outcome.capitalize
+    assert_select "#roll-toast .roll-result__reason", /#{Regexp.escape(RollsHelper::RESULT_TEXT["defense"][roll.outcome])}/
+    assert_select "#roll-toast .roll-toast__setup", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
+    assert_select "#roll-toast .roll-result__dice .die--assist[title=Bram]", 1
     assert_select "#table_feed ##{ActionView::RecordIdentifier.dom_id(roll)}", 1, "the table's log sits beside the sheet"
+  end
+
+  test "the roll's toast is gone 30 seconds on, unless a critical is still waiting on its choice" do
+    sign_in_as identities(:pip)
+    roll = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 4, 2, 1 ]))
+
+    get character_path(@tibbs)
+    assert_select "#roll-toast[data-toast-sticky-value=false][data-toast-seconds-value]", 1
+
+    travel 31.seconds do
+      get character_path(@tibbs)
+      assert_select "#roll-toast", 0
+    end
+
+    roll.update!(dice: [ 6, 6, 2 ], outcome: "perfect", critical: true)
+    travel 5.minutes do
+      get character_path(@tibbs)
+      assert_select "#roll-toast[data-toast-sticky-value=true] .critical__spark", 1
+    end
   end
 
   test "the steppers send totals: the roll takes what's on top of the stat and the damage" do

@@ -48,13 +48,14 @@
       <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
       <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
     </div>
+    <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
+    <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
     <div class="composer__row">
       <% if quick_roll %>
         <%= link_to quick_roll, class: "button composer__roll", "aria-label": "Roll", title: "Roll" do %><%= icon(:die, size: 18) %><% end %>
       <% end %>
-      <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
-      <textarea id="<%= prefix %>_body" name="body" rows="1" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" class="field__input composer__input" data-chat-form-target="body"></textarea>
-      <button type="submit" class="button button--primary composer__send" aria-label="Send"><%= icon(:send, size: 18) %></button>
+      <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
+      <button type="submit" class="button button--primary composer__send">Send</button>
     </div>
   <% end %>
 

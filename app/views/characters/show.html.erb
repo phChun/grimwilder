@@ -89,10 +89,6 @@
     </section>
 
     <div class="sheet__row">
-      <% if @last_roll %>
-        <%= render "characters/last_roll", character: @character, roll: @last_roll, editable: editable %>
-      <% end %>
-
       <section id="damage" class="card harm" aria-labelledby="sheet-harm">
         <h2 id="sheet-harm" class="card__title">Harm</h2>
         <div class="harm__toggles">
@@ -251,6 +247,10 @@
       </section>
     <% end %>
   </div>
+
+  <% if roll_toast?(@character, @last_roll, editable) %>
+    <%= render "characters/roll_toast", character: @character, roll: @last_roll, editable: editable %>
+  <% end %>
 
   <% if campaign %>
     <%= render "campaigns/table_rail", campaign: campaign, membership: @membership, feed: @feed, speakers: @speakers, speaker: (@character if editable && @character.active?), suspense: true, quick_roll: ("#stats" if editable), classes: "fluid__rail" %>

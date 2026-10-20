@@ -49,7 +49,8 @@ class CharactersController < ApplicationController
   end
 
   private
-    # The sheet's newest roll, and for a seated character the table around it.
+    # The sheet's newest roll (a toast just after it's made), and for a seated
+    # character the table around it.
     def load_play
       @last_roll = @character.rolls.where(kind: Character::Rolling::MODES).recent.first
       @allies = @character.campaign ? @character.campaign.characters.excluding(@character).ordered : []

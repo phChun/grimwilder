@@ -1,7 +1,7 @@
 # Action and defense rolls from the sheet. The setup folds open on the stat
-# card itself; the server rolls, then the sheet shows the result in its "Last
-# roll" card. Rolls of a seated character also land in the campaign's log for
-# the whole table.
+# card itself; the server rolls, then the sheet shows the result as a toast.
+# Rolls of a seated character also land in the campaign's log for the whole
+# table.
 class Characters::RollsController < ApplicationController
   include CharacterScoped
 
