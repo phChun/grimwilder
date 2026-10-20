@@ -1,0 +1,32 @@
+<%# locals: (character:, roll:, editable:) %>
+<%# The sheet's newest action or defense roll, shown right where it was made. %>
+<section id="last-roll" class="panel last-roll" aria-labelledby="last-roll-title" aria-live="polite">
+  <div class="last-roll__head">
+    <h2 id="last-roll-title" class="panel__title">Last roll: <%= roll.stat.capitalize %> <%= roll.kind %></h2>
+    <span class="last-roll__when"><%= time_ago_in_words(roll.created_at) %> ago</span>
+  </div>
+  <p class="last-roll__setup"><%= roll_setup(roll) %></p>
+  <div class="tray"><%= roll_dice_tags(roll) %></div>
+  <p class="tray__summary"><%= roll_summary(roll) %></p>
+
+  <div class="<%= class_names("result", "result--compact", "result--#{roll.outcome}") %>">
+    <p class="result__name"><%= roll.outcome.capitalize %><%= " · critical" if roll.critical? %></p>
+    <p class="result__text"><%= roll_result_text(roll) %></p>
+    <% if roll.critical? %>
+      <div class="critical">
+        <p>Pick one: <strong>Greater effect</strong> (drop 1d from the task pool before rolling), <strong>Secondary effect</strong> (gain another related perfect), or <strong>Setup</strong> (a riskless assist on a follow-up). If nothing comes to mind, take spark.</p>
+        <% if editable && character.can_take_spark_for?(roll) %>
+          <%= button_to "Nothing fits: take spark", character_roll_critical_spark_path(character, roll), class: "button button--small critical__spark" %>
+        <% elsif !roll.spark_gained? && character.spark >= Grimwild::MAX_SPARK %>
+          <p class="field__hint"><%= character.name %> already holds <%= Grimwild::MAX_SPARK %> spark.</p>
+        <% end %>
+      </div>
+    <% end %>
+    <% if roll.assists.any? && roll.outcome != "perfect" %>
+      <p class="roll-outcome__assists"><%= roll.assists.pluck("name").to_sentence %> assisted, so the impact move can hit them too.</p>
+    <% end %>
+    <% if (note = roll_spark_note(roll)) %>
+      <p class="roll-outcome__spark"><%= note %></p>
+    <% end %>
+  </div>
+</section>

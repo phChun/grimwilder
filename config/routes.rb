@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
   resources :characters do
     scope module: :characters do
-      resources :rolls, only: %i[ new create show ] do
+      resources :rolls, only: :create do
         resource :critical_spark, only: :create, module: :rolls
       end
       resource :experience, only: :create
@@ -60,6 +60,7 @@ Rails.application.routes.draw do
         resource :ending, only: %i[ new create ], module: :scenes
       end
       resources :notes, only: :create
+      resources :messages, only: :create
       resource :rest, only: :create
       resource :downtime, only: %i[ new create ]
 

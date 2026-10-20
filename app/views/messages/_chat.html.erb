@@ -1,0 +1,29 @@
+<%# locals: (campaign:, messages:, speakers:, speaker: nil) %>
+<%# speakers: the characters you can speak as (your own, seated here); speaker: the one chosen first. %>
+<%= turbo_stream_from campaign, :chat %>
+
+<div class="chat">
+  <div class="chat__scroller">
+    <div>
+      <ol id="chat_messages" class="chat__lines" aria-live="polite" aria-label="Chat messages"><%= render partial: "messages/message", collection: messages, as: :message %></ol>
+      <p class="empty chat__empty">No messages yet. Say hello to the table.</p>
+    </div>
+  </div>
+
+  <%= form_with url: campaign_messages_path(campaign), class: "chat__form", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
+    <% if speakers.any? %>
+      <label class="visually-hidden" for="chat_character_<%= campaign.id %>">Speak as</label>
+      <select id="chat_character_<%= campaign.id %>" name="character_id" class="field__input field__input--small chat__as">
+        <option value=""><%= Current.identity.display_name %></option>
+        <% speakers.each do |character| %>
+          <%= tag.option character.name, value: character.id, selected: character == speaker %>
+        <% end %>
+      </select>
+    <% end %>
+    <div class="chat__compose">
+      <label class="visually-hidden" for="chat_body_<%= campaign.id %>">Message</label>
+      <textarea id="chat_body_<%= campaign.id %>" name="body" rows="1" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Message the table…" class="field__input chat__input" data-chat-form-target="body"></textarea>
+      <button type="submit" class="button button--small button--primary">Send</button>
+    </div>
+  <% end %>
+</div>

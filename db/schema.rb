@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_16_220000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_17_100000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -90,6 +90,20 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_220000) do
     t.index ["campaign_id", "identity_id"], name: "index_memberships_on_campaign_id_and_identity_id", unique: true
     t.index ["campaign_id"], name: "index_memberships_on_campaign_id"
     t.index ["identity_id"], name: "index_memberships_on_identity_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.integer "identity_id", null: false
+    t.integer "character_id"
+    t.string "name", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "created_at"], name: "index_messages_on_campaign_id_and_created_at"
+    t.index ["campaign_id"], name: "index_messages_on_campaign_id"
+    t.index ["character_id"], name: "index_messages_on_character_id"
+    t.index ["identity_id"], name: "index_messages_on_identity_id"
   end
 
   create_table "passkeys", force: :cascade do |t|
@@ -238,6 +252,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_16_220000) do
   add_foreign_key "characters", "identities"
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"
+  add_foreign_key "messages", "campaigns", on_delete: :cascade
+  add_foreign_key "messages", "characters", on_delete: :nullify
+  add_foreign_key "messages", "identities"
   add_foreign_key "passkeys", "identities"
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade

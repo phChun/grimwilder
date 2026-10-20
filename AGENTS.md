@@ -54,7 +54,7 @@ app/
   views/
     layouts/application.html.erb
     pages/home.html.erb
-    rolls/show.html.erb    # reactive template (herb:state)
+    rolls/show.html.erb    # the anonymous /roll page: reactive template (herb:state)
 config/initializers/reactionview.rb  # intercept_erb + slots on
 test/javascript/dice.test.mjs
 .herb.yml                  # framework: actionview, template_engine: herb
@@ -179,8 +179,8 @@ In JavaScript:
 - **Roll** is one entry in a campaign's log: an `action` or `defense` roll from a character sheet, a `story` roll, a `quarrel`, a `montage`, or a `pool` roll, drop-first or push.
 - **Power pools** (pg. 19): `Pool#roll!(as_action: true, thorns:, character:, spend_spark:)` rolls the pool as an action roll in place of a stat. The highest die is the `outcome`, then 1–3s drop. Spark dice count toward the result but never drop or join the pool, and they're stored after the pool's own dice in the Roll's `dice` (the last `spark_spent` of them). A disaster gives the character spark. A plain roll is the use that isn't risky: it works, and dice still drop. Names are copied in when the roll is made, so the log survives renames and deletes. Rolls on hidden pools are `gm_only`.
 - `Character#roll!(stat, by:, mode:, spend_spark:, help:, assists:, thorns:)` (in `Character::Rolling`) does everything in one transaction: it spends spark (+1d each), rolls 1d for each assisting character (pg. 13; stored in `assists` and counted via `Roll#all_dice`, so an assist can set the result or make a critical), adds damage thorns, clears the stat's mark, gives spark on a disaster (capped at `Grimwild::MAX_SPARK`), and records the Roll. Unseated characters' rolls are kept but have no campaign, so they aren't logged.
-- The sheet links to `characters/:id/rolls/new?stat=…` (setup), which posts to `create` and lands on the result (`show`).
-- A critical where no effect fits gives spark (`Character#take_spark_for_critical!`, from a button on the result page): owner only, once, on the character's latest roll, below 2 spark. It sets `spark_gained` on the Roll, which then reads "Critical: nothing fit…" instead of "Disaster…".
+- Rolls happen on the sheet. Each stat card's Roll button is a `<details class="stat-roll" name="stat-roll">` (one open at a time; the open card spans the stat grid's row) holding the setup form (`characters/_roll_form`). It posts to `characters/:id/rolls#create`, which redirects back to the sheet; the morph refresh closes the setup and shows the result in the "Last roll" card (`characters/_last_roll`, the character's newest action/defense roll). There are no separate setup or result pages any more.
+- A critical where no effect fits gives spark (`Character#take_spark_for_critical!`, from a button on the sheet's Last roll card): owner only, once, on the character's latest roll, below 2 spark. It sets `spark_gained` on the Roll, which then reads "Critical: nothing fit…" instead of "Disaster…".
 - Updating a Roll replaces its log entry live, the same way new rolls are prepended.
 - **Story rolls** (`Roll.story!`, in `Roll::Story`; pg. 16) come from the campaign page: 1d/2d/3d for bad/even/good odds, rare thorns, and a `question`. They're made for one of your own seated characters (spark can go in, and a disaster gives spark) or for no one. `stat_dice` holds the odds.
 - **Quarrels** (`Roll.quarrel!`, in `Roll::Quarrel`; pg. 23) have their own page. Each side rolls 2d plus any spark, and each assist rolls its own 1d (pg. 13). The highest die wins, and a tie has no `winner`. Everyone involved takes spark. Sides go in the `sides` JSON and the stakes in `question`. Any member can record a quarrel, but only a character's own player can spend its spark (the `SparkSpending` controller concern).
@@ -189,9 +189,17 @@ In JavaScript:
 - Live updates: `Roll` prepends `rolls/_roll` to `#roll_log` over `[campaign, :rolls]`, or over `[campaign, :gm_rolls]` for GM-only rolls. The GM table renders `rolls/_log` (locals `campaign:`, `membership:`, `rolls:`: the list only, no heading), which subscribes to `Roll.streams_for(campaign, membership)` itself; load the entries with `campaign.rolls.table_log(membership)`. `rolls/_roll` renders in a job, so it must not use `Current`.
 - In tests, `assert_no_turbo_stream_broadcasts` counts every broadcast so far in the test, not just the ones inside its block. `FixedDice` (test/test_helpers) stands in for `Random`.
 
+## Table chat
+
+- **`Message`** (`messages`): `campaign`, `identity`, optional `character` (speaking in character), `name` (copied in), `body` (≤ 500 characters). It's separate from the roll log on purpose, so talk never buries rolls; log notes (`Roll.note!`) still exist for one-line game events.
+- Anyone at the table posts (`POST /campaigns/:id/messages`, `Campaigns::MessagesController`), as themselves or one of their own characters seated there; the model validates that too.
+- Live: `after_create_commit` broadcasts (synchronously, for chat latency) an append of `messages/_message` to `#chat_messages` over `[campaign, :chat]`. The sender sees their line the same way, so a Turbo submit gets `204`, and `chat_form_controller.js` clears the box (Enter sends, Shift+Enter is a new line). `messages/_message` renders outside requests: no `Current`.
+- `messages/_chat` (locals `campaign:`, `messages:`, `speakers:`, `speaker:`) is on the GM table (`#chat`) and in the character view's rail. `Message.chat_for(campaign)` gives the newest 40, oldest first. Newest is at the bottom; a `column-reverse` scroller keeps it pinned without JS.
+- Times are `<time datetime>` shown in the viewer's zone by `local_time_controller.js` (re-run after a morph); the server fallback is UTC.
+
 ## The GM table (campaigns#show)
 
-The campaign page is where play runs, for the GM and players alike. Three columns from 1100px wide (side: At the table, Roll log, Invite & settings; main: Pools, Story roll; tools: Crucibles), two from 768px, and one on phones with section tabs.
+The campaign page is where play runs, for the GM and players alike. Three columns from 1100px wide (side: At the table, Roll log, Chat, Invite & settings; main: Pools, Story roll; tools: Crucibles), two from 768px, and one on phones with section tabs.
 - Every section is a native `<details>`. `details_memory_controller.js` remembers open/closed per browser in localStorage (keyed by campaign and section). With nothing saved, phones open only Pools. It also restores what people opened after a Turbo morph, because a pool refresh re-renders the page with the server's defaults.
 - `CampaignTable#load_table` (a controller concern) loads everything. `Campaigns::PoolsController#create` uses it too, to show the table again with the form open when a pool doesn't save.
 - **Pools** are compact rows (`campaigns/pools/_pool`). The ⋯ fold-out holds drop-first, push, the power-pool action roll and the GM controls. `GET /campaigns/:id/pools` and `/pools` (the home page's Pools card) redirect to `#pools`, and pool actions redirect back to the table. The new-pool form (`campaigns/pools/_form`) keeps its own herb:state.
@@ -259,7 +267,8 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 - Book reference lists (paths with core talents, the 18 backgrounds with their wises, traits, desires, weapon styles, bond words, arcs) live in `config/grimwild.yml` and are read through the `Grimwild` module.
 - Stats are 1–3 each and must total 8 on create. Detail lists (backgrounds, traits, features, bonds…) are json columns; the model setters clean and cap them, and accept Rails' `{"0"=>…}` nested form hashes.
 - `Character::Damage`: marks per stat, bloodied/rattled/desperate, conditions, and `damage_thorns(stat)`. `roll!(stat)` clears that stat's mark. `Character::Advancement`: XP fills level+1 boxes, then levels up (max 7).
-- **Roll from the sheet:** POST `/characters/:id/rolls?stat=agility` redirects to `/roll?dice=&thorns=&for=&reasons=&character_id=`. `roller_controller.js` reads `data-roller-dice/thorns-value` and sets the herb state.
+- **Roll from the sheet:** see *Table rolls & the log*. The setup folds open on the stat card and the result shows in the sheet's Last roll card.
+- **The character view** (`characters#show`, `.play-view`): the sheet's play and story columns, plus, for a seated character, a rail with the table's live Roll log (`rolls/_log`, newest 20) and Chat. Phones stack play, rail, story; from 60rem the rail sits beside the sheet (sticky); from 90rem play, story and rail get a column each. The rail's sections are `<details>` remembered by `details-memory` as `sheet-log` / `sheet-chat`. An unseated character gets `.play-view--solo` and no rail.
 - Quick changes on the sheet (marks, harm, spark, thread) are `button_to` PATCHes with `quick: 1`, with morph refreshes on the page.
 - Herb linter false positive: a hash key with a state's name (`@preset[:thorns]` on the roll page) counts as reading the state. Rename the key (`:damage_thorns`).
 - Not yet: a talent catalog (talents are free text plus the path's core talent), path-specific sheet parts, spending spark straight into a roll, and auto-taking spark on a disaster.

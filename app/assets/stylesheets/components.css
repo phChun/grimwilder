@@ -650,11 +650,46 @@ form.button_to, .button_to { margin: 0; }
 .field__input--small { min-height: 2.25rem; font-size: 0.95rem; }
 .field__input--short { width: 6rem; }
 
-.sheet { display: grid; gap: var(--space-5); align-items: start; }
+/* The character view: the sheet's play and story columns, plus the table's
+   log and chat in a rail. Phones stack play, rail, story; mid widths put the
+   rail beside the sheet; wide screens give each its own column. */
+.site-main:has(.play-view) { max-width: 96rem; }
+
+.play-view { display: flex; flex-direction: column; gap: var(--space-5); }
+.play-view .sheet__play { order: 1; }
+.play-view__rail { order: 2; display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.play-view .sheet__story { order: 3; }
 
 @media (min-width: 60rem) {
-  .sheet { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+  .play-view {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    grid-template-areas: "play rail" "story rail";
+    align-items: start;
+  }
+  .play-view .sheet__play { grid-area: play; }
+  .play-view .sheet__story { grid-area: story; }
+  .play-view__rail {
+    grid-area: rail;
+    position: sticky;
+    top: var(--space-4);
+    max-height: calc(100vh - 2 * var(--space-4));
+    overflow-y: auto;
+  }
+  .play-view--solo { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas: "play story"; }
 }
+
+@media (min-width: 90rem) {
+  .play-view {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(20rem, 24rem);
+    grid-template-areas: "play story rail";
+  }
+}
+
+.play-view__table { margin: 0; font-size: 0.9rem; }
+.play-view__scroll { max-height: 26rem; overflow-y: auto; }
+.play-view__log .log-entry { padding-block: var(--space-2); }
+.play-view__log .log-entry__result { font-size: 1.05rem; }
 
 .sheet__play,
 .sheet__story { display: grid; gap: var(--space-5); }
@@ -726,6 +761,46 @@ form.button_to, .button_to { margin: 0; }
 .stat-card { display: flex; flex-direction: column; }
 .stat-card > .button_to:last-child { margin-top: auto; }
 .stat-card .toggle { align-self: flex-start; }
+
+/* Rolling from a stat card: the setup folds open in place, and the open card
+   takes the whole row so the form has room. One open at a time. */
+.stat-card:has(.stat-roll[open]) { grid-column: 1 / -1; border-color: var(--line-strong); }
+.stat-roll { margin-top: auto; }
+.stat-roll > summary { list-style: none; cursor: pointer; }
+.stat-roll > summary::-webkit-details-marker { display: none; }
+.stat-roll[open] > summary { background: var(--paper-sunken); border-color: var(--line-strong); color: var(--ink); }
+.stat-roll__form { display: grid; gap: var(--space-4); margin-top: var(--space-3); }
+.stat-roll__group { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
+.stat-roll__assists { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.stat-roll__numbers { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.stat-roll__form .field__hint { margin: 0; }
+
+/* The sheet's newest roll. */
+.last-roll { display: grid; gap: var(--space-2); }
+.last-roll__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-3); }
+.last-roll__when { font-size: 0.85rem; color: var(--ink-faint); }
+.last-roll__setup { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+.last-roll .tray__summary { margin: 0; }
+.result--compact { margin-top: 0; padding: var(--space-3) var(--space-4); }
+.result--compact .result__name { font-family: var(--font-display); font-size: 1.8rem; line-height: 1.1; }
+
+/* Table chat: newest at the bottom. A column-reverse scroller stays pinned to
+   the newest line as lines arrive, with no script. */
+.chat { display: grid; gap: var(--space-3); }
+.chat__scroller { display: flex; flex-direction: column-reverse; max-height: 22rem; overflow-y: auto; }
+.chat__lines { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.chat__lines:has(li) + .chat__empty { display: none; }
+.chat__empty { margin: 0; }
+.chat-line { display: grid; gap: 2px; }
+.chat-line__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); margin: 0; font-size: 0.85rem; }
+.chat-line__who { color: var(--ink); }
+.chat-line__player,
+.chat-line__time { color: var(--ink-faint); }
+.chat-line__body { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.chat__form { display: grid; gap: var(--space-2); margin: 0; }
+.chat__as { max-width: 100%; }
+.chat__compose { display: flex; gap: var(--space-2); align-items: flex-end; }
+.chat__input { flex: 1; min-width: 0; min-height: 2.5rem; max-height: 8rem; resize: vertical; field-sizing: content; }
 
 /* ---------- Talents ---------- */
 
@@ -872,15 +947,16 @@ form.button_to, .button_to { margin: 0; }
 }
 .gm-table__tab:hover { background: var(--paper-sunken); color: var(--ink); }
 
-/* One column on phones, in play order: pools, crucibles, table, log, story roll, settings. */
+/* One column on phones, in play order: pools, crucibles, table, log, chat, story roll, settings. */
 .gm-table__columns { display: flex; flex-direction: column; gap: var(--space-3); }
 .gm-table__column { display: contents; }
 .gm-table__pools { order: 1; }
 .gm-table__crucibles { order: 2; }
 .gm-table__seats { order: 3; }
 .gm-table__log { order: 4; }
-.gm-table__story { order: 5; }
-.gm-table__settings { order: 6; }
+.gm-table__chat { order: 5; }
+.gm-table__story { order: 6; }
+.gm-table__settings { order: 7; }
 
 @media (min-width: 48rem) {
   .gm-table__tabs { display: none; }

@@ -1,0 +1,9 @@
+<%# locals: (message:) %>
+<li id="<%= dom_id(message) %>" class="chat-line" data-identity="<%= message.identity_id %>">
+  <p class="chat-line__head">
+    <strong class="chat-line__who"><%= message.name %></strong>
+    <% if message.character_id %><span class="chat-line__player"><%= message.identity.display_name %></span><% end %>
+    <time class="chat-line__time" datetime="<%= message.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= message.created_at.utc.strftime("%H:%M UTC") %></time>
+  </p>
+  <p class="chat-line__body"><%= message.body %></p>
+</li>

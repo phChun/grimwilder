@@ -21,13 +21,13 @@ class TableLogTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select "#roll_log > li", 0
-    assert_select "turbo-cable-stream-source", 3, "pool and table refreshes, plus the open log"
+    assert_select "turbo-cable-stream-source", 4, "pool and table refreshes, the open log and the chat"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
     assert_select "#roll_log > li", 1
-    assert_select "turbo-cable-stream-source", 4, "pool and table refreshes, plus both logs"
+    assert_select "turbo-cable-stream-source", 5, "pool and table refreshes, both logs and the chat"
   end
 
   test "the table shows the newest #{CampaignTable::LOG_SIZE} log entries" do
@@ -69,7 +69,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
     roll = tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 6, 6, 2 ]))
 
     sign_in_as identities(:pip)
-    get character_roll_path(tibbs, roll)
+    get character_path(tibbs)
     assert_select "form[action=?] button", character_roll_critical_spark_path(tibbs, roll), text: "Nothing fits: take spark"
 
     perform_enqueued_jobs do
@@ -77,12 +77,12 @@ class TableLogTest < ActionDispatch::IntegrationTest
         post character_roll_critical_spark_path(tibbs, roll)
       end
     end
-    assert_redirected_to character_roll_path(tibbs, roll)
+    assert_redirected_to character_path(tibbs)
     assert_equal 2, tibbs.reload.spark
 
     follow_redirect!
     assert_select "form[action=?]", character_roll_critical_spark_path(tibbs, roll), count: 0
-    assert_select ".roll-outcome__spark", "Critical: nothing fit, so Gibbletibble \"Tibbs\" takes spark."
+    assert_select "#last-roll .roll-outcome__spark", "Critical: nothing fit, so Gibbletibble \"Tibbs\" takes spark."
 
     post character_roll_critical_spark_path(tibbs, roll)
     assert_equal 2, tibbs.reload.spark

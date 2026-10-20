@@ -1,0 +1,68 @@
+<%# locals: (character:, stat:, allies:) %>
+<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"). %>
+<% damage = character.damage_reasons(stat) %>
+<% prefix = "roll_#{stat}" %>
+<details class="stat-roll" name="stat-roll">
+  <summary class="button button--primary button--small stat-card__roll">Roll <%= character.stat(stat) %>d<%= " +#{damage.size}t" if damage.any? %></summary>
+
+  <%= form_with url: character_rolls_path(character), class: "stat-roll__form" do %>
+    <input type="hidden" name="stat" value="<%= stat %>">
+
+    <fieldset class="segmented">
+      <legend class="visually-hidden">Roll type</legend>
+      <label class="segmented__option">
+        <input type="radio" name="mode" value="action" checked>
+        <span>Action</span>
+      </label>
+      <label class="segmented__option">
+        <input type="radio" name="mode" value="defense">
+        <span>Defense</span>
+      </label>
+    </fieldset>
+
+    <% if damage.any? %>
+      <p class="field__hint">+<%= damage.size %>t from damage (<%= damage.to_sentence %>), already counted.</p>
+    <% end %>
+
+    <% if character.spark.positive? %>
+      <fieldset class="stat-roll__group">
+        <legend class="field__label">Spend spark <small>+1d each</small></legend>
+        <div class="segmented segmented--auto">
+          <% (0..character.spark).each do |amount| %>
+            <label class="segmented__option">
+              <%= radio_button_tag :spark, amount, amount.zero?, id: "#{prefix}_spark_#{amount}" %>
+              <span><%= amount %></span>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
+    <% end %>
+
+    <% if allies.any? %>
+      <fieldset class="stat-roll__group">
+        <legend class="field__label">Assists <small>1d each, shares the risk</small></legend>
+        <div class="stat-roll__assists">
+          <% allies.each do |ally| %>
+            <label class="check">
+              <%= check_box_tag "assists[]", ally.id, false, id: "#{prefix}_assist_#{ally.id}" %>
+              <%= ally.name %>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
+    <% end %>
+
+    <div class="stat-roll__numbers">
+      <div class="field">
+        <label class="field__label" for="<%= prefix %>_help">Extra dice <small>d6</small></label>
+        <input type="number" id="<%= prefix %>_help" name="help" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number" title="From talents, or outside help like an NPC or the scene">
+      </div>
+      <div class="field">
+        <label class="field__label" for="<%= prefix %>_thorns">Thorns <small>d8</small></label>
+        <input type="number" id="<%= prefix %>_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number" title="One per difficulty factor; typical play is 0–2">
+      </div>
+    </div>
+
+    <button type="submit" class="button button--primary">Roll <%= stat.capitalize %></button>
+  <% end %>
+</details>

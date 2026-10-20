@@ -20,13 +20,18 @@
   <p class="flash flash--alert"><%= @character.errors.full_messages.to_sentence %></p>
 <% end %>
 
-<div class="sheet">
+<% campaign = @character.campaign %>
+<%# The sheet's two columns, plus the table's log and chat beside them for a seated character. %>
+<div class="<%= class_names("play-view", "play-view--solo": !campaign) %>" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign&.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
   <div class="sheet__play">
+    <% if @last_roll %>
+      <%= render "characters/last_roll", character: @character, roll: @last_roll, editable: editable %>
+    <% end %>
+
     <section class="panel stack" aria-labelledby="sheet-stats">
       <h2 id="sheet-stats" class="panel__title">Stats</h2>
       <div class="stat-grid">
         <% Grimwild.stats.each do |stat, description| %>
-          <% thorns = @character.damage_thorns(stat) %>
           <div class="<%= class_names("stat-card", "stat-card--marked": @character.marked?(stat)) %>">
             <div class="stat-card__top">
               <span class="stat-card__name"><%= stat.capitalize %></span>
@@ -35,7 +40,7 @@
             <p class="stat-card__desc"><%= description %></p>
             <% if editable %>
               <%= button_to (@character.marked?(stat) ? "Marked" : "Mark"), character_path(@character), method: :patch, params: { quick: 1, character: { "marked_#{stat}" => !@character.marked?(stat) } }, class: "toggle", "aria-pressed": @character.marked?(stat).to_s, title: "A mark adds +1t to the next roll with this stat, then clears" %>
-              <%= link_to "Roll #{@character.stat(stat)}d#{" +#{thorns}t" if thorns.positive?}", new_character_roll_path(@character, stat: stat), class: "button button--primary button--small stat-card__roll" %>
+              <%= render "characters/roll_form", character: @character, stat: stat, allies: @allies %>
             <% elsif @character.marked?(stat) %>
               <span class="tag">Marked</span>
             <% end %>
@@ -200,4 +205,28 @@
       </section>
     <% end %>
   </div>
+
+  <% if campaign %>
+    <aside class="play-view__rail" aria-label="<%= campaign.name %> table">
+      <p class="play-view__table"><%= link_to "#{campaign.name} table", campaign_path(campaign) %></p>
+
+      <details id="sheet-log" class="fold fold--panel play-view__log" open data-details-memory-target="section" data-section="sheet-log" data-phone-open="true">
+        <summary class="fold__summary">
+          <span class="fold__title">Roll log</span>
+          <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
+        </summary>
+        <div class="play-view__scroll">
+          <%= render "rolls/log", campaign: campaign, membership: @membership, rolls: @log_rolls %>
+        </div>
+      </details>
+
+      <details id="sheet-chat" class="fold fold--panel play-view__chat" open data-details-memory-target="section" data-section="sheet-chat" data-phone-open="true">
+        <summary class="fold__summary">
+          <span class="fold__title">Chat</span>
+          <span class="live"><span class="live__dot" aria-hidden="true"></span>Live</span>
+        </summary>
+        <%= render "messages/chat", campaign: campaign, messages: @messages, speakers: @speakers, speaker: (@character if editable) %>
+      </details>
+    </aside>
+  <% end %>
 </div>

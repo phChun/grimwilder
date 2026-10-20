@@ -39,6 +39,7 @@
     <a href="#crucibles" class="gm-table__tab" data-action="details-memory#jump">Crucibles</a>
     <a href="#table" class="gm-table__tab" data-action="details-memory#jump">Table</a>
     <a href="#roll-log" class="gm-table__tab" data-action="details-memory#jump">Log</a>
+    <a href="#chat" class="gm-table__tab" data-action="details-memory#jump">Chat</a>
   </nav>
 
   <div class="gm-table__columns">
@@ -104,6 +105,14 @@
           <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="Add a note to the log">
           <button type="submit" class="button button--small">Note</button>
         <% end %>
+      </details>
+
+      <details id="chat" class="fold fold--panel gm-table__chat" open data-details-memory-target="section" data-section="chat">
+        <summary class="fold__summary">
+          <span class="fold__title">Chat</span>
+          <span class="live fold__meta--wide"><span class="live__dot" aria-hidden="true"></span>Live</span>
+        </summary>
+        <%= render "messages/chat", campaign: Current.campaign, messages: @messages, speakers: @my_characters, speaker: nil %>
       </details>
 
       <%= tag.details id: "settings", class: "fold fold--panel gm-table__settings", open: Current.campaign.errors.any?, data: { details_memory_target: "section", section: "settings" } do %>

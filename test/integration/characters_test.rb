@@ -41,27 +41,31 @@ class CharactersTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get character_path(@tibbs)
-    assert_select "a[href=?]", new_character_roll_path(@tibbs, stat: "agility"), text: "Roll 3d +1t"
-
-    get new_character_roll_path(@tibbs, stat: "agility")
-    assert_response :success
-    assert_select "input[name=spark]", 2, "0 or the 1 spark Tibbs holds"
-    assert_select ".page-header__lede", /\+1t from damage \(marked\)/
-    assert_select "input[name='assists[]'][value=?]", characters(:bram).id.to_s
+    assert_select ".stat-card details.stat-roll", 4
+    assert_select "details.stat-roll summary", text: "Roll 3d +1t"
+    assert_select "details.stat-roll form[action=?]", character_rolls_path(@tibbs) do |forms|
+      agility = forms.find { _1.at_css("input[name=stat][value=agility]") }
+      assert_equal 2, agility.css("input[name=spark]").size, "0 or the 1 spark Tibbs holds"
+      assert_match(/\+1t from damage \(marked\)/, agility.text)
+      assert agility.at_css("input[name='assists[]'][value='#{characters(:bram).id}']")
+    end
+    assert_select "#last-roll", 0, "no roll yet"
 
     assert_difference -> { @tibbs.rolls.count }, 1 do
       post character_rolls_path(@tibbs), params: { stat: "agility", mode: "defense", spark: 1, help: 1, thorns: 2, assists: [ characters(:bram).id ] }
     end
     roll = @tibbs.rolls.last
-    assert_redirected_to character_roll_path(@tibbs, roll)
+    assert_redirected_to character_path(@tibbs)
     assert_equal [ "defense", 5, 3 ], [ roll.kind, roll.dice.size, roll.thorns.size ]
     assert_equal [ "Bram" ], roll.assists.pluck("name")
     assert_not @tibbs.reload.marked_agility?
 
     follow_redirect!
-    assert_select ".result__name", roll.outcome.capitalize
-    assert_select ".page-header__lede", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
-    assert_select ".tray .die--assist[title=Bram]", 1
+    assert_select "#last-roll .panel__title", "Last roll: Agility defense"
+    assert_select "#last-roll .result__name", /\A#{roll.outcome.capitalize}/
+    assert_select "#last-roll .last-roll__setup", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
+    assert_select "#last-roll .tray .die--assist[title=Bram]", 1
+    assert_select "#roll_log ##{ActionView::RecordIdentifier.dom_id(roll)}", 1, "the table's log sits beside the sheet"
   end
 
   test "only characters seated alongside can assist" do
@@ -110,8 +114,6 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
 
     post character_rolls_path(@tibbs), params: { stat: "agility" }
-    assert_response :not_found
-    get new_character_roll_path(@tibbs, stat: "agility")
     assert_response :not_found
   end
 

@@ -1,5 +1,5 @@
 # Everything the GM table (campaigns#show) shows: who's at the table, pools,
-# the newest log entries and the crucibles. Pool actions that fail validation
+# the newest log entries, the chat and the crucibles. Pool actions that fail validation
 # show the table again, so they load it too.
 module CampaignTable
   LOG_SIZE = 8
@@ -13,6 +13,7 @@ module CampaignTable
       @talent_pools = Current.campaign.pools.talent.includes(:last_rolled_by).ordered.group_by(&:character_id)
       @pool ||= Current.campaign.pools.new(starting_size: 4)
       @rolls = Current.campaign.rolls.table_log(Current.membership, limit: LOG_SIZE)
+      @messages = Message.chat_for(Current.campaign)
       @crucible_groups = Crucible.grouped
       @session = Current.campaign.current_session
     end

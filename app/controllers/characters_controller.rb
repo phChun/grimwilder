@@ -1,4 +1,6 @@
 class CharactersController < ApplicationController
+  LOG_SIZE = 20
+
   require_authentication
 
   before_action :set_character, only: %i[ show edit update destroy ]
@@ -8,7 +10,10 @@ class CharactersController < ApplicationController
     @characters = Current.identity.characters.includes(:campaign).ordered
   end
 
+  # The sheet is where a player plays: rolls fold open on the stat cards, and
+  # a seated character's sheet also shows the table's roll log and chat.
   def show
+    load_play
   end
 
   def new
@@ -32,6 +37,7 @@ class CharactersController < ApplicationController
     if @character.update(character_params)
       redirect_to @character
     else
+      load_play if params[:quick]
       render (params[:quick] ? :show : :edit), status: :unprocessable_entity
     end
   end
@@ -42,6 +48,19 @@ class CharactersController < ApplicationController
   end
 
   private
+    # The sheet's newest roll, and for a seated character the table around it.
+    def load_play
+      @last_roll = @character.rolls.where(kind: Character::Rolling::MODES).recent.first
+      @allies = @character.campaign ? @character.campaign.characters.excluding(@character).ordered : []
+
+      if (campaign = @character.campaign)
+        @membership = Current.identity.memberships.find_by!(campaign: campaign)
+        @log_rolls = campaign.rolls.table_log(@membership, limit: LOG_SIZE)
+        @messages = Message.chat_for(campaign)
+        @speakers = Current.identity.characters.where(campaign: campaign).ordered
+      end
+    end
+
     def set_character
       @character = Character.visible_to(Current.identity).find(params[:id])
     end
