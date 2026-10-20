@@ -1,0 +1,12 @@
+<%# locals: (campaign:) %>
+<%# "Live now" while a session is open. It's broadcast to everyone over [campaign, :live], so it reads nothing per viewer: the link goes through campaign_play_path, which sends the GM to the table and a player to their sheet. %>
+<% if (session = campaign.current_session) %>
+  <% scene = session.current_scene %>
+  <%= link_to campaign_play_path(campaign), class: "live-banner" do %>
+    <span class="live-banner__now"><span class="live-banner__dot" aria-hidden="true"></span>Live now</span>
+    <span class="live-banner__where">
+      <%= session.title %><% if scene %> · Scene <%= scene.number %>, <%= scene.title %><% end %> · <%= session.characters.size %> at the table
+    </span>
+    <span class="live-banner__go">Back to the table <%= icon(:send, size: 14) %></span>
+  <% end %>
+<% end %>

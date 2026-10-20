@@ -53,9 +53,18 @@ class Campaign < ApplicationRecord
     broadcast_table_refresh
   end
 
-  # Boundaries (a session starting, a rest) change what everyone's table shows.
+  # Boundaries (a session starting, a rest) change what everyone's table shows,
+  # and the live banner on every other campaign page. The banner has its own
+  # stream so pages that don't morph never reload for it.
   def broadcast_table_refresh
-    ActiveRecord.after_all_transactions_commit { broadcast_refresh_later_to(self, :table) }
+    ActiveRecord.after_all_transactions_commit do
+      broadcast_refresh_later_to(self, :table)
+      broadcast_update_later_to(self, :live, target: live_banner_id, partial: "campaigns/live_banner", locals: { campaign: self })
+    end
+  end
+
+  def live_banner_id
+    ActionView::RecordIdentifier.dom_id(self, :live_banner)
   end
 
   private

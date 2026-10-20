@@ -42,11 +42,13 @@ export default class extends Controller {
     this.trayTarget.replaceChildren(...d6s, ...d8s)
   }
 
+  // Matches shared/_die: a d6 carries its own result's tier for when it's lit.
   die(value, kind, modifier) {
     const el = document.createElement("span")
-    el.className = ["die", `die--${kind}`, modifier].filter(Boolean).join(" ")
+    const tier = kind === "d6" ? (value === 6 ? "perfect" : value >= 4 ? "messy" : "grim") : null
+    el.className = ["die", `die--${kind}`, tier && `die--${tier}`, modifier].filter(Boolean).join(" ")
     el.textContent = value
-    el.setAttribute("aria-label", `${kind} showing ${value}`)
+    el.setAttribute("aria-label", `${kind === "d8" ? "thorn" : kind} showing ${value}`)
     el.style.setProperty("--delay", `${Math.random() * 120}ms`)
     return el
   }

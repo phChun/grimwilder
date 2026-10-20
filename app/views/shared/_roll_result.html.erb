@@ -1,0 +1,10 @@
+<%# locals: (roll:, size: 44, heading: nil) %>
+<%# An action, defense, story or power-pool roll: the dice, the result word and a one-line reason ("Messy, cut to grim by a thorn"). Renders outside requests too (log broadcasts), so no Current. %>
+<div class="<%= class_names("roll-result", "roll-result--#{size}", "roll-result--#{roll_result_tier(roll)}") %>">
+  <% if heading %><div class="roll-result__heading"><%= heading %></div><% end %>
+  <div class="roll-result__row">
+    <div class="roll-result__dice"><%= roll_dice_tags(roll, size: size) %></div>
+    <div class="roll-result__word"><%= roll_result_word(roll) %></div>
+  </div>
+  <p class="roll-result__reason"><%= roll_reason(roll) %></p>
+</div>

@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Grimwilder">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="dark">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -16,10 +16,6 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Zilla+Slab:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 
     <%# List stylesheets explicitly: Herb compiles stylesheet_link_tag to a static <link> via stylesheet_path, which doesn't understand Propshaft's :app shorthand. %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -30,34 +26,14 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="site-header">
-      <div class="site-header__inner">
-        <%= link_to root_path, class: "brand" do %>
-          <span class="brand__mark" aria-hidden="true">&#10033;</span>
-          <span class="brand__name">Grimwilder</span>
-        <% end %>
-
-        <nav class="site-nav" aria-label="Toolkit">
-          <% toolkit_nav.each do |item| %>
-            <% if item[:ready] %>
-              <% path = public_send(item[:path]) %>
-              <%= link_to item[:label], path, class: "site-nav__link", "aria-current": (current_page?(path) ? "page" : nil) %>
-            <% else %>
-              <span class="site-nav__link site-nav__link--soon" title="Coming soon"><%= item[:label] %></span>
-            <% end %>
-          <% end %>
-        </nav>
-
-        <nav class="account-nav" aria-label="Account">
-          <% if authenticated? %>
-            <%= link_to "Campaigns", campaigns_path, class: "site-nav__link", "aria-current": (current_page?(campaigns_path) ? "page" : nil) %>
-            <%= link_to Current.identity.display_name, profile_path, class: "site-nav__link account-nav__me" %>
-          <% else %>
-            <%= link_to "Sign in", new_session_path, class: "site-nav__link account-nav__signin" %>
-          <% end %>
-        </nav>
-      </div>
-    </header>
+    <% membership = context_membership %>
+    <%= render "layouts/app_header", membership: membership %>
+    <% if membership %>
+      <%= turbo_stream_from membership.campaign, :live %>
+      <% if live_banner?(membership) %>
+        <div id="<%= membership.campaign.live_banner_id %>"><%= render "campaigns/live_banner", campaign: membership.campaign %></div>
+      <% end %>
+    <% end %>
 
     <main id="main" class="site-main">
       <%= render "shared/flash" %>
@@ -65,6 +41,13 @@
     </main>
 
     <footer class="site-footer">
+      <nav aria-label="Toolkit">
+        <ul class="site-footer__tools">
+          <% toolkit_nav.select { _1[:ready] }.each do |item| %>
+            <li><%= link_to item[:label], public_send(item[:path]) %></li>
+          <% end %>
+        </ul>
+      </nav>
       <p>
         Grimwilder is an unofficial fan toolkit. Rules from
         <cite>Grimwild: Community Edition</cite>, based on <cite>Grimwild</cite> by J.&nbsp;D.&nbsp;Maxwell (Oddity Press),

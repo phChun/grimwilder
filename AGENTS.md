@@ -41,9 +41,10 @@ Run the Herb linter after every template change. Its `herb-state-valid-reads` ru
 
 ```
 app/
+  assets/fonts/             # self-hosted Spectral + IBM Plex woff2 (OFL, licenses alongside)
   assets/stylesheets/
-    application.css        # design tokens (light + dark), base, layout
-    components.css         # buttons, panels, tool cards, roller, dice, results
+    application.css        # @font-face, design tokens (dark only), base, the shell (header, live banner), layout
+    components.css         # buttons, cards, dice, roll results, pool tracks, pips, steppers, and each screen
   controllers/
     pages_controller.rb    # home
     rolls_controller.rb    # /roll (no server logic; all client-side)
@@ -99,6 +100,7 @@ Pattern used here: **the template owns the inputs and the result text; Stimulus 
 **Known gotchas**
 - **Don't use `stylesheet_link_tag :app` or `:all`.** Herb compiles `stylesheet_link_tag` into a static `<link>` built with `stylesheet_path`, so the shorthand becomes a lookup for `app.css` and fails. List each stylesheet by name in the layout. **Adding a new CSS file means adding a new `stylesheet_link_tag` line.**
 - Other tag helpers may get the same static compilation. If a helper does something unusual with its arguments, check the compiled output (the error page shows it).
+- **`link_to` with an interpolated attribute value that contains a space comes out broken**: `"aria-label": "Account: #{name}"` (or `aria: { label: … }`) renders as `aria-label="Account:" gwen=""`. Write that `<a>` by hand (see `layouts/_app_header`); the linter's "prefer link_to" info is wrong there. `button_to` isn't affected.
 - Avoid `<%#=` commented-out output tags; the linter flags them.
 
 ## Grimwild glossary (domain definitions)
@@ -283,14 +285,28 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 - The free-text `talents` column is now "Talent notes", for choices talents ask for (skills, spells, tricks) or homebrew.
 - Not yet: the Monk martial arts style, Rogue thieves' guild, and other optional path builders; legacy talents (pg. 190–191).
 
-## Design system
+## Design system (the night-table direction)
 
-- Tokens are in `:root` in `application.css`, redefined for dark mode under `prefers-color-scheme: dark`. Use the tokens and never hard-code colours in components.
-- Theme: a parchment light mode and a forest-night dark mode.
-- Fonts (Google Fonts): **IM Fell English SC** for display, **Zilla Slab** for body (the book's body font). The book's headers use Inlander Rough, a commercial font; only swap it in if it's licensed.
-- Result colours: `--perfect` green, `--messy` ochre, `--grim` rust, `--disaster` plum. Thorns (d8) are drawn as plum diamonds, d6s as rounded squares. Always show the result's name in text, not just its colour.
-- BEM-style class names (`.roller__controls`, `.die--d8`, `.result--messy`). Mobile first. Keep a 16px gutter and no horizontal scrolling.
-- Accessibility: a skip link, visible `:focus-visible` outlines, `aria-live` on changing results, and `prefers-reduced-motion` respected.
+The UI rethink (brief "Grimwilder: night-table UI", 2026-10-20; mockups in the local, git-ignored `docs/design/ui-rethink/`) is being built in five phases: (1) tokens and shell, (2) character view, (3) GM table, (4) campaign page, (5) chat. Phase 1 is done; screens not yet rebuilt still use their older class names in the new palette.
+
+- **Dark only.** Every color, font and radius is a custom property in `:root` in `application.css`; templates and components use only the variables. The older names (`--paper`, `--ink`, `--moss`, `--font-body`…) are aliases kept until each screen is rebuilt. Don't use them in new work.
+- Fonts are self-hosted through Propshaft (`app/assets/fonts`, `@font-face` in `application.css`): **Spectral** (500, 700, italic 500) for names, headings and in-character speech (`--font-display`); **IBM Plex Sans** (400, 500, 600) for UI (`--font-ui`); **IBM Plex Mono** (500, 600) for dice and counts (`--font-dice`). No Google Fonts.
+- Body text is 15px, line-height 1.5. Every button and input is at least `--tap` (44px) tall; icon-only buttons have an `aria-label`. Icons are inline stroke SVGs from `icon(:name)` (`IconsHelper`), never emoji or glyphs.
+- Results: `--perfect`, `--messy`, `--grim` (plus `--grim-ring`/`--grim-bg`/`--grim-line` for cards), and `--disaster`, which is ours: the palette has no disaster color. Always show the word (Perfect, Messy, Grim, Disaster, Critical) next to the color. Meta-currencies: `--spark` amber circles, `--thread` blue diamonds, `--suspense` purple diamonds.
+- Primary actions are `--ember`. One `.button--primary` per area; `.button` is the outline secondary, `.button--ghost` text only. Buttons and cards are CSS classes (`.button…`, `.card`/`.card--dashed`) because `button_to`, `link_to` and submits all need them; `shared/_card` wraps a block when that's tidier.
+- Page layout: `.fluid` > `.fluid__main` (flex 999 1 640px) + `.fluid__rail` (flex 1 1 340px, max 420px), so the rail drops under the content on a phone. Keep a 16px gutter and no horizontal scrolling at 390px.
+- BEM-style class names. Accessibility: a skip link, `:focus-visible` outlines (`--focus`), `aria-live` on changing results, `prefers-reduced-motion` respected.
+
+**Shared partials** (`app/views/shared`), which every rebuilt screen is assembled from:
+- `_die` (`value:, kind:, state: nil|:highest|:dropped, size: 28|32|44`): a d6 gets its own tier class (`die--perfect/messy/grim`), so the highest die fills with *its* result's color (a 5 cut to grim is still messy-ochre); a d8 is a ring, red when it cuts. Classes `die--top`/`die--dropped`/`die--cut` are shared with `roller_controller.js`. `RollsHelper#roll_dice_tags` renders every roll's dice through it.
+- `_roll_result` (`roll:, size:, heading:`): dice, the word (`roll_result_word`) and the reason line (`roll_reason`: "Messy, cut to grim by a thorn"). No `Current`, so it renders in broadcasts.
+- `_pool_track` (segments = the current phase's `starting_size`; purple when hidden), `_pips` (`kind:, value:, max:`, always with an `aria-label` like "1 of 2 spark"), `_segmented` and `_stepper`.
+- `_segmented` uses radio inputs rather than `aria-pressed` buttons: herb:state can't compute `aria-pressed`, and a checked radio tells the browser and screen readers the same thing. Pass `input_data:` for a `data-herb-set` binding.
+- `_stepper` is a real number input with − and + (`stepper_controller.js` steps it and fires `input`/`change`, so herb bindings still see it).
+
+**The shell** (`layouts/_app_header`): wordmark, a `<details>` campaign switcher, tabs and an account button. Inside a campaign (`context_membership`: `Current.membership`, or `@membership` on a seated character's sheet) the tabs are the campaign's (`campaign_tabs`): GM Campaign · Characters · Log; player Campaign · My character · Party · Log (`Membership#seated_character`). Characters and Party point at the campaign page's party section, Log at the session history. The Table tab arrives with phase 3. Outside a campaign the tabs are the toolkit's, which the footer always lists too.
+
+**Live banner** (`campaigns/_live_banner`): "Live now · Session 8 · Scene 2, The mill fire · 3 at the table" while a session is open, linking to `campaign_play_path`, which sends the GM to the table and a player to their sheet. It shows on campaign pages except the one it links to (`live_banner?`). It updates over its own **`[campaign, :live]`** stream, not `:table`: `:table` carries refresh actions, which would reload pages that don't morph (and wipe a half-typed form). `Campaign#broadcast_table_refresh` sends both, so every boundary updates the banner.
 
 ## Roadmap
 

@@ -1,0 +1,7 @@
+<%# locals: (pool:) %>
+<%# One segment per die in the pool's (current phase's) full size, filled for the dice left. Ember for visible pools, purple for hidden ones. %>
+<span class="<%= class_names("pool-track", "pool-track--hidden": pool.hidden?) %>" role="img" aria-label="<%= pool.size %> of <%= pool.starting_size %> dice left">
+  <% pool.starting_size.times do |index| %>
+    <span class="<%= class_names("pool-track__segment", "pool-track__segment--full": index < pool.size) %>"></span>
+  <% end %>
+</span>

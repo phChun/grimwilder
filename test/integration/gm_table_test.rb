@@ -19,7 +19,7 @@ class GmTableTest < ActionDispatch::IntegrationTest
     assert_select "details#roll-log #roll_log"
     assert_select "details#crucibles turbo-frame#crucible[src=?]", crucible_path(Crucible.grouped.first.last.first, embed: 1)
     assert_select "details#crucibles select#crucible-pick optgroup", Crucible.grouped.size
-    assert_select "turbo-cable-stream-source", 4, "pool and table refreshes, the log and the chat"
+    assert_select "turbo-cable-stream-source", 5, "pool and table refreshes, the log, the chat and the live banner"
   end
 
   test "players see a push badge, and a fold-out with drop-first and push" do

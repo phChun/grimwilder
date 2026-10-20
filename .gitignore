@@ -36,3 +36,6 @@
 
 # Design briefs and sketches, kept locally
 /docs/
+
+# macOS
+.DS_Store

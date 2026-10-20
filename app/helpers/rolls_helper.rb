@@ -24,33 +24,63 @@ module RollsHelper
     RESULT_TEXT.fetch(roll.kind).fetch(roll.outcome)
   end
 
-  # d6s (then any assist dice, dashed and named), then thorns as d8 diamonds.
+  # d6s (then any assist dice, dashed and named), then thorns as d8 rings.
   # Action and defense rolls light up the die that set the result (every 6 on
   # a critical); pool rolls light up the dice that stay and strike out the ones
   # that drop, and mark a power pool's spark dice, which never drop.
-  def roll_dice_tags(roll, small: false)
+  def roll_dice_tags(roll, small: false, size: small ? 32 : 44)
     highest = roll.all_dice.max
     lit_one = false
     light = ->(value) do
-      if roll.pool? then value >= 4 ? "die--top" : "die--dropped"
-      elsif value == highest && (!lit_one || roll.critical?) then lit_one = true; "die--top"
+      if roll.pool? then value >= 4 ? :highest : :dropped
+      elsif value == highest && (!lit_one || roll.critical?) then lit_one = true; :highest
       end
     end
 
     pool_dice = roll.pool? ? roll.dice.size - roll.spark_spent : roll.dice.size
     d6s = roll.dice.map.with_index do |value, index|
       if index < pool_dice
-        roll_die_tag(value, "d6", light.(value), small)
+        die_tag(value, state: light.(value), size: size)
       else
-        roll_die_tag(value, "d6", "die--spark", small, label: "spark die showing #{value}", title: "Spark")
+        die_tag(value, size: size, extra: "die--spark", aria_label: "spark die showing #{value}", title: "Spark")
       end
     end
     assists = roll.assists.map do |assist|
-      roll_die_tag(assist["die"], "d6", [ light.(assist["die"]), "die--assist" ], small, label: "#{assist["name"]}'s assist die showing #{assist["die"]}", title: assist["name"])
+      die_tag(assist["die"], state: light.(assist["die"]), size: size, extra: "die--assist", aria_label: "#{assist["name"]}'s assist die showing #{assist["die"]}", title: assist["name"])
     end
-    d8s = roll.thorns.map { |value| roll_die_tag(value, "d8", ("die--cut" if value >= 7), small) }
+    d8s = roll.thorns.map { |value| die_tag(value, kind: "d8", size: size) }
 
     safe_join(d6s + assists + d8s)
+  end
+
+  def die_tag(value, **options)
+    render "shared/die", value: value, **options
+  end
+
+  # The word a result card shows: Perfect, Messy, Grim, Disaster or Critical.
+  def roll_result_word(roll)
+    roll.critical? ? "Critical" : roll.outcome.capitalize
+  end
+
+  def roll_result_tier(roll)
+    roll.critical? ? "critical" : roll.outcome
+  end
+
+  # One line on how the dice got there: "Messy, cut to grim by a thorn".
+  def roll_reason(roll)
+    result = Grimwild::Dice.interpret(roll.all_dice, roll.thorns)
+
+    if result.critical?
+      "More than one 6, so thorns can't cut it"
+    elsif result.applied_cuts.positive?
+      base = Grimwild::Dice::RESULTS[Grimwild::Dice::RESULTS.index(result.result) - result.applied_cuts]
+      thorns = result.applied_cuts == 1 ? "a thorn" : "#{result.applied_cuts} thorns"
+      "#{base.capitalize}, cut to #{result.result} by #{thorns}"
+    elsif roll.thorns.any?
+      "Highest die #{result.highest}, and no thorn cut it"
+    else
+      "Highest die #{result.highest}"
+    end
   end
 
   # "3d Agility + 1 spark + 1d extra + Wren assisting, vs 2t (marked, 1 situational)",
@@ -101,8 +131,8 @@ module RollsHelper
     top = dice.index(dice.max)
     tags = dice.map.with_index do |value, index|
       helper = side["helpers"][index - side["dice"].size] if index >= side["dice"].size
-      tag.span(value, class: [ "die", "die--d6", "die--small", ("die--top" if index == top), ("die--assist" if helper) ],
-        "aria-label": helper ? "#{helper["name"]}'s assist die showing #{value}" : "d6 showing #{value}", title: helper&.dig("name"))
+      die_tag(value, state: (:highest if index == top), size: 32, extra: ("die--assist" if helper),
+        aria_label: (helper ? "#{helper["name"]}'s assist die showing #{value}" : nil), title: helper&.dig("name"))
     end
     safe_join(tags)
   end
@@ -133,9 +163,4 @@ module RollsHelper
     else "Rolled #{roll.dice.size}d: #{roll.dropped.zero? ? "nothing dropped" : "#{roll.dropped}d dropped"}. #{left}"
     end
   end
-
-  private
-    def roll_die_tag(value, kind, modifier, small, label: "#{kind} showing #{value}", title: nil)
-      tag.span(value, class: [ "die", "die--#{kind}", *modifier, ("die--small" if small) ], "aria-label": label, title: title)
-    end
 end
