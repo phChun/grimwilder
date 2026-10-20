@@ -76,6 +76,12 @@ class Character < ApplicationRecord
     identity_id == identity&.id
   end
 
+  # The owner, or the GM of the campaign this character is seated in: who may
+  # tick talent uses and mark harm, marks and conditions on the sheet.
+  def tended_by?(identity)
+    owned_by?(identity) || (campaign && identity&.membership_in(campaign)&.gm?) || false
+  end
+
   private
     # Rails sends nested form fields as a hash keyed "0", "1", ...
     def list(value)

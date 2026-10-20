@@ -1,11 +1,12 @@
 module CharactersHelper
   DAMAGE_SOURCES = { "marked" => "the mark", "bloodied" => "Bloodied", "rattled" => "Rattled", "desperate" => "Desperate" }.freeze
 
-  # A character's owner and their campaign's GM can tick talent uses.
+  # A character's owner and their campaign's GM can tick talent uses, and mark
+  # harm, marks and conditions.
   def can_spend_talent_uses?(character)
-    character.owned_by?(Current.identity) ||
-      (character.campaign && Current.identity&.membership_in(character.campaign)&.gm?)
+    character.tended_by?(Current.identity)
   end
+  alias_method :can_change_damage?, :can_spend_talent_uses?
 
   # "1 thorn from the mark, already added"
   def damage_thorns_note(character, stat)

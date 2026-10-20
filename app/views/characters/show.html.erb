@@ -2,7 +2,10 @@
 <% content_for :head do %>
   <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
 <% end %>
+<%# The GM can mark harm here too; the owner's open sheet refreshes when they do. %>
+<%= turbo_stream_from @character %>
 <% editable = @character.owned_by?(Current.identity) %>
+<% tends = can_change_damage?(@character) %>
 <% campaign = @character.campaign %>
 <% short = @character.short_name %>
 
@@ -95,8 +98,8 @@
         <div class="harm__toggles">
           <% { "bloodied" => "+1t to Brawn and Agility", "rattled" => "+1t to Wits and Presence", "desperate" => "+1t to every roll; more harm drops you" }.each do |harm, effect| %>
             <% on = @character.public_send(:"#{harm}?") %>
-            <% if editable %>
-              <%= button_to harm.capitalize, character_path(@character), method: :patch, params: { quick: 1, character: { harm => !on } }, class: "harm-toggle", "aria-pressed": on.to_s, title: effect %>
+            <% if tends %>
+              <%= button_to harm.capitalize, character_damage_path(@character), method: :patch, params: { character: { harm => !on } }, class: "harm-toggle", "aria-pressed": on.to_s, title: effect %>
             <% else %>
               <span class="<%= class_names("harm-toggle", "harm-toggle--on": on) %>"><%= harm.capitalize %><span class="visually-hidden"><%= on ? ": yes" : ": no" %></span></span>
             <% end %>
@@ -107,8 +110,8 @@
           <span class="harm__label">Marks</span>
           <% Grimwild::STATS.each do |stat| %>
             <% marked = @character.marked?(stat) %>
-            <% if editable %>
-              <%= button_to stat.capitalize, character_path(@character), method: :patch, params: { quick: 1, character: { "marked_#{stat}" => !marked } }, class: "mark-toggle", "aria-pressed": marked.to_s, title: "A mark adds +1t to the next roll with this stat, then clears" %>
+            <% if tends %>
+              <%= button_to stat.capitalize, character_damage_path(@character), method: :patch, params: { character: { "marked_#{stat}" => !marked } }, class: "mark-toggle", "aria-pressed": marked.to_s, title: "A mark adds +1t to the next roll with this stat, then clears" %>
             <% elsif marked %>
               <span class="mark-toggle mark-toggle--on"><%= stat.capitalize %> marked</span>
             <% end %>
@@ -122,7 +125,7 @@
               <li class="condition">
                 <span class="condition__name"><%= size ? pool_name.capitalize : condition["name"] %><% if condition["lasts"] == "scene" %> <span class="tag">clears after scene</span><% end %></span>
                 <% if size %><span class="condition__size"><%= size %>d</span><% end %>
-                <% if editable %>
+                <% if tends %>
                   <% if size&.positive? %>
                     <%= button_to "Roll", character_condition_roll_path(@character, index), class: "button button--small", "aria-label": "Roll #{condition["name"]}" %>
                   <% end %>
@@ -133,7 +136,7 @@
           </ul>
         <% end %>
 
-        <% if editable %>
+        <% if tends %>
           <%= form_with url: character_conditions_path(@character), class: "condition-form" do |form| %>
             <%= form.text_field :condition, placeholder: "4d poisoned, broken arm…", autocomplete: "off", class: "field__input", "aria-label": "New condition" %>
             <label class="check">
