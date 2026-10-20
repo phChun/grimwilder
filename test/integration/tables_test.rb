@@ -35,9 +35,11 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select ".scene-bar__actions a[href=?]", new_campaign_quarrel_path(@campaign), "Quarrel"
     assert_select ".scene-bar__actions a[href=?]", new_campaign_play_session_ending_path(@campaign, session), "End session"
 
-    assert_select ".suspense-panel__note", "players can see it"
-    assert_select ".suspense-panel [aria-label=?]", "0 suspense", text: "0" # session 1 adds none
-    assert_select ".suspense-panel button[aria-label=?]", "Take 1 suspense"
+    assert_select "#table .party-grid > .suspense-panel:first-child .suspense-panel__note", "players can see it"
+    assert_select ".scene-bar .suspense-panel", 0, "suspense sits with the party, not the scene"
+    assert_select ".suspense-panel__value[aria-label=?]", "0 suspense", text: "0" # session 1 adds none
+    assert_select ".suspense-panel button[aria-label=?][disabled]", "Spend 1 suspense", text: /Spend/
+    assert_select ".suspense-panel button[aria-label=?]", "Gain 1 suspense", text: /Gain/
 
     assert_select ".party-card a[href=?]", character_path(characters(:tibbs)), characters(:tibbs).name
     assert_select ".party-card__harm", "Bloodied · Agility marked · 4d poisoned"

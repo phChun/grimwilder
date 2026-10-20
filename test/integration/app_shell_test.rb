@@ -89,7 +89,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get character_path(characters(:tibbs))
 
-    assert_select ".table-rail__head ##{@campaign.suspense_meter_id} .pips--suspense[aria-label=?]", "3 suspense"
+    assert_select ".table-rail__head ##{@campaign.suspense_meter_id}[aria-label=?] .suspense-meter__value", "Suspense: 3", "3"
     assert_select ".table-rail__head button", 0, "nothing to change it with"
 
     perform_enqueued_jobs do

@@ -1,0 +1,19 @@
+<%# locals: (campaign:) %>
+<%# The GM's suspense (pg. 96), as the first card in the party grid: the GM's pressure on the party. Everyone at the table sees it; only the GM changes it. %>
+<section class="party-card suspense-panel" aria-label="Suspense">
+  <div class="suspense-panel__head">
+    <span class="suspense-panel__label">Suspense</span>
+    <span class="suspense-panel__note">players can see it</span>
+  </div>
+  <%# The count leads, like a pool's dice; the diamonds are a track under it, capped so a big count keeps its shape. Spending prompts an impact move (pg. 96), so the buttons say so. %>
+  <div class="suspense-panel__count">
+    <span class="suspense-panel__value" aria-label="<%= campaign.suspense %> suspense"><%= campaign.suspense %></span>
+    <% if campaign.suspense.positive? %>
+      <%= render "shared/pips", kind: "suspense", value: campaign.suspense, cap: 6 %>
+    <% end %>
+  </div>
+  <div class="suspense-panel__control" role="group" aria-label="Change suspense">
+    <%= button_to campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, class: "button suspense-panel__step", disabled: campaign.suspense.zero?, "aria-label": "Spend 1 suspense", title: "Spending prompts an impact move" do %><span aria-hidden="true">−</span> Spend<% end %>
+    <%= button_to campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, class: "button suspense-panel__step", "aria-label": "Gain 1 suspense" do %><span aria-hidden="true">+</span> Gain<% end %>
+  </div>
+</section>

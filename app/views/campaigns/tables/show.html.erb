@@ -53,22 +53,6 @@
           </details>
         </div>
       </div>
-
-      <div class="suspense-panel">
-        <div class="suspense-panel__head">
-          <span class="suspense-panel__label">Suspense</span>
-          <span class="suspense-panel__note">players can see it</span>
-        </div>
-        <div class="suspense-panel__control">
-          <%= button_to "−", campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, class: "suspense-panel__step", disabled: campaign.suspense.zero?, "aria-label": "Spend 1 suspense" %>
-          <% if campaign.suspense.positive? %>
-            <%= render "shared/pips", kind: "suspense", value: campaign.suspense %>
-          <% else %>
-            <span class="suspense-panel__none" aria-label="0 suspense">0</span>
-          <% end %>
-          <%= button_to "+", campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, class: "suspense-panel__step", "aria-label": "Take 1 suspense" %>
-        </div>
-      </div>
     </section>
 
     <% if @session && (writable = @session.characters_needing_moments(Current.identity).select { _1.owned_by?(Current.identity) }).any? %>
@@ -85,6 +69,7 @@
         <%= link_to "Add your character", new_character_path(campaign_id: campaign.id), class: "button button--ghost button--small" %>
       </div>
       <div class="party-grid">
+        <%= render "campaigns/tables/suspense_panel", campaign: campaign %>
         <% seats.each do |membership, seated| %>
           <% if seated.empty? %>
             <div class="party-card party-card--empty">

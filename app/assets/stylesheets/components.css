@@ -1052,6 +1052,7 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 
 /* Pips: spark circles, thread and suspense diamonds. */
 .pips { display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
+.pips__more { margin-left: 2px; font-family: var(--font-dice); font-size: 12px; font-weight: 600; color: var(--muted); }
 
 .pip {
   width: 14px;
@@ -1371,7 +1372,7 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   .fluid__rail.table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
 }
 
-.table-rail__head { display: flex; align-items: center; gap: var(--space-2); padding: 12px 14px; border-bottom: 1px solid var(--line-soft); }
+.table-rail__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: 12px 14px; border-bottom: 1px solid var(--line-soft); }
 .table-rail__title { flex: 1; margin: 0; font-size: 19px; }
 
 .table-rail__summary {
@@ -1389,7 +1390,7 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 
 .suspense-meter { display: inline-flex; align-items: center; gap: var(--space-2); font-size: 13px; font-weight: 600; color: var(--suspense-text); }
 .suspense-meter .pip { width: 9px; height: 9px; }
-.suspense-meter__none { color: var(--dim); font-weight: 500; }
+.suspense-meter__value { font-family: var(--font-dice); font-weight: 600; }
 
 /* ---------- GM table (campaigns/tables#show) ---------- */
 
@@ -1422,44 +1423,30 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   box-shadow: var(--shadow);
 }
 
-.suspense-panel {
-  flex: 1 1 260px;
-  max-width: 300px;
-  display: flex;
-  flex-direction: column;
+/* Suspense: the first card in the party grid, in the GM's purple. */
+.party-card.suspense-panel {
+  justify-content: space-between;
   gap: var(--space-3);
-  padding: 16px 18px;
-  border: 1px solid var(--suspense-line);
-  border-radius: var(--radius-card);
+  border-color: var(--suspense-line);
   background: var(--suspense-bg);
-}
-
-@media (max-width: 47.99rem) {
-  .suspense-panel { max-width: none; }
 }
 
 .suspense-panel__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
 .suspense-panel__label { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--suspense-text); }
 .suspense-panel__note { font-size: 12px; color: var(--muted); }
-.suspense-panel__control { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-.suspense-panel__control .button_to { margin: 0; }
-.suspense-panel .pips { flex-wrap: wrap; justify-content: center; gap: 6px; }
-.suspense-panel .pip { width: 22px; height: 22px; }
-.suspense-panel__none { font-family: var(--font-dice); color: var(--dim); }
+.suspense-panel__count { display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap); }
+.suspense-panel__value { font-family: var(--font-dice); font-weight: 600; font-size: 30px; line-height: 1; color: var(--suspense); }
+.suspense-panel .pips { gap: 6px; }
+.suspense-panel .pip { width: 12px; height: 12px; }
 
-.suspense-panel__step {
-  width: var(--tap);
-  height: var(--tap);
-  border: 1px solid var(--suspense-line);
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--text);
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
+/* One joined control, in the regular button style, like the dice and thorn steppers. */
+.suspense-panel__control { display: flex; }
+.suspense-panel__control .button_to { flex: 1; margin: 0; }
+.suspense-panel__step { width: 100%; gap: var(--space-1); }
+.suspense-panel__control .button_to:first-child .suspense-panel__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
+.suspense-panel__control .button_to:last-child .suspense-panel__step { margin-left: -1px; border-radius: 0 var(--radius-control) var(--radius-control) 0; }
 .suspense-panel__step:hover:not(:disabled) { background: var(--surface-2); }
-.suspense-panel__step:disabled { opacity: 0.4; cursor: not-allowed; }
+.suspense-panel__step:disabled { color: var(--dim); cursor: not-allowed; }
 
 /* Sections */
 .gm-section { display: flex; flex-direction: column; gap: var(--space-3); }
@@ -1744,7 +1731,7 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 
 /* ---------- Table rail: chat and log in one stream ---------- */
 
-.table-rail__titles { flex: 1; min-width: 0; }
+.table-rail__titles { flex: 1 1 9rem; min-width: 0; }
 .table-rail__where { margin: 0; font-size: 0.85rem; color: var(--muted); }
 
 .avatars { display: inline-flex; }

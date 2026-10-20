@@ -1,8 +1,10 @@
-<%# locals: (kind:, value:, max: nil) %>
-<%# Spark (amber circles), thread (blue diamonds) or suspense (purple diamonds). With max:, empty pips show what's left to fill. %>
+<%# locals: (kind:, value:, max: nil, cap: nil) %>
+<%# Spark (amber circles), thread (blue diamonds) or suspense (purple diamonds). With max:, empty pips show what's left to fill. With cap:, at most that many pips show, then "+N", so a big count keeps its shape. %>
 <% count = max || value %>
+<% shown = cap ? [ count, cap ].min : count %>
 <span class="<%= class_names("pips", "pips--#{kind}") %>" role="img" aria-label="<%= max ? "#{value} of #{max} #{kind}" : "#{value} #{kind}" %>">
-  <% count.times do |index| %>
+  <% shown.times do |index| %>
     <span class="<%= class_names("pip", "pip--full": index < value) %>"></span>
   <% end %>
+  <% if count > shown %><span class="pips__more" aria-hidden="true">+<%= count - shown %></span><% end %>
 </span>

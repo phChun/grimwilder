@@ -64,7 +64,7 @@ class PlaySessionsTest < ActionDispatch::IntegrationTest
     assert_equal 0, @campaign.reload.suspense
 
     get campaign_table_path(@campaign)
-    assert_select ".suspense-panel [aria-label=?]", "0 suspense"
+    assert_select ".suspense-panel__value[aria-label=?]", "0 suspense"
   end
 
   test "players see the status line but none of the GM's session controls" do

@@ -57,6 +57,10 @@ class SharedComponentsTest < ActionView::TestCase
 
     render "shared/pips", kind: "suspense", value: 3
     assert_select ".pips--suspense[aria-label=?]", "3 suspense"
+
+    render "shared/pips", kind: "suspense", value: 9, cap: 6
+    assert_select ".pips--suspense[aria-label=?] .pip", "9 suspense", 6
+    assert_select ".pips__more", "+3"
   end
 
   test "segmented toggles are labelled radios" do
