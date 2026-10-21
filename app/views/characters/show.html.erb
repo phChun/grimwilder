@@ -68,6 +68,21 @@
       </div>
     </section>
 
+    <%# Up for grabs (Character::Claiming): who holds it, and the way to pick it or give it back. %>
+    <% if @character.up_for_grabs? %>
+      <div class="claim-bar claim-bar--open">
+        <p class="claim-bar__text"><strong>Up for grabs.</strong> <%= @character.claimable_by?(Current.identity) && !@membership&.gm? ? "Pick #{short} to play them: they become yours." : "Waiting for a player at the table to pick #{short}." %></p>
+        <% if @character.claimable_by?(Current.identity) && !@membership&.gm? %>
+          <%= button_to "Play #{short}", character_claim_path(@character), class: "button button--small button--primary" %>
+        <% end %>
+      </div>
+    <% elsif @character.releasable_by?(Current.identity) %>
+      <div class="claim-bar">
+        <p class="claim-bar__text"><%= editable && !@membership&.gm? ? "Done with #{short}? Give them back to the GM for someone else to pick." : "Played by #{@character.identity.display_name}. Put #{short} up for grabs to let another player pick them." %></p>
+        <%= button_to (editable && !@membership&.gm? ? "Give back" : "Put up for grabs"), character_claim_path(@character), method: :delete, class: "button button--ghost button--small", form: { data: { turbo_confirm: "#{@character.name} goes back to the GM, for any player to pick. Continue?" } } %>
+      </div>
+    <% end %>
+
     <% if @character.errors.any? %>
       <p class="flash flash--alert"><%= @character.errors.full_messages.to_sentence %></p>
     <% end %>

@@ -30,6 +30,6 @@ class Campaigns::ScenesController < ApplicationController
   private
     def set_session
       @session = Current.campaign.current_session
-      @my_characters = Current.campaign.characters.where(identity: Current.identity).ordered
+      @my_characters = Current.campaign.characters.played.where(identity: Current.identity).ordered
     end
 end

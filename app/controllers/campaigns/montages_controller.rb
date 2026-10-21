@@ -21,7 +21,7 @@ class Campaigns::MontagesController < ApplicationController
 
   private
     def set_characters
-      @characters = Current.campaign.characters.includes(:identity).ordered
+      @characters = Current.campaign.characters.played.includes(:identity).ordered
     end
 
     # participants[<character id>][in] is "1" for everyone taking part;

@@ -20,7 +20,7 @@ class Campaigns::PlaySessionsController < ApplicationController
   end
 
   def create
-    characters = Current.campaign.characters.where(id: Array(params[:character_ids]).compact_blank).to_a
+    characters = Current.campaign.characters.played.where(id: Array(params[:character_ids]).compact_blank).to_a
     session = PlaySession.start!(Current.campaign, characters: characters, recap: params[:recap], by: Current.identity)
     back_to_table(notice: "#{session.title} begins.")
   rescue ArgumentError => error
@@ -36,7 +36,7 @@ class Campaigns::PlaySessionsController < ApplicationController
 
   private
     def set_form
-      @characters = Current.campaign.characters.includes(:identity).ordered
+      @characters = Current.campaign.characters.played.includes(:identity).ordered
       @previous = Current.campaign.play_sessions.includes(:scenes, moments: :character).ordered.last
       @number = @previous&.number.to_i + 1
     end

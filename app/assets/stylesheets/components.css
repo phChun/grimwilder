@@ -1781,6 +1781,25 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 
 .party-gone { margin: 0; font-size: 0.9rem; color: var(--muted); }
 
+/* Up for grabs (Character::Claiming): characters waiting for a player to pick. */
+.hero-card__release { align-self: flex-start; margin: -6px 0 0; }
+.grabs { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); scroll-margin-top: 6rem; }
+.grabs__title { margin: 0; font-family: var(--font-ui); font-size: 0.87rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.grabs__hint { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.grabs__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.grabs__item { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px; border: 1px dashed var(--line-strong); border-radius: var(--radius-card); }
+.grabs__item .button_to { margin: 0; }
+.grabs__who { display: flex; flex: 1; flex-direction: column; min-width: 8rem; }
+.grabs__name { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: var(--text); text-decoration: none; }
+a.grabs__name:hover { color: var(--link); text-decoration: underline; }
+.grabs__meta { font-size: 0.87rem; color: var(--muted); }
+
+/* The sheet's strip: up for grabs, or the way to give it back. */
+.claim-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); padding: 10px 12px 10px 16px; border: 1px solid var(--line); border-radius: var(--radius-card); }
+.claim-bar--open { border-style: dashed; border-color: var(--ember); background: var(--ember-soft); }
+.claim-bar__text { flex: 1 1 16rem; margin: 0; color: var(--text-soft); }
+.claim-bar .button_to { margin: 0; }
+
 /* Previously on… */
 .previously {
   display: flex;

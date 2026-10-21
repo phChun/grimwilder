@@ -41,7 +41,10 @@
         <%= link_to "Open my character", character_path(@mine), class: "button button--primary campaign-hero__go" %>
       <% else %>
         <%= link_to "Make your character", new_character_path(campaign_id: campaign.id), class: "button button--primary campaign-hero__go" %>
-        <p class="campaign-hero__hint">Seat them in <%= campaign.name %> and they'll join the party.</p>
+        <p class="campaign-hero__hint">
+          Seat them in <%= campaign.name %> and they'll join the party.
+          <% if @up_for_grabs.any? %>Or <a href="#up-for-grabs">pick one that's up for grabs</a>.<% end %>
+        </p>
       <% end %>
     </div>
   </section>
@@ -59,6 +62,9 @@
       <section id="party" class="gm-section" aria-labelledby="party-title">
         <div class="gm-section__head">
           <h2 id="party-title" class="gm-section__title">The party</h2>
+          <% if gm %>
+            <%= link_to "Make one for the table", new_character_path(campaign_id: campaign.id, up_for_grabs: 1), class: "button button--ghost button--small" %>
+          <% end %>
         </div>
         <div class="party-grid party-grid--wide">
           <% table_seats(@memberships, @party).each do |membership, seated| %>
@@ -93,10 +99,33 @@
                   <% end %>
                 </div>
                 <p class="<%= class_names("hero-card__harm", "hero-card__harm--none": harm_line(character).nil?) %>"><%= harm_line(character) || "No harm" %></p>
+                <% if gm %>
+                  <%= button_to "Put up for grabs", character_claim_path(character), method: :delete, class: "button button--ghost button--small hero-card__release", form: { data: { turbo_confirm: "#{character.name} goes back to you, for any player to pick. Continue?" } } %>
+                <% end %>
               </article>
             <% end %>
           <% end %>
         </div>
+        <% if @up_for_grabs.any? %>
+          <div id="up-for-grabs" class="grabs">
+            <h3 class="grabs__title">Up for grabs</h3>
+            <p class="grabs__hint"><%= gm ? "Waiting for a player to pick. You hold them until then." : "Made by the GM, or given back. Pick one to play it: it becomes yours." %></p>
+            <ul class="grabs__list">
+              <% @up_for_grabs.each do |character| %>
+                <li class="grabs__item">
+                  <span class="monogram monogram--44 monogram--empty" aria-hidden="true"><%= initial(character.short_name) %></span>
+                  <div class="grabs__who">
+                    <%= link_to character.name, character_path(character), class: "grabs__name" %>
+                    <span class="grabs__meta"><%= character.path %> <%= character.level %></span>
+                  </div>
+                  <% unless gm %>
+                    <%= button_to "Play #{character.short_name}", character_claim_path(character), class: "button button--small button--primary" %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
         <% if @gone.any? %>
           <p class="party-gone">
             Fallen and retired:

@@ -19,7 +19,7 @@ class Campaigns::QuarrelsController < ApplicationController
 
   private
     def set_characters
-      @characters = Current.campaign.characters.includes(:identity).ordered
+      @characters = Current.campaign.characters.played.includes(:identity).ordered
     end
 
     # participants[<character id>][role] is "quarrel", "assist-<character id>" or blank;

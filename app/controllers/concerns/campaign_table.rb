@@ -7,7 +7,8 @@ module CampaignTable
   private
     def load_table
       @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
-      @characters = Current.campaign.characters.includes(:identity).ordered
+      @characters = Current.campaign.characters.played.includes(:identity).ordered
+      @up_for_grabs = Current.campaign.characters.up_for_grabs.ordered
       @my_characters = @characters.select { _1.owned_by?(Current.identity) }
       @pools = Current.campaign.pools.shared.visible_to(Current.membership).includes(:last_rolled_by).ordered
       @talent_pools = Current.campaign.pools.talent.includes(:last_rolled_by).ordered.group_by(&:character_id)

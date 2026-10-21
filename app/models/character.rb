@@ -1,7 +1,8 @@
 # A player character. Owned by an identity; optionally seated in one of that
-# identity's campaigns, where the table can see it.
+# identity's campaigns, where the table can see it. The GM can offer one up for
+# grabs for a player to pick (Character::Claiming).
 class Character < ApplicationRecord
-  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentUses, Character::Sessions
+  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentUses, Character::Sessions, Character::Claiming
 
   STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 46)
 

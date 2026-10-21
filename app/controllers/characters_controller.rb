@@ -17,7 +17,7 @@ class CharactersController < ApplicationController
   end
 
   def new
-    @character = Current.identity.characters.new(path: params[:path].presence || "Fighter", campaign_id: params[:campaign_id])
+    @character = Current.identity.characters.new(path: params[:path].presence || "Fighter", campaign_id: params[:campaign_id], up_for_grabs: params[:up_for_grabs] == "1")
   end
 
   def create
@@ -51,12 +51,12 @@ class CharactersController < ApplicationController
   private
     # For a seated character, the table around the sheet.
     def load_play
-      @allies = @character.campaign ? @character.campaign.characters.excluding(@character).ordered : []
+      @allies = @character.campaign ? @character.campaign.characters.played.excluding(@character).ordered : []
 
       if (campaign = @character.campaign)
         @membership = Current.identity.memberships.find_by!(campaign: campaign)
         @feed = TableFeed.new(campaign, @membership, rolls: LOG_SIZE)
-        @speakers = Current.identity.characters.where(campaign: campaign).active.ordered
+        @speakers = Current.identity.characters.where(campaign: campaign).played.active.ordered
       end
     end
 
@@ -70,7 +70,7 @@ class CharactersController < ApplicationController
 
     def character_params
       params.require(:character).permit(
-        :name, :path, :campaign_id, :status, :level, :xp,
+        :name, :path, :campaign_id, :status, :up_for_grabs, :level, :xp,
         :brawn, :agility, :wits, :presence, :spark, :thread,
         :marked_brawn, :marked_agility, :marked_wits, :marked_presence, :bloodied, :rattled, :desperate,
         :not_trait, :not_desire, :weapons, :talents, :notes,

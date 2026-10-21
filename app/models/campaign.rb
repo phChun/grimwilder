@@ -14,6 +14,9 @@ class Campaign < ApplicationRecord
   has_many :scenes
   has_many :pools, dependent: :destroy
   has_many :characters, dependent: :nullify
+  # Up-for-grabs characters stay with the GM who held them, no longer offered.
+  # (Prepended, so it runs before the nullify above unseats them.)
+  before_destroy(prepend: true) { characters.up_for_grabs.update_all(up_for_grabs: false) }
 
   normalizes :name, :setting, :party_never, :group_arc, with: ->(value) { value.squish.presence }
   normalizes :pitch, with: ->(value) { value.strip.presence }

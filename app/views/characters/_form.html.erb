@@ -25,6 +25,15 @@
       <%= form.label :campaign_id, "Campaign", class: "field__label" %>
       <%= form.select :campaign_id, Current.identity.campaigns.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
     </div>
+    <% if Current.identity.memberships.gm.exists? %>
+      <div class="field">
+        <label class="check">
+          <%= form.check_box :up_for_grabs %>
+          Up for grabs
+        </label>
+        <p class="field__hint">For a campaign you GM: the character waits on the campaign page for a player to pick, and you hold it until then.</p>
+      </div>
+    <% end %>
     <% if character.persisted? %>
       <div class="field">
         <%= form.label :status, "Status", class: "field__label" %>

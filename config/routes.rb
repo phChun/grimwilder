@@ -25,6 +25,7 @@ Rails.application.routes.draw do
         resource :skin, only: %i[ update destroy ], controller: "talent_skins"
       end
       resource :talent_uses, only: :update
+      resource :claim, only: %i[ create destroy ]
     end
   end
 
