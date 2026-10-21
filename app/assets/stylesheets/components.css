@@ -1199,17 +1199,18 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
   background: var(--surface);
 }
 
-.stat-card__head { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 0 var(--space-2); }
+.stat-card__head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-2); }
 .stat-card__name { flex: 1; min-width: 0; margin: 0; font-size: 1.4rem; overflow-wrap: anywhere; }
 .stat-card__dice { font-family: var(--font-dice); font-weight: 600; font-size: 28px; line-height: 1; }
 .stat-card__desc { margin: 0; font-size: 0.87rem; color: var(--dim); }
 
 .tag--marked { margin: 0; border: 0; border-radius: var(--radius-sm); background: var(--grim-bg); color: var(--grim); align-self: center; }
-/* Mark / Marked sits centered in the head, between the name and the dice.
-   Mark is quiet (dashed, dim) until it's on, then red. The owner and the GM
-   can toggle it; everyone else sees the red tag when it's marked. */
-.stat-card__head > .stat-card__name { grid-column: 1; }
-.stat-card__head > .stat-card__dice { grid-column: 3; justify-self: end; }
+/* The head: the name on top, then Mark / Marked on the left and the dice on
+   the right. Mark is quiet (dashed, dim) until it's on, then red. The owner
+   and the GM can toggle it; everyone else sees the red tag when it's marked. */
+.stat-card__head > .stat-card__name { grid-column: 1 / -1; }
+.stat-card__head > :is(.stat-card__mark-form, .tag--marked) { grid-row: 2; grid-column: 1; justify-self: start; }
+.stat-card__head > .stat-card__dice { grid-row: 2; grid-column: 2; justify-self: end; }
 .stat-card__mark-form { margin: 0; }
 .stat-card .stat-card__mark { min-width: 5.5rem; padding: 0 10px; border-style: dashed; border-radius: var(--radius-sm); color: var(--dim); font-size: 0.8rem; }
 .stat-card .stat-card__mark[aria-pressed="true"] { border-style: solid; border-color: var(--grim); background: var(--grim-bg); color: var(--grim); }
