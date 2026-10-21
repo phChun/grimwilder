@@ -23,5 +23,10 @@ module Grimwilder
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Whether new people can make an account. ALLOW_SIGNUPS=false closes sign-ups:
+    # existing accounts still sign in, and so can anyone holding a campaign's
+    # invite link. See Identity.signups_open?.
+    config.x.signups_open = ActiveModel::Type::Boolean.new.cast(ENV.fetch("ALLOW_SIGNUPS", "true"))
   end
 end

@@ -10,6 +10,29 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".app-header a.account--signin", "Sign in"
     assert_select ".app-header .switcher", 0
     assert_select ".site-footer__tools a", "Crucibles"
+    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 3
+    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", text: "Characters", count: 0
+    assert_select ".site-footer__tools a", text: "Characters", count: 0
+  end
+
+  test "the home page offers characters and pools once you're signed in" do
+    get root_path
+    assert_select "#tools-heading", "Free tools"
+    assert_select ".hero__actions a.button--primary[href=?]", campaigns_path(anchor: "campaign-new"), "Start a campaign and build characters"
+    assert_select ".tool-card[href=?]", talents_path
+    assert_select ".tool-card[href=?]", characters_path, 0
+    assert_select ".tool-card", 3, "signed out, just the free tools"
+
+    sign_in_as identities(:pip)
+    get root_path
+    assert_select ".tool-card[href=?]", characters_path
+    assert_select ".tool-card[href=?]", pools_path
+    assert_select ".tool-card[href=?]", new_session_path, 0
+  end
+
+  test "making a character needs an account" do
+    get new_character_path
+    assert_redirected_to new_session_path
   end
 
   test "the GM gets the campaign's tabs, a switcher and an account button" do

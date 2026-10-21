@@ -51,6 +51,10 @@ env:
     # Passkeys are bound to this origin (config/initializers/webauthn.rb).
     APP_ORIGIN: https://grimwilder.com
 
+    # New accounts. false closes sign-ups: existing accounts still sign in, and
+    # so does anyone holding a campaign's invite link (config/application.rb).
+    ALLOW_SIGNUPS: true
+
     # Who sign-in code emails come from (app/mailers/application_mailer.rb).
     MAILER_FROM: Grimwilder <no-reply@grimwilder.com>
 

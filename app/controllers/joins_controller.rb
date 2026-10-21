@@ -5,7 +5,10 @@ class JoinsController < ApplicationController
 
   def show
     @membership = Current.identity&.membership_in(@campaign)
-    session[:return_to_after_authenticating] = request.url unless authenticated?
+    unless authenticated?
+      session[:return_to_after_authenticating] = request.url
+      session[:invite_code] = @campaign.join_code # lets them sign up while sign-ups are closed
+    end
   end
 
   def create

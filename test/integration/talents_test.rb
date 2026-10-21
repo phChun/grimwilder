@@ -7,6 +7,13 @@ class TalentsTest < ActionDispatch::IntegrationTest
     assert_select "#group-rogue h2", text: "The Rogue"
     assert_select "#talent-expertise .tag", text: "Core"
     assert_select "#talent-eldritch-affinity .tag", text: "Not for Sorcerer"
+
+    assert_select "#talent-lucky > .talent__summary", Talent.find("lucky").summary
+    assert_select "#talent-lucky > details.talent__more:not([open])" do
+      assert_select "summary", "Full text"
+      assert_select ".talent__text p", /1d Luck pool/
+    end
+    assert_select "#talent-lucky > .talent__text", 0, "the book text is folded away"
   end
 
   test "choose a talent for your character" do

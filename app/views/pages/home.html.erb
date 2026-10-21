@@ -6,12 +6,13 @@
     track diminishing pools, smash crucibles together, and keep your adventurers close at hand.
   </p>
   <div class="hero__actions">
-    <%= link_to "Make an action roll", roll_path, class: "button button--primary" %>
+    <%# Signed out, campaigns sends you through sign-in and back. %>
+    <%= link_to "Start a campaign and build characters", campaigns_path(anchor: "campaign-new"), class: "button button--primary" %>
   </div>
 </section>
 
 <section class="tool-grid" aria-labelledby="tools-heading">
-  <h2 id="tools-heading" class="section-title">The toolkit</h2>
+  <h2 id="tools-heading" class="section-title">Free tools</h2>
 
   <ul class="tool-grid__list">
     <li>
@@ -22,13 +23,6 @@
       <% end %>
     </li>
     <li>
-      <%= link_to pools_path, class: "tool-card tool-card--ready" do %>
-        <span class="tool-card__glyph" aria-hidden="true">4d</span>
-        <span class="tool-card__name">Pools</span>
-        <span class="tool-card__desc">Task, pressure, timer and resource pools for your campaign. Roll them, drop the 1–3s, watch them run out.</span>
-      <% end %>
-    </li>
-    <li>
       <%= link_to crucibles_path, class: "tool-card tool-card--ready" do %>
         <span class="tool-card__glyph" aria-hidden="true">6&times;6</span>
         <span class="tool-card__name">Crucibles</span>
@@ -36,11 +30,28 @@
       <% end %>
     </li>
     <li>
-      <%= link_to characters_path, class: "tool-card tool-card--ready" do %>
-        <span class="tool-card__glyph" aria-hidden="true">&#9776;</span>
-        <span class="tool-card__name">Characters</span>
-        <span class="tool-card__desc">Stats, damage, spark, bonds and talents on a sheet that rolls for you.</span>
+      <%= link_to talents_path, class: "tool-card tool-card--ready" do %>
+        <span class="tool-card__glyph" aria-hidden="true"><%= Talent.all.size %></span>
+        <span class="tool-card__name">Talents</span>
+        <span class="tool-card__desc">Every path's talents, plus background and heritage talents, with a one-line gist of each.</span>
       <% end %>
     </li>
+    <%# Characters and campaigns need an account; signed out, the hero's button leads there. %>
+    <% if authenticated? %>
+      <li>
+        <%= link_to characters_path, class: "tool-card tool-card--ready" do %>
+          <span class="tool-card__glyph" aria-hidden="true">&#9776;</span>
+          <span class="tool-card__name">Characters</span>
+          <span class="tool-card__desc">Stats, damage, spark, bonds and talents on a sheet that rolls for you.</span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to pools_path, class: "tool-card tool-card--ready" do %>
+          <span class="tool-card__glyph" aria-hidden="true">4d</span>
+          <span class="tool-card__name">Pools</span>
+          <span class="tool-card__desc">Task, pressure, timer and resource pools for your campaign. Roll them, drop the 1–3s, watch them run out.</span>
+        <% end %>
+      </li>
+    <% end %>
   </ul>
 </section>

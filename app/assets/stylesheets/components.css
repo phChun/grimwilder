@@ -751,7 +751,10 @@ form.button_to, .button_to { margin: 0; }
 .talent__header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-3); }
 .talent__name { margin: 0; font-size: 1.3rem; }
 .talent__meta { font-size: 0.8rem; color: var(--ink-faint); }
-.talent__summary { margin: 0 0 var(--space-2); font-weight: 600; color: var(--text); }
+.talent__summary { margin: 0; font-weight: 600; color: var(--text); }
+.talent__more > .fold__summary { min-height: var(--tap); font-size: 0.87rem; font-weight: 600; color: var(--dim); }
+.talent__more[open] > .fold__summary { margin-bottom: var(--space-1); }
+.talent__more .talent__note { margin-top: var(--space-2); }
 .talent__text p { margin: 0 0 var(--space-2); font-size: 0.95rem; }
 .talent__text p:last-child { margin-bottom: 0; }
 .talent__note { margin: 0; padding-left: var(--space-3); border-left: 3px solid var(--line-strong); font-size: 0.88rem; font-style: italic; color: var(--ink-soft); }

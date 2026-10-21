@@ -9,14 +9,18 @@
     </span>
   </header>
   <p class="talent__summary"><%= talent.summary %></p>
-  <div class="talent__text">
-    <% talent.paragraphs.each do |paragraph| %>
-      <p><%= paragraph %></p>
+  <%# The summary is our gist; the book's text and tip fold away (search still matches them). %>
+  <details class="fold talent__more">
+    <summary class="fold__summary">Full text</summary>
+    <div class="talent__text">
+      <% talent.paragraphs.each do |paragraph| %>
+        <p><%= paragraph %></p>
+      <% end %>
+    </div>
+    <% if talent.note.present? %>
+      <p class="talent__note"><%= talent.note %></p>
     <% end %>
-  </div>
-  <% if talent.note.present? %>
-    <p class="talent__note"><%= talent.note %></p>
-  <% end %>
+  </details>
   <% if character && !talent.core? %>
     <div class="talent__take">
       <% if character.has_talent?(talent) %>

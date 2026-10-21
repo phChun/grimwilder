@@ -18,6 +18,16 @@ class Identity < ApplicationRecord
     find_or_create_by!(email_address: email_address)
   end
 
+  # Sign-ups (config.x.signups_open, from ALLOW_SIGNUPS). While they're closed,
+  # a new email only gets an account through a campaign's invite link.
+  def self.signups_open?
+    Rails.configuration.x.signups_open
+  end
+
+  def self.may_sign_in?(email_address, invited: false)
+    signups_open? || invited || exists?(email_address: normalize_value_for(:email_address, email_address.to_s))
+  end
+
   def display_name
     name.presence || email_address.split("@").first
   end

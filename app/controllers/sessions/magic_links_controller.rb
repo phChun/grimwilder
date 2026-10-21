@@ -11,7 +11,10 @@ class Sessions::MagicLinksController < ApplicationController
   end
 
   def create
-    if magic_link = MagicLink.consume(params.expect(:code), email_address: email_address_pending_authentication)
+    magic_link = MagicLink.consume(params.expect(:code), email_address: email_address_pending_authentication)
+
+    # A code sent before sign-ups closed doesn't open a new account after.
+    if magic_link && Identity.may_sign_in?(magic_link.email_address, invited: invited?)
       clear_pending_authentication
       start_new_session_for Identity.find_or_create_for_sign_in!(magic_link.email_address)
       redirect_to after_authentication_url

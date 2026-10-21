@@ -19,12 +19,13 @@ module ApplicationHelper
     end.join(" ")
   end
 
-  # The play toolkit's tools. They're the header's tabs outside a campaign, and
-  # always listed in the footer. `ready: false` items render as "soon".
+  # The play toolkit's public tools. They're the header's tabs outside a
+  # campaign, and always listed in the footer. `ready: false` items render as
+  # "soon". Characters and campaigns need an account, so they aren't here; the
+  # home page offers them once you're signed in.
   TOOLKIT_NAV = [
     { label: "Roll", path: :roll_path, ready: true },
     { label: "Crucibles", path: :crucibles_path, ready: true },
-    { label: "Characters", path: :characters_path, ready: true },
     { label: "Talents", path: :talents_path, ready: true }
   ].freeze
 

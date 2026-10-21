@@ -5,14 +5,14 @@ module PendingAuthentication
   extend ActiveSupport::Concern
 
   included do
-    helper_method :email_address_pending_authentication
+    helper_method :email_address_pending_authentication, :invited?
   end
 
   private
-    def set_pending_authentication(magic_link)
+    def set_pending_authentication(email_address, expires_at:)
       cookies[:pending_authentication] = {
-        value: pending_authentication_verifier.generate(magic_link.email_address, expires_at: magic_link.expires_at),
-        expires: magic_link.expires_at,
+        value: pending_authentication_verifier.generate(email_address, expires_at: expires_at),
+        expires: expires_at,
         httponly: true,
         same_site: :lax
       }
@@ -24,6 +24,13 @@ module PendingAuthentication
 
     def clear_pending_authentication
       cookies.delete(:pending_authentication)
+    end
+
+    # Someone who opened a campaign's invite link (JoinsController#show) may sign
+    # up even while sign-ups are closed, as long as the link still works (the
+    # GM resetting it takes that back).
+    def invited?
+      session[:invite_code].present? && Campaign.exists?(join_code: session[:invite_code])
     end
 
     def pending_authentication_verifier

@@ -4,7 +4,10 @@
   <header class="page-header">
     <p class="eyebrow">Account</p>
     <h1>Sign in</h1>
-    <p class="page-header__lede">No passwords. We'll email you a code, or you can use a passkey. New here? Entering your email creates your account.</p>
+    <p class="page-header__lede">
+      No passwords. We'll email you a code, or you can use a passkey.
+      <% if Identity.signups_open? || invited? %>New here? Entering your email creates your account.<% else %>New accounts are invite-only for now: ask your GM for their campaign's invite link.<% end %>
+    </p>
   </header>
 
   <section class="panel auth__panel">
