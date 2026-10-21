@@ -8,7 +8,7 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-gm-value="<%= gm %>" data-feed-session-value="<%= session.present? %>">
+<section class="<%= class_names("table-rail", classes) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-gm-value="<%= gm %>" data-feed-session-value="<%= session.present? %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>
@@ -25,7 +25,7 @@
   <div class="feed">
     <%= render "shared/segmented", name: "#{prefix}_filter", legend: "Show", options: [ %w[ all Everything ], %w[ story Story ], %w[ dice Dice ] ], checked: "all", id_prefix: "#{prefix}_filter", classes: "feed__filter" %>
 
-    <div class="feed__scroller">
+    <div class="feed__scroller" data-feed-target="scroller" data-action="scroll->feed#scrolled">
       <div>
         <ol id="table_feed" class="feed__items" aria-live="polite" aria-label="Table chat and log">
           <% feed.entries.each do |entry| %>
@@ -39,6 +39,11 @@
         <p class="empty feed__empty">Nothing yet. Rolls, scenes and talk land here as they happen.</p>
       </div>
     </div>
+    <%# Shown by feed_controller.js when lines arrive while you're scrolled up reading. %>
+    <button type="button" class="feed__new" hidden data-feed-target="newPill" data-action="feed#latest">
+      <span data-feed-target="newCount">New</span>
+      <%= icon(:chevron, size: 14) %>
+    </button>
   </div>
 
   <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>

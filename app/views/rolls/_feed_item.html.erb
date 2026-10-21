@@ -2,9 +2,9 @@
 <%# A log entry in the table's rail. Character rolls are small result cards, pool rolls one line, and markers and notes centered game events (a scene start is a divider). Renders in broadcasts, so no Current. The session pages keep the fuller rolls/_roll. %>
 <% time = capture do %><time class="feed-item__time" datetime="<%= roll.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= roll.created_at.utc.strftime("%H:%M UTC") %></time><% end %>
 <% if roll.marker? && roll.scene && roll.name.include?("Scene #{roll.scene.number}:") %>
-  <li id="<%= dom_id(roll) %>" class="feed-item feed-item--event feed-item--marker feed-divider"><span class="feed-divider__text">Scene <%= roll.scene.number %> · <%= roll.scene.title %></span></li>
+  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="feed-item feed-item--event feed-item--marker feed-divider"><span class="feed-divider__text">Scene <%= roll.scene.number %> · <%= roll.scene.title %></span></li>
 <% elsif roll.marker? || roll.note? %>
-  <li id="<%= dom_id(roll) %>" class="<%= class_names("feed-item", "feed-item--event", "feed-item--marker": roll.marker?, "feed-item--note": roll.note?) %>">
+  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="<%= class_names("feed-item", "feed-item--event", "feed-item--marker": roll.marker?, "feed-item--note": roll.note?) %>">
     <% if roll.marker? %>
       <p class="feed-event"><strong><%= roll.name %></strong><% if roll.question %> · <%= roll.question %><% end %></p>
       <% roll.sides.each do |level_up| %>
@@ -15,7 +15,7 @@
     <% end %>
   </li>
 <% elsif roll.pool? && roll.outcome.nil? %>
-  <li id="<%= dom_id(roll) %>" class="feed-item feed-item--dice feed-pool">
+  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="feed-item feed-item--dice feed-pool">
     <p class="feed-pool__line">
       <span class="feed-pool__name"><%= roll.name %><%= ": #{roll.phase}" if roll.phase %></span>
       <span class="feed-pool__change"><% if roll.dropped %><%= roll.remaining + roll.dropped.to_i %>d → <strong><%= roll.remaining %>d</strong><% end %></span>
@@ -25,7 +25,7 @@
     <p class="feed-item__meta"><%= pool_roll_summary(roll) %></p>
   </li>
 <% else %>
-  <li id="<%= dom_id(roll) %>" class="<%= class_names("feed-item", "feed-item--dice", "feed-roll", "feed-item--#{roll.outcome}": roll.outcome, "feed-roll--#{roll_result_tier(roll)}": roll.outcome) %>">
+  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="<%= class_names("feed-item", "feed-item--dice", "feed-roll", "feed-item--#{roll.outcome}": roll.outcome, "feed-roll--#{roll_result_tier(roll)}": roll.outcome) %>">
     <p class="feed-roll__head">
       <% case roll.kind %>
       <% when "pool" %>

@@ -1889,7 +1889,7 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 .avatar:first-child { margin-left: 0; }
 .avatar--gm { background: var(--ember-soft); color: var(--link); }
 
-.feed { display: flex; flex-direction: column; gap: var(--space-3); padding: 12px 14px 0; }
+.feed { position: relative; display: flex; flex-direction: column; gap: var(--space-3); padding: 12px 14px 0; }
 .feed__filter { grid-template-columns: repeat(3, 1fr); }
 
 /* Newest at the bottom: a column-reverse scroller stays pinned to the newest line as lines arrive. */
@@ -1897,6 +1897,34 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 .feed__items { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0 0 var(--space-3); list-style: none; }
 .feed__items:has(li) + .feed__empty { display: none; }
 .feed__empty { margin: 0 0 var(--space-3); }
+
+/* "3 new": lines arrived while you were scrolled up (feed_controller.js). */
+.feed__new {
+  position: absolute;
+  z-index: 2;
+  bottom: var(--space-3);
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 0 14px 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ember);
+  color: var(--ember-ink);
+  font: 600 0.87rem/1 var(--font-ui);
+  box-shadow: 0 8px 20px -6px rgb(0 0 0 / 0.8);
+  transform: translateX(-50%);
+  cursor: pointer;
+  animation: feed-new-in 160ms ease-out;
+}
+
+.feed__new[hidden] { display: none; }
+.feed__new:hover { filter: brightness(1.08); }
+.feed__new:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@keyframes feed-new-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+@media (prefers-reduced-motion: reduce) { .feed__new { animation: none; } }
 
 /* Filters: Story is messages only, Dice is rolls and pool changes only. */
 .table-rail:has(.feed__filter input[value=story]:checked) .feed__items > :not(.feed-item--story):not(.feed-item--talk),

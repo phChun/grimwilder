@@ -75,6 +75,16 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select ".composer input[name=speak_as][value=whisper]", 0
   end
 
+  test "the rail can keep your place: a scroller, a hidden new-lines pill, and who made each line" do
+    note = Roll.note!(campaign: @campaign, by: identities(:gwen), text: "The mill burns.")
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+
+    assert_select ".table-rail[data-controller=feed] .feed__scroller[data-feed-target=scroller]"
+    assert_select ".table-rail button.feed__new[hidden][data-action='feed#latest']"
+    assert_select "##{dom_id(note)}[data-identity=?]", identities(:gwen).id.to_s
+  end
+
   test "whispers never reach another player's page" do
     @campaign.memberships.create!(identity: identities(:stranger), role: :player)
     @campaign.messages.create!(identity: identities(:pip), kind: "whisper", body: "Secret plan")
