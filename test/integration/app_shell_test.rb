@@ -6,6 +6,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
   test "outside a campaign the tabs are the toolkit's, and signed out there's a sign-in button" do
     get root_path
     assert_select ".app-header .brand .brand__name", "Grimwilder"
+    assert_select ".app-header .brand .brand__beta", "Beta"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", "Roll"
     assert_select ".app-header a.account--signin", "Sign in"
     assert_select ".app-header .switcher", 0
