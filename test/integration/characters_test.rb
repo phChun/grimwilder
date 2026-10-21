@@ -36,13 +36,32 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert @tibbs.bloodied?
   end
 
+  test "who they are: lists, title-cased, with what they're not" do
+    @tibbs.update!(traits: [ "brave", "quick-witted" ], not_trait: "rash", desires: [ "glory" ], arcs: [ "uncover the truth" ],
+      bonds: [ { "to" => "Lillylux", "bond" => "lowkey affection" } ])
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+
+    assert_select ".facts div", text: /Traits/ do
+      assert_select ".facts__list li", 3
+      assert_select ".facts__list li", "Brave"
+      assert_select ".facts__list li", "Quick-Witted"
+      assert_select ".facts__list li.facts__not", "But not Rash"
+    end
+    assert_select ".facts__list li.facts__arc", "Uncover the Truth"
+    assert_select ".facts__list li", "Lillylux · Lowkey Affection"
+    assert_equal [ "brave", "quick-witted" ], @tibbs.reload.traits, "stored as typed"
+  end
+
   test "roll a stat from the sheet, spending spark" do
     @tibbs.update!(marked_agility: true)
     sign_in_as identities(:pip)
 
     get character_path(@tibbs)
     assert_select ".stat-card details.stat-roll", 4
-    assert_select ".stat-card--marked .tag--marked", "Marked"
+    assert_select ".stat-card--marked button.mark-toggle[aria-pressed=true]", "Marked"
+    assert_select ".stat-card button.mark-toggle[aria-pressed=false]", { count: 3, text: "Mark" }
+    assert_select "#damage .mark-toggle", 0, "marks are on the stat cards now"
     assert_select "details.stat-roll summary .stat-roll__open", text: "Roll Agility"
     assert_select "details.stat-roll form[action=?]", character_rolls_path(@tibbs) do |forms|
       agility = forms.find { _1.at_css("input[name=stat][value=agility]") }
@@ -66,7 +85,7 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_not @tibbs.reload.marked_agility?
 
     follow_redirect!
-    assert_select "#roll-toast .roll-toast__title", "Agility defense · just now"
+    assert_select "#roll-toast .roll-toast__title", /Agility defense · just now$/
     assert_select "#roll-toast .roll-result__word", roll.critical? ? "Critical" : roll.outcome.capitalize
     assert_select "#roll-toast .roll-result__reason", /#{Regexp.escape(RollsHelper::RESULT_TEXT["defense"][roll.outcome])}/
     assert_select "#roll-toast .roll-toast__setup", "3d Agility + 1 spark + 1d extra + Bram assisting, vs 3t (marked, 2 situational)"
@@ -139,9 +158,18 @@ class CharactersTest < ActionDispatch::IntegrationTest
     post character_experience_path(@tibbs)
     assert_equal 2, @tibbs.reload.level
 
+    get character_path(@tibbs)
+    assert_select "form.condition-form input[type=number][name=dice][aria-label=?]", "Dice (optional)"
+    assert_select "form.condition-form input[type=text][name=condition]"
+
     post character_conditions_path(@tibbs), params: { condition: "4d poisoned" }
-    post character_conditions_path(@tibbs), params: { condition: "twisted ankle", lasts: "scene" }
-    assert_equal [ { "name" => "4d poisoned", "lasts" => nil }, { "name" => "twisted ankle", "lasts" => "scene" } ], @tibbs.reload.conditions
+    post character_conditions_path(@tibbs), params: { condition: "twisted ankle", lasts: "scene", dice: "" }
+    post character_conditions_path(@tibbs), params: { condition: "burning", dice: "3" }
+    post character_conditions_path(@tibbs), params: { condition: "2d cursed", dice: "5" }
+    assert_equal [ { "name" => "4d poisoned", "lasts" => nil }, { "name" => "twisted ankle", "lasts" => "scene" },
+      { "name" => "3d burning", "lasts" => nil }, { "name" => "2d cursed", "lasts" => nil } ], @tibbs.reload.conditions
+    delete character_condition_path(@tibbs, 3)
+    delete character_condition_path(@tibbs, 2)
     delete character_condition_path(@tibbs, 1)
     delete character_condition_path(@tibbs, 0)
     assert_empty @tibbs.reload.conditions

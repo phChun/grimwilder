@@ -13,9 +13,9 @@ class Characters::TalentUsesController < ApplicationController
       Roll.note!(campaign: @character.campaign, by: Current.identity, character: @character, text: "#{@character.name} spends #{use.label.downcase}")
     end
     @character.campaign&.broadcast_table_refresh
-    redirect_to character_path(@character, anchor: "talent-uses")
+    redirect_to character_path(@character, anchor: "talent-#{use.talent_key}")
   rescue ArgumentError => error
-    redirect_to character_path(@character, anchor: "talent-uses"), alert: error.message
+    redirect_to character_path(@character, anchor: "talents"), alert: error.message
   end
 
   private

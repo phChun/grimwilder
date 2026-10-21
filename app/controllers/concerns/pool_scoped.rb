@@ -15,7 +15,7 @@ module PoolScoped
     # Back to the table, or to the sheet when a talent pool was rolled there.
     def back_to_pools(**options)
       if params[:return_to] == "character" && @pool.character
-        redirect_to helpers.character_path(@pool.character, anchor: "talent-uses"), **options
+        redirect_to helpers.character_path(@pool.character, anchor: "talent-#{@pool.use_key.to_s.split("/").first}"), **options
       else
         back_to_table(anchor: helpers.dom_id(@pool), **options)
       end

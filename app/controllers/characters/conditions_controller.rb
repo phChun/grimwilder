@@ -3,8 +3,10 @@ class Characters::ConditionsController < ApplicationController
   include CharacterDamage
 
   def create
-    @character.add_condition!(params.expect(:condition), lasts: params[:lasts])
+    @character.add_condition!(params[:condition], lasts: params[:lasts], dice: params[:dice])
     back_to_damage
+  rescue ArgumentError => error
+    back_to_damage(alert: error.message)
   end
 
   def destroy

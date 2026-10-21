@@ -35,7 +35,7 @@ module Character::Talents
   end
 
   def remove_talent!(key)
-    update!(talent_keys: talent_keys - [ key.to_s ])
+    update!(talent_keys: talent_keys - [ key.to_s ], talent_skins: talent_skins.except(key.to_s))
   end
 
   private

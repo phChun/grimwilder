@@ -291,15 +291,28 @@
   text-decoration: line-through;
 }
 
-/* Thorns: rings. A 7 or 8 cuts. */
+/* Thorns: diamonds (a square turned 45° behind the number, which stays
+   upright). A 7 or 8 cuts, and goes red. */
 .die--d8 {
-  border-radius: 50%;
+  position: relative;
+  isolation: isolate;
   background: transparent;
-  box-shadow: inset 0 0 0 2px var(--line-strong);
   color: var(--dim);
+  font-size: calc(var(--size) * 0.4);
 }
 
-.die--d8.die--cut { box-shadow: inset 0 0 0 2px var(--grim-ring); color: var(--grim); }
+.die--d8::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 15%;
+  border: 2px solid var(--line-strong);
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+
+.die--d8.die--cut { color: var(--grim); }
+.die--d8.die--cut::before { border-color: var(--grim-ring); background: var(--grim-bg); }
 
 .die--assist { box-shadow: inset 0 0 0 1px var(--muted); outline: 1px dashed var(--muted); outline-offset: 2px; }
 .die--spark { box-shadow: inset 0 0 0 2px var(--spark); }
@@ -738,6 +751,7 @@ form.button_to, .button_to { margin: 0; }
 .talent__header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-3); }
 .talent__name { margin: 0; font-size: 1.3rem; }
 .talent__meta { font-size: 0.8rem; color: var(--ink-faint); }
+.talent__summary { margin: 0 0 var(--space-2); font-weight: 600; color: var(--text); }
 .talent__text p { margin: 0 0 var(--space-2); font-size: 0.95rem; }
 .talent__text p:last-child { margin-bottom: 0; }
 .talent__note { margin: 0; padding-left: var(--space-3); border-left: 3px solid var(--line-strong); font-size: 0.88rem; font-style: italic; color: var(--ink-soft); }
@@ -1185,14 +1199,20 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
   background: var(--surface);
 }
 
-.stat-card__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); }
+.stat-card__head { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 0 var(--space-2); }
 .stat-card__name { flex: 1; min-width: 0; margin: 0; font-size: 1.4rem; overflow-wrap: anywhere; }
 .stat-card__dice { font-family: var(--font-dice); font-weight: 600; font-size: 28px; line-height: 1; }
 .stat-card__desc { margin: 0; font-size: 0.87rem; color: var(--dim); }
 
 .tag--marked { margin: 0; border: 0; border-radius: var(--radius-sm); background: var(--grim-bg); color: var(--grim); align-self: center; }
-.stat-card--marked .stat-card__name { flex: 0 1 auto; }
-.stat-card--marked .tag--marked { margin-right: auto; }
+/* Mark / Marked sits centered in the head, between the name and the dice.
+   Mark is quiet (dashed, dim) until it's on, then red. The owner and the GM
+   can toggle it; everyone else sees the red tag when it's marked. */
+.stat-card__head > .stat-card__name { grid-column: 1; }
+.stat-card__head > .stat-card__dice { grid-column: 3; justify-self: end; }
+.stat-card__mark-form { margin: 0; }
+.stat-card .stat-card__mark { min-width: 5.5rem; padding: 0 10px; border-style: dashed; border-radius: var(--radius-sm); color: var(--dim); font-size: 0.8rem; }
+.stat-card .stat-card__mark[aria-pressed="true"] { border-style: solid; border-color: var(--grim); background: var(--grim-bg); color: var(--grim); }
 
 .stat-card:has(.stat-roll[open]) {
   grid-column: span 2;
@@ -1224,13 +1244,21 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .stat-roll__actions { display: flex; gap: var(--space-2); }
 .stat-roll__go { flex: 1; min-height: 48px; font-size: 1rem; }
 
-/* Rows of cards that wrap */
-.sheet__row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
-.sheet__row > * { flex: 1 1 240px; min-width: 0; }
-.sheet__row--even > * { flex: 1 1 280px; }
+/* The sheet's top: stats, then harm. With room (a laptop beside the rail),
+   the stats sit two by two (Brawn, Agility / Wits, Presence) with harm beside them. */
+.sheet { container: sheet / inline-size; }
+.sheet__top { display: flex; flex-direction: column; gap: 12px; }
 
-/* The roll just made from the sheet, as a toast in the bottom corner (away from
-   the rail's composer): grim-red for grim and disaster. toast_controller.js
+@container sheet (min-width: 40rem) {
+  /* Harm is as tall as the stats beside it (its conditions stay right under
+     the harm toggles), until a roll setup opens and makes the stats much taller. */
+  .sheet__top { display: grid; grid-template-columns: minmax(0, 3fr) minmax(15rem, 2fr); align-items: stretch; }
+  .sheet__top:has(.stat-roll[open]) { align-items: start; }
+  .sheet__top .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* The roll you just made, of any kind, as a toast in the bottom corner (away
+   from the rail's composer): grim-red for grim and disaster. toast_controller.js
    hides it after 30 seconds. */
 .roll-toast {
   position: fixed;
@@ -1268,9 +1296,48 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .roll-toast__close { display: grid; place-items: center; width: var(--tap); height: var(--tap); padding: 0; border: 0; border-radius: var(--radius-control); background: none; color: var(--muted); cursor: pointer; }
 .roll-toast__close:hover { background: var(--surface-2); color: var(--text); }
 .roll-toast__setup { margin: 0; font-size: 0.87rem; color: var(--dim); }
+.roll-toast__question { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.35; }
+.roll-toast__result { margin: 0; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; }
+.roll-toast__pool { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.roll-toast__pool .feed-pool__change { font-size: 1.1rem; }
 .roll-toast__note { margin: 0; font-size: 0.87rem; color: var(--text-soft); }
 .roll-toast__note--spark { color: var(--spark); }
 .roll-toast .critical { margin: 0; }
+
+/* Failures (shared/_toasts): grim-red toasts at the top of the screen, clear of
+   the roll toast and the rail's composer, stacking if there's more than one. */
+.toasts {
+  position: fixed;
+  z-index: 40;
+  top: 16px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(28rem, calc(100% - 32px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 4px 4px 16px;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--grim-bg) 92%, black);
+  box-shadow: inset 0 0 0 1px var(--grim-line), 0 12px 32px -8px rgb(0 0 0 / 0.85);
+  pointer-events: auto;
+  animation: toast-in 180ms ease-out;
+}
+
+.toast[hidden] { display: none; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-12px); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+.toast__message { flex: 1; margin: 0; padding: 10px 0; color: var(--text); }
+.toast__close { display: grid; flex: none; place-items: center; width: var(--tap); height: var(--tap); padding: 0; border: 0; border-radius: var(--radius-control); background: none; color: var(--grim); cursor: pointer; }
+.toast__close:hover { background: var(--surface-2); color: var(--text); }
 
 /* Harm */
 .harm { display: flex; flex-direction: column; gap: 12px; }
@@ -1298,8 +1365,6 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 span.harm-toggle { cursor: default; }
 span.harm-toggle:not(.harm-toggle--on) { color: var(--dim); border-style: dashed; }
 
-.harm__marks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
-.harm__label { margin-right: var(--space-1); font-size: 0.87rem; color: var(--dim); }
 
 .mark-toggle {
   min-height: var(--tap);
@@ -1334,17 +1399,41 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 
 .condition-form { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; }
 .condition-form .field__input { flex: 1 1 12rem; min-width: 0; min-height: var(--tap); }
+/* [4]d [poisoned]: the dice count is optional, for a condition that's a pool. */
+.condition-form__dice { display: inline-flex; align-items: center; gap: 4px; }
+.condition-form .condition-form__count { flex: 0 0 3.5rem; width: 3.5rem; padding-inline: 6px; text-align: center; font-family: var(--font-dice); font-weight: 600; }
+.condition-form__d { font-family: var(--font-dice); font-weight: 600; color: var(--muted); }
 .harm__changed { margin: 0; font-size: 12px; color: var(--dim); }
 
 /* Who they are */
 .facts { display: flex; flex-direction: column; gap: 10px; margin: 0; }
-.facts dt,
-.arcs dt { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.facts dt { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
 .facts dd { margin: 0; }
-.facts__line { display: block; }
+.facts__list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding-left: 1.1rem; }
+.facts__list li::marker { color: var(--dim); }
+.facts__not { list-style: none; margin-left: -1.1rem; color: var(--muted); }
+.facts__but { font-size: 0.87rem; color: var(--dim); }
+
+/* Who they are: a column, or a few side by side when the sheet is wide. */
+@container sheet (min-width: 40rem) {
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 12px 20px; }
+}
 
 /* Talents and arcs */
-.talent-card { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-2); padding: 12px; border-radius: var(--radius-control); background: var(--bg); }
+.talents__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-3); }
+.talents__head .card__title { margin: 0; }
+
+/* Talents in boxes that wrap, with "Full text" at the bottom. With room for
+   columns, all are as tall as the tallest. One with its full text open takes
+   the whole row, and then rows size to their own boxes so the rest don't grow
+   with it. */
+.talent-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-2); margin-bottom: var(--space-3); }
+@container sheet (min-width: 40rem) {
+  .talent-list { grid-auto-rows: 1fr; }
+  .talent-list:has(.talent-card__more[open]) { grid-auto-rows: auto; }
+}
+.talent-card:has(> .talent-card__more[open]) { grid-column: 1 / -1; }
+.talent-card { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: var(--radius-control); background: var(--bg); }
 .talent-card__head { display: flex; align-items: baseline; gap: var(--space-2); }
 .talent-card__name { flex: 1; margin: 0; font-family: var(--font-ui); font-size: 1rem; font-weight: 600; }
 .talent-card__core { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--spark); }
@@ -1352,6 +1441,30 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .talent-card__text { margin: 0; font-size: 0.93rem; color: var(--muted); }
 .talent-card__note { margin: var(--space-1) 0 0; font-size: 0.85rem; font-style: italic; color: var(--dim); }
 .talent-card .button_to { margin: var(--space-1) 0 0; align-self: flex-start; }
+.talent-card--skinned { box-shadow: inset 3px 0 0 var(--spark); }
+.talent-card__aka { margin: 0; font-size: 12px; color: var(--dim); }
+.talent-card__summary { margin: 2px 0 0; font-size: 0.93rem; color: var(--muted); }
+.talent-card__label { margin: var(--space-2) 0 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.talent-card__text--own { color: var(--text); }
+
+/* What a talent gives: tick boxes, talent pools, extra thread */
+.talent-card__uses { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2); }
+.talent-card__uses .pool-rows--sheet { margin: 0; }
+.talent-card__chip { align-self: flex-start; margin: 0; padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 0.8rem; color: var(--muted); }
+.use-tracker { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
+.use-tracker__name { font-size: 0.9rem; font-weight: 600; }
+.use-tracker__resets { font-size: 12px; color: var(--dim); }
+
+/* The full text and the re-skin form, folded away */
+.talent-card__more { margin-top: auto; padding-top: var(--space-2); }
+.talent-card__more > .fold__summary { min-height: 2rem; font-size: 0.85rem; font-weight: 600; color: var(--dim); }
+.talent-card__more[open] > .fold__summary { margin-bottom: var(--space-1); }
+.talent-card__more > .talent-card__text + .talent-card__text { margin-top: var(--space-2); }
+.talent-skin { margin-top: var(--space-2); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); }
+.talent-skin > .fold__summary { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+.talent-skin[open] > .fold__summary { margin-bottom: var(--space-2); }
+.talent-skin .field__input { width: 100%; }
+.talent-skin__actions { display: flex; gap: var(--space-2); }
 
 .talent-slot {
   display: flex;
@@ -1368,9 +1481,7 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 
 .talent-slot:hover { color: var(--text); border-color: var(--muted); }
 
-.arcs { display: flex; flex-direction: column; gap: 6px; margin: var(--space-3) 0 0; }
-.arcs > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
-.arcs dd { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 17px; }
+.facts__arc { font-family: var(--font-display); font-style: italic; font-size: 17px; }
 
 .sheet-notes { margin-top: var(--space-3); color: var(--text-soft); }
 .sheet-notes__title { margin: 0 0 var(--space-1); font-family: var(--font-ui); font-size: 0.87rem; font-weight: 600; color: var(--dim); }

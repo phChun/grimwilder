@@ -1,6 +1,4 @@
 <% if notice.present? %>
   <p class="flash flash--notice" role="status"><%= notice %></p>
 <% end %>
-<% if alert.present? %>
-  <p class="flash flash--alert" role="alert"><%= alert %></p>
-<% end %>
+<%# Alerts are toasts: shared/_toasts. %>

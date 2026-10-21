@@ -6,10 +6,6 @@
   <p class="page-header__lede">Open in the middle of the action (pg. 95). If the setup is unclear, open with a story roll.</p>
 </header>
 
-<% if flash[:alert] %>
-  <p class="flash flash--alert"><%= flash[:alert] %></p>
-<% end %>
-
 <% if @session %>
   <%= form_with url: campaign_scenes_path(Current.campaign), class: "panel stack session-form" do %>
     <div class="field">

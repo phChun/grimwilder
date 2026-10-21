@@ -19,6 +19,14 @@ class TalentTest < ActiveSupport::TestCase
     Talent.all.each { |talent| assert talent.text.present?, "#{talent.key} has no text" }
   end
 
+  test "every talent has a one-line summary for the sheet" do
+    Talent.all.each do |talent|
+      assert talent.summary.present?, "#{talent.key} has no summary"
+      assert_operator talent.summary.length, :<=, 100, "#{talent.key}'s summary is too long"
+      assert_no_match(/\n/, talent.summary, talent.key)
+    end
+  end
+
   test "prohibited talents can't be chosen by that path" do
     affinity = Talent.find("eldritch-affinity")
 

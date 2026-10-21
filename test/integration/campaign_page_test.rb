@@ -17,7 +17,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".campaign-hero__pitch", "Toll-roads and a quietly failing accord."
     assert_select ".campaign-hero__facts dd", "Wardens, Outsiders"
     assert_select ".campaign-hero__facts dd", "Mercenaries"
-    assert_select ".campaign-hero__facts dd", "Uncover the truth"
+    assert_select ".campaign-hero__facts dd", "Uncover the Truth"
     assert_select ".campaign-hero__facts dd", "The Bramble Marches"
     assert_select ".campaign-hero__action a.button--primary[href=?]", campaign_table_path(@campaign), "Open the GM table"
     assert_select ".campaign-hero__action button[data-clipboard-text-value=?]", join_url(@campaign.join_code), text: /Copy invite link/
@@ -136,6 +136,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     patch campaign_path(@campaign), params: { campaign: { name: "", pitch: "x" * 201 } }
     assert_response :unprocessable_entity
     assert_select ".form-error", /Name can't be blank.*Pitch is too long/
+    assert_select ".toasts .toast .toast__message", "That didn't save. Check the form for what to fix."
 
     sign_out
     sign_in_as identities(:pip)

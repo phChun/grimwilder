@@ -11,12 +11,14 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get character_path(@fen)
-    assert_select "#talent-uses .use-tracker", /Inspiration/
-    assert_select "#talent-uses button.use-box", 3
-    assert_select "#talent-uses", /Resets each session/
+    assert_select "#talent-inspiration .use-tracker", /Inspiration/
+    assert_select "#talent-inspiration button.use-box", 3
+    assert_select "#talent-inspiration", /Resets each session/
+    assert_select "#talent-bardic-lore .talent-card__chip", "+1 thread each session"
+    assert_select "#talents input[data-talent-uses-target=note]"
 
     patch character_talent_uses_path(@fen), params: { use: "inspiration/inspiration", spent: 1, note: "1" }
-    assert_redirected_to character_path(@fen, anchor: "talent-uses")
+    assert_redirected_to character_path(@fen, anchor: "talent-inspiration")
     assert_equal 1, @fen.reload.talent_uses["inspiration/inspiration"]
     assert_equal "Fen spends inspiration", @campaign.rolls.note.last.question
 
@@ -64,8 +66,11 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
     assert_select "#pools ##{dom_id(luck)}", 0, "talent pools stay on the sheet"
 
+    get character_path(@fen)
+    assert_select "#talent-lucky ##{dom_id(luck)}", 1, "a talent pool sits under its talent"
+
     post campaign_pool_roll_path(@campaign, luck), params: { return_to: "character" }
-    assert_redirected_to character_path(@fen, anchor: "talent-uses")
+    assert_redirected_to character_path(@fen, anchor: "talent-lucky")
     assert luck.reload.last_rolled_at
   end
 end

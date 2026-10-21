@@ -12,10 +12,6 @@
   </p>
 </header>
 
-<% if flash[:alert] %>
-  <p class="flash flash--alert"><%= flash[:alert] %></p>
-<% end %>
-
 <%= form_with url: campaign_play_sessions_path(Current.campaign), class: "panel stack session-form" do %>
   <fieldset class="roll-setup__group">
     <legend class="field__label">Who's here?</legend>

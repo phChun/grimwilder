@@ -1,4 +1,24 @@
 module ApplicationHelper
+  # How long a failure toast (shared/_toast) stays up, unless held.
+  FAILURE_TOAST_SECONDS = 10
+
+  # Short words that stay lowercase inside a title ("Laws of the Land").
+  TITLE_SMALL_WORDS = %w[ a an and as at but by for in nor of on or the to with ].freeze
+
+  # "uncover the truth" -> "Uncover the Truth", "quick-witted" -> "Quick-Witted".
+  # For showing the book's lowercase lists and what players typed from them;
+  # what's stored doesn't change. Capitals already there are kept.
+  def title_case(text)
+    words = text.to_s.squish.split(" ")
+    words.each_with_index.map do |word, index|
+      if index.positive? && index < words.size - 1 && TITLE_SMALL_WORDS.include?(word.downcase)
+        word.downcase
+      else
+        word.gsub(/(\A|-)(\p{Ll})/) { "#{$1}#{$2.upcase}" }
+      end
+    end.join(" ")
+  end
+
   # The play toolkit's tools. They're the header's tabs outside a campaign, and
   # always listed in the footer. `ready: false` items render as "soon".
   TOOLKIT_NAV = [

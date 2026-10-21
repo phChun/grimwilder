@@ -69,7 +69,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
       } }
     end
     assert_response :unprocessable_entity
-    assert_select ".flash--alert", "Only Bram's player can spend their spark."
+    assert_select ".toast__message", "Only Bram's player can spend their spark."
   end
 
   test "an assist must back someone who's quarreling" do
@@ -79,7 +79,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
       @tibbs.id => { role: "quarrel" }, @bram.id => { role: "assist-#{@tibbs.id}" }
     } }
     assert_response :unprocessable_entity
-    assert_select ".flash--alert", "A quarrel needs at least two sides."
+    assert_select ".toast__message", "A quarrel needs at least two sides."
   end
 
   test "outsiders can't quarrel or roll here" do
@@ -116,10 +116,10 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     post campaign_montages_path(@campaign), params: { participants: { @tibbs.id => { spark: 1 } } }
-    assert_select ".flash--alert", "Pick who takes part in the montage."
+    assert_select ".toast__message", "Pick who takes part in the montage."
 
     post campaign_montages_path(@campaign), params: { participants: { @bram.id => { in: "1", spark: 1 } } }
-    assert_select ".flash--alert", "Only Bram's player can spend their spark."
+    assert_select ".toast__message", "Only Bram's player can spend their spark."
     assert_equal 0, @campaign.rolls.montage.count
   end
 end

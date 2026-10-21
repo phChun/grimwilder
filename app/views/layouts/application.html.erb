@@ -40,6 +40,11 @@
       <%= yield %>
     </main>
 
+    <% if toast_roll %>
+      <%= render "rolls/toast", roll: toast_roll %>
+    <% end %>
+    <%= render "shared/toasts" %>
+
     <footer class="site-footer">
       <nav aria-label="Toolkit">
         <ul class="site-footer__tools">

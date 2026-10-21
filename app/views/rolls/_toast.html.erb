@@ -1,0 +1,51 @@
+<%# locals: (roll:) %>
+<%# The roll you just made, of any kind, as a toast on whatever page you land on (the layout renders it from RollsHelper#toast_roll). toast_controller.js hides it after ROLL_TOAST_SECONDS; hovering or focusing it holds it. A critical still waiting on "Nothing fits: take spark" stays until it's closed. Spark and assists go in before a roll (pg. 12–13), so there's no reroll. %>
+<aside id="roll-toast" class="<%= class_names("roll-toast", "roll-toast--#{roll_result_tier(roll)}": roll.outcome) %>" role="status" aria-labelledby="roll-toast-title" data-controller="toast" data-toast-key-value="<%= roll_toast_key(roll) %>" data-toast-seconds-value="<%= roll_toast_seconds_left(roll) %>" data-toast-sticky-value="<%= roll_toast_sticky?(roll) %>" data-action="mouseenter->toast#pause mouseleave->toast#resume focusin->toast#pause focusout->toast#resume turbo:morph@document->toast#sync">
+  <div class="roll-toast__head">
+    <h2 id="roll-toast-title" class="roll-toast__title"><%= roll_toast_heading(roll) %></h2>
+    <button type="button" class="roll-toast__close" aria-label="Close" data-action="toast#close"><%= icon(:close, size: 18) %></button>
+  </div>
+
+  <% if roll.question %>
+    <p class="roll-toast__question"><%= roll.quarrel? ? "Stakes: #{roll.question}" : roll.question %></p>
+  <% end %>
+
+  <% if roll.quarrel? || roll.montage? %>
+    <ul class="quarrel-sides">
+      <% roll.sides.each do |side| %>
+        <li class="<%= class_names("quarrel-side", "quarrel-side--winner": roll.quarrel? && side["name"] == roll.winner) %>">
+          <span class="quarrel-side__name"><%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if roll.montage? %>: <%= side["outcome"] %><%= " (critical)" if side["critical"] %><% end %></span>
+          <span class="feed-roll__dice"><%= side_dice_tags(side) %></span>
+        </li>
+      <% end %>
+    </ul>
+    <p class="roll-toast__result"><%= roll.quarrel? ? quarrel_result(roll) : "Montage: #{roll.outcome}" %></p>
+    <p class="roll-toast__setup"><% if roll.montage? %>The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.<% else %><% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %><% end %></p>
+  <% elsif roll.pool? && roll.outcome.nil? %>
+    <div class="roll-toast__pool">
+      <div class="roll-result__dice"><%= roll_dice_tags(roll, size: 32) %></div>
+      <% if roll.dropped %><span class="feed-pool__change"><%= roll.remaining + roll.dropped.to_i %>d → <strong><%= roll.remaining %>d</strong></span><% end %>
+    </div>
+    <p class="roll-toast__setup"><%= pool_roll_summary(roll) %></p>
+  <% else %>
+    <%= render "shared/roll_result", roll: roll, detail: (roll_result_text(roll) unless roll.pool?) %>
+    <p class="roll-toast__setup"><%= roll.pool? ? pool_roll_summary(roll) : roll_setup(roll) %></p>
+
+    <% if roll.critical? && (roll.action? || roll.defense?) %>
+      <div class="critical">
+        <p>Pick one: <strong>Greater effect</strong> (drop 1d from the task pool before rolling), <strong>Secondary effect</strong> (gain another related perfect), or <strong>Setup</strong> (a riskless assist on a follow-up). If nothing comes to mind, take spark.</p>
+        <% if roll_toast_sticky?(roll) %>
+          <%= button_to "Nothing fits: take spark", character_roll_critical_spark_path(roll.character, roll), class: "button critical__spark" %>
+        <% elsif !roll.spark_gained? && roll.character && roll.character.spark >= Grimwild::MAX_SPARK %>
+          <p class="roll-toast__note"><%= roll.character.name %> already holds <%= Grimwild::MAX_SPARK %> spark.</p>
+        <% end %>
+      </div>
+    <% end %>
+    <% if roll.assists.any? && roll.outcome != "perfect" %>
+      <p class="roll-toast__note"><%= roll.assists.pluck("name").to_sentence %> assisted, so the impact move can hit them too.</p>
+    <% end %>
+    <% if (note = roll_spark_note(roll)) %>
+      <p class="roll-toast__note roll-toast__note--spark"><%= note %></p>
+    <% end %>
+  <% end %>
+</aside>

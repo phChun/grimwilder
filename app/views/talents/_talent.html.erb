@@ -1,5 +1,5 @@
 <%# locals: (talent:, character: nil) %>
-<article id="talent-<%= talent.key %>" class="<%= class_names("talent", "talent--core": talent.core?) %>" data-talent-filter-target="item" data-search="<%= [ talent.name, talent.group.name, talent.text ].join(" ").downcase %>">
+<article id="talent-<%= talent.key %>" class="<%= class_names("talent", "talent--core": talent.core?) %>" data-talent-filter-target="item" data-search="<%= [ talent.name, talent.group.name, talent.summary, talent.text ].join(" ").downcase %>">
   <header class="talent__header">
     <h3 class="talent__name"><%= talent.name %></h3>
     <span class="talent__meta">
@@ -8,6 +8,7 @@
       pg. <%= talent.page %>
     </span>
   </header>
+  <p class="talent__summary"><%= talent.summary %></p>
   <div class="talent__text">
     <% talent.paragraphs.each do |paragraph| %>
       <p><%= paragraph %></p>

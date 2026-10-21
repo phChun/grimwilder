@@ -104,6 +104,6 @@ class PlaySessionsTest < ActionDispatch::IntegrationTest
 
     post campaign_play_sessions_path(@campaign), params: { character_ids: [ @tibbs.id ] }
     assert_response :unprocessable_entity
-    assert_select ".flash--alert", "Session 1 is still going."
+    assert_select ".toast__message", "Session 1 is still going."
   end
 end

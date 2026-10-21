@@ -5,9 +5,10 @@ import { Controller } from "@hotwired/stimulus"
 // A sticky one stays until closed. A Turbo morph re-renders it with the
 // server's markup, so after every morph this puts back whatever the person
 // already did: a toast that's gone stays gone (closed ones are remembered for
-// this tab by key).
+// this tab by key). With `remove`, a toast leaves the page once it's gone
+// (the failure toasts, which are data-turbo-permanent and would pile up).
 export default class extends Controller {
-  static values = { key: String, seconds: Number, sticky: Boolean }
+  static values = { key: String, seconds: Number, sticky: Boolean, remove: Boolean }
 
   connect() {
     this.sync()
@@ -62,6 +63,7 @@ export default class extends Controller {
   hide() {
     clearTimeout(this.timer)
     this.element.hidden = true
+    if (this.removeValue) this.element.remove()
   }
 }
 

@@ -1,0 +1,8 @@
+<%# Failures as toasts at the top of the screen, so they're seen wherever the page is scrolled: an alert flash, a form sent back to fix (422), or (from toasts_controller.js) a save that couldn't reach the server. Each toast is data-turbo-permanent with its own id, so a morph refresh neither wipes it nor stops a newer one arriving. %>
+<% message = alert.presence || ("That didn't save. Check the form for what to fix." if response.status == 422) %>
+<div id="toasts" class="toasts" data-controller="toasts" data-action="turbo:fetch-request-error@document->toasts#unreachable toasts:show@document->toasts#announce turbo:before-cache@document->toasts#clear">
+  <% if message %>
+    <%= render "shared/toast", message: message %>
+  <% end %>
+  <template data-toasts-target="template"><%= render "shared/toast", message: "" %></template>
+</div>

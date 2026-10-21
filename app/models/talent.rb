@@ -3,7 +3,7 @@
 # any talent (pg. 52) except those marked "[Prohibited: Path]".
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :text, :note, :page, :group, :core, :uses)
+class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses)
   def self.all
     catalog[:talents]
   end
@@ -56,7 +56,7 @@ class Talent < Data.define(:key, :name, :text, :note, :page, :group, :core, :use
 
   def self.build(attributes, group:, core:)
     key = keyify(attributes["name"])
-    new(key: key, name: attributes["name"], text: attributes["text"], note: (attributes["note"] unless core), page: attributes["page"],
+    new(key: key, name: attributes["name"], summary: attributes["summary"], text: attributes["text"], note: (attributes["note"] unless core), page: attributes["page"],
       group: group, core: core, uses: Array(attributes["uses"]).map { Talent::Use.from(key, _1) })
   end
 

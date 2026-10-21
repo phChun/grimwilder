@@ -5,6 +5,8 @@ module Character::Damage
   HARMS = %w[ bloodied rattled desperate ].freeze
   # "4d poisoned": a condition that's also a timer pool (pg. 29).
   CONDITION_POOL = /\A(\d+)d\s+(\S.*)\z/i
+  # Pools run 1–20 dice (Pool#starting_size), and so do condition pools.
+  CONDITION_MAX_DICE = 20
 
   included do
     # Whoever is changing marks, harm or conditions right now. Callers set it
@@ -94,7 +96,13 @@ module Character::Damage
     end
   end
 
-  def add_condition!(name, lasts: nil)
+  # dice: makes it a pool ("4d poisoned"), unless the name already is one.
+  def add_condition!(name, lasts: nil, dice: nil)
+    name = name.to_s.squish
+    raise ArgumentError, "Name the condition to add it." if name.empty?
+
+    dice = dice.to_i.clamp(0, CONDITION_MAX_DICE)
+    name = "#{dice}d #{name}" if dice.positive? && name.present? && !name.match?(CONDITION_POOL)
     update!(conditions: conditions + [ { "name" => name, "lasts" => lasts } ])
   end
 

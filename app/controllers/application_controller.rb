@@ -6,4 +6,21 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  rescue_from ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved, with: :not_saved
+  rescue_from ActionController::ParameterMissing, with: :not_saved
+
+  private
+    # A save nothing else caught, or a form sent with something missing: back
+    # where they were, with a toast saying why (shared/_toasts), instead of an
+    # error page.
+    def not_saved(error)
+      raise error if request.get?
+
+      errors = error.respond_to?(:record) ? error.record&.errors&.full_messages.to_a : [ "Fill in #{error.param.to_s.humanize(capitalize: false)} and try again." ]
+      respond_to do |format|
+        format.html { redirect_back_or_to root_path, status: :see_other, alert: [ "That didn't save.", errors.to_sentence.presence ].compact.join(" ") }
+        format.any { head :unprocessable_entity }
+      end
+    end
 end

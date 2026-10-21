@@ -23,7 +23,7 @@
         <dl class="campaign-hero__facts">
           <div><dt>The party is</dt><dd><%= campaign.party_is.join(", ").presence || "—" %></dd></div>
           <div><dt>Never</dt><dd><%= campaign.party_never || "—" %></dd></div>
-          <div><dt>Group arc</dt><dd><%= campaign.group_arc&.capitalize || "—" %></dd></div>
+          <div><dt>Group arc</dt><dd><%= campaign.group_arc.present? ? title_case(campaign.group_arc) : "—" %></dd></div>
           <div><dt>Setting</dt><dd><%= campaign.setting || "—" %></dd></div>
         </dl>
       <% end %>

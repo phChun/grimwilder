@@ -52,10 +52,15 @@ export default class extends Controller {
         button.classList.add("feed-item__star--done")
         button.lastChild.textContent = " Starred for next session"
       } else {
-        button.disabled = false
+        this.failed(button, "That star didn't save. Try again.")
       }
     } catch {
-      button.disabled = false
+      this.failed(button, "Couldn't reach Grimwilder, so that star didn't save. Check your connection and try again.")
     }
+  }
+
+  failed(button, message) {
+    button.disabled = false
+    document.dispatchEvent(new CustomEvent("toasts:show", { detail: { message } }))
   }
 }

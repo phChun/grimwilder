@@ -13,7 +13,7 @@ class GmHarmTest < ActionDispatch::IntegrationTest
     get character_path(@tibbs)
 
     assert_select "#damage form[action=?] button[aria-pressed=false]", character_damage_path(@tibbs), text: "Bloodied"
-    assert_select "#damage form[action=?] button", character_damage_path(@tibbs), text: "Agility"
+    assert_select ".stat-card form[action=?] button[aria-label=?]", character_damage_path(@tibbs), "Mark Agility", text: "Mark"
     assert_select "#damage form[action=?]", character_conditions_path(@tibbs)
     assert_select "details.stat-roll", 0, "only the owner rolls"
     assert_select ".adjust", 0, "nor spends spark or thread"

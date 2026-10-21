@@ -20,6 +20,49 @@ module RollsHelper
     }
   }.freeze
 
+  # The roll you just made shows as a toast (rolls/_toast, in the layout) on
+  # whatever page you land on, for this long after it was made or changed
+  # (taking spark for a critical changes it).
+  ROLL_TOAST_SECONDS = 30
+
+  # Your newest roll, while it's still toast-worthy.
+  def toast_roll
+    return unless Current.identity
+    return @toast_roll if defined?(@toast_roll)
+
+    roll = Roll.where(identity: Current.identity).where.not(kind: %w[ marker note ]).order(updated_at: :desc, id: :desc).first
+    @toast_roll = roll if roll && (roll_toast_seconds_left(roll).positive? || roll_toast_sticky?(roll))
+  end
+
+  def roll_toast_seconds_left(roll)
+    [ (ROLL_TOAST_SECONDS - (Time.current - roll.updated_at)).ceil, 0 ].max
+  end
+
+  # A critical waiting on its owner's choice stays until it's closed.
+  def roll_toast_sticky?(roll)
+    character = roll.character
+    character.present? && character.identity_id == Current.identity&.id && character.can_take_spark_for?(roll)
+  end
+
+  # Changes when the roll does, so a closed toast comes back for news.
+  def roll_toast_key(roll)
+    "roll-#{roll.id}-#{roll.updated_at.to_i}"
+  end
+
+  # "Gibbles · Agility defense · just now", "Story roll · 5 minutes ago"
+  def roll_toast_heading(roll)
+    what =
+      case roll.kind
+      when "action", "defense" then "#{roll.name} · #{roll.stat.capitalize}#{" defense" if roll.defense?}"
+      when "story" then "#{"#{roll.name} · " if roll.character}Story roll"
+      when "montage" then "Montage · #{roll.name}"
+      when "quarrel" then "Quarrel · #{roll.name}"
+      else "#{roll.name}#{": #{roll.phase}" if roll.phase}#{", as an action" if roll.outcome}"
+      end
+    when_rolled = roll.created_at > 1.minute.ago ? "just now" : "#{time_ago_in_words(roll.created_at)} ago"
+    "#{what} · #{when_rolled}"
+  end
+
   def roll_result_text(roll)
     RESULT_TEXT.fetch(roll.kind).fetch(roll.outcome)
   end

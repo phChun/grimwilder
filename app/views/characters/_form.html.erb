@@ -4,11 +4,11 @@
     <p class="flash flash--alert"><%= character.errors.full_messages.to_sentence %></p>
   <% end %>
 
-  <datalist id="traits-list"><% Grimwild.traits.each do |trait| %><option value="<%= trait %>"></option><% end %></datalist>
-  <datalist id="desires-list"><% Grimwild.desires.each do |desire| %><option value="<%= desire %>"></option><% end %></datalist>
-  <datalist id="styles-list"><% Grimwild.weapon_styles.each do |style| %><option value="<%= style %>"></option><% end %></datalist>
+  <datalist id="traits-list"><% Grimwild.traits.each do |trait| %><option value="<%= title_case(trait) %>"></option><% end %></datalist>
+  <datalist id="desires-list"><% Grimwild.desires.each do |desire| %><option value="<%= title_case(desire) %>"></option><% end %></datalist>
+  <datalist id="styles-list"><% Grimwild.weapon_styles.each do |style| %><option value="<%= title_case(style) %>"></option><% end %></datalist>
   <datalist id="backgrounds-list"><% Grimwild.backgrounds.each_key do |background| %><option value="<%= background %>"></option><% end %></datalist>
-  <datalist id="arcs-list"><% Grimwild.arcs.values.flatten.each do |arc| %><option value="<%= arc %>"></option><% end %></datalist>
+  <datalist id="arcs-list"><% Grimwild.arcs.values.flatten.each do |arc| %><option value="<%= title_case(arc) %>"></option><% end %></datalist>
 
   <section class="panel stack" aria-labelledby="form-basics">
     <h2 id="form-basics" class="panel__title">Who they are</h2>
@@ -52,7 +52,7 @@
     </div>
   </section>
 
-  <section class="panel stack" aria-labelledby="form-backgrounds" data-controller="background" data-background-wises-value="<%= Grimwild.backgrounds.to_json %>">
+  <section class="panel stack" aria-labelledby="form-backgrounds" data-controller="background" data-background-wises-value="<%= Grimwild.backgrounds.transform_values { |wises| wises.map { title_case(_1) } }.to_json %>">
     <h2 id="form-backgrounds" class="panel__title">Backgrounds</h2>
     <p class="field__hint">Two backgrounds, each with three wises. Pick a common one to fill in its wises, then make them your own.</p>
     <div class="two-up">
@@ -62,7 +62,7 @@
           <legend class="field__label">Background <%= i + 1 %></legend>
           <input type="text" name="character[backgrounds][<%= i %>][name]" value="<%= background["name"] %>" list="backgrounds-list" placeholder="Charlatan" autocomplete="off" class="field__input" aria-label="Background <%= i + 1 %> name" data-action="change->background#fill" data-index="<%= i %>">
           <% 3.times do |w| %>
-            <input type="text" name="character[backgrounds][<%= i %>][wises][]" value="<%= background.fetch("wises", [])[w] %>" placeholder="wise" autocomplete="off" class="field__input field__input--small" aria-label="Background <%= i + 1 %> wise <%= w + 1 %>" data-background-target="wise" data-index="<%= i %>">
+            <input type="text" name="character[backgrounds][<%= i %>][wises][]" value="<%= background.fetch("wises", [])[w] %>" placeholder="Wise" autocomplete="off" class="field__input field__input--small" aria-label="Background <%= i + 1 %> wise <%= w + 1 %>" data-background-target="wise" data-index="<%= i %>">
           <% end %>
         </fieldset>
       <% end %>
@@ -77,14 +77,14 @@
         <% 2.times do |i| %>
           <input type="text" name="character[traits][]" value="<%= character.traits[i] %>" list="traits-list" autocomplete="off" class="field__input" aria-label="Trait <%= i + 1 %>">
         <% end %>
-        <%= form.text_field :not_trait, list: "traits-list", autocomplete: "off", placeholder: "but not…", class: "field__input", "aria-label": "Trait you aren't" %>
+        <%= form.text_field :not_trait, list: "traits-list", autocomplete: "off", placeholder: "But not…", class: "field__input", "aria-label": "Trait you aren't" %>
       </fieldset>
       <fieldset class="fieldset">
         <legend class="field__label">Desires: 2 you want, 1 you don't</legend>
         <% 2.times do |i| %>
           <input type="text" name="character[desires][]" value="<%= character.desires[i] %>" list="desires-list" autocomplete="off" class="field__input" aria-label="Desire <%= i + 1 %>">
         <% end %>
-        <%= form.text_field :not_desire, list: "desires-list", autocomplete: "off", placeholder: "but not…", class: "field__input", "aria-label": "Desire you don't want" %>
+        <%= form.text_field :not_desire, list: "desires-list", autocomplete: "off", placeholder: "But not…", class: "field__input", "aria-label": "Desire you don't want" %>
       </fieldset>
     </div>
   </section>
@@ -125,10 +125,10 @@
       <% (character.bonds + [ {}, {} ]).each_with_index do |bond, i| %>
         <div class="two-up">
           <input type="text" name="character[bonds][<%= i %>][to]" value="<%= bond["to"] %>" placeholder="Lillylux" autocomplete="off" class="field__input" aria-label="Bond <%= i + 1 %>: character">
-          <input type="text" name="character[bonds][<%= i %>][bond]" value="<%= bond["bond"] %>" placeholder="lowkey affection" autocomplete="off" class="field__input" aria-label="Bond <%= i + 1 %>: intensity and nature">
+          <input type="text" name="character[bonds][<%= i %>][bond]" value="<%= bond["bond"] %>" placeholder="Lowkey Affection" autocomplete="off" class="field__input" aria-label="Bond <%= i + 1 %>: intensity and nature">
         </div>
       <% end %>
-      <p class="field__hint">Match an intensity (<%= Grimwild.bond_intensities.to_sentence(last_word_connector: " or ") %>) with a nature like <%= Grimwild.bond_natures.first(6).join(", ") %>.</p>
+      <p class="field__hint">Match an intensity (<%= Grimwild.bond_intensities.map { title_case(_1) }.to_sentence(last_word_connector: " or ") %>) with a nature like <%= Grimwild.bond_natures.first(6).map { title_case(_1) }.join(", ") %>.</p>
     </fieldset>
   </section>
 

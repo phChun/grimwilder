@@ -4,6 +4,8 @@
 #
 # Extracted from the book's text layer, then hand-checked. "note" holds the
 # book's sidebar tip for a talent. Any talent can be taken by any path (pg. 52).
+# "summary" is our own one-line gist for the character sheet (not book text);
+# keep it under 100 characters.
 - key: artificer
   name: Artificer
   kind: path
@@ -12,6 +14,7 @@
   tagline: You shape the world with your creations, blending ingenuity, craftsmanship, and magic to forge and enchant wonders.
   core:
     name: Infusion
+    summary: "Your path talents are magitech gizmos you built, and can rebuild or teach others to use."
     text: 'You can reflavor any of your path talents to actually be the effects of magical gizmos you’ve created. Toss in some magitech buzzwords that almost make sense, and use them to sound like you know what you’re talking about—perfect for baffling the less inventive. You can teach others to use them, though doing so always carries risk. If any of these gizmos is ever lost, you can recreate them with some effort during any downtime.
 
 
@@ -25,28 +28,35 @@
     page: 54
   talents:
   - name: Animate Objects
+    summary: "Given time, bring objects to life as a 2d power pool that follows one-word commands."
     text: Given time, you can bestow a semblance of life into objects, giving them a 2d Animated power pool, and controlling them with simple one-word commands. They can roll 1d of their power pool to assist you. You can reliably command up to three of these at a time, with others following their nature. “Following their nature” means they mindlessly do what they were created to do. Brooms sweep, wrenches crank bolts, daggers attack—all without direction from you.
     page: 55
   - name: Grenades
+    summary: "A 3d Grenades resource pool each session for area bombs: entangle, force, fiery and more."
     text: 'Each session, you have a 3d Grenades resource pool. You have access to the following bombs: entangle—force—fiery—gravity—obscuring—stun. These grenades affect multiple targets or an area.'
     page: 55
     uses:
     - { key: grenades, label: Grenades, pool: 3, pool_kind: resource, per: session }
   - name: Artificial Parts
+    summary: "Replacement body parts with 3 perks, each good for +1d once a session, and a drawback."
     text: 'You have enhanced replacement body parts. Choose 3 benefits for them: built-in weapon—detachable—independent—keen sense—storage—strong. Each perk can be activated once per session to take +1d on a related roll. They also have a drawback: noisy—horrifying—unreliable—power source.'
     page: 55
     uses:
     - { key: perks, label: Perks, count: 3, per: session }
   - name: Mischief Maker
+    summary: "Overload arcana for a potent 2d story roll, adding +1t for each extra use in a session."
     text: You can overload arcana to create a potent effect with it. Make a 2d story roll as the magic goes haywire. Add +1t to the story roll each time you use this after the first, clearing them each session.
     page: 55
   - name: Magnum Opus
+    summary: "Build a mythic arcana: a 6d power pool whose touchstones you roll and lock in over time."
     text: You’re in the process of creating a mythic arcana. It has a 6d power pool as normal, but before each session, roll 3 random touchstones. Each time, you can choose 1 touchstone to lock in, never rolling for it again.
     page: 55
   - name: Trap Making
+    summary: "Given time, set potent traps; push yourself to deploy one on the spot. Spark on a perfect."
     text: 'Given time, you can set potent traps, with an effect based on the style: blade—collapse—entangle—fire—poison—alarm. Push yourself to deploy a trap on the spot. On a perfect when triggered, take spark.'
     page: 55
   - name: Wandslinger
+    summary: "Fire magic bolts with Wits; once a session, add a secondary effect as a critical."
     text: 'You have a specialized wand and can use it to fire the following bolts of magic using Wits: acid burst—force blast—ice shard—inferno bolt—static charge—stun beam. Once per session, you can cause a secondary effect (as a critical) related to the type.'
     page: 55
     uses:
@@ -59,6 +69,7 @@
   tagline: You spin tales and songs that stir emotions, inspire bravery, and turn simple deeds into legends.
   core:
     name: Inspiration
+    summary: "3 inspiration a session to bump an ally's die, sway vex or clear marks; more with Presence."
     text: 'Each session, you have 3 inspiration you can use to bolster the spirits of those around you and influence your foes. You can spend inspiration to: increase an ally''s die result by 1 (3→4)—calm or intensify a vex response—clear a mark from an ally. You can also spend inspiration and roll Presence to: pull off a potent feat of emotional influence—interrupt an impact move—clear rattled from an ally.
 
 
@@ -68,28 +79,35 @@
     - { key: inspiration, label: Inspiration, count: 3, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
   talents:
   - name: Dynamic Entrance
+    summary: "Appear in any scene where and when you like, with a 3d story roll for the entrance."
     text: You can always appear in a scene exactly where and when you want, limited only by your physical capabilities. Make a 3d story roll to describe your entrance and its effect.
     note: The player sets the scene for their entrance, allowing extra details based on the result, almost as an action—even an interrupt, itself. The GM will step in if something doesn’t fit.
     page: 57
   - name: Folk Hero
+    summary: "Spend inspiration and spark interchangeably; a 6 on your spark die gives it back."
     text: You can spend inspiration and spark interchangeably. If your spark die comes up as a 6, you regain it. Tales of your heroism are told throughout the area; track their spread with campaign pools.
     note: 'Note: this doesn''t grant the inspiration core talent to non-bards. For every free room and home-cooked meal, you’re likely to have a plea for help, swindlers, starry-eyed followers, and those looking to pick a fight. Any of these would make great tangles.'
     page: 57
   - name: Jack of All Trades
+    summary: "+1d on montage rolls, and a 3d power pool of know-how from your travels."
     text: You take +1d on montage rolls and have a 3d power pool to represent the smattering of knowledge from your travels.
     page: 57
   - name: Forked Tongue
+    summary: "Given time, tell potent lies; push yourself to do it on the spot."
     text: When given time, you can tell potent lies, such as telling the king you're their bastard or a prophecy foretelling the fall of the capital. You can push yourself to do it on the spot.
     page: 57
   - name: Friendly Face
+    summary: "In any new town you know someone, make a friend or meet a fan who'll do you a favor."
     text: 'In any new town or district of a city you go to, you can always: know someone useful—quickly make a friend—be recognized by a fan. They’ll gladly do you a reasonable favor. Take spark if you promise to pay them back.'
     page: 57
   - name: Bardic Lore
+    summary: "3 wises, +1 thread a session, and +1d on story rolls about what you know."
     text: You gain any 3 wises and 1 extra thread per session. You take +1d on any story rolls pertaining to what you know or story details you add.
     page: 57
     uses:
     - { key: thread, thread: 1 }
   - name: Wordplay
+    summary: "Quips on a perfect defense; once a session, goad the GM into spending suspense on talk."
     text: 'On a perfect defense roll when the situation allows for verbal quips, you make them: embarrass themself—let a secret slip—focus on or lose track of you. Once per session, you can goad the GM into spending suspense on conversation.'
     page: 57
     uses:
@@ -102,6 +120,7 @@
   tagline: You don't just fight—you crush anything and everything in your path until nothing stands before you.
   core:
     name: Frenzy
+    summary: "Once a session (or when hurt), rage for a scene: +1d per mark, ignore harm thorns, wreck things."
     text: 'Once per session, or when you get bloodied or take vex, you can enter a frenzy for a scene. During the frenzy, you can only take aggressive actions. You also: take +1d for each mark you have and ignore all thorns from harm and marks—always add collateral damage: send something flying—smash mooks—throw insults—wreck something—always get a final action when dropped. On a critical, ignore getting dropped.
 
 
@@ -117,25 +136,32 @@
     - { key: frenzy, label: Frenzy, count: 1, per: session, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Fearsome
+    summary: "NPCs fear you, and thread sets how; push yourself for potent feats of intimidation."
     text: 'Your presence instills fear in others. The GM judges an NPC’s response, or you can spend thread to set it: hostile—nervous—respectful—scared. You can push yourself to pull off a potent feat of intimidation, such as staring down a dragon or demanding to see the king.'
     note: What exactly makes you so frightening to be around? This could merely be your appearance, but it could also be the way you talk, hold yourself, dress, reputation, or a combination thereof.
     page: 59
   - name: Flesh Wounds
+    summary: "Take a Flesh Wound (+1t until the scene ends) instead of getting bloodied."
     text: When you would get bloodied, you can instead take a Flesh Wound, a condition that inflicts +1t on all rolls, and is cleared when the scene ends. On a disaster, you take the harm as normal.
     page: 59
   - name: Into the Fray
+    summary: "First in: 5s count as 6s and 4s as 1s on your first roll, and you set up whoever follows."
     text: When you’re the first into an intense situation, 5s count as 6s, but 4s count as 1s on your first roll. You also setup the first person following you regardless of your roll outcome.
     page: 59
   - name: Joyful Warrior
+    summary: "On a critical or when bloodied, take spark and clear allies' marks or bring one back."
     text: 'On a critical or when bloodied in battle, you take spark and can: clear one mark from each ally—bring a dropped (not dead) ally back into the scene.'
     page: 59
   - name: Mighty
+    summary: "Given time, potent feats of raw strength; push yourself to do it on the spot."
     text: When given time, you can pull off potent feats of raw strength. You can push yourself to do it on the spot.
     page: 59
   - name: Overkill
+    summary: "On a violent critical, add an extra secondary effect or roll the task pool twice."
     text: 'On a critical when bringing violence, threats, or destruction to bear, you can: cause an extra secondary effect—roll the related task pool twice.'
     page: 59
   - name: Warcry
+    summary: "Twice a session, a battle cry bumps an ally's die, sways vex or clears a mark."
     text: 'Twice per session, you can bolster your allies or strike fear in your foes with an inspiring battle cry, letting you: increase an ally''s die result by 1 (3 → 4)—calm or intensify a vex response—clear a mark from an ally. [Prohibited: Bard]'
     page: 59
     uses:
@@ -148,6 +174,7 @@
   tagline: You serve as a conduit for the divine, channeling holy power to safeguard the faithful and do your god's bidding.
   core:
     name: Channel Divinity
+    summary: "Cast through your god: a 6d major rite and two 4d minor rites, refilled each session."
     text: 'CHANNEL DIVINITY Core Talent You have spellcasting ability, calling upon your deity to channel their magic. You roll a rite pool to cast spells, and that pool and your god’s title serve as touchstones. Your major rite is a 6d power pool, and your 2 minor rites are 4d power pools. They replenish each session. You can drop 1d and roll to cast a potent spell. Spells without risk are automatically successful, unless potent.
 
 
@@ -159,29 +186,36 @@
     - { key: minor-rite-2, label: Second minor rite, pool: 4, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Blessed
+    summary: "Once a session, re-roll a roll you just made with no thorns. Spark on a perfect."
     text: Once per session, you can re-roll a roll you just made as your god attempts to intervene. The re-roll is made without any thorns on it. On a perfect, take spark.
     page: 61
     uses:
     - { key: reroll, label: Re-roll, count: 1, per: session }
   - name: Devout
+    summary: "Your word is trusted and foes won't kill you lightly, but acting in bad faith takes a push."
     text: Intelligent creatures recognize you as a person of deep honesty and only your most hated enemies would treat you with a lack of respect or doubt your word. You are never seriously injured or killed by an enemy, unless they have no choice. Any creature with speech will always hear you out. This aura is upheld by your unwavering commitment—you must push yourself to act in bad faith. You stick to your principles unwaveringly, and even those acting against you know. How does this impact those around you? This is sure to cause tangles, perhaps even quarrels.
     page: 61
   - name: Healer
+    summary: "+1d when healing, spark for both on a critical, and one return from the recently dead."
     text: You take +1d when you heal someone, with magic or treatment. On a critical, both of you take spark. One time only, you can bring back the recently dead. Common sense takes precedent.
     page: 61
   - name: Iron Will
+    summary: "A 2d Iron Will resource pool each session to shrug off rattled or vex."
     text: 'Each session, you have a 2d Iron Will resource pool. When you get rattled or take vex, roll the pool to ignore it. If the situation allows for it, you can also lash out at the cause or a bystander and: instill dread in their heart—sow doubt in their mind.'
     page: 61
     uses:
     - { key: iron-will, label: Iron Will, pool: 2, pool_kind: resource, per: session }
   - name: Rings False
+    summary: "You always know a lie when you hear one; +1d on a follow-up when you call it out."
     text: You always know when someone is lying, though not necessarily the truth. You take +1d on a follow-up if you reveal you know they’re lying.
     note: This could be seen through a darker lens, flavored as having been around criminal types and ne'er-do-wells for far too long.
     page: 61
   - name: Sermons
+    summary: "Given time, potent feats of persuasion for your faith; push yourself to do it on the spot."
     text: When given time, you can pull off potent feats of persuasion in the name of your beliefs, like commanding a crowd to bring the duke for judgment or showing the goblins the glory of your god. You can push yourself to do it on the spot. One time only, you can make this a ritual-level effect.
     page: 61
   - name: Shepherd
+    summary: "+1d when you assist an ally's defense against rattled or vex; spark for both on a perfect."
     text: When you assist an ally on a defense roll that would leave them rattled or with vex, you can invoke your bond to take +1d on the roll. On a perfect, you both take spark.
     page: 61
 - key: druid
@@ -192,6 +226,7 @@
   tagline: You embrace and embody the untamed power of the natural world, transforming into beasts and channeling the spirit of the wild.
   core:
     name: Wild Shape
+    summary: "Shift into beast forms with a 2d Wild Shape resource pool that refills each scene."
     text: 'Shift into any familiar beast form by using a 2d Wild Shape resource pool, replenishing each scene. You take on the form’s physical qualities and feral instincts, moving stat points to represent this (min 1, max 3). You lose access to your own physical talents. Drop 1d before rolling for each wild talent, such as: aquatic—smaller than a cat—bigger than a bear—flying—a thematic path talent.
 
 
@@ -201,29 +236,36 @@
     - { key: wild-shape, label: Wild Shape, pool: 2, pool_kind: resource, per: scene, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Augury
+    summary: "Roll 2 omens before each session and swap one in for any d6 rolled at the table."
     text: You can read the world around you and interpret its signs. Before each session, roll 2d and record the results. These are your Omens. During the session, you can replace any rolled d6 (by anyone) with an omen result, then erase it.
     page: 63
   - name: Awaken
+    summary: "Once a scene, awaken nature nearby as a 3d power pool you can direct."
     text: Once per scene, you may awaken a living natural feature—plants, animals, fungi, or the like—within or nearby the scene. It gains awareness and purpose, forming a 3d power pool you can direct, guided by its nature. One time only, you can make this a ritual-level effect.
     page: 63
     uses:
     - { key: awaken, label: Awaken, count: 1, per: scene }
   - name: Kindred Spirits
+    summary: "Speak with animals, plants and spirits, call them to you, and sense hidden dangers."
     text: You can speak with all manner of wild things—animals, plants, and spirits. When you meet, they know of you. Roll their bond with you or spend thread to establish it. When you call, those nearby will answer. You always sense the presence of hidden dangers in places teeming with wildlife.
     note: Not everything communicates as we do—plants may only impart feelings, spirits might need an offering to even appear. Change it up and make the world feel alive.
     page: 63
   - name: Primordial Bonds
+    summary: "Cast elemental spells with Presence; criticals charge an element for a potent spell."
     text: You have spellcasting ability, using raw elemental power (Fire, Earth, Air, or Water) as the touchstone, and casting spells with Presence. On a critical using an element, charge it. Spend it to cast a potent spell with that element. If the elements are spirits in your setting, consider adding bonds for them. You may find alternative ways to charge an element, such as through great deeds or ritual.
     page: 63
   - name: True Shape
+    summary: "One favorite beast form costs no wild shape dice, or 1d less if it has wild talents."
     text: Choose 1 beast form. If it has no wild talents, you can shift into it without using a wild shape pool. If it has wild talents, you drop 1d less than normal when you shift into it.
     page: 63
   - name: Windcaller
+    summary: "Once a session, summon or dismiss weather; push yourself to do it again."
     text: 'Your voice carries on the winds over great distances. Once per session, you can summon or dismiss, but not control: dense fog—extreme temperatures—heavy rain—snowfall—storms—strong winds. You can push yourself to do it again. You can perform weather rituals without anchors.'
     page: 63
     uses:
     - { key: windcaller, label: Windcaller, count: 1, per: session }
   - name: Primal Growth
+    summary: "Move freely through nature; once a session, grow, wither or shape plants."
     text: 'You can move through any natural terrain quickly and without issue. Once per session you can grow, wither, or shape: crops—dense foliage—entangling vines—fungi—poisonous spores. You can push yourself to do it again. You can perform plant or harvest rituals without anchors.'
     page: 63
     uses:
@@ -236,6 +278,7 @@
   tagline: You become one with your weapon, and through it, you find your real purpose in this life.
   core:
     name: Weapon Mastery
+    summary: "+1d fighting in your style, and mastery each scene to add critical effects."
     text: 'WEAPON MASTERY Core Talent Choose a fighting style you have mastered: brawling—dual-wielding—onehanded—ranged—two-handed. When you fight, defend, or assist in your style, take +1d. Each scene, you have 2 mastery to spend when using this style to add a critical effect.
 
 
@@ -245,34 +288,41 @@
     - { key: mastery, label: Mastery, count: 2, per: scene, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Measured Tones
+    summary: "People stop to listen; push yourself to interrupt aggression. Spark if you talk them down."
     text: When you speak in measured tones, people always stop and listen—you can declare low stakes if desired. Unless completely surprised, you can push yourself to interrupt an impact move initiating aggression. If you change their mind, take spark.
     page: 65
   - name: Swift Recovery
+    summary: "On a perfect with an unmarked stat, clear a mark on another stat."
     text: On a perfect roll with an unmarked stat, clear a mark on another stat.
     page: 65
   - name: Arcane Training
+    summary: "Wizard spellcasting: 3 spells and 1 potent spell a session from 3 theorems."
     text: 'You have spellcasting as the Spellcraft talent. You can cast 3 spells and 1 potent spell per session. You know 3 spell theorems, created with the Spell Crucible, and can learn new spells from scrolls. [Prohibited: Wizard]'
     page: 65
     uses:
     - { key: spells, label: Spells, count: 3, per: session }
     - { key: potent-spells, label: Potent spells, count: 1, per: session }
   - name: Bulwark
+    summary: "A 2d Bulwark resource pool each session to ignore physical harm."
     text: Each session, you have a 2d Bulwark resource pool from armor or other defenses. When you take physical harm, you can roll the pool to ignore the damage.
     page: 65
     uses:
     - { key: bulwark, label: Bulwark, pool: 2, pool_kind: resource, per: session }
   - name: Control
+    summary: "Once a session, declare a zone foes can't cross without dealing with you."
     text: Once per session, you can declare a zone that enemies cannot cross without dealing with you. If they attempt to move past you, you can interrupt them. On a perfect, take spark. You can push yourself to do it again.
     note: Some foes are too large to control. Even experienced, a warrior with control over an area won't stop a dragon—but they may get a parting shot (roll the pool), or move with them.
     page: 65
     uses:
     - { key: control, label: Control, count: 1, per: session }
   - name: Got Your Back
+    summary: "Once a session, assist an ally after a grim; spark for both on a perfect."
     text: Once per session, you can assist an ally after they roll a grim. The ally can also roll 1d. On a perfect, you both take spark. You can push yourself to do it again.
     page: 65
     uses:
     - { key: got-your-back, label: Got Your Back, count: 1, per: session }
   - name: Tactician
+    summary: "Once a session, tag scene elements; allies who use them get your assist without risk."
     text: Once per session during an intense action sequence, you tag 3 scene elements right away, and 1 later in the sequence. When an ally interacts with a tagged element, you assist without risk on the roll. If no roll is needed, they take spark. You can push yourself to do it again.
     note: Scene elements may come from the GM's description, or they could be things that would logically be there. Establish details if needed, the GM will step it in if it's too far.
     page: 65
@@ -286,6 +336,7 @@
   tagline: Your body is a vessel through which you channel your discipline into grace, precision, and the never-ending journey towards perfection.
   core:
     name: Discipline
+    summary: "4 flow each scene to ignore thorns or try fluid maneuvers; interrupt once a session."
     text: 'Never face a disadvantage due to a weapon matchup. Once per session, you can interrupt with a: philosophical point—quick reaction—stunning strike. Each scene, you have 4 flow. Spend it to:
 
 
@@ -303,28 +354,35 @@
     - { key: flow, label: Flow, count: 4, per: scene, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Redirect
+    summary: "On a perfect physical defense, push yourself to turn the attack back on your foe."
     text: On a perfect defense against physical attack, you can push yourself to turn it back on your foe.
     note: Keep vantage in mind when redirecting attacks. If you're quick, you could very well deflect arrows and bolts. If you're also strong, you could catch and return spears and larger weapons.
     page: 67
   - name: Resonance
+    summary: "Hold a beaten foe's lifeforce instead of dropping them, and decide their fate later."
     text: 'When you would drop a foe, you can instead keep their lifeforce. They know you hold their fate. In the near future, you can decide to let go, and: drop them instantly—take spark and release them. One time only on a perfect, you can immediately drop a foe you strike.'
     page: 67
   - name: Healing Hands
+    summary: "Heal a bloodied ally automatically, then defend against taking on their pain."
     text: You can heal an ally that is bloodied. This automatically works, but you must make a Presence defense roll against being bloodied—you take their pain onto yourself and must fend it off.
     page: 67
   - name: Lightning Reflexes
+    summary: "Always act first, and ignore non-damage thorns on Agility defense rolls."
     text: You can always act first, unless completely surprised. You also ignore thorns on Agility defense rolls, except for those from damage.
     page: 67
   - name: Mind Over Matter
+    summary: "Take a mental mark instead of a physical one; spark when you clear a mark by rolling."
     text: When you take a physical mark, you can instead choose to take a mental mark. When you clear a mark by rolling it, take spark.
     page: 67
   - name: Tether
+    summary: "Once a session, link spirits with someone to sense, speak to and find them."
     text: 'Once per session, touch someone to link spirits. You can sense their feelings, speak in their mind, and know where they are. You can push yourself to: assist them without risk—take mental damage for them—teleport to them. If they get dropped, so do you.'
     note: Linking spirits can give you new insight on an ally. Do either of you catch any fleeting memories or thoughts from the other? Consider changing your bond afterward.
     page: 67
     uses:
     - { key: tether, label: Tether, count: 1, per: session }
   - name: There Is No Try
+    summary: "With your life on the line, 5s count as 6s and 4s count as 1s."
     text: When putting your life or something you hold equally dear on the line, 5s count as 6s, and 4s count as 1s. This generally occurs with high stakes or after being bloodied in battle.
     page: 67
 - key: paladin
@@ -335,6 +393,7 @@
   tagline: You have sworn an oath and your unwavering dedication gives you powerful conviction, which you can wield to shape the world.
   core:
     name: Oathsworn
+    summary: "+1d when bloodied, rattled or desperate thorns hit, and 3 smite a session to drop task dice."
     text: 'You draw power from your three tenets. When you add a thorn from bloodied, rattled, or desperate you also take +1d. Each session, you have 3 smite. When acting with total conviction, spend it 1-for-1 to drop dice from a task pool after rolling it. Affirmation: Before each session, state your tenets and discuss how they came up last session. Give spark to one player who joined a scene involving your tenets. Take 1 less smite for each tenet in violation.
 
 
@@ -344,28 +403,35 @@
     - { key: smite, label: Smite, count: 3, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
   talents:
   - name: Aegis
+    summary: "+1d defending yourself from physical harm, with extra effects on a perfect."
     text: 'You take +1d when making a defense roll to protect yourself from physical harm. On a perfect, you can also: keep their attention on you—rekindle hope in an ally—inspire action in a bystander.'
     page: 69
   - name: Authority
+    summary: "NPCs feel your authority, and thread sets how; push yourself for potent commands."
     text: 'Your presence fills the air with authority. The GM judges an NPC’s response, or you can spend thread to set it: admiration—obedience—respect—defiance. You can push yourself to pull off a potent feat of righteous command, such as ordering a demon to kneel or silencing a riot with a word.'
     page: 69
   - name: Challenge
+    summary: "Once a session, challenge a foe for +1d against them, but they get 1 suspense."
     text: Once per session you can challenge a foe, taking +1d on all rolls against them, but give them 1 suspense. If they do anything besides confront you, you can interrupt it. The challenge ends if an ally engages your foe, or your interrupt result is less than a perfect. You can push yourself to do it again.
     page: 69
     uses:
     - { key: challenge, label: Challenge, count: 1, per: session }
   - name: Dauntless
+    summary: "Spark when a roll is cut, +1d on story rolls when dropped, and a perfect keeps you up."
     text: Take spark when your roll is cut. Take +1d on story rolls if dropped. On a perfect, you don't get dropped.
     page: 69
   - name: Divine Blessing
+    summary: "Cleric spellcasting with one 4d rite pool each session."
     text: 'You have spellcasting as the Channel Divinity talent. Detail your god and choose 1 rite, a 4d power pool (per session). You can drop 1d and roll the pool to cast a potent spell. [Prohibited: Cleric]'
     page: 69
     uses:
     - { key: rite, label: Rite, pool: 4, pool_kind: power, per: session }
   - name: Guardian
+    summary: "+1d when you assist on defense, and you can take an attack meant for an ally."
     text: Take +1d when you assist on a defense roll. You can also make a defense roll for an ally when they would be affected by an impact move, or push yourself to defend multiple nearby allies from a single attack, like blocking dragon fire. When you "make a defense roll for an ally", you're not assisting—the impact move is instead now targeting you, and they're no longer at risk.
     page: 69
   - name: Rebuke
+    summary: "When the GM spends suspense on an impact move, +1d on your follow-up against the source."
     text: When the GM spends suspense to prompt an impact move, you take +1d on any follow-up action against the source. On a critical, take spark. (Roll, then choose an option, rewrite for clarity.)
     page: 69
 - key: psion
@@ -376,6 +442,7 @@
   tagline: You unlock the limitless power of the mind, bending thought, will, and reality through focus and discipline.
   core:
     name: Awakened Mind
+    summary: "Cast psionic spells with Wits from two bastions; instability makes them potent, at a cost."
     text: 'You have spellcasting ability. Choose two bastions which act as the touchstone for your psionic magic. You can cast spells using Wits, and can make them potent by adding instability, eventually adding increasing thorns to your future spellcasting rolls. You can’t cast potent spells once adding +2t from instability. Thorns from instability can''t be ignored and reset at the beginning of each session. You gain more slots that don''t add instability with growth.
 
 
@@ -389,35 +456,42 @@
     page: 70
   talents:
   - name: Echo
+    summary: "Once a session, create a 3d duplicate of yourself to assist you or swap places."
     text: 'Once per session, you can create a duplicate as a 3d power pool. It is a second version of you, acting as you with shared knowledge, ability, and resources. You can drop 1d of its pool to have it: assist you—trade places with you.'
     note: This isn’t an interrupt, if you’re targeted by an impact move, it’s too late to switch.
     page: 71
     uses:
     - { key: echo, label: Echo, count: 1, per: session }
   - name: Mind Blast
+    summary: "A critical on a bastion roll clears instability and unleashes mental collateral damage."
     text: 'On a critical on a bastion roll, you don’t add instability, instead clearing one. This causes mental collateral damage around you: confusion—hallucinations—headaches—panic. One time only, you can make this a ritual-level effect, affecting all within miles.'
     page: 71
   - name: Foresight
+    summary: "Once a session, glimpse the result of a plan before deciding to act on it."
     text: You can catch small glimpses of the future. Once per session, you can describe a brief course of action while in a calm situation, and the GM will tell you the result. If there’s risk, make a montage roll to see how it would play out. Afterward, you can decide whether to take the action.
     page: 71
     uses:
     - { key: foresight, label: Foresight, count: 1, per: session }
   - name: Psychic Warrior
+    summary: "Forge willpower weapons used with Wits; +1d to follow up when you take vex or instability."
     text: 'You’re able to turn your psychic volatility against others. You can freely create weapons made from pure willpower, using them with Wits. You take +1d to follow up with them when you: take vex—increase your instability.'
     note: This talent can be poached by any spellcaster. Flavor the weapons with your magical trappings.
     page: 71
   - name: Shift Form
+    summary: "A 2d Shifter resource pool each session to alter your features and form."
     text: Each session, you have a 2d Shifter resource pool. You can roll the pool to alter your features and form, though you keep the same basic shape.
     note: This allows you to change your basic physical features and appearance. You might disguise yourself to infiltrate or blend in, but you’re still clearly humanoid, and have the same capabilities.
     page: 71
     uses:
     - { key: shifter, label: Shifter, pool: 2, pool_kind: resource, per: session }
   - name: Reader
+    summary: "+1 thread a session; spend it to read someone's foremost thought, setting up a follow-up."
     text: You gain 1 thread per session and can spend thread when you first meet someone to know their foremost surface thought—they are like an open book to you. If you follow-up on it, it counts as a setup.
     page: 71
     uses:
     - { key: thread, thread: 1 }
   - name: Tumultuous Mind
+    summary: "Thread sets NPC reactions to your mind; once a session, pass vex to a nearby creature."
     text: 'Your fractured mind bleeds into the consciousness of others. The GM judges an NPC’s response, or you can spend thread to set it: agitated—confused—paranoid—forgetful. Once per session, when you would take vex, a nearby creature must take it instead.'
     page: 71
     uses:
@@ -430,6 +504,7 @@
   tagline: You stalk relentlessly, moving unseen through the terrain, tracking your prey with deadly precision and striking them when they're weakest.
   core:
     name: Quarry
+    summary: "Twice a session, mark a quarry: a 2d pool of bonus dice for anyone hunting or fighting it."
     text: 'Twice per session, you can designate a target as your Quarry—the focus of your hunt. Until the end of the session, you have a 2d Quarry pool rolled as bonus dice to research or locate them, and when anyone attacks or defends against them. When a Quarry die rolls a ''6'', that PC takes spark. Prowler: You take +1d when using stealth, traversal, and traps in familiar terrain.
 
 
@@ -440,26 +515,33 @@
     - { key: quarry, label: Quarry, pool: 2, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Animal Companion
+    summary: "A loyal animal with 3 tricks (rolled at 3d), 2 flaws and a bond with each PC."
     text: 'You’re accompanied by a fiercely loyal animal. Each PC adds a reciprocal bond with it. Choose 3 tricks and 2 flaws. You roll 3d for its tricks and 1d otherwise. It has only two damage boxes, marked (for any mark) and hurt (for any harm). It can always exit a scene when hurt. If lost, you can bond with a new animal. Tricks: distract—fight—guard—perform—rescue—retrieve—scout—search—track—warn. Flaws: aggressive—clumsy—grumpy—insatiable—jumpy—noisy—overprotective—scary—unruly.'
     page: 73
   - name: Keen Senses
+    summary: "Potent feats of tracking, and you always sense living creatures nearby."
     text: Your senses are twice as sharp as normal. You can pull off potent feats of tracking and you always notice the presence of living creatures near you, though details are unclear.
     page: 73
   - name: Relentless
+    summary: "Potent feats of traversal, always moving at full speed whatever is in the way."
     text: You can pull off potent feats of traversal and can always move at full speed, unhindered by what’s in your way.
     page: 73
   - name: Scout Ahead
+    summary: "+1 thread a session; spend it to flash back to scouting ahead, with a 3d montage roll."
     text: 'You gain 1 thread per session and can spend thread to flashback to scouting ahead and: sabotage something—set a trap—survey the area (ask 2 questions)—take out a danger—set up an interrupt. Make a 3d montage roll. The GM always takes suspense in place of an impact move.'
     page: 73
     uses:
     - { key: thread, thread: 1 }
   - name: Seasoned Hunter
+    summary: "Push yourself to shout \"Look out!\": everyone takes +1d on the defense and the follow-up."
     text: You can push yourself to tell your allies to Look Out! and goad the GM into spending suspense on a move you declare to attack your party. Anyone involved takes +1d on a defense roll and follow-up action rolls.
     page: 73
   - name: Sharpshooter
+    summary: "Given time, potent feats of ranged precision; push yourself to do it on the spot."
     text: When given time, you can pull off potent feats of ranged precision, such as shooting just beyond maximum range or into near complete cover. You can push yourself to do it on the spot.
     page: 73
   - name: Trophies
+    summary: "Take trophies from monsters you slay as major expendable arcana, and start with one."
     text: When you play a key part in slaying a powerful monster, you can take a trophy from it. This acts as a major expendable arcana. Use the monster’s name, ability, and a function as the touchstones. You also gain 1 major expendable arcana—detail it.
     note: Major expendable arcana allows you to produce the effects of a ritual.
     page: 73
@@ -471,6 +553,7 @@
   tagline: You live and operate in the margins, striking unseen and disappearing before anyone knows you were there.
   core:
     name: Expertise
+    summary: "+1d with 3 chosen skills, and a 4d Competence pool each session for bonus dice."
     text: 'Choose three skills below as your skill set. Take +1d when using a chosen skill. Each session, you have a 4d Competence pool to represent your focus under pressure. You can roll it as bonus dice after any of the chosen skills. Above board: duel—evade—investigate—persuade—track—traverse. Below table: ambush—forgery & disguise—lying—sabotage—sleight of hand—stealth.
 
 
@@ -480,31 +563,38 @@
     - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
   talents:
   - name: According to Plan
+    summary: "+1 thread a session; spend it to flash back to how you planned for this."
     text: You gain 1 thread per session and can spend thread to flashback, establishing how you planned for the current situation. Make a montage roll, taking +1d if it fell within your expertise. The GM must take suspense in place of an impact move.
     note: 'This can cover any kinds of planning. Consider your other talents and abilities as well, for example: if you have spellcasting, perhaps you prepared by using magic ahead of time.'
     page: 75
     uses:
     - { key: thread, thread: 1 }
   - name: Eldritch Affinity
+    summary: "Sorcery-style spellcasting with Presence and 3 paths or techniques, never potent."
     text: 'You have spellcasting, as the Sorcery talent. You roll Presence to cast and choose 3 from magic paths and techniques. You can’t cast potent spells, nor do you risk a magical twist. [Prohibited: Sorcerer]'
     page: 75
   - name: Lurker
+    summary: "Perfect sneaks reveal secrets or openings; push yourself to freeze and avoid detection."
     text: 'On a perfect sneaking past or secretly observing sentient creatures, they: let a secret slip—give you a golden opportunity. If caught sneaking, you can push yourself to stay completely still and avoid detection, but must leave the area immediately after.'
     page: 75
   - name: Opportunist
+    summary: "+1d following up when someone nearby defends; push to add a critical bonus to an ally."
     text: When someone nearby rolls defense, you take +1d on an immediate follow-up. On a critical by a nearby ally, you can push yourself to add a critical bonus.
     page: 75
   - name: Poisoner
+    summary: "A 4d Poisons resource pool each session: knockout, paralytic, truth serum and more."
     text: 'Each session, you have a 4d Poisons resource pool. You have access to the following poisons: hallucinations—knockout—memory loss—nausea—paralytic—truth serum. They each take a bit of time to work and are most effective if ingested.'
     page: 75
     uses:
     - { key: poisons, label: Poisons, pool: 4, pool_kind: resource, per: session }
   - name: Weasel
+    summary: "Once a session, weasel out of being caught in a lie or red-handed, for now."
     text: Once per session, if caught in a lie or red-handed, you can weasel your way out—for now. Make a story roll to see if they realize their mistake later. You can push yourself to do it again.
     page: 75
     uses:
     - { key: weasel, label: Weasel, count: 1, per: session }
   - name: Distraction
+    summary: "On a perfect, set up an ally and pass them the spotlight, even past suspense."
     text: On a perfect, you can setup an ally and pass them the spotlight, even if the GM wants to spend suspense.
     page: 75
 - key: sorcerer
@@ -515,6 +605,7 @@
   tagline: You are a conduit for ancient and unpredictable forces, shaping spells out of the raw magic that flows through you.
   core:
     name: Sorcery
+    summary: "Cast with Presence using your magic paths and techniques; two or more 1s cause a twist."
     text: 'You have spellcasting ability. You roll Presence to cast and your magic paths and techniques serve as touchstones. Your spells always carry risk and require a roll. You can push yourself to cast a potent spell. When casting, rolling two or more 1s (thorns included) triggers a magical twist. Choose any 4 of Magic Paths and Techniques (with at least 1 of each) and how your twists manifest below, or talk to the GM to make your own. Magical twists: wild surge (2d story roll for effect)—take vex—curse (+1 suspense). Magic paths: blood—decay—flame—frost—lux—shadow—stone—tempest. Techniques: attack—create—defend—enhance—hinder—influence—transform—traverse.
 
 
@@ -522,32 +613,39 @@
     page: 76
   talents:
   - name: Eldritch Growth
+    summary: "Magic has given you a permanent physical feature, like claws or fiery breath."
     text: Intense magic has twisted your body. You gain a permanent physical feature like metal-rending claws, fiery breath, or venomous fangs.
     page: 77
   - name: Maelstrom
+    summary: "On potent spells, 5s count as 6s and 4s as 1s, with a twist on two or more 1s."
     text: You open yourself fully to the maelstrom of raw magic. When you cast a potent spell, 5s count as 6s, but 4s count as 1s. When rolling two or more 1s (including these 4s), you trigger a magical twist, as Sorcery.
     page: 77
   - name: Magic Sense
+    summary: "Always notice magic nearby, +1d to disrupt it, and given time, learn its details."
     text: You always notice magical effects near you, and take +1d when you disrupt them. Given time, you can discern their details (ask 2 questions).
     page: 77
   - name: Metamagic
+    summary: "Twice a session, give a spell an extra touchstone: controlled, distant, subtle and more."
     text: 'Twice per session, you can alter your magic as it flows through you, modifying the effect or casting by giving it an extra touchstone: controlled—distant—intense—lasting—subtle—quick.'
     note: This makes the spell more powerful, but not quite potent. Adding a touchstone should give a clear answer to any question about it. Do you have time to cast a spell? It's quick; yes.
     page: 77
     uses:
     - { key: metamagic, label: Metamagic, count: 2, per: session }
   - name: Spelleater
+    summary: "A 2d Spelleater resource pool each session to ignore magic; at 0d, your next action is potent."
     text: Each session, you have a 2d Spelleater resource pool. When you suffer from magic, you can roll the pool to ignore the effect. When the pool drops to 0d, your next action is potent.
     page: 77
     uses:
     - { key: spelleater, label: Spelleater, pool: 2, pool_kind: resource, per: session }
   - name: Wisps
+    summary: "Two magical motes with traits; sacrifice one to act on its own. They return each session."
     text: 'Two small magical motes float around you. Give them 2 traits such as: annoying—melancholic—mesmerizing—petty—troublesome—whimsical. You can sacrifice one to have it act independently, making a story roll if needed. They return each session.'
     note: You could send one to assist an ally, distract a foe, light the way, or even pass a message to someone. The story roll here is about how effective they are, it doesn't prompt an impact move.
     page: 77
     uses:
     - { key: wisps, label: Wisps, count: 2, per: session }
   - name: Wrath
+    summary: "When an ally is hurt or dropped, +1d and potency on your next spell if you lash out."
     text: When a nearby ally takes harm or is dropped, you take +1d and potency on your next spell, if you immediately lash out.
     page: 77
 - key: summoner
@@ -558,6 +656,7 @@
   tagline: You can create creatures from the essence of other planes to protect yourself and bring ruin to your enemies.
   core:
     name: Vassal
+    summary: "Call and direct a creature from another plane: a 4d power pool with 1 aspect."
     text: 'VASSAL Core Talent You have a connection with a creature from another plane, and are able to call upon and direct it with a 4d power pool. The pool returns to its max once at 0d, or when you push yourself. It has 1 aspect, a strange trait defining it such as: big enough to ride—telepathic—a thematic path talent. It can take 1 mark and 1 harm, with any more breaking the anchors holding it here. Make a 2d story roll to see the fallout before it disappears. You can resummon it every scene.
 
 
@@ -567,29 +666,36 @@
     - { key: vassal, label: Vassal, pool: 4, pool_kind: power, per: scene }
   talents:
   - name: Binding Word
+    summary: "Contracts are a wise, and you can make agreements you witness magically binding."
     text: Add contracts as a wise. If you’re present for an agreement, you can make it binding. Both parties know if it’s broken, with the defaulting party afflicted by a potent spell, using the contract details as touchstones. One time only, you can make this a ritual-level effect.
     page: 79
   - name: Fierce Protector
+    summary: "Once a session, a creature you control interrupts an impact move against you."
     text: Once per session, a creature you control can interrupt an impact move against you. On a grim, they take the impact move instead. Either way, you take +1d on your follow-up against the attacker.
     note: This isn’t limited to your vassal. Animal companions, and familiars can protect you just as well.
     page: 79
     uses:
     - { key: fierce-protector, label: Fierce Protector, count: 1, per: session }
   - name: Shared Soul
+    summary: "Merge with your vassal, sharing talents, aspects and harm, and using its pool or your stats."
     text: You can merge with your vassal, sharing path talents, aspects, and incoming harm. You can choose to use the power pool or your own stats, and when your anchors break, take +1d on the story roll.
     page: 79
   - name: Ley Magic
+    summary: "Once a session, bend local leylines to draw or repel creatures, or enhance or dampen magic."
     text: 'Once per session, you can temporarily alter the leylines in the area to: draw or repel certain creatures—enhance or dampen magic. When you alter a place like this, you know when others enter the area. You can push yourself to do it again.'
     page: 79
     uses:
     - { key: ley-magic, label: Ley Magic, count: 1, per: session }
   - name: Pocket Plane
+    summary: "Given time, open a room-sized pocket dimension; push yourself to open it on the spot."
     text: Given time, you can open a hole to a small pocket dimension about the size of a room. You can push yourself to open it on the spot. If dropped, make a story roll to see what happens inside as the plane collapses. You don't need anchors for planar travel rituals.
     page: 79
   - name: Portal Network
+    summary: "Given time, set waypoints and open portals between them; push for a risky quick link."
     text: 'Given time, you can: establish a waypoint in your network—open a portal from one waypoint to another. You can push yourself to make a temporary link in the moment, but doing so carries risk. Those around you can use the portal as well. Define how you travel, such as by: shadows—trees—doorways—dreams.'
     page: 79
   - name: Monster Menagerie
+    summary: "Bonds with 3 creatures, each with its own aspects; choose which answers your summons."
     text: You have a bond with 3 different creatures, all with their own aspects. When you summon a vassal, you can choose which answers the call.
     page: 79
 - key: swashbuckler
@@ -600,6 +706,7 @@
   tagline: You fight with swagger, skill, and a smile, turning every desperate clash into a daring performance with luck ever by your side.
   core:
     name: Panache
+    summary: "2 panache each scene to strip thorns before rolling; a roll cut by a thorn earns more."
     text: 'Each scene, you have 2 panache to fuel your derring-do. Before making a roll, you can spend panache, removing that many thorns. If you remove all thorns, they become panache dice instead, increasing the final result level on a 7 or 8. When one of your rolls is cut by a thorn, you gain 1 panache (ignoring your max).
 
 
@@ -613,28 +720,35 @@
     - { key: quick-wit, label: Quick Wit, count: 1, per: session }
   talents:
   - name: Audacity
+    summary: "Reckless acts: 5s count as 6s and 4s as 1s, and onlookers are struck by what you did."
     text: 'When you act with pure reckless abandon, 5s count as 6s, but 4s count as 1s. Regardless of the outcome, those around you are briefly struck by: awe—bewilderment—panic—excitement. These aren''t your garden variety bad ideas, these are the kinds of ideas that leave bystanders frozen in place trying to figure out what just happened, and often a part of tangles.'
     page: 81
   - name: Fancy Footwork
+    summary: "On a perfect when fighting for position, roll a related task pool."
     text: 'On a perfect when you fight to setup an advantage or otherwise improve your positioning, you can roll a related task pool by: seizing an opening—unnerving your foe.'
     page: 81
   - name: Natural Moxie
+    summary: "+1d with 2 skills from the Expertise list."
     text: 'Choose two skills from the Expertise talent (pg. 74). Take +1d when using these skills. [Prohibited: Rogue]'
     page: 81
   - name: Improvise
+    summary: "Push yourself and use your surroundings creatively to take +1d."
     text: You can push yourself and describe your creative use of your surroundings to take +1d. These improvised weapons and tools often stretch the bounds of reality with their use.
     page: 81
   - name: Lucky
+    summary: "A 1d Luck pool each session to roll as a bonus die after any roll. Spark on a grim."
     text: Each session you have a 1d Luck pool. You can roll it as a bonus die after any roll you make and story rolls related to you. On a grim, take spark.
     page: 81
     uses:
     - { key: luck, label: Luck, pool: 1, pool_kind: power, per: session }
   - name: Provoke
+    summary: "Once a session, goad the GM into targeting only you, with +1d on that defense."
     text: 'Once per session, through insult, boast, or challenge, you can goad the GM into spending suspense on an impact move targeting only you. You take +1d on the defense roll, and on a perfect, your foe: is compelled to keep lashing out—leaves an opening—is utterly embarrassed.'
     page: 81
     uses:
     - { key: provoke, label: Provoke, count: 1, per: session }
   - name: The Legend of…
+    summary: "Tales of your exploits spread; take spark when you play into your legend."
     text: 'Many recognize you as a hero, others as a cad and ne''er-do-well. Track tales of your exploits with campaign pools. Take spark when you play into it by: leaving a calling card—saying your catchphrase in a dramatic moment—indulging a fan.'
     page: 81
 - key: warlock
@@ -645,6 +759,7 @@
   tagline: You have made a pact with a greater being—power in exchange for service, a pact that may prove to be a double-edged sword.
   core:
     name: Pact
+    summary: "Wield your patron's magic with story rolls, plus a changeable Eldritch Talent and a Patience pool."
     text: 'You have magic bestowed by a patron, allowing you to make a story roll (usually 3d) to wield their magic as a weapon, or ask to channel a potent magical effect using their nature as the touchstone. They gift you an Eldritch Talent—a changeable path talent manifesting with your patron’s trappings. Given time to commune, you can change an Eldritch Talent.
 
 
@@ -658,27 +773,34 @@
     page: 82
   talents:
   - name: Affliction
+    summary: "Once a session, heal a harm by touch, transferring the injury elsewhere."
     text: Once a session, you can place your hands on another to heal a harm by transferring the injury. Allies can roll defense to resist this effect. Talk with your GM about transferring other maladies, such as conditions.
     page: 83
     uses:
     - { key: affliction, label: Transfer harm, count: 1, per: session }
   - name: Knowing Gaze
+    summary: "Given time, a stare reveals someone's fear, desire, loyalty or secrets, once per person."
     text: 'When given time, you can stare into someone’s eyes and learn: the price of their loyalty—their biggest fear—their greatest desire—their next move—what they’re hiding—whom they serve. This gaze only works on someone once. You can push yourself to do this on the spot.'
     page: 83
   - name: Magus
+    summary: "Your weapon is a touchstone with a magical style; push for a secondary effect on a perfect."
     text: 'You weave blade and magic together. You can use your weapon as a touchstone, and add a magical weapon style, such as: flaming—returning—seeking. On a perfect with this weapon, you can push yourself to add a secondary effect based on the magical style. Given time, you can change the style.'
     page: 83
   - name: Otherworldly Form
+    summary: "Turn into a floating, dispersed form with three abilities you choose."
     text: 'You can turn into a floating, dispersed form, flavored after your patron’s trappings. Choose three things you can do in this form: appear barely visible—fly high in the sky—interact with objects—move swiftly—slip through small gaps—speak.'
     page: 83
   - name: Blood Rituals
+    summary: "+1d on ritual invocations, and stand in for one anchor yourself. Spark when it's done."
     text: Take +1d on a ritual’s invocation and replace any one of its anchors with yourself. When you complete a ritual in this way, take spark.
     note: This stacks. Make a coven with your fellow casters!
     page: 83
   - name: Visions
+    summary: "Ask the GM a question for a cryptic but true answer, then defend against rattled."
     text: You can open your mind to seek forbidden knowledge. Ask the GM a specific question. The answer may be cryptic or twisted, but it will never be a lie. Make a defense roll against rattled after the answer.
     page: 83
   - name: Wayfarer
+    summary: "Push yourself to teleport up to two days' ride away, less precisely the further you go."
     text: You can push yourself to teleport. The further or less familiar, the less precise. Max range is two days’ ride away. Make a story roll if you can’t see the destination or take allies you touch with you.
     page: 83
 - key: witch
@@ -689,6 +811,7 @@
   tagline: You are blessed with the knowledge of old magic, wielding the ability to speak the language of the universe.
   core:
     name: Hidden Magic
+    summary: "Cast with Presence using 2 words of power, which burn until next session."
     text: 'You understand the ancient magic inherent in the world. You have spellcasting ability, rolling Presence to cast using any 2 words of power as the touchstones. When you use a word, burn it—you can''t use it again until the next session. Given time, you can make this spell potent. You begin with 6 words of power from the crucible. Spells without risk are automatically successful and don’t burn words, unless potent.
 
 
@@ -701,27 +824,34 @@
     - { key: words, label: Words of power, count: 6, per: session, growth: { 2: 2, 4: 2, 6: 2 } }
   talents:
   - name: Bailiwick
+    summary: "One word of power is your domain: burn any other word to use it; a critical restores all."
     text: You are known to other witches by a title and the power inherent in your magical domain—your Bailiwick. Choose 1 word of power. You can burn any other word to use it, and on a critical, you regain the use of all words.
     note: This isn’t just a specialty. You’re not just a witch that knows the word for Star, you’re The Witch of Sacred Stars. This means you have the responsibility of upholding it, as well.
     page: 85
   - name: Familiar
+    summary: "A small magical creature you can see through, send on tasks and cast spells through."
     text: You manifest a small magical creature. You can communicate telepathically, use its senses, and send it on simple tasks, making a story roll to see how it goes. You can also push yourself to cast a spell through it. If your familiar takes damage, it vanishes and reappears at the start of the next scene.
     page: 85
   - name: Homely Hovel
+    summary: "Given time, bless a homestead: outside help on all rolls there, plus two wondrous traits."
     text: 'Given time, you can bless a homestead to overflow with power. You get outside help on all rolls while on its grounds. Choose two wondrous traits to give it such as: traveling—ritual anchor—healing—caretaker. You can only have one homestead like this at a time. charming castle mysterious cottage rickety glade unsettling manner vibrant shack whimsical temple'
     page: 85
   - name: Evil Eye
+    summary: "Hex someone with Presence (dread, misfortune, sleepiness...), timed as you choose."
     text: 'You can roll Presence to hex someone with: dread—clumsiness—confusion—forgetfulness—misfortune—sleepiness. Decide when it takes effect: now—soon—much later—specific trigger. This magic only works on someone once.'
     page: 85
   - name: Soothsayer
+    summary: "Once a session, tag a local spirit for a 3d Spirit pool of bonus dice in its domain."
     text: 'Once per session, you can tag a spirit in the local area. They offer a 3d Spirit pool rolled as bonus dice when you or an ally invokes their domain. They may ask for aid in return. Spirit domains include things such as: rivers—the night sky—art—furry critters.'
     page: 85
     uses:
     - { key: soothsayer, label: Tag a spirit, count: 1, per: session }
   - name: Wonder Magnet
+    summary: "Your spells can surge wildly, with a 3d story roll for the result; spark on a perfect."
     text: You can cause wild surges when spellcasting, as the magical twist in Sorcery. When it triggers, make a 3d story roll for the results. On a perfect, take spark. When strange things happen, they happen to you.
     page: 85
   - name: Herbalism
+    summary: "Two herb names each session, and 1 trivial and 1 minor potion to use."
     text: Before each session, use the herbalism crucible to make two herb names. Each session, you have 1 trivial and 1 minor potion, chosen when they’re used. The name is the touchstone. One time only, you can have 1 major potion.
     page: 85
     uses:
@@ -735,6 +865,7 @@
   tagline: You wield arcane power through precise knowledge, casting spells from an ever-expanding repertoire, your studies endless.
   core:
     name: Spellcraft
+    summary: "Cast with Wits from 4 spell theorems: 4 spells and 2 potent spells each session."
     text: 'You have spellcasting ability. You roll Wits to cast and the spell theorem you are casting serves as its touchstone. You know 4 spell theorems inscribed in your spellbook, created using the Spell Crucible (below). Each session, you can cast 4 spells and 2 potent spells. You choose which spell theorem to use when you cast, interpreting it as you see fit. Spells cast with no risk require no roll and don’t count against your limited number per session, unless potent. You can learn new theorems from studying and experimenting with scrolls, consuming them.
 
 
@@ -745,33 +876,40 @@
     - { key: potent-spells, label: Potent spells, count: 2, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
   talents:
   - name: Alchemist
+    summary: "A 4d Potions resource pool each session for trivial or minor potions."
     text: Each session, you have a 4d Potions resource pool. You can have a trivial potion (spell effect) by rolling the pool, or drop 1d and roll to make it a minor potion (potent spell effect). You know recipes for your spell theorems, plus two more. Learn new recipes by sacrificing potions you find.
     note: Trivial potions offer a single use magic effect, while minor potions bestow a single potent effect. Reflavor the container as an inscribed rune, carved twig, or even a delicious pastry!
     page: 87
     uses:
     - { key: potions, label: Potions, pool: 4, pool_kind: resource, per: session }
   - name: Archivist
+    summary: "2 minor and 1 major arcana, and you drop 1 fewer die when rolling their pools."
     text: You gain 2 minor, and 1 major arcana that you’ve either found or created. When you roll an arcana’s power pool, you drop 1 fewer die unless it’s the last.
     page: 87
   - name: Component Pouch
+    summary: "A 2d Components resource pool to bump a die by 1 on messy or grim spellcasting."
     text: Each session, you have a 2d Components resource pool to help focus your magic. When you get a messy or grim on spellcasting, you can roll the pool to increase a die result by 1 (3→4). Describe what reagent helped.
     page: 87
     uses:
     - { key: components, label: Components, pool: 2, pool_kind: resource, per: session }
   - name: Colleagues
+    summary: "An eccentric wizard who owes you a favor is in every city; spark for catching up."
     text: In every city, some towns, and the occasional dungeon, you can find a powerful, eccentric wizardly colleague who owes you a favor—or maybe you owe them one. If you go out of your way to meet and catch up, take spark, and they may trade theorem research with you.
     page: 87
   - name: Countermagic
+    summary: "A 2d power pool each session to interrupt hostile magic, turning it back on a perfect."
     text: Each session, you have a 2d power pool you can use to interrupt hostile magic. On a perfect, you can turn the magic back on the source.
     page: 87
     uses:
     - { key: countermagic, label: Countermagic, pool: 2, pool_kind: power, per: session }
   - name: Mastered Theorem
+    summary: "+1d and an extra potent casting each session with one spell theorem."
     text: Choose one of your spell theorems. You take +1d when casting it and gain 1 extra potent spell casting of it per session. Your name becomes linked to it, and it begins to spread in popularity throughout wizardry—track it with campaign pools.
     page: 87
     uses:
     - { key: theorem, label: Potent theorem, count: 1, per: session }
   - name: Specialty School
+    summary: "Add your arcane school to every theorem; spark on a critical with it."
     text: Choose the arcane school of your focus. All of your spell theorems now have it plus another school. When casting, choose which school to use. When you get a critical with this arcane school, take spark.
     page: 87
 - key: backgrounds
@@ -783,39 +921,50 @@
   core: null
   talents:
   - name: Aquatic
+    summary: "Breathe and move quickly underwater, untroubled by aquatic environments."
     text: You can breathe and move quickly through water, and suffer no other issues that aquatic environments bring.
     page: 89
   - name: Teamwork
+    summary: "Assisting and sharing the risk, 5s count as 6s; your 6 counts toward a group montage critical."
     text: Time in a squad or crew taught you to work well with others. When you assist a roll and share the risk, your 5s count as 6s. When taking part in a group montage roll, your 6 result counts towards a critical success.
     page: 89
   - name: Simple Deduction
+    summary: "Once a session, guess at a puzzle and the GM tells you something right, wrong or missed."
     text: 'Once per session when trying to solve a question or puzzle to give a specific guess. The GM will tell you: something right about it—something wrong about it—a detail you missed. Use a story roll if the answer is unclear.'
     page: 89
     uses:
     - { key: deduction, label: Simple Deduction, count: 1, per: session }
   - name: Salt of the Earth
+    summary: "Thread sets NPC reactions to your humble air; spark for helping common folk."
     text: 'You have the air of someone with humble beginnings. The GM judges an NPC’s response, or you can spend thread to set it: disdain—under-estimation—kindred—pity. When you go out of your way to help the common folk, take spark.'
     page: 89
   - name: Regeneration
+    summary: "End a scene bloodied or desperate and roll 2d to heal harm, with a weakness to match."
     text: 'When a scene ends while you are bloodied or desperate, make a 2d story roll as a defense against the harm. On a messy, reduce 1 harm to a mark. On a perfect, clear it.Choose a weakness that accompanies this power, such as: fire—iron—sunlight.'
     page: 89
   - name: Flight
+    summary: "You can fly, with two benefits: agile, strong, swift or tireless."
     text: 'You have the ability to fly. Choose two of the following benefits that define this ability: Agile—Strong—Swift—Tireless. Be mindful of what you carry; most fliers can’t bring much with them.'
     page: 89
   - name: Cultural Weapon
+    summary: "Push yourself for potent feats of prowess with your people's iconic weapon."
     text: While using the iconic weapon of your society, you can push yourself to pull off a potent feat of prowess using one of the styles. These weapons are often highly coveted outside of your ancestral lands.
     page: 89
   - name: Pint-Sized
+    summary: "Given time, potent feats of stealth or escape; push yourself to do it on the spot."
     text: Your slight frame has its advantages. Given time, you can pull off a potent feat of stealth or escape. You can push yourself to do it on the spot.
     page: 89
   - name: Clout
+    summary: "A 3d Favor resource pool each session to have favors granted by the powerful."
     text: Your name or wealth carries weight in the right circles. Each session, you have a 3d Favor resource pool. You can ask as for a reasonable favor from those in power and roll the pool to have it granted. If it drops to 0d, you’ve asked too much. You can get what you want anyway by burning that bridge.
     page: 89
     uses:
     - { key: favor, label: Favor, pool: 3, pool_kind: resource, per: session }
   - name: Thieves’ Cant
+    summary: "A secret language of signs; a perfect deception sets up an ally following your lead."
     text: You and those you teach can communicate subtly in company, silently over distances, and through signs and markings. When you get a perfect deceiving others, you also setup an ally following your lead.
     page: 89
   - name: Crowd Favorite
+    summary: "Entertain a crowd for spark, with a story roll to see how it goes."
     text: Given time and space to entertain a crowd, you and participating allies can take spark for the performance. Give a vignette, then make a story roll to see how it goes.
     page: 89
