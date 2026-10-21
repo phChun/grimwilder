@@ -1699,8 +1699,10 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .campaign-page__side { display: flex; flex-direction: column; gap: 20px; }
 
 /* Hero */
-.campaign-hero { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 32px; }
-.campaign-hero__about { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+/* Same columns as the .fluid page below (main 640px, rail 340–420px, same gap),
+   so the action card lines up with the side column under it. */
+.campaign-hero { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 32px var(--space-5); }
+.campaign-hero__about { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .campaign-hero .eyebrow { margin: 0; }
 .campaign-hero__title { margin: 0; font-size: clamp(2.4rem, 7vw, 3.75rem); line-height: 1.02; }
 .campaign-hero__pitch { max-width: 36rem; margin: 0; font-family: var(--font-display); font-style: italic; font-size: 1.35rem; line-height: 1.4; color: var(--text-soft); }
@@ -1709,7 +1711,7 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .campaign-hero__facts dt { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
 .campaign-hero__facts dd { margin: 2px 0 0; font-weight: 600; }
 
-.campaign-hero__action { flex: 1 1 300px; max-width: 362px; display: flex; flex-direction: column; gap: var(--space-3); padding: 20px; }
+.campaign-hero__action { flex: 1 1 340px; max-width: 420px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-3); padding: 20px; }
 .campaign-hero__go { min-height: 52px; font-size: 1.05rem; }
 .copy-invite { width: 100%; }
 .campaign-hero__hint { margin: 0; font-size: 0.87rem; color: var(--muted); }
