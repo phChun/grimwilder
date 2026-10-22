@@ -64,7 +64,9 @@ class RollCallTest < ActiveSupport::TestCase
     assert_raises(ArgumentError) { call.roll!(@tibbs, by: @gwen, spark: 1) }
 
     call.roll_everyone!(by: @gwen, random: FixedDice.new([ 4, 4, 2, 3 ]))
-    assert_equal "messy", call.reload.roll.outcome
+    assert_equal [ [ 4, 4 ], [ 2, 3 ] ], call.reload.seats.pluck("dice"), "every seat keeps its dice"
+    assert_equal [ [ 4, 4 ], [ 2, 3 ] ], call.roll.sides.pluck("dice"), "and the montage is built from them"
+    assert_equal "messy", call.roll.outcome
     assert_equal [ @gwen.display_name, nil ], call.seats.pluck("rolled_by"), "Bram is Gwen's own"
   end
 

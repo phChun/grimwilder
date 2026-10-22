@@ -177,12 +177,14 @@ class RollCall < ApplicationRecord
 
       character.settle_spark(spent: spark)
       character.save!
-      seat.merge!(
+      rolled = seat.merge(
         "dice" => Array.new(base_dice(seat) + spark) { random.rand(1..6) },
         "thorns" => story? ? Array.new(thorns) { random.rand(1..8) } : [],
         "spark" => spark, "rolled_by" => (by.display_name unless character.owned_by?(by))
       )
-      self.seats = seats.map(&:dup)
+      # Replaced by id, not changed in place: rolling everyone left goes
+      # through seats one by one, and each save must keep the ones before it.
+      self.seats = seats.map { _1["character_id"] == seat["character_id"] ? rolled : _1 }
       save!
     end
 
