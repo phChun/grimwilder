@@ -24,12 +24,21 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get campaign_play_sessions_path(@campaign)
-    assert_select ".session-card__title a[href=?]", campaign_play_session_path(@campaign, @first), text: "Session 1"
+    assert_select "details##{dom_id(@first, :log)}:not([open])" do
+      assert_select "summary .session-card__title", "Session 1"
+      assert_select "summary .session-card__date", /· \d+ entries/
+      assert_select "h3.session-card__scene", "Scene 1: The bridge at Mirefall"
+      assert_select "##{dom_id(@in_scene)}"
+      assert_select "##{dom_id(@hidden)}", 0, "GM-only rolls stay hidden"
+      assert_select "a.session-card__open[href=?]", campaign_play_session_path(@campaign, @first)
+    end
+    assert_select ".session-list[data-controller=details-memory] details[data-details-memory-target=section]", 5
+    assert_select ".session-list > li:first-child details#between-since[open][data-phone-open=true]", 1, "the newest starts open"
     assert_select ".session-card__meta", /1 scene · 1 character there · \+2 XP \(standout\) · Gibbletibble "Tibbs" reached level 2/
     assert_select ".session-before", 0, "no single Before sessions box"
 
     cards = css_select(".session-list > li").map { _1.at_css(".session-card__title").text.strip + " | " + _1.at_css(".session-card__date").text.strip }
-    assert_equal [ "Between sessions | since Session 2", "Session 2", "Between sessions | after Session 1, before Session 2", "Session 1", "Between sessions | before Session 1" ],
+    assert_equal [ "Since Session 2 | 1 entry", "Session 2", "Between Sessions 1 and 2 | 1 entry", "Session 1", "Before Session 1 | 1 entry" ],
       cards.map { _1.sub(/ \| [A-Z][a-z]+ \d+, \d{4}.*/, "") }
     assert_select ".session-card--between:last-child ##{dom_id(@before)}"
     assert_select ".session-card--between:first-child ##{dom_id(since)}"

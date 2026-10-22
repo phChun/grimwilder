@@ -9,6 +9,9 @@ class Campaigns::PlaySessionsController < ApplicationController
   def index
     @sessions = Current.campaign.play_sessions.includes(:scenes, :characters).order(number: :desc)
     @between = between_sessions
+    # Each session's own log, for its fold: { session id => { scene id => rolls } }.
+    @logs = Current.campaign.rolls.where(play_session: @sessions).visible_to(Current.membership).includes(:identity, :pool).order(:created_at, :id)
+      .group_by(&:play_session_id).transform_values { _1.group_by(&:scene_id) }
   end
 
   def show

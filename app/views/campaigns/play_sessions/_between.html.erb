@@ -1,13 +1,16 @@
-<%# locals: (rolls:, after:, before:) %>
-<%# The log between two sessions (rests, downtime, rolls, notes made outside one), in its place in the history, oldest first. after/before: the sessions either side; nil at the ends. %>
-<% span = if after && before then "after #{after.title}, before #{before.title}"
-          elsif before then "before #{before.title}"
-          else "since #{after.title}"
-          end %>
+<%# locals: (rolls:, after:, before:, open: nil) %>
+<%# The log between two sessions (rests, downtime, rolls, notes made outside one), in its place in the history, oldest first, folded like the sessions. after/before: the sessions either side; nil at the ends. %>
+<% title = if after && before then "Between Sessions #{after.number} and #{before.number}"
+           elsif before then "Before #{before.title}"
+           else "Since #{after.title}"
+           end %>
+<% key = before ? "between-before-#{before.number}" : "between-since" %>
 <li class="panel session-card session-card--between">
-  <div class="session-card__head">
-    <h2 class="session-card__title">Between sessions</h2>
-    <span class="session-card__date"><%= span %></span>
-  </div>
-  <ol class="roll-log"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>
+  <%= tag.details id: key, class: "fold session-card__fold", open: open, data: { details_memory_target: "section", section: key, phone_open: open.to_s } do %>
+    <summary class="fold__summary session-card__head">
+      <h2 class="session-card__title"><%= title %></h2>
+      <span class="session-card__date"><%= pluralize(rolls.size, "entry") %></span>
+    </summary>
+    <ol class="roll-log"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>
+  <% end %>
 </li>

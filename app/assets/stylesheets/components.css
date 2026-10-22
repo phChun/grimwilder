@@ -1085,7 +1085,9 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .moment-form { max-width: 36rem; }
 .session-form__scenes { margin: var(--space-1) 0 0; padding-left: 1.3em; }
 
-.session-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); max-width: 48rem; }
+/* A grid of folds, newest first; an open one spans the row to show its log. */
+.session-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); align-items: start; }
+.session-list > li:has(> details[open]) { grid-column: 1 / -1; }
 .session-card { display: grid; gap: var(--space-1); }
 .session-card__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
 .session-card__title { margin: 0; font-size: 1.4rem; }
@@ -1095,6 +1097,12 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .session-card--between { border-style: dashed; background: transparent; }
 .session-card--between .session-card__title { font-size: 1.15rem; color: var(--ink-soft); }
 .session-card--between .roll-log { margin-top: var(--space-2); }
+/* Each session and stretch between them is a fold holding its log. */
+.session-card__head .session-card__title { margin-right: auto; }
+.session-card__head .session-card__date { flex-basis: 100%; }
+.session-card__body { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
+.session-card__scene { margin: var(--space-2) 0 0; font-size: 1rem; color: var(--ink-soft); }
+.session-card__open { justify-self: start; margin-top: var(--space-2); }
 
 .session-page { display: grid; gap: var(--space-4); max-width: 48rem; }
 .session-page__text { margin: 0; white-space: pre-line; }
