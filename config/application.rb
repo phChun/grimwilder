@@ -28,5 +28,9 @@ module Grimwilder
     # existing accounts still sign in, and so can anyone holding a campaign's
     # invite link. See Identity.signups_open?.
     config.x.signups_open = ActiveModel::Type::Boolean.new.cast(ENV.fetch("ALLOW_SIGNUPS", "true"))
+
+    # Nothing here transforms images, so there's no image_processing or libvips
+    # (the production image has neither).
+    config.active_storage.variant_processor = :disabled
   end
 end

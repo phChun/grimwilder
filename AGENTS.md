@@ -17,11 +17,12 @@ Source rulebook: `GWCE P5.2 Pages.pdf` (in the Claude project "Grimwilder", not 
 
 | Piece | Choice |
 |---|---|
-| Ruby / Rails | Ruby **4.0.6**, Rails **8.2.0.alpha** (`main` branch from GitHub) |
+| Ruby / Rails | Ruby **4.0.7**, Rails **8.2.0.alpha** (`main` branch from GitHub) |
 | Views | `.html.erb` compiled by **Herb** and routed through **ReActionView 0.6** (reactionview.dev) |
 | JS | importmap-rails, Turbo, Stimulus, the `reactionview` client (pinned automatically by the gem) |
 | CSS | Plain CSS served by Propshaft. No Tailwind, no Sass |
 | DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal (`config/deploy.yml` still has placeholder values) |
+| Image | Docker Hardened Images: built in `dhi.io/ruby:4.0.7-debian13-dev`, run in `dhi.io/ruby:4.0.7-debian13` (`docker login dhi.io` first). See *Production image* |
 | Tests | Minitest (`bin/rails test`) plus Node's built-in test runner for pure JS |
 | Auth | Passwordless: emailed codes + passkeys (`webauthn` gem); no `has_secure_password` / bcrypt |
 
@@ -350,6 +351,16 @@ The UI rethink (brief "Grimwilder: night-table UI", 2026-10-20; mockups in the l
 4. **Campaign play**: the table log is built, and so are sessions and scenes (see "Sessions & scenes"). Action, defense, story, montage and quarrel rolls are built, with spark and assists. Power pools roll as action rolls too. Next ideas: assists on story rolls, and outside help as its own named die.
 
 Open questions: deploy host and domain; whether rolls can be shared without an account.
+
+## Production image
+
+The `Dockerfile` builds on Docker Hardened Images (Debian 13). The runtime image has **no shell, no package manager and no `/usr/bin/env`**, and only the libraries Ruby needs, so:
+- `bin/docker-entrypoint` is Ruby (`ENTRYPOINT ["ruby", …]`): it runs `db:prepare` before the server, and runs `bin/…` scripts through `ruby`, since their `#!/usr/bin/env ruby` line can't work. The default command is `ruby bin/thrust ruby bin/rails server`.
+- Run commands as `ruby bin/rails …` when you `docker exec` (Kamal's `--reuse` aliases); `docker run image bin/rails …` goes through the entrypoint and is fine. There's no `kamal shell` or `dbc` (no bash, no sqlite3); use `docker debug` on the server for a shell.
+- `BUNDLE_VERSION=system`: otherwise Bundler re-runs `bin/rails` to switch to the lockfile's version, which needs `env`.
+- What the runtime lacks is installed in the build stage and copied in: jemalloc (`/opt/jemalloc`, `LD_PRELOAD`) and time zone data (`/usr/share/zoneinfo`, which TZInfo needs). Anything else with a system library has to be copied the same way, so there's no libvips: images aren't transformed (`variant_processor = :disabled`, no image_processing).
+- It runs as uid 1000 (not the image's 65532), which owns the existing `grimwilder_storage` volume. `/rails` is created by copying, so it's that user's too.
+- Ruby versions follow what DHI publishes (4.0.7 now): keep `.ruby-version` and the `RUBY_VERSION` build arg together.
 
 ## Licensing (must keep)
 

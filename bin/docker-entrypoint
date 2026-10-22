@@ -1,20 +1,17 @@
-#!/bin/bash -e
-
+#!/usr/bin/env ruby
+# The container's entrypoint (Dockerfile). Ruby rather than a shell script,
+# because the hardened runtime image has no shell.
+#
 # If running the rails server (optionally via Thruster, and with any extra
-# flags such as -b) then create or migrate existing database
-rails_server_command() {
-  local prev=""
-  for arg in "$@"; do
-    if [ "$prev" == "./bin/rails" ] && [ "$arg" == "server" ]; then
-      return 0
-    fi
-    prev="$arg"
-  done
-  return 1
-}
+# flags such as -b) then create or migrate existing database. Then run the
+# command, through Ruby when it's one of the app's Ruby scripts (bin/rails),
+# since their #!/usr/bin/env ruby line needs a program the image may not have.
+Dir.chdir File.expand_path("..", __dir__)
 
-if rails_server_command "$@"; then
-  ./bin/rails db:prepare
-fi
+server = ARGV.each_cons(2).any? { |command, arg| File.basename(command) == "rails" && arg == "server" }
+system("ruby", "bin/rails", "db:prepare", exception: true) if server
 
-exec "${@}"
+command = ARGV.dup
+script = command.first.to_s
+command.unshift("ruby") if script.start_with?("bin/", "./bin/") && File.file?(script) && File.open(script, &:gets).to_s.include?("ruby")
+exec(*command)

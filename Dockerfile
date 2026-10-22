@@ -1,38 +1,36 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
+# The production image, on Docker Hardened Images (https://dhi.io): built in the
+# -dev image (root, a shell, apt), run in the runtime image, which has no shell
+# and no package manager. Log in first: docker login dhi.io
+#
+# Use with Kamal or build'n'run by hand:
 # docker build -t grimwilder .
 # docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name grimwilder grimwilder
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
+#
+# There's no shell in the running container, so commands go through Ruby
+# (`ruby bin/rails console`), and debugging is `docker debug <container>`.
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=4.0.6
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+ARG RUBY_VERSION=4.0.7
+
+# Throw-away build stage: gems, bootsnap and assets
+FROM dhi.io/ruby:$RUBY_VERSION-debian13-dev AS build
 
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
-    ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Set production environment variables and enable jemalloc for reduced memory usage and latency.
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development" \
-    LD_PRELOAD="/usr/local/lib/libjemalloc.so"
+    BUNDLE_WITHOUT="development"
 
-# Throw-away build stage to reduce size of final image
-FROM base AS build
-
-# Install packages needed to build gems
+# Packages to build gems, plus what the runtime can't install itself: jemalloc,
+# and time zone data for TZInfo
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config libjemalloc2 tzdata && \
+    mkdir -p /opt/jemalloc && cp /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /opt/jemalloc/ && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
@@ -55,21 +53,37 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
-# Final stage for app image
-FROM base
+# Final stage for app image: the hardened runtime
+FROM dhi.io/ruby:$RUBY_VERSION-debian13
 
-# Run and own only the runtime files as a non-root user for security
-RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+# Production environment, and jemalloc for reduced memory usage and latency.
+# HOME is the app, as uid 1000 has no home of its own here. BUNDLE_VERSION:
+# use the image's Bundler rather than switching to the lockfile's, which
+# re-runs bin/rails through #!/usr/bin/env, and this image has no env.
+ENV RAILS_ENV="production" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="development" \
+    BUNDLE_VERSION="system" \
+    LD_PRELOAD="/opt/jemalloc/libjemalloc.so.2" \
+    HOME="/rails"
+
+# Copy built artifacts: jemalloc, time zones, gems, application. The gems and
+# app belong to uid 1000, which owns the storage volume, as in the image this
+# one replaced. Copying creates /rails, so it's theirs too (WORKDIR first
+# would make it root's).
+COPY --from=build /opt/jemalloc /opt/jemalloc
+COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --chown=1000:1000 --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --chown=1000:1000 --from=build /rails /rails
+WORKDIR /rails
+
+# Run as a non-root user
 USER 1000:1000
 
-# Copy built artifacts: gems, application
-COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --chown=rails:rails --from=build /rails /rails
-
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+# Entrypoint prepares the database. It's Ruby: there's no shell to run a script.
+ENTRYPOINT ["ruby", "/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+CMD ["ruby", "bin/thrust", "ruby", "bin/rails", "server"]
