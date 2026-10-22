@@ -1,0 +1,11 @@
+<%# locals: (campaign:, call: nil, version: nil, error: nil) %>
+<%# The roll call's frame: in the layout's permanent slot on every campaign page, and as Campaigns::RollCallsController#show. A broadcast updates the slot with this frame, empty and with a versioned src, so each viewer loads their own copy. The frame itself isn't permanent: Turbo would swap a permanent element in a stream back for the old one. Written by hand: Herb compiles turbo_frame_tag(record, :prefix) to the record's bare id and prints src="" when it's nil. %>
+<% if version %>
+  <turbo-frame id="<%= campaign.roll_call_frame_id %>" src="<%= campaign_roll_call_path(campaign, v: version) %>"></turbo-frame>
+<% else %>
+  <turbo-frame id="<%= campaign.roll_call_frame_id %>">
+    <% if call %>
+      <%= render "roll_calls/call", call: call, error: error %>
+    <% end %>
+  </turbo-frame>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_21_160000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_22_120000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -209,6 +209,24 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_21_160000) do
     t.index ["last_rolled_by_id"], name: "index_pools_on_last_rolled_by_id"
   end
 
+  create_table "roll_calls", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.integer "identity_id", null: false
+    t.integer "roll_id"
+    t.string "kind", null: false
+    t.string "status", default: "open", null: false
+    t.string "question"
+    t.integer "odds", default: 2, null: false
+    t.integer "thorns", default: 0, null: false
+    t.json "seats", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_roll_calls_on_campaign_id"
+    t.index ["campaign_id"], name: "index_roll_calls_one_open_per_campaign", unique: true, where: "status = 'open'"
+    t.index ["identity_id"], name: "index_roll_calls_on_identity_id"
+    t.index ["roll_id"], name: "index_roll_calls_on_roll_id"
+  end
+
   create_table "rolls", force: :cascade do |t|
     t.integer "campaign_id"
     t.integer "identity_id", null: false
@@ -300,6 +318,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_21_160000) do
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade
   add_foreign_key "pools", "identities", column: "last_rolled_by_id"
+  add_foreign_key "roll_calls", "campaigns"
+  add_foreign_key "roll_calls", "identities"
+  add_foreign_key "roll_calls", "rolls"
   add_foreign_key "rolls", "campaigns"
   add_foreign_key "rolls", "characters", on_delete: :nullify
   add_foreign_key "rolls", "identities"

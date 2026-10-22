@@ -8,6 +8,7 @@ class Campaign < ApplicationRecord
 
   has_many :memberships, dependent: :destroy
   has_many :identities, through: :memberships
+  has_many :roll_calls, dependent: :delete_all
   has_many :rolls, dependent: :delete_all
   has_many :messages, dependent: :delete_all
   has_many :play_sessions, dependent: :destroy
@@ -84,6 +85,15 @@ class Campaign < ApplicationRecord
 
   def live_banner_id
     ActionView::RecordIdentifier.dom_id(self, :live_banner)
+  end
+
+  # The roll call's frame, and the permanent slot around it (roll_calls/_frame).
+  def roll_call_frame_id
+    ActionView::RecordIdentifier.dom_id(self, :roll_call)
+  end
+
+  def roll_call_slot_id
+    ActionView::RecordIdentifier.dom_id(self, :roll_call_slot)
   end
 
   def suspense_meter_id

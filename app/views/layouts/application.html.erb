@@ -40,6 +40,12 @@
       <%= yield %>
     </main>
 
+    <% if membership %>
+      <%# Permanent, so a morph refresh doesn't close the roll call's modal; broadcasts update what's inside. %>
+      <div id="<%= membership.campaign.roll_call_slot_id %>" data-turbo-permanent>
+        <%= render "roll_calls/frame", campaign: membership.campaign, call: RollCall.showing_for(membership.campaign, membership) %>
+      </div>
+    <% end %>
     <% if toast_roll %>
       <%= render "rolls/toast", roll: toast_roll %>
     <% end %>

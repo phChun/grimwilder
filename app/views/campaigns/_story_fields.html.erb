@@ -1,4 +1,6 @@
-<%# locals: (my_characters:) %>
+<%# locals: (my_characters:, spark: nil) %>
+<%# spark: false leaves out the spark field, for a roll call (the player picks their spark when they roll). %>
+<% spark = true if spark.nil? %>
 <fieldset class="roll-setup__group">
   <legend class="field__label">Odds</legend>
   <div class="segmented segmented--auto">
@@ -28,9 +30,11 @@
       </select>
     </div>
 
-    <div class="field">
-      <label class="field__label" for="story_spark">Spark <small>+1d each</small></label>
-      <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
-    </div>
+    <% if spark %>
+      <div class="field">
+        <label class="field__label" for="story_spark">Spark <small>+1d each</small></label>
+        <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+      </div>
+    <% end %>
   <% end %>
 </div>

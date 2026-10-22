@@ -1,12 +1,12 @@
 <%# locals: (my_characters:) %>
-<p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster).</p>
+<p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster). Pick a character and their player rolls it.</p>
 <%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack" do %>
   <div class="field">
     <label class="field__label" for="story_question">Question <small>(optional)</small></label>
     <input type="text" id="story_question" name="question" maxlength="200" autocomplete="off" placeholder="Do I see any guards?" class="field__input">
   </div>
 
-  <%= render "campaigns/story_fields", my_characters: my_characters %>
+  <%= render "campaigns/story_fields", my_characters: my_characters, spark: false %>
 
   <button type="submit" class="button button--primary">Roll</button>
 <% end %>

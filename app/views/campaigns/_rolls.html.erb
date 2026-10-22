@@ -9,7 +9,8 @@
   <% end %>
 
   <div class="rolls__panel rolls__panel--story">
-    <%= render "campaigns/story_roll", my_characters: my_characters %>
+    <%# The GM can call on anyone at the table for a story roll; a player on their own characters. %>
+    <%= render "campaigns/story_roll", my_characters: (gm? ? characters : my_characters) %>
   </div>
 
   <% if characters.any? %>

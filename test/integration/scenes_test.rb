@@ -37,9 +37,15 @@ class ScenesTest < ActionDispatch::IntegrationTest
 
     post campaign_montages_path(@campaign), params: { then: "end_scene", scene: "Across", participants: { @tibbs.id => { in: "1" } } }
     assert_redirected_to new_campaign_scene_ending_path(@campaign, scene)
-    montage = scene.rolls.montage.last
-
     follow_redirect!
+    assert_select "turbo-cable-stream-source[signed-stream-name]", minimum: 1
+    assert_select "#roll_call_campaign_#{@campaign.id} .roll-call__seat", 1, "the GM sees the montage waiting on Tibbs"
+
+    post campaign_roll_call_rolls_path(@campaign), params: { roll_call_id: @campaign.roll_calls.last.id, character_id: @tibbs.id }
+    montage = scene.rolls.montage.last
+    assert montage, "the GM rolled for Tibbs, so the montage landed"
+
+    get new_campaign_scene_ending_path(@campaign, scene)
     assert_select "select[name=closing_roll_id] option[selected][value=?]", montage.id.to_s
 
     post campaign_scene_ending_path(@campaign, scene), params: { closing_roll_id: montage.id, notes: "Across.", clear: [ "#{@tibbs.id}:0" ] }

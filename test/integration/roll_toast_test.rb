@@ -8,7 +8,7 @@ class RollToastTest < ActionDispatch::IntegrationTest
 
   test "a story roll shows its toast back on the campaign page, to the one who rolled it" do
     sign_in_as identities(:pip)
-    post campaign_story_rolls_path(@campaign), params: { question: "Is the bridge out?", odds: 2, character_id: characters(:tibbs).id }
+    post campaign_story_rolls_path(@campaign), params: { question: "Is the bridge out?", odds: 2 }
     follow_redirect!
 
     assert_select "#roll-toast .roll-toast__title", /Story roll · just now$/

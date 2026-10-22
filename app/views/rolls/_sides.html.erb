@@ -1,0 +1,12 @@
+<%# locals: (roll:) %>
+<%# A montage's or quarrel's sides, the outcome and what it means: in the roll toast and a finished roll call. %>
+<ul class="quarrel-sides">
+  <% roll.sides.each do |side| %>
+    <li class="<%= class_names("quarrel-side", "quarrel-side--winner": roll.quarrel? && side["name"] == roll.winner) %>">
+      <span class="quarrel-side__name"><%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if roll.montage? %>: <%= side["outcome"] %><%= " (critical)" if side["critical"] %><% end %></span>
+      <span class="feed-roll__dice"><%= side_dice_tags(side) %></span>
+    </li>
+  <% end %>
+</ul>
+<p class="roll-toast__result"><%= roll.quarrel? ? quarrel_result(roll) : "Montage: #{roll.outcome}" %></p>
+<p class="roll-toast__setup"><% if roll.montage? %>The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.<% else %><% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %><% end %></p>

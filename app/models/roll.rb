@@ -15,6 +15,7 @@ class Roll < ApplicationRecord
   belongs_to :pool, optional: true
   belongs_to :play_session, optional: true
   belongs_to :scene, optional: true
+  has_one :roll_call, dependent: :nullify
 
   enum :kind, %w[ action defense story quarrel montage pool marker note ].index_by(&:itself), validate: true
 

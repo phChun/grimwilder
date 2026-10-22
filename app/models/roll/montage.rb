@@ -7,23 +7,25 @@ module Roll::Montage
   DICE = 2
 
   class_methods do
-    # participants: [{ character:, spend_spark: 0 }, ...]
+    # participants: [{ character:, spend_spark: 0, dice: nil }, ...]; dice the
+    # player already rolled at a roll call, with the spark already spent.
     def montage!(campaign:, by:, participants:, scene: nil, random: Random)
       characters = participants.pluck(:character)
       raise ArgumentError, "Pick who takes part in the montage." if participants.empty?
       raise ArgumentError, "Each character can only roll once." unless characters.uniq.size == characters.size
       raise ArgumentError, "Everyone in a montage must be seated in #{campaign.name}." unless characters.all? { _1.campaign_id == campaign.id }
-      participants.each { |participant| participant[:character].check_spark_spend!(participant[:spend_spark].to_i) }
+      participants.each { |participant| participant[:character].check_spark_spend!(participant[:spend_spark].to_i) unless participant[:dice] }
 
       rolled = participants.map do |participant|
         spent = participant[:spend_spark].to_i
-        { character: participant[:character], spent: spent, result: Grimwild::Dice.roll(DICE + spent, 0, random: random) }
+        result = participant[:dice] ? Grimwild::Dice.interpret(participant[:dice]) : Grimwild::Dice.roll(DICE + spent, 0, random: random)
+        { character: participant[:character], spent: spent, paid: participant[:dice].present?, result: result }
       end
       best = rolled.min_by { Grimwild::Dice::RESULTS.index(_1[:result].result) }[:result]
 
       transaction do
         rolled.each do |side|
-          side[:gained] = side[:character].settle_spark(spent: side[:spent], take: side[:result].result == "disaster")
+          side[:gained] = side[:character].settle_spark(spent: side[:paid] ? 0 : side[:spent], take: side[:result].result == "disaster")
           side[:character].save!
         end
 

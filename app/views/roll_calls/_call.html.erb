@@ -1,0 +1,86 @@
+<%# locals: (call:, error: nil) %>
+<%# A story roll, montage or quarrel waiting on its players (RollCall), as a modal for everyone in it, the GM and whoever called it. Your own seats get a spark choice and a Roll button; the GM can roll for anyone waiting, without their spark. Once everyone has rolled it shows the result. Rendered per viewer (never in a broadcast), so it can use Current. %>
+<% me = Current.identity %>
+<% gm = me.membership_in(call.campaign)&.gm? %>
+<% title_id = "roll-call-title-#{call.id}" %>
+<div class="roll-call" data-controller="roll-call" data-roll-call-key-value="roll-call-<%= call.id %>-<%= call.status %>" data-roll-call-done-value="<%= call.done? %>">
+  <dialog class="<%= class_names("roll-call__dialog", "roll-call__dialog--grim": call.roll && call.roll.outcome.in?(%w[ grim disaster ])) %>" aria-labelledby="<%= title_id %>" data-roll-call-target="dialog" data-action="cancel->roll-call#hide">
+    <div class="roll-call__head">
+      <div>
+        <h2 id="<%= title_id %>" class="roll-call__title"><%= call.title %><% if call.done? %> · rolled<% end %></h2>
+        <p class="roll-call__by">Called by <%= call.identity.display_name %></p>
+      </div>
+      <button type="button" class="roll-call__close" aria-label="<%= call.done? ? "Close" : "Hide for now" %>" data-action="roll-call#hide"><%= icon(:close, size: 18) %></button>
+    </div>
+
+    <% if call.question %>
+      <p class="roll-call__question"><%= call.quarrel? ? "Stakes: #{call.question}" : call.question %></p>
+    <% end %>
+    <% if error %>
+      <p class="roll-call__error" role="alert"><%= error %></p>
+    <% end %>
+
+    <% if call.done? && call.roll %>
+      <div class="roll-call__result" aria-live="polite">
+        <% if call.story? %>
+          <%= render "shared/roll_result", roll: call.roll, detail: roll_result_text(call.roll) %>
+          <p class="roll-toast__setup"><%= roll_setup(call.roll) %></p>
+          <% if (note = roll_spark_note(call.roll)) %><p class="roll-toast__note roll-toast__note--spark"><%= note %></p><% end %>
+        <% else %>
+          <%= render "rolls/sides", roll: call.roll %>
+        <% end %>
+      </div>
+      <div class="roll-call__actions">
+        <button type="button" class="button button--primary" data-action="roll-call#hide">Done</button>
+      </div>
+    <% else %>
+      <p class="roll-call__hint"><%= roll_call_hint(call) %></p>
+      <ul class="roll-call__seats" aria-live="polite">
+        <% call.seats.each do |seat| %>
+          <% character = call.character_for(seat) %>
+          <li class="<%= class_names("roll-call__seat", "roll-call__seat--rolled": seat["dice"]) %>">
+            <div class="roll-call__who">
+              <strong class="roll-call__name"><%= seat["name"] %></strong>
+              <small class="roll-call__meta"><%= seat["player"] %><% if call.assist?(seat) %> · assists <%= call.lead_name(seat) %><% end %></small>
+            </div>
+
+            <% if seat["dice"] %>
+              <div class="roll-call__rolled">
+                <span class="roll-call__dice"><%= roll_call_dice_tags(seat) %></span>
+                <small class="roll-call__meta"><% if seat["spark"].positive? %>+<%= seat["spark"] %> spark<% end %><% if seat["rolled_by"] %><%= " · " if seat["spark"].positive? %>rolled by <%= seat["rolled_by"] %><% end %></small>
+              </div>
+            <% elsif character&.owned_by?(me) %>
+              <%= form_with url: campaign_roll_call_rolls_path(call.campaign), class: "roll-call__roll" do %>
+                <input type="hidden" name="roll_call_id" value="<%= call.id %>">
+                <input type="hidden" name="character_id" value="<%= character.id %>">
+                <% if !call.assist?(seat) && character.spark.positive? %>
+                  <%= render "shared/segmented", name: "spark", legend: "Spend spark (+1d each)", options: (0..character.spark).map { [ _1, _1.zero? ? "No spark" : "+#{_1} spark" ] }, checked: 0, id_prefix: "roll_call_#{call.id}_#{character.id}_spark", classes: "segmented--auto roll-call__spark" %>
+                <% end %>
+                <button type="submit" class="button button--primary" autofocus>Roll <%= call.base_dice(seat) %>d<% if call.story? && call.thorns.positive? %> vs <%= call.thorns %>t<% end %></button>
+              <% end %>
+            <% elsif gm %>
+              <%= button_to "Roll for them", campaign_roll_call_rolls_path(call.campaign), params: { roll_call_id: call.id, character_id: seat["character_id"] }, class: "button button--small", "aria-label": "Roll for #{seat["name"]}" %>
+            <% else %>
+              <span class="roll-call__waiting">Waiting to roll</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+
+      <div class="roll-call__actions">
+        <% if gm && call.waiting.many? %>
+          <%= button_to "Roll for everyone left", campaign_roll_call_rolls_path(call.campaign), params: { roll_call_id: call.id, everyone: 1 }, class: "button" %>
+        <% end %>
+        <% if call.may_cancel?(me) %>
+          <%= button_to "Call it off", campaign_roll_call_path(call.campaign), method: :delete, params: { roll_call_id: call.id }, class: "button button--ghost", form: { data: { turbo_confirm: "Call off this #{call.title.downcase}? Any spark spent on it goes back." } } %>
+        <% end %>
+      </div>
+    <% end %>
+  </dialog>
+
+  <% unless call.done? %>
+    <button type="button" class="roll-call__pill" hidden data-roll-call-target="pill" data-action="roll-call#reopen">
+      <%= icon(:die, size: 18) %> <%= call.title %> · <%= roll_call_waiting_line(call) %>
+    </button>
+  <% end %>
+</div>

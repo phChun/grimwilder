@@ -30,7 +30,8 @@ module RollsHelper
     return unless Current.identity
     return @toast_roll if defined?(@toast_roll)
 
-    roll = Roll.where(identity: Current.identity).where.not(kind: %w[ marker note ]).order(updated_at: :desc, id: :desc).first
+    # A roll call's result shows in its own modal instead.
+    roll = Roll.where(identity: Current.identity).where.not(kind: %w[ marker note ]).where.missing(:roll_call).order(updated_at: :desc, id: :desc).first
     @toast_roll = roll if roll && (roll_toast_seconds_left(roll).positive? || roll_toast_sticky?(roll))
   end
 

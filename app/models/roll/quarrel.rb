@@ -8,19 +8,22 @@ module Roll::Quarrel
   DICE = 2
 
   class_methods do
-    # sides: [{ character:, spend_spark: 0, helpers: [characters] }, ...]
+    # sides: [{ character:, spend_spark: 0, helpers: [characters] }, ...]. A
+    # side from a roll call also has the dice its players already rolled
+    # (dice:, helper_dice: [one per helper]), with the spark already spent.
     def quarrel!(campaign:, by:, sides:, stakes: nil, random: Random)
       everyone = sides.flat_map { |side| [ side[:character], *side[:helpers] ] }
       raise ArgumentError, "A quarrel needs at least two sides." if sides.size < 2
       raise ArgumentError, "Each character can only take one part." unless everyone.uniq.size == everyone.size
       raise ArgumentError, "Everyone in a quarrel must be seated in #{campaign.name}." unless everyone.all? { _1.campaign_id == campaign.id }
-      sides.each { |side| side[:character].check_spark_spend!(side[:spend_spark].to_i) }
+      sides.each { |side| side[:character].check_spark_spend!(side[:spend_spark].to_i) unless side[:dice] }
 
       rolled = sides.map do |side|
         spent = side[:spend_spark].to_i
         {
-          lead: side[:character], spent: spent, dice: Array.new(DICE + spent) { random.rand(1..6) },
-          helpers: side[:helpers].map { |helper| { character: helper, die: random.rand(1..6) } }
+          lead: side[:character], spent: spent, paid: side[:dice].present?,
+          dice: side[:dice] || Array.new(DICE + spent) { random.rand(1..6) },
+          helpers: side[:helpers].map.with_index { |helper, index| { character: helper, die: side.dig(:helper_dice, index) || random.rand(1..6) } }
         }
       end
 
@@ -29,7 +32,7 @@ module Roll::Quarrel
 
       transaction do
         rolled.each do |side|
-          side[:gained] = side[:lead].settle_spark(spent: side[:spent], take: true)
+          side[:gained] = side[:lead].settle_spark(spent: side[:paid] ? 0 : side[:spent], take: true)
           side[:helpers].each { |helper| helper[:gained] = helper[:character].settle_spark(take: true) }
           [ side[:lead], *side[:helpers].pluck(:character) ].each(&:save!)
         end

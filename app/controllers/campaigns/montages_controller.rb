@@ -1,6 +1,7 @@
-# Montage rolls for the seated characters taking part in a stretch of story.
+# Montages: whoever calls one picks the seated characters taking part, then
+# each player rolls their own (RollCall).
 class Campaigns::MontagesController < ApplicationController
-  include CampaignScoped, SparkSpending
+  include CampaignScoped
 
   before_action :set_characters
 
@@ -8,11 +9,11 @@ class Campaigns::MontagesController < ApplicationController
   end
 
   def create
-    Roll.montage!(campaign: Current.campaign, by: Current.identity, scene: params[:scene], participants: participants)
+    RollCall.montage!(campaign: Current.campaign, by: Current.identity, scene: params[:scene], characters: participants)
     if params[:then] == "end_scene" && (scene = Current.campaign.current_scene)
       redirect_to new_campaign_scene_ending_path(Current.campaign, scene)
     else
-      back_to_table(anchor: "roll-log")
+      back_to_table(anchor: "rolls")
     end
   rescue ArgumentError => error
     flash.now[:alert] = error.message
@@ -24,14 +25,9 @@ class Campaigns::MontagesController < ApplicationController
       @characters = Current.campaign.characters.played.includes(:identity).ordered
     end
 
-    # participants[<character id>][in] is "1" for everyone taking part;
-    # participants[<character id>][spark] is spark they spend.
+    # participants[<character id>][in] is "1" for everyone taking part.
     def participants
-      chosen = params.fetch(:participants, {}).permit(@characters.to_h { [ _1.id.to_s, %i[ in spark ] ] }).to_h
-
-      @characters.filter_map do |character|
-        choice = chosen[character.id.to_s]
-        { character: character, spend_spark: spark_to_spend(character, choice[:spark]) } if choice&.dig(:in) == "1"
-      end
+      chosen = params.fetch(:participants, {}).permit(@characters.to_h { [ _1.id.to_s, %i[ in ] ] }).to_h
+      @characters.select { chosen.dig(_1.id.to_s, :in) == "1" }
     end
 end

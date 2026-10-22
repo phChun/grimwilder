@@ -1374,6 +1374,73 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .roll-toast__note--spark { color: var(--spark); }
 .roll-toast .critical { margin: 0; }
 
+/* Roll call (roll_calls/_call): a story roll, montage or quarrel waiting on its
+   players, as a modal. Hidden, it leaves a pill above the roll toast's corner. */
+.roll-call__dialog {
+  width: min(32rem, calc(100% - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 14px 18px 18px;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 12px 32px -8px rgb(0 0 0 / 0.85);
+}
+
+.roll-call__dialog[open] { display: flex; flex-direction: column; gap: 14px; animation: roll-toast-in 180ms ease-out; }
+.roll-call__dialog::backdrop { background: rgb(10 9 7 / 0.7); }
+.roll-call__dialog--grim { background: color-mix(in srgb, var(--grim-bg) 92%, black); box-shadow: inset 0 0 0 1px var(--grim-line), 0 12px 32px -8px rgb(0 0 0 / 0.85); }
+@media (prefers-reduced-motion: reduce) { .roll-call__dialog[open] { animation: none; } }
+
+.roll-call__head { display: flex; align-items: flex-start; gap: var(--space-2); margin-right: -10px; }
+.roll-call__head > div { flex: 1; }
+.roll-call__title { margin: 0; font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; }
+.roll-call__by { margin: 0; font-size: 0.87rem; color: var(--dim); }
+.roll-call__close { display: grid; place-items: center; width: var(--tap); height: var(--tap); padding: 0; border: 0; border-radius: var(--radius-control); background: none; color: var(--muted); cursor: pointer; }
+.roll-call__close:hover { background: var(--surface-2); color: var(--text); }
+.roll-call__question { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.35; }
+.roll-call__hint { margin: 0; font-size: 0.87rem; color: var(--muted); }
+.roll-call__error { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-control); background: var(--grim-bg); color: var(--grim); }
+
+.roll-call__seats { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.roll-call__seat { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-control); }
+.roll-call__seat--rolled { background: var(--surface-2); }
+.roll-call__who { display: grid; min-width: 0; }
+.roll-call__name { font-family: var(--font-display); font-size: 1.1rem; }
+.roll-call__meta { color: var(--dim); font-size: 0.85rem; }
+.roll-call__waiting { color: var(--muted); font-size: 0.9rem; font-style: italic; }
+.roll-call__rolled { display: grid; justify-items: end; gap: 2px; }
+.roll-call__dice { display: flex; flex-wrap: wrap; gap: 6px; }
+.roll-call__roll { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--space-2); flex: 1 1 14rem; }
+.roll-call__roll .button { flex: 0 0 auto; }
+.roll-call__spark { flex: 1 1 12rem; }
+.roll-call__result { display: grid; gap: 12px; }
+.roll-call__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
+.roll-call__actions .button_to { margin: 0; }
+
+.roll-call__pill {
+  position: fixed;
+  z-index: 31;
+  left: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 1px solid var(--ember);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 0.9rem var(--font-ui);
+  box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.85);
+  cursor: pointer;
+}
+
+.roll-call__pill[hidden] { display: none; }
+.roll-call__pill .icon { color: var(--ember); }
+.roll-call__pill:hover { background: var(--surface-2); }
+
 /* Failures (shared/_toasts): grim-red toasts at the top of the screen, clear of
    the roll toast and the rail's composer, stacking if there's more than one. */
 .toasts {

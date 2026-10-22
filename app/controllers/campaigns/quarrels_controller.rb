@@ -1,8 +1,8 @@
 # Quarrels between seated characters. The whole table agrees to one out loud,
-# so any member can record it, but only a character's own player can spend
-# that character's spark.
+# so any member can call it; then each player rolls their own side or assist
+# (RollCall).
 class Campaigns::QuarrelsController < ApplicationController
-  include CampaignScoped, SparkSpending
+  include CampaignScoped
 
   before_action :set_characters
 
@@ -10,8 +10,8 @@ class Campaigns::QuarrelsController < ApplicationController
   end
 
   def create
-    Roll.quarrel!(campaign: Current.campaign, by: Current.identity, stakes: params[:stakes], sides: sides)
-    back_to_table(anchor: "roll-log")
+    RollCall.quarrel!(campaign: Current.campaign, by: Current.identity, stakes: params[:stakes], sides: sides)
+    back_to_table(anchor: "rolls")
   rescue ArgumentError => error
     flash.now[:alert] = error.message
     render :new, status: :unprocessable_entity
@@ -22,15 +22,13 @@ class Campaigns::QuarrelsController < ApplicationController
       @characters = Current.campaign.characters.played.includes(:identity).ordered
     end
 
-    # participants[<character id>][role] is "quarrel", "assist-<character id>" or blank;
-    # participants[<character id>][spark] is spark that side spends.
+    # participants[<character id>][role] is "quarrel", "assist-<character id>" or blank.
     def sides
       chosen = participants.select { |_, choice| choice[:role].present? }
       leads = chosen.select { |_, choice| choice[:role] == "quarrel" }
 
-      sides = leads.to_h do |id, choice|
-        character = @characters.find { _1.id.to_s == id }
-        [ id, { character: character, spend_spark: spark_to_spend(character, choice[:spark]), helpers: [] } ]
+      sides = leads.to_h do |id, _|
+        [ id, { character: @characters.find { _1.id.to_s == id }, helpers: [] } ]
       end
 
       (chosen.to_a - leads.to_a).each do |id, choice|
@@ -44,7 +42,7 @@ class Campaigns::QuarrelsController < ApplicationController
     end
 
     def participants
-      params.fetch(:participants, {}).permit(@characters.to_h { [ _1.id.to_s, %i[ role spark ] ] }).to_h
+      params.fetch(:participants, {}).permit(@characters.to_h { [ _1.id.to_s, %i[ role ] ] }).to_h
         .transform_values(&:with_indifferent_access)
     end
 end

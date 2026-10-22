@@ -19,15 +19,11 @@
               <small><%= character.identity.display_name %> · <%= pluralize(character.spark, "spark") %></small>
             </span>
           </label>
-          <% if character.owned_by?(Current.identity) && character.spark.positive? %>
-            <span class="quarrel-form__choices">
-              <%= select_tag "participants[#{character.id}][spark]", options_for_select((0..character.spark).map { [ "+#{_1} spark", _1 ] }, choice[:spark].to_i), id: "montage_spark_#{character.id}", class: "field__input", "aria-label": "Spark #{character.name} spends" %>
-            </span>
-          <% end %>
         </li>
       <% end %>
     </ul>
   </fieldset>
 
-  <button type="submit" class="button button--primary">Roll the montage</button>
+  <p class="field__hint">Each player then rolls their own, with any spark they spend.</p>
+  <button type="submit" class="button button--primary">Call for the montage</button>
 <% end %>

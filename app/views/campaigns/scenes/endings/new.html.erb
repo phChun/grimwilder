@@ -1,4 +1,9 @@
 <% content_for :title, "End scene #{@scene.number} · #{Current.campaign.name}" %>
+<% content_for :head do %>
+  <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+<% end %>
+<%# A montage called from here lands once everyone has rolled; the refresh offers it. %>
+<%= turbo_stream_from Current.campaign, :roll_calls %>
 
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
@@ -14,7 +19,7 @@
     <% else %>
       <p class="field__hint">No montage rolled in this scene yet.</p>
     <% end %>
-    <p class="field__hint"><%= link_to "Roll a montage", new_campaign_montage_path(Current.campaign, then: "end_scene", scene: @scene.title) %>, then come back here.</p>
+    <p class="field__hint"><%= link_to "Call for a montage", new_campaign_montage_path(Current.campaign, then: "end_scene", scene: @scene.title) %>, then come back here.</p>
   </div>
 
   <div class="field">

@@ -55,6 +55,10 @@ Rails.application.routes.draw do
       resources :story_rolls, only: :create
       resources :quarrels, only: %i[ new create ]
       resources :montages, only: %i[ new create ]
+      # The story roll, montage or quarrel waiting on its players (RollCall)
+      resource :roll_call, only: %i[ show destroy ] do
+        resources :rolls, only: :create, module: :roll_calls
+      end
 
       resources :play_sessions, only: %i[ index show new create update ] do
         scope module: :play_sessions do
