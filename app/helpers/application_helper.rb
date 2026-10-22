@@ -50,7 +50,6 @@ module ApplicationHelper
       [
         [ "Campaign", campaign_path(campaign), on_campaign ],
         [ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ],
-        [ "Characters", campaign_path(campaign, anchor: "party"), false ],
         log
       ]
     else
@@ -58,7 +57,6 @@ module ApplicationHelper
       [
         [ "Campaign", campaign_path(campaign), on_campaign ],
         ([ "My character", character_path(mine), controller_path == "characters" && @character == mine ] if mine),
-        [ "Party", campaign_path(campaign, anchor: "party"), false ],
         log
       ].compact
     end

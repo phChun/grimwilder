@@ -62,13 +62,21 @@
                 </div>
               <% end %>
               <%= link_to "Edit sheet", edit_character_path(@character), class: "button button--ghost" %>
+              <%# Character::Claiming: the owner hands it back to the table from here (a GM looking at someone else's gets the bar below). %>
+              <% if @character.releasable_by?(Current.identity) && !@character.up_for_grabs? %>
+                <% giving_back = !@membership&.gm? %>
+                <div class="adjust__claim">
+                  <p class="adjust__hint"><%= giving_back ? "Done with #{short}? The GM gets them back for someone else to pick." : "Let a player at the table pick #{short} to play." %></p>
+                  <%= button_to (giving_back ? "Give #{short} back" : "Put #{short} up for grabs"), character_claim_path(@character), method: :delete, class: "button button--ghost", form: { data: { turbo_confirm: "#{@character.name} goes back to the GM, for any player to pick. Continue?" } } %>
+                </div>
+              <% end %>
             </div>
           </details>
         <% end %>
       </div>
     </section>
 
-    <%# Up for grabs (Character::Claiming): who holds it, and the way to pick it or give it back. %>
+    <%# Up for grabs (Character::Claiming): who holds it, and the way to pick it; a GM looking at someone else's can put it up for grabs. The owner gives theirs back from Adjust. %>
     <% if @character.up_for_grabs? %>
       <div class="claim-bar claim-bar--open">
         <p class="claim-bar__text"><strong>Up for grabs.</strong> <%= @character.claimable_by?(Current.identity) && !@membership&.gm? ? "Pick #{short} to play them: they become yours." : "Waiting for a player at the table to pick #{short}." %></p>
@@ -76,10 +84,10 @@
           <%= button_to "Play #{short}", character_claim_path(@character), class: "button button--small button--primary" %>
         <% end %>
       </div>
-    <% elsif @character.releasable_by?(Current.identity) %>
+    <% elsif @character.releasable_by?(Current.identity) && !editable %>
       <div class="claim-bar">
-        <p class="claim-bar__text"><%= editable && !@membership&.gm? ? "Done with #{short}? Give them back to the GM for someone else to pick." : "Played by #{@character.identity.display_name}. Put #{short} up for grabs to let another player pick them." %></p>
-        <%= button_to (editable && !@membership&.gm? ? "Give back" : "Put up for grabs"), character_claim_path(@character), method: :delete, class: "button button--ghost button--small", form: { data: { turbo_confirm: "#{@character.name} goes back to the GM, for any player to pick. Continue?" } } %>
+        <p class="claim-bar__text">Played by <%= @character.identity.display_name %>. Put <%= short %> up for grabs to let another player pick them.</p>
+        <%= button_to "Put up for grabs", character_claim_path(@character), method: :delete, class: "button button--ghost button--small", form: { data: { turbo_confirm: "#{@character.name} goes back to the GM, for any player to pick. Continue?" } } %>
       </div>
     <% end %>
 

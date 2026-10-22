@@ -43,6 +43,10 @@ class UpForGrabsTest < ActionDispatch::IntegrationTest
 
   test "the GM puts a player's character up for grabs, and someone else can pick it" do
     sign_in_as identities(:gwen)
+    get character_path(characters(:bram))
+    assert_select ".claim-bar", 0, "the GM's own character: from Adjust"
+    assert_select ".adjust__panel form[action=?] button", character_claim_path(characters(:bram)), "Put Bram up for grabs"
+
     get character_path(@tibbs)
     assert_select ".claim-bar form[action=?] button", character_claim_path(@tibbs), "Put up for grabs"
 
@@ -61,7 +65,8 @@ class UpForGrabsTest < ActionDispatch::IntegrationTest
   test "a player gives theirs back, but can't give away anyone else's" do
     sign_in_as identities(:pip)
     get character_path(@tibbs)
-    assert_select ".claim-bar form[action=?] button", character_claim_path(@tibbs), "Give back"
+    assert_select ".claim-bar", 0, "the owner gives it back from Adjust"
+    assert_select ".adjust__panel form[action=?] button", character_claim_path(@tibbs), "Give Tibbs back"
 
     delete character_claim_path(characters(:bram))
     assert_redirected_to character_path(characters(:bram))

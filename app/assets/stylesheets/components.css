@@ -1254,6 +1254,12 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .adjust__value { min-width: 2ch; text-align: center; font-family: var(--font-dice); font-weight: 600; }
 .adjust__hint { flex-basis: 100%; margin: 0; font-size: 0.8rem; color: var(--dim); }
 
+/* Giving the character back: the description, then the button under it,
+   full width like Edit sheet. */
+.adjust__claim { display: grid; gap: var(--space-2); }
+.adjust__claim .button_to { margin: 0; }
+.adjust__claim .button { width: 100%; }
+
 /* Stat cards; the one rolling spans two columns. */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
 
