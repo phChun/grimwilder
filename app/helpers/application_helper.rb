@@ -21,8 +21,8 @@ module ApplicationHelper
 
   # The play toolkit's public tools. They're the header's tabs outside a
   # campaign, and always listed in the footer. `ready: false` items render as
-  # "soon". Characters and campaigns need an account, so they aren't here; the
-  # home page offers them once you're signed in.
+  # "soon". Characters and campaigns need an account, so they aren't here: the
+  # header adds a Characters tab once you're signed in (characters_tab).
   TOOLKIT_NAV = [
     { label: "Roll", path: :roll_path, ready: true },
     { label: "Crucibles", path: :crucibles_path, ready: true },
@@ -33,14 +33,22 @@ module ApplicationHelper
     TOOLKIT_NAV
   end
 
+  # Every signed-in person's own characters, the last tab in the header inside
+  # a campaign or out: [label, path, current?]. A player's sheet in a campaign
+  # is "My character" instead.
+  def characters_tab
+    [ "Characters", characters_path, controller_path == "characters" && action_name.in?(%w[ index new create ]) ]
+  end
+
   # The campaign the page belongs to, for the header and live banner: the one
   # in the URL, or the campaign a sheet's character is seated in.
   def context_membership
     Current.membership || @membership
   end
 
-  # The header's tabs inside a campaign: [label, path, current?]. Party and
-  # Characters point at the campaign page's party section.
+  # The header's tabs inside a campaign: [label, path, current?]. A player
+  # with more than one character seated here gets "My characters" with a menu
+  # of them instead of a path: [[name, path, current?], ...].
   def campaign_tabs(membership)
     campaign = membership.campaign
     on_campaign = controller_path == "campaigns" && action_name == "show"
@@ -53,12 +61,14 @@ module ApplicationHelper
         log
       ]
     else
-      mine = membership.seated_character
-      [
-        [ "Campaign", campaign_path(campaign), on_campaign ],
-        ([ "My character", character_path(mine), controller_path == "characters" && @character == mine ] if mine),
-        log
-      ].compact
+      sheets = membership.seated_characters.map { [ _1.name, character_path(_1), controller_path == "characters" && @character == _1 ] }
+      mine =
+        case sheets.size
+        when 0 then nil
+        when 1 then [ "My character", sheets.first[1], sheets.first[2] ]
+        else [ "My characters", sheets, sheets.any?(&:last) ]
+        end
+      [ [ "Campaign", campaign_path(campaign), on_campaign ], mine, log ].compact
     end
   end
 

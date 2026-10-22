@@ -30,9 +30,14 @@ class Membership < ApplicationRecord
     end
   end
 
-  # The character this member plays here, if they've seated one that's still playing.
+  # The characters this member plays here: seated, and still playing.
+  def seated_characters
+    identity.characters.where(campaign: campaign).played.active.ordered
+  end
+
+  # The one their tab and the live banner lead to when there's a choice: the first by name.
   def seated_character
-    identity.characters.where(campaign: campaign).played.active.ordered.first
+    seated_characters.first
   end
 
   private

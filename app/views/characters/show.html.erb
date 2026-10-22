@@ -61,6 +61,9 @@
                   <p class="adjust__hint">Take 1 XP after each session. <%= @character.xp_to_next_level %> fills level <%= @character.level + 1 %>.</p>
                 </div>
               <% end %>
+              <% if @character.seatable_by?(Current.identity) %>
+                <%= render "characters/seat_form", character: @character, campaigns: Current.identity.campaigns.order(:name) %>
+              <% end %>
               <%= link_to "Edit sheet", edit_character_path(@character), class: "button button--ghost" %>
               <%# Character::Claiming: the owner hands it back to the table from here (a GM looking at someone else's gets the bar below). %>
               <% if @character.releasable_by?(Current.identity) && !@character.up_for_grabs? %>

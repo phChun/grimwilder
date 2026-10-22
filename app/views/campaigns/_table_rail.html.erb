@@ -45,7 +45,8 @@
 
   <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
     <% voices = gm ? [ %w[ narration Narrate ], [ "npc", "As NPC" ], [ "table_talk", "Table talk" ] ] : speakers.map { [ "character:#{_1.id}", "As #{_1.short_name}" ] } + [ [ "table_talk", "Table talk" ], [ "whisper", "To GM" ] ] %>
-    <%= render "shared/segmented", name: "speak_as", legend: "Speak as", options: voices, checked: default_voice(membership, speakers, speaker), id_prefix: "#{prefix}_voice", classes: "composer__voices" %>
+    <%# In rows: one row of up to three, two by two for four (two characters), three across for more. %>
+    <%= render "shared/segmented", name: "speak_as", legend: "Speak as", options: voices, checked: default_voice(membership, speakers, speaker), id_prefix: "#{prefix}_voice", classes: "composer__voices composer__voices--#{voices.size == 4 ? 2 : voices.size.clamp(1, 3)}" %>
     <div class="composer__npc">
       <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
       <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">

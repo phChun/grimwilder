@@ -133,6 +133,15 @@
 .tool-card__name { font-family: var(--font-display); font-size: 1.4rem; color: var(--ink); }
 .tool-card__desc { font-size: 0.95rem; }
 
+/* The character list: each card links to the sheet and seats it in a campaign. */
+.character-list__card { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
+.character-list__card .field__hint { margin: auto 0 0; }
+.character-list__link { display: flex; flex-direction: column; gap: var(--space-1); color: var(--ink-soft); text-decoration: none; }
+.character-list__link:hover .tool-card__name { color: var(--ember); }
+.seat-form { display: grid; gap: var(--space-1); margin-top: auto; }
+.seat-form__row { display: flex; gap: var(--space-2); }
+.seat-form__row .field__input { flex: 1; min-width: 0; }
+
 /* ---------- Roller ---------- */
 
 .roller__grid {
@@ -2237,7 +2246,11 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 
 /* Composer */
 .composer { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 12px 14px; border-top: 1px solid var(--line-soft); }
-.composer__voices { grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); }
+.composer__voices { grid-template-columns: repeat(var(--voice-columns, 3), minmax(0, 1fr)); }
+.composer__voices--1 { --voice-columns: 1; }
+.composer__voices--2 { --voice-columns: 2; }
+/* A long name is cut short rather than spilling out of its cell. */
+.composer__voices .segmented__text { display: block; padding-inline: var(--space-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .composer__npc { display: none; }
 .composer:has(input[name=speak_as][value=npc]:checked) .composer__npc { display: block; }
 .composer__row { display: flex; align-items: center; gap: var(--space-2); }

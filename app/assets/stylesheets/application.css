@@ -358,11 +358,18 @@ small { font-size: 0.8em; color: var(--dim); }
 
 .tabs__link:hover { color: var(--text); }
 
-.tabs__link[aria-current="page"] {
+.tabs__link[aria-current="page"],
+.tabs__link--current {
   color: var(--text);
   font-weight: 600;
   box-shadow: inset 0 -2px 0 var(--ember);
 }
+
+/* A tab with a menu: "My characters" when a player has several seated here. */
+.tab-menu { position: relative; }
+.tab-menu__button { gap: var(--space-1); cursor: pointer; list-style: none; }
+.tab-menu__button::-webkit-details-marker { display: none; }
+.tab-menu[open] .tab-menu__button .icon { transform: rotate(180deg); }
 
 .tabs__link--soon { color: var(--dim); cursor: default; }
 .tabs__link--soon:hover { color: var(--dim); }

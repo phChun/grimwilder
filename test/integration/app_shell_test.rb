@@ -31,6 +31,17 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".tool-card[href=?]", new_session_path, 0
   end
 
+  test "signed in, every page's tabs end with your characters" do
+    sign_in_as identities(:stranger)
+    get root_path
+    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 4
+    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link[href=?]", characters_path, "Characters"
+
+    get characters_path
+    assert_select ".tabs__link[aria-current=page]", "Characters"
+    assert_select ".site-footer__tools a", text: "Characters", count: 0
+  end
+
   test "making a character needs an account" do
     get new_character_path
     assert_redirected_to new_session_path
@@ -40,11 +51,11 @@ class AppShellTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 3
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 4
     assert_select ".tabs__link[aria-current=page]", "Campaign"
     assert_select ".tabs__link[href=?]", campaign_table_path(@campaign), "Table"
-    assert_select ".tabs__link", text: "Characters", count: 0
     assert_select ".tabs__link[href=?]", campaign_play_sessions_path(@campaign), "Log"
+    assert_select ".tabs__link[href=?]", characters_path, "Characters"
     assert_select ".switcher__name", @campaign.name
     assert_select ".switcher__menu a[aria-current=page]", /#{@campaign.name}/
     assert_select "a.account[aria-label=?]", "Account: Gwen", "G"
@@ -64,11 +75,31 @@ class AppShellTest < ActionDispatch::IntegrationTest
     get character_path(characters(:tibbs))
 
     assert_select ".tabs__link[aria-current=page][href=?]", character_path(characters(:tibbs)), "My character"
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 3
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 4
     assert_select ".tabs__link", text: "Party", count: 0
   end
 
-  test "the live banner shows while a session is open, except on the page it links to" do
+  test "a player with two characters seated picks which sheet to open from the tab" do
+    tibbs = characters(:tibbs)
+    moss = identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
+    identities(:pip).characters.create!(name: "Old Fen", path: "Fighter", brawn: 3, agility: 2, wits: 2, presence: 1, campaign: @campaign, status: "retired")
+    sign_in_as identities(:pip)
+
+    get campaign_path(@campaign)
+    assert_select ".tabs__link", text: "My character", count: 0
+    assert_select "details.tab-menu" do
+      assert_select "summary.tabs__link:not(.tabs__link--current)", "My characters"
+      assert_select ".tab-menu__menu a", 2, "only the ones still playing"
+      assert_select ".tab-menu__menu a[href=?]", character_path(moss), "Moss"
+      assert_select ".tab-menu__menu a[href=?]", character_path(tibbs), tibbs.name
+    end
+
+    get character_path(moss)
+    assert_select "summary.tabs__link--current", "My characters"
+    assert_select ".tab-menu__menu a[aria-current=page][href=?]", character_path(moss)
+  end
+
+    test "the live banner shows while a session is open, except on the page it links to" do
     get_banner = ->(path) { get path; css_select(".live-banner").first }
 
     sign_in_as identities(:gwen)

@@ -34,7 +34,21 @@ class ChatTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "a blank message isn't sent, and outsiders can't post" do
+  test "speak-as sits in one row of three, or two by two for a player with two characters" do
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select ".composer__voices.composer__voices--3 input[name=speak_as]", 3
+
+    identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
+    get campaign_path(@campaign)
+    assert_select ".composer__voices.composer__voices--2 input[name=speak_as]", 4
+
+    identities(:pip).characters.create!(name: "Rue", path: "Rogue", brawn: 1, agility: 3, wits: 2, presence: 2, campaign: @campaign)
+    get campaign_path(@campaign)
+    assert_select ".composer__voices.composer__voices--3 input[name=speak_as]", 5
+  end
+
+    test "a blank message isn't sent, and outsiders can't post" do
     sign_in_as identities(:pip)
     assert_no_difference -> { Message.count } do
       post campaign_messages_path(@campaign), params: { speak_as: "table_talk", body: "   " }

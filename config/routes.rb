@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       end
       resource :talent_uses, only: :update
       resource :claim, only: %i[ create destroy ]
+      resource :seat, only: :update
     end
   end
 

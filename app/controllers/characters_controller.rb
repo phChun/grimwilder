@@ -6,6 +6,7 @@ class CharactersController < ApplicationController
 
   def index
     @characters = Current.identity.characters.includes(:campaign).ordered
+    @campaigns = Current.identity.campaigns.order(:name)
   end
 
   # The sheet is where a player plays: rolls fold open on the stat cards, and

@@ -30,8 +30,22 @@
   <% if membership %>
     <nav class="tabs" aria-label="Campaign">
       <% campaign_tabs(membership).each do |text, path, current| %>
-        <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
+        <% if path.is_a?(Array) %>
+          <%# More than one character seated here: a menu of their sheets. %>
+          <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
+            <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
+            <ul class="switcher__menu tab-menu__menu" data-menu-target="panel">
+              <% path.each do |name, sheet_path, open| %>
+                <li><%= link_to name, sheet_path, "aria-current": (open ? "page" : nil) %></li>
+              <% end %>
+            </ul>
+          </details>
+        <% else %>
+          <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
+        <% end %>
       <% end %>
+      <% text, path, current = characters_tab %>
+      <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
     </nav>
   <% else %>
     <nav class="tabs" aria-label="Toolkit">
@@ -42,6 +56,10 @@
         <% else %>
           <span class="tabs__link tabs__link--soon" title="Coming soon"><%= item[:label] %></span>
         <% end %>
+      <% end %>
+      <% if authenticated? %>
+        <% text, path, current = characters_tab %>
+        <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
       <% end %>
     </nav>
   <% end %>
