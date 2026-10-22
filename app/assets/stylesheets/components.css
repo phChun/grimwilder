@@ -1378,7 +1378,8 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 
 /* Roll call (roll_calls/_call): a story roll, montage or quarrel waiting on its
    players, as a modal. Hidden, it leaves a pill above the roll toast's corner. */
-.roll-call__dialog {
+.roll-call__dialog,
+.confirm {
   width: min(32rem, calc(100% - 32px));
   max-height: calc(100vh - 32px);
   padding: 14px 18px 18px;
@@ -1389,10 +1390,12 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
   box-shadow: inset 0 0 0 1px var(--line-strong), 0 12px 32px -8px rgb(0 0 0 / 0.85);
 }
 
-.roll-call__dialog[open] { display: flex; flex-direction: column; gap: 14px; animation: roll-toast-in 180ms ease-out; }
-.roll-call__dialog::backdrop { background: rgb(10 9 7 / 0.7); }
+.roll-call__dialog[open],
+.confirm[open] { display: flex; flex-direction: column; gap: 14px; animation: roll-toast-in 180ms ease-out; }
+.roll-call__dialog::backdrop,
+.confirm::backdrop { background: rgb(10 9 7 / 0.7); }
 .roll-call__dialog--grim { background: color-mix(in srgb, var(--grim-bg) 92%, black); box-shadow: inset 0 0 0 1px var(--grim-line), 0 12px 32px -8px rgb(0 0 0 / 0.85); }
-@media (prefers-reduced-motion: reduce) { .roll-call__dialog[open] { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .roll-call__dialog[open], .confirm[open] { animation: none; } }
 
 .roll-call__head { display: flex; align-items: flex-start; gap: var(--space-2); margin-right: -10px; }
 .roll-call__head > div { flex: 1; }
@@ -1442,6 +1445,13 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .roll-call__pill[hidden] { display: none; }
 .roll-call__pill .icon { color: var(--ember); }
 .roll-call__pill:hover { background: var(--surface-2); }
+
+/* Confirmations (shared/_confirm, confirm_controller.js): in place of the
+   browser's confirm() for data-turbo-confirm, in the roll call's dialog look.
+   The confirm button says what you clicked, red for deleting or removing. */
+.confirm { width: min(26rem, calc(100% - 32px)); }
+.confirm__message { margin: 0; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
+.confirm__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
 
 /* Toasts (shared/_toasts) at the top center, stacking: the roll you just made,
    news from a notice flash (neutral), and failures (grim-red). Pages have no

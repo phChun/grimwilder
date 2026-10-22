@@ -50,6 +50,15 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select "a.account[aria-label=?]", "Account: Gwen", "G"
   end
 
+  test "every page has the confirmation dialog that stands in for the browser's confirm()" do
+    get root_path
+    assert_select "dialog#confirm.confirm[data-controller=confirm][data-turbo-permanent]" do
+      assert_select "[data-confirm-target=message]"
+      assert_select "button[data-action='confirm#cancel'][data-confirm-target=cancelButton]", "Cancel"
+      assert_select "button[data-action='confirm#accept'][data-confirm-target=acceptButton]"
+    end
+  end
+
   test "a player's tabs lead to their character, and the sheet marks it current" do
     sign_in_as identities(:pip)
     get character_path(characters(:tibbs))

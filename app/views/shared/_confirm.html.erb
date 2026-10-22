@@ -1,0 +1,8 @@
+<%# The confirmation for data-turbo-confirm, in place of the browser's confirm(): confirm_controller.js makes it Turbo's confirm method, fills in the message and the button, and answers when it closes. Cancel has focus, so Enter doesn't delete by accident; Escape or a click outside cancels. Permanent, so a morph doesn't close it mid-question. %>
+<dialog id="confirm" class="confirm" aria-labelledby="confirm-message" data-turbo-permanent data-controller="confirm" data-action="cancel->confirm#cancel close->confirm#closed click->confirm#backdrop">
+  <p id="confirm-message" class="confirm__message" data-confirm-target="message"></p>
+  <div class="confirm__actions">
+    <button type="button" class="button button--ghost" data-confirm-target="cancelButton" data-action="confirm#cancel">Cancel</button>
+    <button type="button" class="button button--primary" data-confirm-target="acceptButton" data-action="confirm#accept">Continue</button>
+  </div>
+</dialog>
