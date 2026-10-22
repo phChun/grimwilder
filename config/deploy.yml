@@ -1,10 +1,9 @@
 # Name of your application. Used to uniquely configure containers.
 service: grimwilder
 
-# Name of the container image (use your-user/app-name on external registries).
-# On DigitalOcean's registry this is <registry name>/grimwilder: change the first
-# part if you name the registry something other than "grimwilder".
-image: grimwilder/grimwilder
+# Name of the container image, on GitHub's registry (ghcr.io/<user>/grimwilder).
+# TODO: your GitHub username, here and under registry/username.
+image: GITHUB_USER/grimwilder
 
 # Deploy to these servers.
 servers:
@@ -31,11 +30,11 @@ proxy:
 
 # Where you keep your container images.
 registry:
-  # DigitalOcean Container Registry. It takes an API token (with registry
-  # read/write) as both the username and the password.
-  server: registry.digitalocean.com
-  username:
-    - KAMAL_REGISTRY_PASSWORD
+  # GitHub Container Registry. The password is a classic personal access token
+  # with write:packages: in the production environment's secrets for
+  # .github/workflows/deploy.yml, and in your shell for deploys from the Mac.
+  server: ghcr.io
+  username: GITHUB_USER
   password:
     - KAMAL_REGISTRY_PASSWORD
 

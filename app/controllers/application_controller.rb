@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
     # where they were, with a toast saying why (shared/_toasts), instead of an
     # error page.
     def not_saved(error)
-      raise error if request.get?
+      raise error if request.get? || request.head?
 
       errors = error.respond_to?(:record) ? error.record&.errors&.full_messages.to_a : [ "Fill in #{error.param.to_s.humanize(capitalize: false)} and try again." ]
       respond_to do |format|
