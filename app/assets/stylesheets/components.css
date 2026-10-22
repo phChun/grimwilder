@@ -1333,25 +1333,21 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
   .sheet__top .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* The roll you just made, of any kind, as a toast in the bottom corner (away
-   from the rail's composer): grim-red for grim and disaster. toast_controller.js
-   hides it after 30 seconds. */
+/* The roll you just made, of any kind, as a toast at the top of the toast
+   stack: grim-red for grim and disaster. toast_controller.js hides it after
+   10 seconds. */
 .roll-toast {
-  position: fixed;
-  z-index: 30;
-  left: 16px;
-  bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: min(26rem, calc(100% - 32px));
   max-height: calc(100vh - 32px);
+  pointer-events: auto;
   overflow-y: auto;
   padding: 14px 18px 18px;
   border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--line-strong), 0 12px 32px -8px rgb(0 0 0 / 0.85);
-  animation: roll-toast-in 180ms ease-out;
+  animation: toast-in 180ms ease-out;
 }
 
 .roll-toast[hidden] { display: none; }
@@ -1447,8 +1443,8 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .roll-call__pill .icon { color: var(--ember); }
 .roll-call__pill:hover { background: var(--surface-2); }
 
-/* Failures (shared/_toasts): grim-red toasts at the top of the screen, clear of
-   the roll toast and the rail's composer, stacking if there's more than one. */
+/* Toasts (shared/_toasts) at the top center, stacking: the roll you just made,
+   news (neutral), and failures (grim-red). */
 .toasts {
   position: fixed;
   z-index: 40;
@@ -1475,6 +1471,8 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 }
 
 .toast[hidden] { display: none; }
+.toast--notice { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong), 0 12px 32px -8px rgb(0 0 0 / 0.85); }
+.toast--notice .toast__close { color: var(--muted); }
 @keyframes toast-in { from { opacity: 0; transform: translateY(-12px); } }
 @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 
@@ -1821,6 +1819,11 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .pool-new__toggle { list-style: none; }
 .pool-new__toggle::-webkit-details-marker { display: none; }
 .pool-new__panel { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); width: min(26rem, calc(100vw - 2rem)); box-shadow: var(--shadow); }
+
+/* menu_controller.js: a floating panel with no room below opens upward, and
+   one that fits neither way scrolls. */
+[data-menu-target="panel"] { overflow-y: auto; }
+[data-menu-target="panel"].menu-panel--up { top: auto; bottom: calc(100% + 4px); }
 
 /* Folds on the GM table: Rolls and the crucible */
 .gm-fold__summary { display: flex; align-items: center; min-height: var(--tap); list-style: none; cursor: pointer; }

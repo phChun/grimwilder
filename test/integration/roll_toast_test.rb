@@ -12,6 +12,7 @@ class RollToastTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_select "#roll-toast .roll-toast__title", /Story roll · just now$/
+    assert_select ".toasts > #roll-toast", 1, "at the top of the toast stack"
     assert_select "#roll-toast .roll-toast__question", "Is the bridge out?"
     assert_select "#roll-toast .roll-result__word", 1
 
@@ -31,11 +32,11 @@ class RollToastTest < ActionDispatch::IntegrationTest
     assert_select "#roll-toast .roll-toast__setup", /left|0d/
   end
 
-  test "it's gone 30 seconds on" do
+  test "it's gone 10 seconds on" do
     sign_in_as identities(:pip)
     post campaign_pool_roll_path(@campaign, pools(:lookouts))
 
-    travel 31.seconds do
+    travel 11.seconds do
       get campaign_path(@campaign)
       assert_select "#roll-toast", 0
     end

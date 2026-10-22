@@ -104,9 +104,9 @@
     <section id="pools" class="gm-section" aria-labelledby="pools-title">
       <div class="gm-section__head">
         <h2 id="pools-title" class="gm-section__title">Pools</h2>
-        <%= tag.details id: "pool-new", class: "pool-new", open: @pool.errors.any? do %>
+        <%= tag.details id: "pool-new", class: "pool-new", open: @pool.errors.any?, data: { controller: "menu", action: "toggle->menu#place turbo:submit-end->menu#closeOnSuccess" } do %>
           <summary class="button pool-new__toggle">+ New pool</summary>
-          <div class="pool-new__panel card"><%= render "campaigns/pools/form", pool: @pool %></div>
+          <div class="pool-new__panel card" data-menu-target="panel"><%= render "campaigns/pools/form", pool: @pool %></div>
         <% end %>
       </div>
       <% if @pools.any? %>

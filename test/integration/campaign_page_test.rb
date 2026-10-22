@@ -165,6 +165,8 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     post campaign_pools_path(@campaign), params: { pool: { name: "", starting_size: 4 } }
     assert_response :unprocessable_entity
     assert_select "details#pool-new[open] .form-error", /Name can't be blank/
+    assert_select "details#pool-new[data-controller=menu][data-action~='turbo:submit-end->menu#closeOnSuccess'] [data-menu-target=panel]"
+    assert_select "details.pool-card__more[data-controller=menu] .pool-card__menu[data-menu-target=panel]", minimum: 1
     assert_select "#pools .pool-card", 3
   end
 

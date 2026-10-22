@@ -46,9 +46,6 @@
         <%= render "roll_calls/frame", campaign: membership.campaign, call: RollCall.showing_for(membership.campaign, membership) %>
       </div>
     <% end %>
-    <% if toast_roll %>
-      <%= render "rolls/toast", roll: toast_roll %>
-    <% end %>
     <%= render "shared/toasts" %>
 
     <footer class="site-footer">

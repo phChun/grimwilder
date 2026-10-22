@@ -23,7 +23,7 @@ module RollsHelper
   # The roll you just made shows as a toast (rolls/_toast, in the layout) on
   # whatever page you land on, for this long after it was made or changed
   # (taking spark for a critical changes it).
-  ROLL_TOAST_SECONDS = 30
+  ROLL_TOAST_SECONDS = 10
 
   # Your newest roll, while it's still toast-worthy.
   def toast_roll

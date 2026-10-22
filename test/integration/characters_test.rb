@@ -93,14 +93,14 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_select "#table_feed ##{ActionView::RecordIdentifier.dom_id(roll)}", 1, "the table's log sits beside the sheet"
   end
 
-  test "the roll's toast is gone 30 seconds on, unless a critical is still waiting on its choice" do
+  test "the roll's toast is gone 10 seconds on, unless a critical is still waiting on its choice" do
     sign_in_as identities(:pip)
     roll = @tibbs.roll!("agility", by: identities(:pip), random: FixedDice.new([ 4, 2, 1 ]))
 
     get character_path(@tibbs)
     assert_select "#roll-toast[data-toast-sticky-value=false][data-toast-seconds-value]", 1
 
-    travel 31.seconds do
+    travel 11.seconds do
       get character_path(@tibbs)
       assert_select "#roll-toast", 0
     end

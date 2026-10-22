@@ -73,6 +73,10 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_difference -> { Pool.count }, -1 do
       delete campaign_pool_path(@campaign, pools(:lookouts))
     end
+
+    follow_redirect!
+    assert_select ".toasts .toast.toast--notice[role=status] .toast__message", "#{pools(:lookouts).name} removed."
+    assert_select ".flash--notice", 0, "a toast, not a banner"
   end
 
   test "outsiders get a 404" do
