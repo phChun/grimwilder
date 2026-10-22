@@ -1749,10 +1749,18 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .pool-new__toggle::-webkit-details-marker { display: none; }
 .pool-new__panel { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); width: min(26rem, calc(100vw - 2rem)); box-shadow: var(--shadow); }
 
-/* Story roll and crucible */
+/* Rolls and crucible */
 .gm-fold__summary { display: flex; align-items: center; min-height: var(--tap); list-style: none; cursor: pointer; }
 .gm-fold__summary::-webkit-details-marker { display: none; }
 .gm-fold[open] .gm-fold__summary { margin-bottom: var(--space-3); }
+
+/* Rolls: the segmented control picks which group roll's form shows. */
+.rolls { display: grid; gap: var(--space-4); }
+.rolls__panel { display: grid; gap: var(--space-3); }
+.rolls__panel > .field__hint { margin: 0; }
+.rolls:has(.rolls__kinds input[value=story]:checked) .rolls__panel:not(.rolls__panel--story),
+.rolls:has(.rolls__kinds input[value=montage]:checked) .rolls__panel:not(.rolls__panel--montage),
+.rolls:has(.rolls__kinds input[value=quarrel]:checked) .rolls__panel:not(.rolls__panel--quarrel) { display: none; }
 
 .crucible-row { container: crucible / inline-size; }
 .crucible-row__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); margin-bottom: var(--space-5); }
@@ -2200,7 +2208,7 @@ form[aria-busy="true"] :is(.button, button, .harm-toggle, .mark-toggle) {
   transform: scale(0.97);
 }
 
-/* Folds (Story roll, Log a game event): a chevron that turns when open, and a hover. */
+/* Folds (Rolls, Log a game event): a chevron that turns when open, and a hover. */
 .gm-fold__summary,
 .table-rail__summary {
   justify-content: space-between;

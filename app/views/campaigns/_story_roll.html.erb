@@ -1,4 +1,4 @@
-<%# locals: (characters:, my_characters:) %>
+<%# locals: (my_characters:) %>
 <p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster).</p>
 <%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack" do %>
   <div class="field">
@@ -9,11 +9,4 @@
   <%= render "campaigns/story_fields", my_characters: my_characters %>
 
   <button type="submit" class="button button--primary">Roll</button>
-<% end %>
-
-<% if characters.any? %>
-  <p class="fold__footer">
-    <%= link_to "Roll a montage", new_campaign_montage_path(Current.campaign) %>
-    <% if characters.size >= 2 %> · <%= link_to "Start a quarrel", new_campaign_quarrel_path(Current.campaign) %><% end %>
-  </p>
 <% end %>

@@ -29,12 +29,7 @@
         <div class="scene-bar__actions">
           <% if @session.nil? %>
             <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary" %>
-            <a href="#story-roll" class="button" data-action="details-memory#jump">Story roll</a>
-          <% else %>
-            <a href="#story-roll" class="button button--primary" data-action="details-memory#jump">Story roll</a>
           <% end %>
-          <%= link_to "Montage", new_campaign_montage_path(campaign), class: "button" %>
-          <%= link_to "Quarrel", new_campaign_quarrel_path(campaign), class: "button" %>
           <span class="scene-bar__spacer"></span>
           <% if scene %>
             <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost" %>
@@ -125,9 +120,9 @@
       <% end %>
     </section>
 
-    <details id="story-roll" class="card gm-fold" data-details-memory-target="section" data-section="story">
-      <summary class="gm-fold__summary"><span class="gm-section__title">Story roll</span><%= icon(:chevron, size: 18) %></summary>
-      <%= render "campaigns/story_roll", characters: @characters, my_characters: @my_characters %>
+    <details id="rolls" class="card gm-fold" data-details-memory-target="section" data-section="rolls">
+      <summary class="gm-fold__summary"><span class="gm-section__title">Rolls</span><%= icon(:chevron, size: 18) %></summary>
+      <%= render "campaigns/rolls", characters: @characters, my_characters: @my_characters %>
     </details>
 
     <section id="crucibles" class="card crucible-row" aria-labelledby="crucible-title" data-turbo-permanent>
@@ -154,5 +149,5 @@
     </section>
   </div>
 
-  <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [], quick_roll: "#story-roll", classes: "fluid__rail" %>
+  <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [], quick_roll: "#rolls", classes: "fluid__rail" %>
 </div>

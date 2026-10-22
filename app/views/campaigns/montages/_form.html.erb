@@ -1,0 +1,33 @@
+<%# locals: (characters:, classes: nil) %>
+<%= form_with url: campaign_montages_path(Current.campaign), class: class_names("stack quarrel-form", classes) do %>
+  <% if params[:then] == "end_scene" %><input type="hidden" name="then" value="end_scene"><% end %>
+  <div class="field">
+    <label class="field__label" for="montage_scene">The scene</label>
+    <input type="text" id="montage_scene" name="scene" value="<%= params[:scene] %>" maxlength="200" autocomplete="off" placeholder="The six-hour climb to the sanctum" class="field__input">
+  </div>
+
+  <fieldset class="roll-setup__group">
+    <legend class="field__label">Who takes part</legend>
+    <ul class="list">
+      <% characters.each do |character| %>
+        <% choice = params.dig(:participants, character.id.to_s) || {} %>
+        <li class="list__item quarrel-form__row">
+          <label class="check">
+            <%= check_box_tag "participants[#{character.id}][in]", "1", choice[:in] == "1", id: "montage_in_#{character.id}" %>
+            <span>
+              <strong><%= character.name %></strong>
+              <small><%= character.identity.display_name %> · <%= pluralize(character.spark, "spark") %></small>
+            </span>
+          </label>
+          <% if character.owned_by?(Current.identity) && character.spark.positive? %>
+            <span class="quarrel-form__choices">
+              <%= select_tag "participants[#{character.id}][spark]", options_for_select((0..character.spark).map { [ "+#{_1} spark", _1 ] }, choice[:spark].to_i), id: "montage_spark_#{character.id}", class: "field__input", "aria-label": "Spark #{character.name} spends" %>
+            </span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </fieldset>
+
+  <button type="submit" class="button button--primary">Roll the montage</button>
+<% end %>

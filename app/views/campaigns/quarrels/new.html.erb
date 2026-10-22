@@ -13,34 +13,4 @@
   <p class="flash flash--alert"><%= flash[:alert] %></p>
 <% end %>
 
-<%= form_with url: campaign_quarrels_path(Current.campaign), class: "panel stack quarrel-form" do %>
-  <div class="field">
-    <label class="field__label" for="quarrel_stakes">Stakes</label>
-    <input type="text" id="quarrel_stakes" name="stakes" value="<%= params[:stakes] %>" maxlength="200" autocomplete="off" placeholder="Do we warn the king?" class="field__input">
-    <p class="field__hint">What happens if each side wins. Err on the side of dramatic: bruises, not bloodied.</p>
-  </div>
-
-  <fieldset class="roll-setup__group">
-    <legend class="field__label">Who's in it</legend>
-    <ul class="list">
-      <% @characters.each do |character| %>
-        <% choice = params.dig(:participants, character.id.to_s) || {} %>
-        <li class="list__item quarrel-form__row">
-          <span>
-            <strong><%= character.name %></strong>
-            <small><%= character.identity.display_name %> · <%= pluralize(character.spark, "spark") %></small>
-          </span>
-          <span class="quarrel-form__choices">
-            <% roles = [ [ "Not in it", "" ], [ "Quarrels", "quarrel" ] ] + @characters.excluding(character).map { [ "Assists #{_1.name}", "assist-#{_1.id}" ] } %>
-            <%= select_tag "participants[#{character.id}][role]", options_for_select(roles, choice[:role]), id: "quarrel_role_#{character.id}", class: "field__input", "aria-label": "#{character.name}'s part" %>
-            <% if character.owned_by?(Current.identity) && character.spark.positive? %>
-              <%= select_tag "participants[#{character.id}][spark]", options_for_select((0..character.spark).map { [ "+#{_1} spark", _1 ] }, choice[:spark].to_i), id: "quarrel_spark_#{character.id}", class: "field__input", "aria-label": "Spark #{character.name} spends" %>
-            <% end %>
-          </span>
-        </li>
-      <% end %>
-    </ul>
-  </fieldset>
-
-  <button type="submit" class="button button--primary">Roll the quarrel</button>
-<% end %>
+<%= render "campaigns/quarrels/form", characters: @characters, classes: "panel" %>

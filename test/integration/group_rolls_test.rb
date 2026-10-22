@@ -33,7 +33,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
 
     post campaign_story_rolls_path(@campaign), params: { odds: 5 }
-    assert_redirected_to campaign_table_path(@campaign, anchor: "story-roll")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "rolls")
     assert_equal "Pick 1d, 2d or 3d for the odds.", flash[:alert]
   end
 
@@ -94,7 +94,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
   test "roll a montage" do
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select "a[href=?]", new_campaign_montage_path(@campaign)
+    assert_select "#rolls form[action=?]", campaign_montages_path(@campaign)
 
     get new_campaign_montage_path(@campaign)
     assert_select "input[type=checkbox]", 2

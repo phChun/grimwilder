@@ -7,6 +7,6 @@ class Campaigns::StoryRollsController < ApplicationController
     Roll.story!(campaign: Current.campaign, by: Current.identity, **story_roll_args)
     back_to_table(anchor: "roll-log")
   rescue ArgumentError => error
-    back_to_table(anchor: "story-roll", alert: error.message)
+    back_to_table(anchor: "rolls", alert: error.message)
   end
 end

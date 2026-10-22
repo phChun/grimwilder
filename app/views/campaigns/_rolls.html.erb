@@ -1,0 +1,28 @@
+<%# locals: (characters:, my_characters:) %>
+<%# The table's group rolls in one fold: a story roll, a montage or a quarrel, picked with the segmented control. CSS (:has) shows the chosen form, so switching needs no script or reload. Quarrels need two characters at the table, montages one. %>
+<% kinds = [ %w[ story Story ] ] %>
+<% kinds << %w[ montage Montage ] if characters.any? %>
+<% kinds << %w[ quarrel Quarrel ] if characters.size >= 2 %>
+<div class="rolls">
+  <% if kinds.many? %>
+    <%= render "shared/segmented", name: "roll_kind", legend: "Kind of roll", options: kinds, checked: "story", classes: "segmented--auto rolls__kinds" %>
+  <% end %>
+
+  <div class="rolls__panel rolls__panel--story">
+    <%= render "campaigns/story_roll", my_characters: my_characters %>
+  </div>
+
+  <% if characters.any? %>
+    <div class="rolls__panel rolls__panel--montage">
+      <p class="field__hint">Zoom out over a stretch of the story. Everyone taking part rolls 2d, and the best result is the scene's outcome (pg. 16).</p>
+      <%= render "campaigns/montages/form", characters: characters %>
+    </div>
+  <% end %>
+
+  <% if characters.size >= 2 %>
+    <div class="rolls__panel rolls__panel--quarrel">
+      <p class="field__hint">Characters at odds: each side rolls 2d plus spark, allies assist with 1d, and the highest die wins. Everyone in it takes spark (pg. 23).</p>
+      <%= render "campaigns/quarrels/form", characters: characters %>
+    </div>
+  <% end %>
+</div>

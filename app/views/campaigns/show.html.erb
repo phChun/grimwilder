@@ -207,9 +207,9 @@
       </section>
 
       <% unless gm %>
-        <details id="story-roll" class="card side-card" data-details-memory-target="section" data-section="story">
-          <summary class="gm-fold__summary"><span class="side-card__title">Story roll</span><%= icon(:chevron, size: 18) %></summary>
-          <%= render "campaigns/story_roll", characters: @characters, my_characters: @my_characters %>
+        <details id="rolls" class="card side-card" data-details-memory-target="section" data-section="rolls">
+          <summary class="gm-fold__summary"><span class="side-card__title">Rolls</span><%= icon(:chevron, size: 18) %></summary>
+          <%= render "campaigns/rolls", characters: @characters, my_characters: @my_characters %>
         </details>
       <% end %>
 
@@ -235,7 +235,6 @@
 
       <% unless gm %>
         <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: @my_characters.select(&:active?), suspense: true, quick_roll: (character_path(@mine, anchor: "stats") if @mine) %>
-        <p class="side-card__note"><%= link_to "Montage", new_campaign_montage_path(campaign) %> · <%= link_to "Quarrel", new_campaign_quarrel_path(campaign) %></p>
       <% end %>
     </aside>
   </div>

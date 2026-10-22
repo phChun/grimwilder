@@ -30,9 +30,12 @@ class TablesTest < ActionDispatch::IntegrationTest
 
     assert_select ".scene-bar__status", /Session 1 · live \d+m · Scene 1 of 1/
     assert_select "h1.scene-bar__title", "The mill fire"
-    assert_select ".scene-bar__actions a.button--primary", "Story roll"
-    assert_select ".scene-bar__actions a[href=?]", new_campaign_montage_path(@campaign), "Montage"
-    assert_select ".scene-bar__actions a[href=?]", new_campaign_quarrel_path(@campaign), "Quarrel"
+    assert_select ".scene-bar__actions a", text: /Story roll|Montage|Quarrel/, count: 0
+    assert_select "details#rolls summary", "Rolls"
+    assert_select "#rolls .rolls__kinds input[name=roll_kind]", 3
+    assert_select "#rolls form[action=?]", campaign_story_rolls_path(@campaign)
+    assert_select "#rolls form[action=?]", campaign_montages_path(@campaign)
+    assert_select "#rolls form[action=?]", campaign_quarrels_path(@campaign)
     assert_select ".scene-bar__actions a[href=?]", new_campaign_play_session_ending_path(@campaign, session), "End session"
 
     assert_select "#table .party-grid > .suspense-panel:first-child .suspense-panel__note", "players can see it"

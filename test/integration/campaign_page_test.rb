@@ -91,7 +91,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
     assert_select "#pools .pool-glance", 2, "the hidden ambush isn't listed"
     assert_select "#pools .pool-glance__hidden", /1 hidden pool, only you see it/
-    assert_select "#story-roll", 0, "the GM rolls story at the table"
+    assert_select "#rolls", 0, "the GM rolls story at the table"
     assert_select ".table-rail", 0
 
     sign_out
@@ -103,7 +103,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select "#{brawl} .badge--push", "Nothing dropped: push?"
     assert_select "#{brawl} details.pool-row__more form[action=?]", campaign_pool_push_path(@campaign, pools(:brawl))
     assert_select "#{brawl} details.pool-row__more form[action=?] input[name=drop_first][value='1']", campaign_pool_roll_path(@campaign, pools(:brawl))
-    assert_select "#story-roll form[action=?]", campaign_story_rolls_path(@campaign)
+    assert_select "#rolls form[action=?]", campaign_story_rolls_path(@campaign)
     assert_select ".table-rail #table_feed"
     assert_select ".table-rail form[action=?]", campaign_notes_path(@campaign)
   end
