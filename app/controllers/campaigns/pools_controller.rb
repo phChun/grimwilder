@@ -29,7 +29,7 @@ class Campaigns::PoolsController < ApplicationController
 
   def destroy
     @pool.destroy
-    back_to_table(anchor: "pools", flash: { toast: "#{@pool.name} removed." })
+    back_to_table(anchor: "pools", notice: "#{@pool.name} removed.")
   end
 
   private

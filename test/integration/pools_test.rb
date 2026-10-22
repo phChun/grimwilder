@@ -76,7 +76,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select ".toasts .toast.toast--notice[role=status] .toast__message", "#{pools(:lookouts).name} removed."
-    assert_select ".flash--notice", 0, "a toast, not a banner"
+    assert_select ".flash", 0, "a toast, not a banner"
   end
 
   test "outsiders get a 404" do

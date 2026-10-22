@@ -1,5 +1,5 @@
 <%# locals: (message:, tone: nil) %>
-<%# One toast (see shared/_toasts): a failure (grim-red), or with tone: :notice some news, like a pool removed. toast_controller.js hides and removes it after FAILURE_TOAST_SECONDS; hovering or focusing it holds it. %>
+<%# One toast (see shared/_toasts): a failure (grim-red), or with tone: :notice some news (a notice flash). toast_controller.js hides and removes it after FAILURE_TOAST_SECONDS; hovering or focusing it holds it. %>
 <% notice = tone == :notice %>
 <% key = SecureRandom.hex(6) %>
 <div id="toast-<%= key %>" class="<%= class_names("toast", "toast--notice": notice) %>" role="<%= notice ? "status" : "alert" %>" data-turbo-permanent data-controller="toast" data-toast-key-value="<%= key %>" data-toast-seconds-value="<%= ApplicationHelper::FAILURE_TOAST_SECONDS %>" data-toast-remove-value="true" data-action="mouseenter->toast#pause mouseleave->toast#resume focusin->toast#pause focusout->toast#resume">

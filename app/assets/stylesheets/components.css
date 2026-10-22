@@ -1444,7 +1444,8 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .roll-call__pill:hover { background: var(--surface-2); }
 
 /* Toasts (shared/_toasts) at the top center, stacking: the roll you just made,
-   news (neutral), and failures (grim-red). */
+   news from a notice flash (neutral), and failures (grim-red). Pages have no
+   banners. */
 .toasts {
   position: fixed;
   z-index: 40;

@@ -91,10 +91,6 @@
       </div>
     <% end %>
 
-    <% if @character.errors.any? %>
-      <p class="flash flash--alert"><%= @character.errors.full_messages.to_sentence %></p>
-    <% end %>
-
     <div class="sheet__top">
       <section id="stats" class="stat-grid" aria-label="Stats">
         <% Grimwild.stats.each do |stat, description| %>

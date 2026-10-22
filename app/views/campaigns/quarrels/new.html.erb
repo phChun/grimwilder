@@ -9,8 +9,4 @@
   </p>
 </header>
 
-<% if flash[:alert] %>
-  <p class="flash flash--alert"><%= flash[:alert] %></p>
-<% end %>
-
 <%= render "campaigns/quarrels/form", characters: @characters, classes: "panel" %>

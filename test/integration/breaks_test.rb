@@ -17,6 +17,9 @@ class BreaksTest < ActionDispatch::IntegrationTest
     post campaign_rest_path(@campaign)
     assert_redirected_to campaign_table_path(@campaign, anchor: "roll-log")
     assert_not @tibbs.reload.bloodied?
+    follow_redirect!
+    assert_select ".toasts .toast--notice[role=status] .toast__message", "Everyone rests."
+    assert_select ".flash", 0, "news is a toast, not a banner"
 
     get new_campaign_downtime_path(@campaign)
     assert_select "input[name='clear[]'][checked]", 2
