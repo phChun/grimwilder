@@ -43,7 +43,7 @@
             <summary class="button button--ghost between-scenes__toggle">Rest or downtime</summary>
             <div class="between-scenes__actions">
               <%= button_to "Rest", campaign_rest_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Rest: clear marks and harm for #{@session ? "everyone here" : "everyone seated"}?" } } %>
-              <%= link_to "Downtime…", new_campaign_downtime_path(campaign), class: "button button--small" %>
+              <%= link_to "Downtime…", new_campaign_downtime_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
             </div>
           </details>
         </div>

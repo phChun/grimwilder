@@ -1,0 +1,5 @@
+<%# A page shown in a modal: a link with data-turbo-frame="modal" loads its page's <turbo-frame id="modal"> in here (campaigns/downtimes/new), and frame_modal_controller.js opens it once loaded. The page still works on its own. Its forms target _top, so saving refreshes the whole page, and the modal closes when they succeed. Closing empties it, so it loads fresh next time. Permanent, so a morph doesn't close it. %>
+<dialog id="frame-modal" class="frame-modal" aria-label="Dialog" data-turbo-permanent data-controller="frame-modal" data-action="turbo:frame-load->frame-modal#open turbo:submit-end->frame-modal#submitted close->frame-modal#closed click->frame-modal#backdrop">
+  <button type="button" class="roll-call__close frame-modal__close" aria-label="Close" data-action="frame-modal#close"><%= icon(:close, size: 18) %></button>
+  <turbo-frame id="modal" data-frame-modal-target="frame"></turbo-frame>
+</dialog>
