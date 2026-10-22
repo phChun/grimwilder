@@ -62,7 +62,7 @@ class RollCall < ApplicationRecord
       def call!(campaign, by, seats:, **attributes)
         ids = seats.pluck("character_id")
         raise ArgumentError, "Each character can only take one part." unless ids.uniq.size == ids.size
-        raise ArgumentError, "Everyone in it must be seated in #{campaign.name}." unless campaign.characters.played.where(id: ids).count == ids.size
+        raise ArgumentError, "Everyone in it must be seated in #{campaign.name}." unless campaign.characters.played.active.where(id: ids).count == ids.size
         if (waiting = campaign.roll_calls.open.first)
           raise ArgumentError, "Finish or cancel the #{waiting.title.downcase} that's waiting first."
         end

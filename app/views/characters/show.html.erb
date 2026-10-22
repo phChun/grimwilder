@@ -167,7 +167,7 @@
                 <span class="condition__name"><%= size ? pool_name.capitalize : condition["name"] %><% if condition["lasts"] == "scene" %> <span class="tag">clears after scene</span><% end %></span>
                 <% if size %><span class="condition__size"><%= size %>d</span><% end %>
                 <% if tends %>
-                  <% if size&.positive? %>
+                  <% if size&.positive? && @character.active? %>
                     <%= button_to "Roll", character_condition_roll_path(@character, index), class: "button button--small", "aria-label": "Roll #{condition["name"]}" %>
                   <% end %>
                   <%= button_to "Clear", character_condition_path(@character, index), method: :delete, class: "button button--ghost button--small", "aria-label": "Clear #{condition["name"]}" %>

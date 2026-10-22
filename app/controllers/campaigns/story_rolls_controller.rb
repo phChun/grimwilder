@@ -21,7 +21,7 @@ class Campaigns::StoryRollsController < ApplicationController
     def called_character
       return if params[:character_id].blank?
 
-      characters = Current.campaign.characters.played
+      characters = Current.campaign.characters.played.active
       characters = characters.where(identity: Current.identity) unless gm?
       characters.find(params[:character_id])
     end

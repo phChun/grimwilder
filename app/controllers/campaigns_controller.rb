@@ -60,8 +60,8 @@ class CampaignsController < ApplicationController
     end
 
     def load_overview
-      @party = @characters.select(&:active?)
-      @gone = @characters.reject(&:active?)
+      @party = @characters
+      @gone = Current.campaign.characters.played.gone.includes(:identity).to_a
       ended = Current.campaign.play_sessions.ended.order(number: :desc).includes(scenes: [ :opening_roll, :closing_roll ])
       @previous = ended.first
       @older = ended.offset(1).limit(OLDER_SESSIONS).to_a

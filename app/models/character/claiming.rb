@@ -19,9 +19,9 @@ module Character::Claiming
     (up_for_grabs? && campaign && identity&.membership_in(campaign).present?) || false
   end
 
-  # The campaign's GM, or the player who has it.
+  # The campaign's GM, or the player who has it, while they're still playing.
   def releasable_by?(identity)
-    (campaign.present? && !up_for_grabs? && tended_by?(identity)) || false
+    (campaign.present? && !up_for_grabs? && active? && tended_by?(identity)) || false
   end
 
   def claim!(by:)

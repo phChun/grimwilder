@@ -7,7 +7,7 @@ module Campaign::Breaks
   extend ActiveSupport::Concern
 
   def resting_characters
-    (current_session ? current_session.characters : characters.played).ordered.to_a
+    (current_session ? current_session.characters : characters.played).active.ordered.to_a
   end
 
   # Faction and other long-term pools, rolled in downtime.

@@ -50,7 +50,7 @@ class CharactersController < ApplicationController
   private
     # For a seated character, the table around the sheet.
     def load_play
-      @allies = @character.campaign ? @character.campaign.characters.played.excluding(@character).ordered : []
+      @allies = @character.campaign ? @character.campaign.characters.played.active.excluding(@character).ordered : []
 
       if (campaign = @character.campaign)
         @membership = Current.identity.memberships.find_by!(campaign: campaign)

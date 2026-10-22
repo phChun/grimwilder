@@ -64,7 +64,12 @@ class Pool < ApplicationRecord
   end
 
   def rollable?
-    !depleted?
+    !depleted? && !held_by_gone_character?
+  end
+
+  # A talent pool whose character has fallen or retired waits for them to return.
+  def held_by_gone_character?
+    character_id.present? && character.gone?
   end
 
   # drop_first: Greater effect, potency and some talents drop 1d before rolling.
@@ -75,6 +80,7 @@ class Pool < ApplicationRecord
   # or join the pool. A use that isn't risky just rolls: it works, and dice drop.
   def roll!(by:, drop_first: false, as_action: false, thorns: 0, character: nil, spend_spark: 0, random: Random)
     raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
+    raise ArgumentError, "#{self.character.name} is #{self.character.status}; return them to play to roll." if held_by_gone_character?
     check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
 
     before = size
@@ -92,7 +98,7 @@ class Pool < ApplicationRecord
 
   # A task pool roll that dropped nothing: the player takes a mark to drop 1d anyway.
   def pushable?
-    task? && last_action == "rolled" && last_dropped == 0 && !depleted?
+    task? && last_action == "rolled" && last_dropped == 0 && !depleted? && !held_by_gone_character?
   end
 
   def push!(by:)
@@ -128,6 +134,7 @@ class Pool < ApplicationRecord
         raise ArgumentError, "Thorns go from 0 to #{Character::Rolling::MAX_EXTRA}." unless thorns.in?(0..Character::Rolling::MAX_EXTRA)
         raise ArgumentError, "Only a character can spend spark." if character.nil? && spend_spark != 0
         raise ArgumentError, "#{character&.name} isn't seated in #{campaign.name}." if character && character.campaign_id != campaign_id
+        raise ArgumentError, "#{character.name} is #{character.status}; return them to play to roll." if character&.gone?
         character&.check_spark_spend!(spend_spark)
         raise ArgumentError, "Dropping 1d first leaves nothing to roll." if drop_first && size == 1 && spend_spark.zero?
       elsif thorns != 0 || spend_spark != 0 || character

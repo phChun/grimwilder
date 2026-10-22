@@ -5,7 +5,7 @@
 module StoryRollParams
   private
     def story_roll_args
-      character = Current.identity.characters.where(campaign: Current.campaign).played.find(params[:character_id]) if params[:character_id].present?
+      character = Current.identity.characters.where(campaign: Current.campaign).played.active.find(params[:character_id]) if params[:character_id].present?
 
       { character: character, spend_spark: params[:spark].to_i, **story_roll_options }
     end

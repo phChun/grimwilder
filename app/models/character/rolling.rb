@@ -52,7 +52,7 @@ module Character::Rolling
   end
 
   def check_assists!(allies)
-    unless allies.uniq.size == allies.size && allies.none?(self) && allies.all? { campaign_id && _1.campaign_id == campaign_id }
+    unless allies.uniq.size == allies.size && allies.none?(self) && allies.all? { campaign_id && _1.campaign_id == campaign_id && _1.active? }
       raise ArgumentError, "Only other characters seated in #{campaign&.name || "a campaign"} with #{name} can assist."
     end
   end

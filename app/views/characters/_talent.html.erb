@@ -6,6 +6,7 @@
 <% thread = talent.uses.select(&:thread?).sum(&:thread) %>
 <% removable = editable && !talent.core? %>
 <% rolls = editable && character.campaign && !character.up_for_grabs? && character.active? ? talent.rolls : [] %>
+<% pushes = editable && character.active? && talent.pushes? %>
 <article id="talent-<%= talent.key %>" class="<%= class_names("talent-card", "talent-card--core": talent.core?, "talent-card--eldritch": eldritch, "talent-card--skinned": talent.skinned?) %>">
   <div class="talent-card__head">
     <h3 class="talent-card__name"><%= talent.name %></h3>
@@ -94,14 +95,14 @@
     </div>
   <% end %>
 
-  <% if rolls.any? || (editable && talent.pushes?) %>
+  <% if rolls.any? || pushes %>
     <div class="talent-card__actions">
       <% rolls.each do |roll| %>
         <%= button_to character_talent_roll_path(character, talent.key), params: { index: roll.index }, class: "button button--small talent-card__roll", form: { class: "talent-card__action" } do %>
           <%= icon(:die, size: 16) %> <span><%= roll.label %></span> <small><%= roll.dice_label %><%= " · spends #{roll.cost}" if roll.cost %></small>
         <% end %>
       <% end %>
-      <% if editable && talent.pushes? %>
+      <% if pushes %>
         <details id="talent-<%= talent.key %>-push" class="talent-card__push" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
           <summary class="button button--small talent-card__push-toggle">Push yourself <small>mark a stat</small></summary>
           <div class="talent-card__menu talent-card__menu--push" data-menu-target="panel">

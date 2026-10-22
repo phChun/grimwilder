@@ -106,6 +106,7 @@ module Character::Damage
   # and at 0d it has run its course (the condition stays until it's cleared).
   # The roll goes in the table's log like any pool roll.
   def roll_condition!(index, by:, random: Random)
+    raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
     condition = conditions.fetch(index.to_i) { raise ArgumentError, "That condition is gone." }
     size, label = condition_pool(condition)
     raise ArgumentError, "#{condition["name"]} isn't a pool to roll." unless size&.positive?
