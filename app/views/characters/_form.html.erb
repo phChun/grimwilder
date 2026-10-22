@@ -40,6 +40,12 @@
         <%= form.select :status, [ [ "Still playing", "active" ], [ "Fallen", "fallen" ], [ "Retired", "retired" ] ], {}, class: "field__input" %>
         <p class="field__hint">Fallen and retired characters stay listed on the campaign page, under the party.</p>
       </div>
+      <% unless character.active? %>
+        <div class="field">
+          <%= form.label :farewell, "How it ended", class: "field__label" %>
+          <%= form.text_field :farewell, maxlength: Character::Farewell::FAREWELL_LIMIT, autocomplete: "off", class: "field__input" %>
+        </div>
+      <% end %>
       <div class="field field--inline">
         <%= form.label :level, class: "field__label" %>
         <%= form.number_field :level, min: 1, max: Grimwild::MAX_LEVEL, class: "field__input field__input--short" %>

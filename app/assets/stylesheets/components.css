@@ -2059,7 +2059,33 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 .stat-tile--marked .stat-tile__value,
 .stat-tile--marked .stat-tile__name { color: var(--grim); }
 
-.party-gone { margin: 0; font-size: 0.9rem; color: var(--muted); }
+/* Fallen and retired characters (Character::Farewell), remembered under the
+   party and on the Characters page. Fallen ones carry a grim edge. */
+.farewells { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.farewells--page { margin-top: var(--space-6); }
+.farewells__title { margin: 0; font-size: 1.1rem; color: var(--muted); }
+.farewells__list { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.farewell-card { display: flex; gap: var(--space-3); padding: 14px 16px; border: 1px dashed var(--line-strong); border-radius: var(--radius-control); background: transparent; }
+.farewell-card--fallen { border-color: var(--grim-line); }
+.farewell-card__body { display: grid; gap: 2px; align-content: start; min-width: 0; }
+.farewell-card__status { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.farewell-card--fallen .farewell-card__status { color: var(--grim); }
+.farewell-card__name { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--text); text-decoration: none; }
+.farewell-card__name:hover { text-decoration: underline; }
+.farewell-card__meta { margin: 0; font-size: 0.85rem; color: var(--dim); }
+.farewell-card__words { margin: var(--space-1) 0 0; font-family: var(--font-display); font-style: italic; color: var(--text-soft); }
+
+/* A fallen or retired character's own sheet. */
+.farewell-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 14px 18px; border: 1px dashed var(--line-strong); border-radius: var(--radius-control); }
+.farewell-banner--fallen { border-color: var(--grim-line); background: var(--grim-bg); }
+.farewell-banner__status { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.farewell-banner--fallen .farewell-banner__status strong { color: var(--grim); }
+.farewell-banner__words { margin: var(--space-1) 0 0; font-family: var(--font-display); font-style: italic; font-size: 1.15rem; }
+.farewell-banner__hint { margin: var(--space-1) 0 0; font-size: 0.85rem; color: var(--dim); }
+.farewell-banner .button_to { margin: 0; }
+.adjust__farewell { padding-top: var(--space-2); border-top: 1px solid var(--line-soft); }
+.adjust__farewell[open] > .fold__summary { margin-bottom: var(--space-2); }
+.adjust__farewell-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
 /* Up for grabs (Character::Claiming): characters waiting for a player to pick. */
 .hero-card__release { align-self: flex-start; margin: -6px 0 0; }

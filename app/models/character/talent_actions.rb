@@ -10,6 +10,7 @@ module Character::TalentActions
     talent = talent_entry(key)
     roll = talent.rolls[index.to_i] or raise ArgumentError, "#{talent.name} has no roll like that."
     raise ArgumentError, "Seat #{name} in a campaign to roll at the table." unless campaign && !up_for_grabs?
+    raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
 
     transaction do
       spend_for_roll!(roll)

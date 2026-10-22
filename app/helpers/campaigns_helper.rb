@@ -87,11 +87,6 @@ module CampaignsHelper
     characters.find { _1.identity_id == membership.identity_id && _1.active? }&.short_name || "making one"
   end
 
-  # "Brother Oake, Cleric 3, fallen"
-  def gone_line(character)
-    "#{character.path} #{character.level}, #{character.status}"
-  end
-
   # The composer's first speak-as choice: the GM narrates during a session; a
   # player speaks as their character if they have one here.
   def default_voice(membership, speakers, speaker)

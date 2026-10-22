@@ -65,6 +65,22 @@
                 <%= render "characters/seat_form", character: @character, campaigns: Current.identity.campaigns.order(:name) %>
               <% end %>
               <%= link_to "Edit sheet", edit_character_path(@character), class: "button button--ghost" %>
+              <%# Character::Farewell: the owner ends their story here; the banner below brings them back. %>
+              <% if @character.active? && !@character.up_for_grabs? %>
+                <details class="fold adjust__farewell">
+                  <summary class="fold__summary"><span class="adjust__name">Their story ends…</span></summary>
+                  <%= form_with url: character_story_end_path(@character), class: "stack adjust__farewell-form", data: { turbo_confirm: "#{@character.name} leaves the party, remembered under it. You can bring them back. Continue?" } do |form| %>
+                    <div class="field">
+                      <%= form.label :farewell, "How it ended (optional)", class: "field__label", for: "farewell" %>
+                      <%= form.text_area :farewell, id: "farewell", rows: 2, maxlength: Character::Farewell::FAREWELL_LIMIT, placeholder: "Held the bridge so the others could run.", class: "field__input" %>
+                    </div>
+                    <div class="adjust__farewell-actions">
+                      <button type="submit" name="status" value="fallen" class="button button--danger">Mark fallen</button>
+                      <button type="submit" name="status" value="retired" class="button">Retire <%= short %></button>
+                    </div>
+                  <% end %>
+                </details>
+              <% end %>
               <%# Character::Claiming: the owner hands it back to the table from here (a GM looking at someone else's gets the bar below). %>
               <% if @character.releasable_by?(Current.identity) && !@character.up_for_grabs? %>
                 <% giving_back = !@membership&.gm? %>
@@ -78,6 +94,20 @@
         <% end %>
       </div>
     </section>
+
+    <%# A fallen or retired character's sheet says so, with the player's farewell; the owner can bring them back. %>
+    <% if @character.gone? %>
+      <div class="<%= class_names("farewell-banner", "farewell-banner--fallen": @character.fallen?) %>">
+        <div>
+          <p class="farewell-banner__status"><strong><%= @character.status.capitalize %></strong><% if @character.status_changed_at %> · <%= l(@character.status_changed_at.to_date, format: :long) %><% end %></p>
+          <% if @character.farewell.present? %><blockquote class="farewell-banner__words">“<%= @character.farewell %>”</blockquote><% end %>
+          <p class="farewell-banner__hint"><%= short %> is out of the party, remembered under it<%= " on #{campaign.name}'s page" if campaign %>.</p>
+        </div>
+        <% if editable %>
+          <%= button_to "Return #{short} to play", character_story_end_path(@character), method: :delete, class: "button button--small" %>
+        <% end %>
+      </div>
+    <% end %>
 
     <%# Up for grabs (Character::Claiming): who holds it, and the way to pick it; a GM looking at someone else's can put it up for grabs. The owner gives theirs back from Adjust. %>
     <% if @character.up_for_grabs? %>
@@ -109,7 +139,7 @@
               <span class="stat-card__dice"><%= @character.stat(stat) %>d</span>
             </div>
             <p class="stat-card__desc"><%= description %></p>
-            <% if editable %>
+            <% if editable && @character.active? %>
               <%= render "characters/roll_form", character: @character, stat: stat, allies: @allies %>
             <% end %>
           </article>

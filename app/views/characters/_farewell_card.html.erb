@@ -1,0 +1,11 @@
+<%# locals: (character:, player: nil) %>
+<%# A fallen or retired character, remembered (Character::Farewell): how and when their story ended, and the player's farewell line. player: show who played them. %>
+<article class="<%= class_names("farewell-card", "farewell-card--fallen": character.fallen?) %>">
+  <span class="monogram monogram--44 monogram--empty" aria-hidden="true"><%= initial(character.short_name) %></span>
+  <div class="farewell-card__body">
+    <p class="farewell-card__status"><%= character.status.capitalize %><% if character.status_changed_at %> · <%= l(character.status_changed_at.to_date, format: :long) %><% end %></p>
+    <%= link_to character.name, character_path(character), class: "farewell-card__name" %>
+    <p class="farewell-card__meta"><%= character.path %> <%= character.level %><% if player %> · played by <%= character.identity.display_name %><% end %><% if !player && character.campaign %> · <%= character.campaign.name %><% end %></p>
+    <% if character.farewell.present? %><blockquote class="farewell-card__words">“<%= character.farewell %>”</blockquote><% end %>
+  </div>
+</article>

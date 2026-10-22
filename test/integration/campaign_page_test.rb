@@ -56,7 +56,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
 
   test "the party: a card per active character, a dashed one for a member still making theirs, and the fallen and retired below" do
     characters(:tibbs).update!(bloodied: true, marked_agility: true, conditions: [ "4d poisoned" ])
-    characters(:bram).update!(status: "fallen")
+    characters(:bram).update!(status: "fallen", farewell: "Held the bridge.")
     @campaign.memberships.create!(identity: identities(:stranger), role: :player)
     sign_in_as identities(:pip)
 
@@ -72,8 +72,12 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
 
     assert_select "#party .hero-card--empty .hero-card__name", "Stranger joined"
     assert_select "#party .hero-card", 2, "Tibbs and Stranger; Bram has fallen"
-    assert_select ".party-gone a[href=?]", character_path(characters(:bram)), "Bram"
-    assert_select ".party-gone", /Bram, Fighter 1, fallen/
+    assert_select "#fallen-and-retired .farewell-card--fallen" do
+      assert_select ".farewell-card__status", /\AFallen · /
+      assert_select "a.farewell-card__name[href=?]", character_path(characters(:bram)), "Bram"
+      assert_select ".farewell-card__meta", "Fighter 1 · played by Gwen"
+      assert_select ".farewell-card__words", "“Held the bridge.”"
+    end
   end
 
   test "previously on: the last session's scenes and outcomes, and older sessions" do
