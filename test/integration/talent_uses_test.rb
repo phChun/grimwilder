@@ -51,13 +51,13 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
   end
 
   test "the table shows uses left and talent pools under the character, not with the shared pools" do
-    @fen.update!(talent_keys: [ "bardic-lore", "lucky" ])
+    @fen.update!(level: 2, talent_keys: [ "bardic-lore", "lucky" ])
     PlaySession.start!(@campaign, characters: [ @fen ], by: identities(:gwen))
     luck = @fen.talent_pools.sole
     sign_in_as identities(:gwen)
 
     get campaign_table_path(@campaign)
-    assert_select "#table .party-card__uses", "Inspiration 3/3"
+    assert_select "#table .party-card__uses", "Inspiration 4/4"
     assert_select "#table .seat-pool__name", "Luck"
     assert_select "#pools ##{dom_id(luck)}", 0
 

@@ -1,4 +1,4 @@
-<%# locals: (talent:, character: nil) %>
+<%# locals: (talent:, character: nil, eldritch: nil) %>
 <article id="talent-<%= talent.key %>" class="<%= class_names("talent", "talent--core": talent.core?) %>" data-talent-filter-target="item" data-search="<%= [ talent.name, talent.group.name, talent.summary, talent.text ].join(" ").downcase %>">
   <header class="talent__header">
     <h3 class="talent__name"><%= talent.name %></h3>
@@ -25,8 +25,19 @@
     <div class="talent__take">
       <% if character.has_talent?(talent) %>
         <span class="tag">Taken</span>
+      <% elsif character.has_eldritch_talent?(talent) %>
+        <span class="tag">Eldritch</span>
       <% elsif talent.prohibited_for?(character.path) %>
         <span class="field__hint">Not available to a <%= character.path %>.</span>
+      <% elsif eldritch %>
+        <% if character.eldritch_talents_full? %>
+          <span class="field__hint">No Eldritch Talent slot free at level <%= character.level %>.</span>
+        <% else %>
+          <%= button_to "Take as Eldritch", character_talents_path(character), params: { talent: talent.key, eldritch: 1 }, class: "button button--small button--primary", "aria-label": "Take #{talent.name} as an Eldritch Talent" %>
+          <% if talent.one_time_only? %><p class="field__hint">Its "One time only" feature won't work as an Eldritch Talent.</p><% end %>
+        <% end %>
+      <% elsif character.talents_full? %>
+        <span class="field__hint">No room at level <%= character.level %>.</span>
       <% else %>
         <%= button_to "Take #{talent.name}", character_talents_path(character), params: { talent: talent.key }, class: "button button--small button--primary" %>
       <% end %>

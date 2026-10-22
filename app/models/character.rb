@@ -2,7 +2,7 @@
 # identity's campaigns, where the table can see it. The GM can offer one up for
 # grabs for a player to pick (Character::Claiming).
 class Character < ApplicationRecord
-  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentUses, Character::Sessions, Character::Claiming, Character::Seating
+  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentUses, Character::Sessions, Character::Claiming, Character::Seating, Character::EldritchTalents
 
   STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 46)
 

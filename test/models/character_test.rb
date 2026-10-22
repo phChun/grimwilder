@@ -204,6 +204,7 @@ class CharacterTalentsTest < ActiveSupport::TestCase
   end
 
   test "add and remove talents" do
+    @tibbs.update!(level: 2)
     @tibbs.add_talent!("lucky")
     @tibbs.add_talent!("lucky")
     assert_equal %w[according-to-plan lucky], @tibbs.reload.talent_keys
@@ -212,7 +213,30 @@ class CharacterTalentsTest < ActiveSupport::TestCase
     assert_equal %w[according-to-plan], @tibbs.reload.talent_keys
   end
 
-  test "can't take a core talent, an unknown one, or one prohibited for the path" do
+  test "one chosen talent per level, from any path" do
+    assert @tibbs.talents_full?
+    assert_raises(ActiveRecord::RecordInvalid) { @tibbs.add_talent!("lucky") }
+    assert_equal %w[according-to-plan], @tibbs.reload.talent_keys
+
+    @tibbs.update!(level: 2)
+    @tibbs.add_talent!("bulwark")
+    assert @tibbs.reload.talents_full?
+
+    @tibbs.level = 1
+    assert_not @tibbs.valid?, "can't drop below the talents taken"
+    assert_match "remove one first", @tibbs.errors.full_messages.to_sentence
+  end
+
+  test "a sheet already over the limit still saves other changes, and says so" do
+    @tibbs.update_columns(talent_keys: %w[according-to-plan lucky])
+    assert_equal 1, @tibbs.extra_talents
+    @tibbs.update!(spark: 2)
+
+    @tibbs.remove_talent!("lucky")
+    assert_equal 0, @tibbs.reload.extra_talents
+  end
+
+    test "can't take a core talent, an unknown one, or one prohibited for the path" do
     @tibbs.talent_keys = [ "sorcery" ]
     assert_not @tibbs.valid?
 

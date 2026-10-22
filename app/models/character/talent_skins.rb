@@ -13,8 +13,13 @@ module Character::TalentSkins
     [ core_talent_entry, *chosen_talents ].compact.map { Character::SkinnedTalent.new(_1, talent_skins[_1.key]) }
   end
 
+  # A warlock's Eldritch Talents, shown in their own list (Character::EldritchTalents).
+  def eldritch_talent_entries
+    eldritch_talents.map { Character::SkinnedTalent.new(_1, talent_skins[_1.key]) }
+  end
+
   def talent_entry(key)
-    talent_entries.find { _1.key == key.to_s } or raise ActiveRecord::RecordNotFound, "#{name} has no talent #{key.inspect}"
+    [ *talent_entries, *eldritch_talent_entries ].find { _1.key == key.to_s } or raise ActiveRecord::RecordNotFound, "#{name} has no talent #{key.inspect}"
   end
 
   # Saves the non-blank fields; all blank resets the talent to the book's.

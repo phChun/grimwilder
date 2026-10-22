@@ -1,17 +1,31 @@
-<% content_for :title, "Choose a talent for #{@character.name}" %>
+<% content_for :title, @eldritch ? "Choose an Eldritch Talent for #{@character.name}" : "Choose a talent for #{@character.name}" %>
 
 <header class="page-header">
   <p class="eyebrow"><%= link_to @character.name, character_path(@character, anchor: "talents") %></p>
-  <h1>Choose a talent</h1>
-  <p class="page-header__lede">
-    <%= @character.name %> has <%= pluralize(@character.talent_keys.size, "talent") %> besides <%= @character.core_talent %>.
-    <% if @character.talents_to_choose.positive? %>
-      At level <%= @character.level %>, choose <%= @character.talents_to_choose %> more.
-    <% else %>
-      That's the full set for level <%= @character.level %>; you gain another each level.
-    <% end %>
-    <%= @character.path %> talents come first, but any path's are open.
-  </p>
+  <% if @eldritch %>
+    <h1>Choose an Eldritch Talent</h1>
+    <p class="page-header__lede">
+      Your patron gifts <%= @character.name %> <%= pluralize(@character.eldritch_talent_slots, "Eldritch Talent") %> at level <%= @character.level %>: path talents with the patron's trappings, on top of your own (Pact, pg. 82). <%= @character.eldritch_talent_keys.size %> taken.
+      Given time to commune, you can change one: remove it from the sheet and roll your Patience pool.
+      "One time only" features don't work as Eldritch Talents.
+    </p>
+  <% else %>
+    <h1>Choose a talent</h1>
+    <p class="page-header__lede">
+      <%= @character.name %> has <%= pluralize(@character.talent_keys.size, "talent") %> besides <%= @character.core_talent %>.
+      <% if @character.talents_to_choose.positive? %>
+        At level <%= @character.level %>, choose <%= @character.talents_to_choose %> more.
+      <% elsif @character.extra_talents.positive? %>
+        That's <%= @character.extra_talents %> more than level <%= @character.level %> allows: remove <%= @character.extra_talents == 1 ? "one" : @character.extra_talents %> from the sheet.
+      <% else %>
+        That's the full set for level <%= @character.level %>; you gain another each level. To swap one, remove it from the sheet first.
+      <% end %>
+      <%= @character.path %> talents come first, but any path's are open.
+      <% if @character.eldritch_talents? %>
+        <%= link_to "Eldritch Talents are chosen separately.", new_character_talent_path(@character, eldritch: 1) %>
+      <% end %>
+    </p>
+  <% end %>
 </header>
 
-<%= render "talents/catalog", groups: @groups, character: @character %>
+<%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch %>

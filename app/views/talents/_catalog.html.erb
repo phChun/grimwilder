@@ -1,4 +1,4 @@
-<%# locals: (groups:, character: nil) %>
+<%# locals: (groups:, character: nil, eldritch: nil) %>
 <div class="talent-catalog" data-controller="talent-filter">
   <div class="talent-catalog__tools">
     <input type="search" class="field__input talent-catalog__search" placeholder="Search talents: stealth, spark, potent…" autocomplete="off" aria-label="Search talents" data-talent-filter-target="query" data-action="input->talent-filter#filter">
@@ -19,7 +19,7 @@
       </header>
       <div class="talent-grid">
         <% group.talents.each do |talent| %>
-          <%= render "talents/talent", talent: talent, character: character %>
+          <%= render "talents/talent", talent: talent, character: character, eldritch: eldritch %>
         <% end %>
       </div>
     </section>

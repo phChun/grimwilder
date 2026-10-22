@@ -1,4 +1,4 @@
-<%# locals: (talent:, character:, editable: nil, tends: nil, pools: nil) %>
+<%# locals: (talent:, character:, editable: nil, tends: nil, pools: nil, eldritch: nil) %>
 <%# One talent on the sheet: name, a one-line summary, what it gives (tick boxes, talent pools, thread), then the full text and the re-skin form in a fold-out. %>
 <% pools ||= [] %>
 <% counters = talent.uses.select(&:counter?) %>
@@ -10,11 +10,12 @@
     <% if talent.core? %>
       <span class="talent-card__core">Core</span>
     <% else %>
-      <span class="talent-card__source"><%= talent.group.path? ? talent.group.name : "Background" %> · pg. <%= talent.page %></span>
+      <span class="talent-card__source"><%= "Eldritch · " if eldritch %><%= talent.group.path? ? talent.group.name : "Background" %> · pg. <%= talent.page %></span>
     <% end %>
   </div>
   <% if talent.renamed? %><p class="talent-card__aka">Re-skinned <%= talent.book.name %></p><% end %>
   <p class="talent-card__summary"><%= talent.summary %></p>
+  <% if eldritch && talent.one_time_only? %><p class="talent-card__aka">Its "One time only" feature doesn't work as an Eldritch Talent.</p><% end %>
 
   <% if counters.any? || pool_uses.any? || thread.positive? %>
     <div class="talent-card__uses">
@@ -91,7 +92,7 @@
     <% end %>
 
     <% if editable && !talent.core? %>
-      <%= button_to "Remove talent", character_talent_path(character, talent.key), method: :delete, class: "button button--ghost button--small", "aria-label": "Remove #{talent.name}", form: { data: { turbo_confirm: "Remove #{talent.name}?" } } %>
+      <%= button_to "Remove talent", character_talent_path(character, talent.key, eldritch: (1 if eldritch)), method: :delete, class: "button button--ghost button--small", "aria-label": "Remove #{talent.name}", form: { data: { turbo_confirm: "Remove #{talent.name}?" } } %>
     <% end %>
   </details>
 </article>

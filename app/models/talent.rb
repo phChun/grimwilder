@@ -78,6 +78,11 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     core
   end
 
+  # "One time only…" features, which thematic path talents can't use (pg. 53).
+  def one_time_only?
+    text.match?(/one time only/i)
+  end
+
   def prohibited_paths
     text.scan(/\[Prohibited: ([^\]]+)\]/).flatten.flat_map { _1.split(/,\s*/) }
   end

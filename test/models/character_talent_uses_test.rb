@@ -36,7 +36,7 @@ class CharacterTalentUsesTest < ActiveSupport::TestCase
   end
 
   test "ending a scene resets only per-scene uses and pools" do
-    @ash.update!(talent_keys: [ "bulwark", "control" ])
+    @ash.update!(level: 2, talent_keys: [ "bulwark", "control" ])
     session = PlaySession.start!(@campaign, characters: [ @ash ], by: identities(:gwen))
     bulwark = @ash.talent_pools.sole
     bulwark.roll!(by: identities(:gwen), random: FixedDice.new([ 1, 6 ]))

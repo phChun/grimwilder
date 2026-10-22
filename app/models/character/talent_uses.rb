@@ -10,7 +10,7 @@ module Character::TalentUses
   end
 
   def talent_use_list
-    [ core_talent_entry, *chosen_talents ].compact.flat_map(&:uses)
+    [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses)
   end
 
   def use_counters
