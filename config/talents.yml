@@ -47,6 +47,8 @@
     summary: "Overload arcana for a potent 2d story roll, adding +1t for each extra use in a session."
     text: You can overload arcana to create a potent effect with it. Make a 2d story roll as the magic goes haywire. Add +1t to the story roll each time you use this after the first, clearing them each session.
     page: 55
+    rolls:
+    - { kind: story, odds: 2, label: Overload the arcana }
   - name: Magnum Opus
     summary: "Build a mythic arcana: a 6d power pool whose touchstones you roll and lock in over time."
     text: You’re in the process of creating a mythic arcana. It has a 6d power pool as normal, but before each session, roll 3 random touchstones. Each time, you can choose 1 touchstone to lock in, never rolling for it again.
@@ -83,6 +85,8 @@
     text: You can always appear in a scene exactly where and when you want, limited only by your physical capabilities. Make a 3d story roll to describe your entrance and its effect.
     note: The player sets the scene for their entrance, allowing extra details based on the result, almost as an action—even an interrupt, itself. The GM will step in if something doesn’t fit.
     page: 57
+    rolls:
+    - { kind: story, odds: 3, label: Make your entrance }
   - name: Folk Hero
     summary: "Spend inspiration and spark interchangeably; a 6 on your spark die gives it back."
     text: You can spend inspiration and spark interchangeably. If your spark die comes up as a 6, you regain it. Tales of your heroism are told throughout the area; track their spread with campaign pools.
@@ -470,6 +474,8 @@
     summary: "Once a session, glimpse the result of a plan before deciding to act on it."
     text: You can catch small glimpses of the future. Once per session, you can describe a brief course of action while in a calm situation, and the GM will tell you the result. If there’s risk, make a montage roll to see how it would play out. Afterward, you can decide whether to take the action.
     page: 71
+    rolls:
+    - { kind: montage, label: See how it plays out, use: foresight }
     uses:
     - { key: foresight, label: Foresight, count: 1, per: session }
   - name: Psychic Warrior
@@ -530,6 +536,8 @@
     summary: "+1 thread a session; spend it to flash back to scouting ahead, with a 3d montage roll."
     text: 'You gain 1 thread per session and can spend thread to flashback to scouting ahead and: sabotage something—set a trap—survey the area (ask 2 questions)—take out a danger—set up an interrupt. Make a 3d montage roll. The GM always takes suspense in place of an impact move.'
     page: 73
+    rolls:
+    - { kind: montage, label: "Flashback: scouting ahead", thread: 1, bonus: 1 }
     uses:
     - { key: thread, thread: 1 }
   - name: Seasoned Hunter
@@ -567,6 +575,8 @@
     text: You gain 1 thread per session and can spend thread to flashback, establishing how you planned for the current situation. Make a montage roll, taking +1d if it fell within your expertise. The GM must take suspense in place of an impact move.
     note: 'This can cover any kinds of planning. Consider your other talents and abilities as well, for example: if you have spellcasting, perhaps you prepared by using magic ahead of time.'
     page: 75
+    rolls:
+    - { kind: montage, label: "Flashback: the plan", thread: 1 }
     uses:
     - { key: thread, thread: 1 }
   - name: Eldritch Affinity
@@ -591,6 +601,8 @@
     summary: "Once a session, weasel out of being caught in a lie or red-handed, for now."
     text: Once per session, if caught in a lie or red-handed, you can weasel your way out—for now. Make a story roll to see if they realize their mistake later. You can push yourself to do it again.
     page: 75
+    rolls:
+    - { kind: story, odds: 2, label: Do they realize later?, use: weasel }
     uses:
     - { key: weasel, label: Weasel, count: 1, per: session }
   - name: Distraction
@@ -642,6 +654,8 @@
     text: 'Two small magical motes float around you. Give them 2 traits such as: annoying—melancholic—mesmerizing—petty—troublesome—whimsical. You can sacrifice one to have it act independently, making a story roll if needed. They return each session.'
     note: You could send one to assist an ally, distract a foe, light the way, or even pass a message to someone. The story roll here is about how effective they are, it doesn't prompt an impact move.
     page: 77
+    rolls:
+    - { kind: story, odds: 2, label: Send a wisp off, use: wisps }
     uses:
     - { key: wisps, label: Wisps, count: 2, per: session }
   - name: Wrath
@@ -662,6 +676,8 @@
 
       GROWTH: At levels 3 and 6, you gain +1 aspect.'
     page: 78
+    rolls:
+    - { kind: story, odds: 2, label: The anchors break }
     uses:
     - { key: vassal, label: Vassal, pool: 4, pool_kind: power, per: scene }
   talents:
@@ -690,6 +706,8 @@
     summary: "Given time, open a room-sized pocket dimension; push yourself to open it on the spot."
     text: Given time, you can open a hole to a small pocket dimension about the size of a room. You can push yourself to open it on the spot. If dropped, make a story roll to see what happens inside as the plane collapses. You don't need anchors for planar travel rituals.
     page: 79
+    rolls:
+    - { kind: story, odds: 2, label: The plane collapses }
   - name: Portal Network
     summary: "Given time, set waypoints and open portals between them; push for a risky quick link."
     text: 'Given time, you can: establish a waypoint in your network—open a portal from one waypoint to another. You can push yourself to make a temporary link in the moment, but doing so carries risk. Those around you can use the portal as well. Define how you travel, such as by: shadows—trees—doorways—dreams.'
@@ -771,6 +789,8 @@
 
       Patron: roll or choose 2 natures and 2 desires (patron crucible), give your patron a name, trappings, a way of communicating and a following.'
     page: 82
+    rolls:
+    - { kind: story, odds: 3, label: "Wield your patron's magic" }
   talents:
   - name: Affliction
     summary: "Once a session, heal a harm by touch, transferring the injury elsewhere."
@@ -803,6 +823,8 @@
     summary: "Push yourself to teleport up to two days' ride away, less precisely the further you go."
     text: You can push yourself to teleport. The further or less familiar, the less precise. Max range is two days’ ride away. Make a story roll if you can’t see the destination or take allies you touch with you.
     page: 83
+    rolls:
+    - { kind: story, odds: 2, label: Teleport blind or with allies }
 - key: witch
   name: Witch
   kind: path
@@ -832,6 +854,8 @@
     summary: "A small magical creature you can see through, send on tasks and cast spells through."
     text: You manifest a small magical creature. You can communicate telepathically, use its senses, and send it on simple tasks, making a story roll to see how it goes. You can also push yourself to cast a spell through it. If your familiar takes damage, it vanishes and reappears at the start of the next scene.
     page: 85
+    rolls:
+    - { kind: story, odds: 2, label: Send your familiar }
   - name: Homely Hovel
     summary: "Given time, bless a homestead: outside help on all rolls there, plus two wondrous traits."
     text: 'Given time, you can bless a homestead to overflow with power. You get outside help on all rolls while on its grounds. Choose two wondrous traits to give it such as: traveling—ritual anchor—healing—caretaker. You can only have one homestead like this at a time. charming castle mysterious cottage rickety glade unsettling manner vibrant shack whimsical temple'
@@ -850,6 +874,8 @@
     summary: "Your spells can surge wildly, with a 3d story roll for the result; spark on a perfect."
     text: You can cause wild surges when spellcasting, as the magical twist in Sorcery. When it triggers, make a 3d story roll for the results. On a perfect, take spark. When strange things happen, they happen to you.
     page: 85
+    rolls:
+    - { kind: story, odds: 3, label: The wild surge }
   - name: Herbalism
     summary: "Two herb names each session, and 1 trivial and 1 minor potion to use."
     text: Before each session, use the herbalism crucible to make two herb names. Each session, you have 1 trivial and 1 minor potion, chosen when they’re used. The name is the touchstone. One time only, you can have 1 major potion.
@@ -932,6 +958,8 @@
     summary: "Once a session, guess at a puzzle and the GM tells you something right, wrong or missed."
     text: 'Once per session when trying to solve a question or puzzle to give a specific guess. The GM will tell you: something right about it—something wrong about it—a detail you missed. Use a story roll if the answer is unclear.'
     page: 89
+    rolls:
+    - { kind: story, odds: 2, label: Is the answer clear?, use: deduction }
     uses:
     - { key: deduction, label: Simple Deduction, count: 1, per: session }
   - name: Salt of the Earth
@@ -942,6 +970,8 @@
     summary: "End a scene bloodied or desperate and roll 2d to heal harm, with a weakness to match."
     text: 'When a scene ends while you are bloodied or desperate, make a 2d story roll as a defense against the harm. On a messy, reduce 1 harm to a mark. On a perfect, clear it.Choose a weakness that accompanies this power, such as: fire—iron—sunlight.'
     page: 89
+    rolls:
+    - { kind: story, odds: 2, label: Heal as the scene ends }
   - name: Flight
     summary: "You can fly, with two benefits: agile, strong, swift or tireless."
     text: 'You have the ability to fly. Choose two of the following benefits that define this ability: Agile—Strong—Swift—Tireless. Be mindful of what you carry; most fliers can’t bring much with them.'
@@ -968,3 +998,5 @@
     summary: "Entertain a crowd for spark, with a story roll to see how it goes."
     text: Given time and space to entertain a crowd, you and participating allies can take spark for the performance. Give a vignette, then make a story roll to see how it goes.
     page: 89
+    rolls:
+    - { kind: story, odds: 2, label: Play to the crowd }

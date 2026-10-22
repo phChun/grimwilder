@@ -417,6 +417,10 @@
 select.field__input { padding-right: 2.5rem; }
 
 .field__input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: transparent; }
+/* Safari leaves a focused select (ours are drawn with appearance: none)
+   without the outline, so it would lose its edge until it loses focus: keep
+   the border and draw the ring as a shadow. */
+select.field__input:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
 
 .field__input--code {
   font-family: ui-monospace, Menlo, Consolas, monospace;
@@ -739,9 +743,10 @@ form.button_to, .button_to { margin: 0; }
   border-bottom: 1px solid var(--line);
 }
 
-.talent-catalog__search { max-width: 32rem; }
-.talent-catalog__jump { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-.chip--link { text-decoration: none; font-size: 0.85rem; padding: 2px var(--space-2); }
+.talent-catalog__tools { grid-template-columns: minmax(12rem, 16rem) minmax(0, 32rem); align-items: center; }
+.talent-catalog__tools > .field__hint { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 35rem) { .talent-catalog__tools { grid-template-columns: 1fr; } }
+.talent-catalog__path { width: 100%; }
 
 .talent-group { scroll-margin-top: 9rem; }
 .talent-group[hidden] { display: none; }
@@ -757,23 +762,23 @@ form.button_to, .button_to { margin: 0; }
   gap: var(--space-2);
   padding: var(--space-4);
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--paper-raised);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
   scroll-margin-top: 9rem;
 }
 
 .talent[hidden] { display: none; }
-.talent--core { border-color: var(--moss); border-width: 2px; }
+.talent--core { grid-column: 1 / -1; border-color: color-mix(in srgb, var(--ember) 45%, var(--line)); background: linear-gradient(135deg, var(--ember-soft), var(--surface-2) 60%); }
 .talent__header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-3); }
 .talent__name { margin: 0; font-size: 1.3rem; }
-.talent__meta { font-size: 0.8rem; color: var(--ink-faint); }
-.talent__summary { margin: 0; font-weight: 600; color: var(--text); }
+.talent__meta { font-size: 0.8rem; color: var(--dim); }
+.talent__summary { margin: 0; color: var(--text-soft); }
 .talent__more > .fold__summary { min-height: var(--tap); font-size: 0.87rem; font-weight: 600; color: var(--dim); }
 .talent__more[open] > .fold__summary { margin-bottom: var(--space-1); }
 .talent__more .talent__note { margin-top: var(--space-2); }
 .talent__text p { margin: 0 0 var(--space-2); font-size: 0.95rem; }
 .talent__text p:last-child { margin-bottom: 0; }
-.talent__note { margin: 0; padding-left: var(--space-3); border-left: 3px solid var(--line-strong); font-size: 0.88rem; font-style: italic; color: var(--ink-soft); }
+.talent__note { margin: 0; padding-left: var(--space-3); border-left: 3px solid var(--line-strong); font-size: 0.88rem; font-style: italic; color: var(--muted); }
 .talent__take { margin-top: auto; padding-top: var(--space-2); }
 .talent__take .button_to { margin: 0; }
 
@@ -1619,48 +1624,95 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .talents__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-3); }
 .talents__head .card__title { margin: 0; }
 
-/* Talents in boxes that wrap, with "Full text" at the bottom. With room for
-   columns, all are as tall as the tallest. One with its full text open takes
-   the whole row, and then rows size to their own boxes so the rest don't grow
-   with it. */
-.talent-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-2); margin-bottom: var(--space-3); }
+/* The core talent on its own, then the rest as cards that wrap. With room for
+   columns, they're all as tall as the tallest, with "From the book" at the
+   foot. One with its book text open takes the whole row, and then rows size
+   to their own cards so the rest don't grow with it. */
+.talent-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
 @container sheet (min-width: 40rem) {
   .talent-list { grid-auto-rows: 1fr; }
-  .talent-list:has(.talent-card__more[open]) { grid-auto-rows: auto; }
+  .talent-list:has(.talent-card__more[open]) { grid-auto-rows: auto; align-items: start; }
 }
+.talent-card--core { margin-bottom: var(--space-3); }
+.talent-card { position: relative; display: flex; flex-direction: column; gap: var(--space-1); padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.talent-card--core,
 .talent-card:has(> .talent-card__more[open]) { grid-column: 1 / -1; }
-.talent-card { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: var(--radius-control); background: var(--bg); }
-.talent-card__head { display: flex; align-items: baseline; gap: var(--space-2); }
-.talent-card__name { flex: 1; margin: 0; font-family: var(--font-ui); font-size: 1rem; font-weight: 600; }
-.talent-card__core { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--spark); }
-.talent-card__source { font-size: 12px; color: var(--dim); }
-.talent-card__text { margin: 0; font-size: 0.93rem; color: var(--muted); }
-.talent-card__note { margin: var(--space-1) 0 0; font-size: 0.85rem; font-style: italic; color: var(--dim); }
-.talent-card .button_to { margin: var(--space-1) 0 0; align-self: flex-start; }
+.talent-card--core { padding: 18px 20px; border-color: color-mix(in srgb, var(--ember) 45%, var(--line)); background: linear-gradient(135deg, var(--ember-soft), var(--surface-2) 60%); }
+.talent-card--eldritch { border-color: var(--suspense-line); }
 .talent-card--skinned { box-shadow: inset 3px 0 0 var(--spark); }
+.talent-card__head { display: flex; align-items: flex-start; gap: var(--space-2); }
+.talent-card__name { flex: 1; margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; line-height: 1.25; }
+.talent-card--core .talent-card__name { font-size: 1.5rem; }
+.talent-card__source { margin: 0; font-size: 12px; color: var(--dim); }
+.talent-card--core .talent-card__source { color: var(--ember); font-weight: 600; letter-spacing: 0.04em; }
+.talent-card__summary { margin: var(--space-1) 0 0; color: var(--text-soft); }
+.talent-card--core .talent-card__summary { font-size: 1.05rem; max-width: 46rem; }
+.talent-card__growth { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.talent-card__label { margin: var(--space-2) 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.talent-card__growth .talent-card__label { margin: 0 var(--space-1) 0 0; color: var(--ember); }
 .talent-card__aka { margin: 0; font-size: 12px; color: var(--dim); }
-.talent-card__summary { margin: 2px 0 0; font-size: 0.93rem; color: var(--muted); }
-.talent-card__label { margin: var(--space-2) 0 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.talent-card__text { margin: 0; font-size: 0.93rem; color: var(--muted); }
 .talent-card__text--own { color: var(--text); }
+.talent-card__note { margin: var(--space-1) 0 0; padding-left: var(--space-3); border-left: 3px solid var(--line-strong); font-size: 0.85rem; font-style: italic; color: var(--dim); }
+
+/* What a talent is: small badges by kind. */
+.talent-kinds { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 0; padding: 0; list-style: none; }
+.talent-kind { padding: 1px 8px; border: 1px solid currentColor; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--dim); }
+.talent-kind--spell { color: var(--suspense-text); }
+.talent-kind--roll { color: var(--ember); }
+.talent-kind--pool { color: var(--thread); }
+.talent-kind--uses { color: var(--spark); }
+.talent-kind--push { color: var(--grim); }
 
 /* What a talent gives: tick boxes, talent pools, extra thread */
-.talent-card__uses { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2); }
+.talent-card__uses { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--line-soft); }
 .talent-card__uses .pool-rows--sheet { margin: 0; }
-.talent-card__chip { align-self: flex-start; margin: 0; padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 0.8rem; color: var(--muted); }
+/* A talent pool on its card: the dice, Roll and ⋯ on top, then its name,
+   kind and last roll underneath. */
+.pool-rows--sheet .pool-row { grid-template-columns: 6px auto minmax(0, 1fr) auto 2.25rem; row-gap: var(--space-1); }
+.pool-rows--sheet .pool-row__stripe { grid-row: 1 / 3; grid-column: 1; }
+.pool-rows--sheet .pool-row__size { grid-row: 1; grid-column: 2; }
+.pool-rows--sheet .pool-row__count { text-align: left; }
+.pool-rows--sheet .pool-row .pool__pips { display: flex; }
+.pool-rows--sheet .pool-row__primary { grid-row: 1; grid-column: 4; }
+.pool-rows--sheet .pool-row__main { grid-row: 2; grid-column: 2 / -1; }
+.pool-rows--sheet .pool-row__more { grid-row: 3; grid-column: 1 / -1; }
+.talent-card__chip { align-self: flex-start; margin: 0; padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 0.8rem; color: var(--thread); }
+.talent-card__pool-preview { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); opacity: 0.8; }
+.talent-card__pool-preview .pool-track { flex: 0 1 10rem; }
 .use-tracker { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
 .use-tracker__name { font-size: 0.9rem; font-weight: 600; }
 .use-tracker__resets { font-size: 12px; color: var(--dim); }
 
-/* The full text and the re-skin form, folded away */
+/* What you can do with it: its rolls and Push yourself. */
+.talent-card__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.talent-card__action { margin: 0; }
+.talent-card__roll { gap: 6px; height: auto; min-height: var(--tap); text-align: left; }
+.talent-card__roll small { color: var(--dim); font-weight: 400; }
+.talent-card__push { position: relative; }
+.talent-card__push-toggle { list-style: none; border-color: var(--grim-line); color: var(--grim); }
+.talent-card__push-toggle::-webkit-details-marker { display: none; }
+.talent-card__push-toggle small { color: var(--dim); font-weight: 400; }
+.talent-card__push-stat { display: flex; justify-content: space-between; width: 100%; }
+.talent-card__push-stat small { color: var(--dim); font-weight: 400; }
+.talent-card__push-stat--harm small { color: var(--grim); }
+
+/* The ⋯ menu (re-skin, Remove) and the push menu float like a pool card's. */
+.talent-card__more-menu { position: relative; margin: -8px -10px 0 0; }
+.talent-card__toggle { width: var(--tap); padding: 0; list-style: none; color: var(--dim); }
+.talent-card__toggle::-webkit-details-marker { display: none; }
+.talent-card__menu { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); display: grid; gap: var(--space-2); width: min(22rem, calc(100vw - 2rem)); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: var(--shadow); }
+.talent-card__menu--push { left: 0; right: auto; width: min(16rem, calc(100vw - 2rem)); }
+.talent-card__menu .field__hint { margin: 0; }
+.talent-card__menu .button_to, .talent-card__menu .button_to .button { width: 100%; margin: 0; }
+.talent-card__menu-title { margin: 0; font-weight: 600; }
+.talent-skin__form .field__input { width: 100%; }
+
+/* The book's text, folded away at the foot of the card. */
 .talent-card__more { margin-top: auto; padding-top: var(--space-2); }
 .talent-card__more > .fold__summary { min-height: 2rem; font-size: 0.85rem; font-weight: 600; color: var(--dim); }
 .talent-card__more[open] > .fold__summary { margin-bottom: var(--space-1); }
 .talent-card__more > .talent-card__text + .talent-card__text { margin-top: var(--space-2); }
-.talent-skin { margin-top: var(--space-2); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); }
-.talent-skin > .fold__summary { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-.talent-skin[open] > .fold__summary { margin-bottom: var(--space-2); }
-.talent-skin .field__input { width: 100%; }
-.talent-skin__actions { display: flex; gap: var(--space-2); }
 
 .talent-slot {
   display: flex;

@@ -10,10 +10,29 @@ class TalentsTest < ActionDispatch::IntegrationTest
 
     assert_select "#talent-lucky > .talent__summary", Talent.find("lucky").summary
     assert_select "#talent-lucky > details.talent__more:not([open])" do
-      assert_select "summary", "Full text"
+      assert_select "summary", "From the book"
       assert_select ".talent__text p", /1d Luck pool/
     end
     assert_select "#talent-lucky > .talent__text", 0, "the book text is folded away"
+  end
+
+  test "a dropdown shows one path's talents, or all of them" do
+    get talents_path
+    assert_select "select#talent-path[data-talent-filter-target=path]" do
+      assert_select "option", Talent.groups.size + 1
+      assert_select "option[selected]", "All talents"
+      assert_select "option[value=warlock]", "Warlock"
+      assert_select "option[value=backgrounds]", "Background and heritage"
+    end
+    assert_select "section.talent-group[hidden]", 0, "all of them to start"
+
+    get talents_path(path: "warlock")
+    assert_select "select#talent-path option[selected][value=warlock]"
+    assert_select "section.talent-group:not([hidden])", 1
+    assert_select "section#group-warlock:not([hidden])"
+
+    get talents_path(path: "nonsense")
+    assert_select "section.talent-group[hidden]", 0
   end
 
   test "choose a talent for your character" do
@@ -23,6 +42,8 @@ class TalentsTest < ActionDispatch::IntegrationTest
     get new_character_talent_path(tibbs)
     assert_response :success
     assert_select "section.talent-group:first-of-type h2", text: "The Rogue"
+    assert_select "select#talent-path option[selected][value=rogue]", 1, "opens on the character's own path"
+    assert_select "section.talent-group:not([hidden])", 1
     assert_select "#talent-according-to-plan .tag", text: "Taken"
     assert_select "#talent-lucky .talent__take", text: /No room at level 1/
     assert_select "#talent-lucky .talent__take form", 0

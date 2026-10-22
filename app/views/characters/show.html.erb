@@ -176,11 +176,18 @@
         <% end %>
       </div>
       <% talent_pools = @character.talent_pools.to_a %>
-      <div class="talent-list">
-        <% @character.talent_entries.each do |talent| %>
-          <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools %>
-        <% end %>
-      </div>
+      <%# The core talent on its own, then the rest in a grid of matching heights. %>
+      <% core, chosen = @character.talent_entries.partition(&:core?) %>
+      <% core.each do |talent| %>
+        <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools %>
+      <% end %>
+      <% if chosen.any? %>
+        <div class="talent-list">
+          <% chosen.each do |talent| %>
+            <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools %>
+          <% end %>
+        </div>
+      <% end %>
       <% if tends && @character.use_counters.any? %>
         <label class="check use-note">
           <input type="checkbox" data-talent-uses-target="note" data-action="talent-uses#remember">
@@ -211,13 +218,13 @@
             <%= link_to "Pick #{@character.eldritch_talents_to_choose == 1 ? "an Eldritch Talent" : "#{@character.eldritch_talents_to_choose} Eldritch Talents"}", new_character_talent_path(@character, eldritch: 1), class: "talent-slot" %>
           <% end %>
           <% if editable && @character.extra_eldritch_talents.positive? %>
-            <p class="talent-over">Level <%= @character.level %> has room for <%= pluralize(@character.eldritch_talent_slots, "Eldritch Talent") %>. Remove <%= @character.extra_eldritch_talents == 1 ? "one" : @character.extra_eldritch_talents %> under its Full text.</p>
+            <p class="talent-over">Level <%= @character.level %> has room for <%= pluralize(@character.eldritch_talent_slots, "Eldritch Talent") %>. Remove <%= @character.extra_eldritch_talents == 1 ? "one" : @character.extra_eldritch_talents %> from its ⋯ menu.</p>
           <% end %>
         </div>
       <% end %>
 
       <% if editable && @character.extra_talents.positive? %>
-        <p class="talent-over">Level <%= @character.level %> has room for <%= pluralize(@character.expected_talent_count, "talent") %> besides <%= @character.core_talent %>. Remove <%= @character.extra_talents == 1 ? "one" : @character.extra_talents %> under its Full text.</p>
+        <p class="talent-over">Level <%= @character.level %> has room for <%= pluralize(@character.expected_talent_count, "talent") %> besides <%= @character.core_talent %>. Remove <%= @character.extra_talents == 1 ? "one" : @character.extra_talents %> from its ⋯ menu.</p>
       <% end %>
 
       <% if @character.talents.present? %>

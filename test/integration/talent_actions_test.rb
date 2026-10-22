@@ -1,0 +1,53 @@
+require "test_helper"
+
+# A talent's card on the sheet: its badges, its rolls and Push yourself.
+class TalentActionsTest < ActionDispatch::IntegrationTest
+  setup do
+    @campaign = campaigns(:bramblewood)
+    @tibbs = characters(:tibbs)
+    @tibbs.update!(level: 2, talent_keys: %w[ according-to-plan lurker ])
+  end
+
+  test "the core talent leads, every card says what it is, and the owner gets its actions" do
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+
+    assert_select ".talent-list .talent-card--core", 0, "the core talent sits above the grid"
+    assert_select "#talents > .talent-card--core#talent-expertise + .talent-list > .talent-card", 2
+    assert_select "#talents > .talent-card--core#talent-expertise" do
+      assert_select ".talent-card__source", /Core talent · Rogue/
+      assert_select ".talent-card__growth", /At levels 3 and 6/
+      assert_select ".talent-kind--pool", "Pool"
+    end
+    assert_select "#talent-according-to-plan" do
+      assert_select ".talent-kind--roll", "Roll"
+      assert_select "form[action=?] button.talent-card__roll", character_talent_roll_path(@tibbs, "according-to-plan"), /Flashback: the plan\s+2d montage · spends 1 thread/
+      assert_select ".talent-card__menu button", text: "Remove talent"
+    end
+    assert_select "#talent-lurker .talent-card__push" do
+      assert_select "summary", /Push yourself\s+mark a stat/
+      assert_select "button.talent-card__push-stat", 4
+    end
+    assert_select "#talent-expertise .talent-card__menu button", text: "Remove talent", count: 0
+
+    post character_talent_roll_path(@tibbs, "according-to-plan"), params: { index: 0 }
+    assert_redirected_to character_path(@tibbs, anchor: "talent-according-to-plan")
+    assert @campaign.roll_calls.open.sole.montage?
+
+    post character_talent_push_path(@tibbs, "lurker"), params: { stat: "wits" }
+    assert @tibbs.reload.marked_wits?
+    follow_redirect!
+    assert_select ".toast", /Tibbs marks Wits\./
+  end
+
+  test "others at the table see the cards without the actions" do
+    sign_in_as identities(:gwen)
+    get character_path(@tibbs)
+
+    assert_select "#talent-according-to-plan .talent-kind--roll"
+    assert_select ".talent-card__roll", 0
+    assert_select ".talent-card__push", 0
+    post character_talent_roll_path(@tibbs, "according-to-plan"), params: { index: 0 }
+    assert_response :not_found
+  end
+end

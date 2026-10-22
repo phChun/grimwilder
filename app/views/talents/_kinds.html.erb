@@ -1,0 +1,7 @@
+<%# locals: (talent:) %>
+<%# What a talent does at the table (Talent#kinds), as small badges: Spell, Roll, Pool, Uses, Push, or Always for one that's simply on. %>
+<ul class="talent-kinds" aria-label="Kind of talent">
+  <% talent.kinds.each do |kind| %>
+    <li class="<%= class_names("talent-kind", "talent-kind--#{kind.downcase}") %>"><%= kind %></li>
+  <% end %>
+</ul>

@@ -23,6 +23,8 @@ Rails.application.routes.draw do
       end
       resources :talents, only: %i[ new create destroy ] do
         resource :skin, only: %i[ update destroy ], controller: "talent_skins"
+        resource :roll, only: :create, controller: "talent_rolls"
+        resource :push, only: :create, controller: "talent_pushes"
       end
       resource :talent_uses, only: :update
       resource :claim, only: %i[ create destroy ]

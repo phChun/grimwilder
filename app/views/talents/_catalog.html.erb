@@ -1,17 +1,18 @@
-<%# locals: (groups:, character: nil, eldritch: nil) %>
+<%# locals: (groups:, character: nil, eldritch: nil, selected: nil) %>
+<%# A dropdown picks one path (or Background, or all of them) and only that group shows; the search filters within it. selected: a group key, or blank for all. talent_filter_controller.js keeps it in the URL as ?path=. %>
+<% selected = groups.map(&:key).include?(selected) ? selected : "" %>
 <div class="talent-catalog" data-controller="talent-filter">
   <div class="talent-catalog__tools">
+    <div class="talent-catalog__pick">
+      <label class="visually-hidden" for="talent-path">Show talents for</label>
+      <%= select_tag :path, options_for_select([ [ "All talents", "" ], *groups.map { [ _1.path? ? _1.name : "Background and heritage", _1.key ] } ], selected), id: "talent-path", class: "field__input talent-catalog__path", data: { talent_filter_target: "path", action: "change->talent-filter#filter" } %>
+    </div>
     <input type="search" class="field__input talent-catalog__search" placeholder="Search talents: stealth, spark, potent…" autocomplete="off" aria-label="Search talents" data-talent-filter-target="query" data-action="input->talent-filter#filter">
-    <nav class="talent-catalog__jump" aria-label="Jump to a path">
-      <% groups.each do |group| %>
-        <a href="#group-<%= group.key %>" class="chip chip--link"><%= group.path? ? group.name : "Background" %></a>
-      <% end %>
-    </nav>
     <p class="field__hint" data-talent-filter-target="count" aria-live="polite"></p>
   </div>
 
   <% groups.each do |group| %>
-    <section id="group-<%= group.key %>" class="talent-group" data-talent-filter-target="group" aria-labelledby="heading-<%= group.key %>">
+    <section id="group-<%= group.key %>" class="talent-group" data-talent-filter-target="group" data-key="<%= group.key %>"<% if selected.present? && selected != group.key %> hidden<% end %> aria-labelledby="heading-<%= group.key %>">
       <header class="talent-group__header">
         <h2 id="heading-<%= group.key %>" class="section-title"><%= group.path? ? "The #{group.name}" : group.name %></h2>
         <% if group.aka %><p class="field__hint">AKA the <%= group.aka %></p><% end %>

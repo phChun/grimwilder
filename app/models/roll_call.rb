@@ -33,10 +33,11 @@ class RollCall < ApplicationRecord
       call!(campaign, by, kind: "story", question: question, odds: odds, thorns: thorns, seats: [ seat(character) ])
     end
 
-    def montage!(campaign:, by:, characters:, scene: nil)
+    # bonus: extra dice for everyone in it (a talent's 3d montage, say).
+    def montage!(campaign:, by:, characters:, scene: nil, bonus: 0)
       raise ArgumentError, "Pick who takes part in the montage." if characters.empty?
 
-      call!(campaign, by, kind: "montage", question: scene, seats: characters.map { seat(_1) })
+      call!(campaign, by, kind: "montage", question: scene, seats: characters.map { seat(_1).merge("bonus" => bonus.to_i) })
     end
 
     # sides: [{ character:, helpers: [characters] }, ...]
@@ -111,11 +112,11 @@ class RollCall < ApplicationRecord
     seats.find { _1["character_id"] == seat["lead_id"] }&.dig("name")
   end
 
-  # Before spark: the odds for a story roll, 1d to assist, else 2d.
+  # Before spark: the odds for a story roll, 1d to assist, else 2d plus any bonus.
   def base_dice(seat)
     if story? then odds
     elsif assist?(seat) then 1
-    else Roll::Quarrel::DICE
+    else Roll::Quarrel::DICE + seat["bonus"].to_i
     end
   end
 

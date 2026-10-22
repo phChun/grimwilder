@@ -3,7 +3,7 @@
 # any talent (pg. 52) except those marked "[Prohibited: Path]".
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses)
+class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls)
   def self.all
     catalog[:talents]
   end
@@ -57,7 +57,8 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
   def self.build(attributes, group:, core:)
     key = keyify(attributes["name"])
     new(key: key, name: attributes["name"], summary: attributes["summary"], text: attributes["text"], note: (attributes["note"] unless core), page: attributes["page"],
-      group: group, core: core, uses: Array(attributes["uses"]).map { Talent::Use.from(key, _1) })
+      group: group, core: core, uses: Array(attributes["uses"]).map { Talent::Use.from(key, _1) },
+      rolls: Array(attributes["rolls"]).each_with_index.map { Talent::Roll.from(key, _2, _1) })
   end
 
   def self.keyify(name)
@@ -69,13 +70,43 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
       kind == "path"
     end
 
+    # The core talent first, then the rest A to Z.
     def talents
-      Talent.all.select { |talent| talent.group == self }
+      Talent.all.select { |talent| talent.group == self }.sort_by { [ _1.core? ? 0 : 1, _1.name.downcase ] }
     end
   end
 
   def core?
     core
+  end
+
+  # What a talent does at the table, for the badges on its card. A talent
+  # with none of these is always on.
+  KINDS = %w[ Spell Roll Pool Uses Push Always ].freeze
+
+  def kinds
+    found = [
+      ("Spell" if spellcasting?),
+      ("Roll" if rolls.any?),
+      ("Pool" if uses.any?(&:pool?)),
+      ("Uses" if uses.any?(&:counter?)),
+      ("Push" if pushes?)
+    ].compact
+    found.presence || [ "Always" ]
+  end
+
+  def spellcasting?
+    text.match?(/spellcasting/i)
+  end
+
+  # "You can push yourself to…": use it, then mark a stat (pg. 21).
+  def pushes?
+    text.match?(/push yourself/i)
+  end
+
+  # A core talent's "GROWTH: At levels 3 and 6, …" line, without the label.
+  def growth
+    text[/GROWTH:\s*([^\n]+)/, 1]&.strip
   end
 
   # "One time only…" features, which thematic path talents can't use (pg. 53).
@@ -91,9 +122,10 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     prohibited_paths.include?(path)
   end
 
-  # Paragraphs, without the "[Prohibited: …]" marker (shown separately).
+  # Paragraphs, without the "[Prohibited: …]" marker (shown separately) or,
+  # for a core talent, its GROWTH line (shown on its own).
   def paragraphs
-    text.sub(/\s*\[Prohibited: [^\]]+\]/, "").split(/\n{2,}/)
+    text.sub(/\s*\[Prohibited: [^\]]+\]/, "").then { core? ? _1.sub(/GROWTH:[^\n]+/, "") : _1 }.split(/\n{2,}/).map(&:strip).compact_blank
   end
 
   def to_param

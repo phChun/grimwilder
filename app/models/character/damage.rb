@@ -55,6 +55,31 @@ module Character::Damage
     end)
   end
 
+  # Taking a mark (pg. 27), as when pushing yourself: a stat already marked
+  # takes its harm instead (bloodied for Brawn and Agility, rattled for Wits
+  # and Presence); that harm a second time makes you desperate, and harm while
+  # desperate drops you, which the sheet doesn't track. Doesn't save. Returns
+  # what happened: "marks Brawn", "is bloodied", "is desperate", "is dropped".
+  def take_mark(stat)
+    stat = stat.to_s
+    raise ArgumentError, "Pick Brawn, Agility, Wits or Presence." unless Grimwild::STATS.include?(stat)
+    outcome = mark_would_be(stat)
+    case outcome
+    when "mark" then public_send(:"marked_#{stat}=", true)
+    when "dropped" then nil
+    else public_send(:"#{outcome}=", true)
+    end
+    outcome == "mark" ? "marks #{stat.capitalize}" : "is #{outcome}"
+  end
+
+  # What taking a mark on this stat would do, for the button: "mark", "bloodied"…
+  def mark_would_be(stat)
+    return "mark" unless marked?(stat)
+
+    harm = Grimwild::PHYSICAL_STATS.include?(stat.to_s) ? "bloodied" : "rattled"
+    !public_send(harm) ? harm : (desperate? ? "dropped" : "desperate")
+  end
+
   # A significant rest (pg. 30) clears all marks and harm. Doesn't save.
   def rest(by: nil)
     self.changed_by = by if by

@@ -13,7 +13,7 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
     get character_path(@fen)
     assert_select "#talent-inspiration .use-tracker", /Inspiration/
     assert_select "#talent-inspiration button.use-box", 3
-    assert_select "#talent-inspiration", /Resets each session/
+    assert_select "#talent-inspiration .use-tracker__resets", "3 left · resets each session"
     assert_select "#talent-bardic-lore .talent-card__chip", "+1 thread each session"
     assert_select "#talents input[data-talent-uses-target=note]"
 

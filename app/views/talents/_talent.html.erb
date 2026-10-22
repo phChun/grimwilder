@@ -8,10 +8,12 @@
       pg. <%= talent.page %>
     </span>
   </header>
+  <%= render "talents/kinds", talent: talent %>
   <p class="talent__summary"><%= talent.summary %></p>
+  <% if talent.core? && talent.growth %><p class="talent-card__growth"><span class="talent-card__label">Grows</span> <%= talent.growth %></p><% end %>
   <%# The summary is our gist; the book's text and tip fold away (search still matches them). %>
   <details class="fold talent__more">
-    <summary class="fold__summary">Full text</summary>
+    <summary class="fold__summary">From the book</summary>
     <div class="talent__text">
       <% talent.paragraphs.each do |paragraph| %>
         <p><%= paragraph %></p>

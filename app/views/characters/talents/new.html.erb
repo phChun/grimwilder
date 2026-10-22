@@ -28,4 +28,4 @@
   <% end %>
 </header>
 
-<%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch %>
+<%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch, selected: params[:path] || Talent.groups.find { _1.name == @character.path }&.key %>

@@ -1,6 +1,16 @@
 require "test_helper"
 
 class TalentTest < ActiveSupport::TestCase
+  test "each path lists its core talent first, then the rest A to Z" do
+    Talent.groups.each do |group|
+      talents = group.talents
+      rest = talents.reject(&:core?)
+      assert talents.first.core?, group.name if group.path?
+      assert_equal rest.map { _1.name.downcase }.sort, rest.map { _1.name.downcase }, group.name
+    end
+    assert_equal %w[ Pact Affliction Blood\ Rituals Knowing\ Gaze ], Talent.groups.find { _1.key == "warlock" }.talents.first(4).map(&:name)
+  end
+
   test "17 paths, each with a core talent and 7 path talents, plus background talents" do
     paths = Talent.groups.select(&:path?)
     assert_equal Grimwild.paths.keys.sort, paths.map(&:name).sort
