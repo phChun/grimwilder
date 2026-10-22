@@ -125,10 +125,11 @@
       <%= render "campaigns/rolls", characters: @characters, my_characters: @my_characters %>
     </details>
 
-    <section id="crucibles" class="card crucible-row" aria-labelledby="crucible-title" data-turbo-permanent>
-      <div class="crucible-picker" data-controller="crucible-picker" data-crucible-picker-url-value="<%= crucible_path("__key__", embed: 1) %>">
+    <%# Permanent, so a morph doesn't wipe a roll; details-memory remembers whether it's open. The frame is lazy, so a closed fold doesn't load its table. %>
+    <details id="crucibles" class="card gm-fold crucible-row" data-details-memory-target="section" data-section="crucible" data-turbo-permanent data-controller="crucible-picker" data-crucible-picker-url-value="<%= crucible_path("__key__", embed: 1) %>">
+      <summary class="gm-fold__summary"><span class="gm-section__title">Crucible</span><%= icon(:chevron, size: 18) %></summary>
+      <div class="crucible-picker">
         <div class="crucible-row__head">
-          <h2 id="crucible-title" class="gm-section__title">Crucible</h2>
           <label class="visually-hidden" for="crucible-pick">Crucible table</label>
           <select id="crucible-pick" class="field__input crucible-row__pick" data-crucible-picker-target="select" data-action="crucible-picker#pick">
             <% @crucible_groups.each do |group, crucibles| %>
@@ -142,11 +143,11 @@
           <span class="visually-hidden" data-crucible-picker-target="current"><%= first_crucible.name %></span>
           <p class="crucible-picker__recent" data-crucible-picker-target="recent" hidden></p>
         </div>
-        <%= turbo_frame_tag "crucible", src: crucible_path(first_crucible, embed: 1), data: { crucible_picker_target: "frame" } do %>
+        <%= turbo_frame_tag "crucible", src: crucible_path(first_crucible, embed: 1), loading: "lazy", data: { crucible_picker_target: "frame" } do %>
           <p class="crucible__hint">Loading <%= first_crucible.name %>…</p>
         <% end %>
       </div>
-    </section>
+    </details>
   </div>
 
   <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [], quick_roll: "#rolls", classes: "fluid__rail" %>

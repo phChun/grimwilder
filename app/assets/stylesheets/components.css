@@ -1816,7 +1816,7 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .pool-new__toggle::-webkit-details-marker { display: none; }
 .pool-new__panel { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); width: min(26rem, calc(100vw - 2rem)); box-shadow: var(--shadow); }
 
-/* Rolls and crucible */
+/* Folds on the GM table: Rolls and the crucible */
 .gm-fold__summary { display: flex; align-items: center; min-height: var(--tap); list-style: none; cursor: pointer; }
 .gm-fold__summary::-webkit-details-marker { display: none; }
 .gm-fold[open] .gm-fold__summary { margin-bottom: var(--space-3); }

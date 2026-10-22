@@ -112,6 +112,7 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select ".table-rail #table_feed"
     assert_select ".table-rail form[action=?]", campaign_notes_path(@campaign)
     assert_select ".table-rail #table_feed .chat-line__body", "Ready."
-    assert_select "#crucibles turbo-frame#crucible"
+    assert_select "details#crucibles summary .gm-section__title", "Crucible"
+    assert_select "details#crucibles turbo-frame#crucible[loading=lazy]"
   end
 end
