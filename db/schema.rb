@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_22_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_22_150000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -99,6 +99,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_22_120000) do
     t.string "role", default: "player", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "seen_at"
+    t.datetime "active_at"
     t.index ["campaign_id", "identity_id"], name: "index_memberships_on_campaign_id_and_identity_id", unique: true
     t.index ["campaign_id"], name: "index_memberships_on_campaign_id"
     t.index ["identity_id"], name: "index_memberships_on_identity_id"

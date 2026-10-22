@@ -58,6 +58,10 @@
   --suspense-bg: #1f1a24;
   --suspense-line: #4a3a5a;
 
+  /* Presence halos on the rail's faces: at the table and in use, or open but idle. */
+  --presence-active: #6fcf8a;
+  --presence-idle: #e6b450;
+
   /* Type */
   --font-display: "Spectral", Georgia, serif;
   --font-ui: "IBM Plex Sans", "Helvetica Neue", sans-serif;

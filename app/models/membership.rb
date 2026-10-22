@@ -10,6 +10,26 @@ class Membership < ApplicationRecord
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
 
+  # Each open page checks in this often (presence_controller.js); a member not
+  # heard from for longer than PRESENCE_WINDOW is gone. Pages say whether
+  # they're in use; the latest of those keeps a member active.
+  PRESENCE_BEAT = 30.seconds
+  PRESENCE_WINDOW = 75.seconds
+
+  # A page checking in: always seen, and active if it's in use.
+  def check_in!(active:, at: Time.current)
+    update_columns(seen_at: at, active_at: (active ? at : active_at))
+  end
+
+  # "active" (green halo), "idle" (yellow: connected, not in use lately) or
+  # "away" (no halo: no page open).
+  def presence(now: Time.current)
+    if active_at && active_at > now - PRESENCE_WINDOW then "active"
+    elsif seen_at && seen_at > now - PRESENCE_WINDOW then "idle"
+    else "away"
+    end
+  end
+
   # The character this member plays here, if they've seated one that's still playing.
   def seated_character
     identity.characters.where(campaign: campaign).played.active.ordered.first

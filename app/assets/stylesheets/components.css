@@ -2035,13 +2035,12 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .table-rail__titles { flex: 1 1 9rem; min-width: 0; }
 .table-rail__where { margin: 0; font-size: 0.85rem; color: var(--muted); }
 
-.avatars { display: inline-flex; }
+.avatars { display: inline-flex; gap: 6px; }
 .avatar {
   display: grid;
   place-items: center;
   width: 28px;
   height: 28px;
-  margin-left: -6px;
   border: 2px solid var(--rail);
   border-radius: 50%;
   background: var(--surface-2);
@@ -2050,8 +2049,32 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
   font-weight: 600;
 }
 
-.avatar:first-child { margin-left: 0; }
 .avatar--gm { background: var(--ember-soft); color: var(--link); }
+
+/* Presence halos (presence_controller.js): the ring that separates each face
+   turns green while they have the table open and in use, yellow while it's
+   open but idle, and stays plain when no page is open. */
+.avatar { transition: border-color 200ms; }
+
+/* Hovering a face shows who it is and their presence (data-label): a popover
+   in the top layer (presence_controller.js), so the rail's clipping and
+   whatever paints over it can't hide it. */
+.face-tip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font: 500 12px/1.4 var(--font-ui);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.avatar[data-presence="active"] { border-color: var(--presence-active); }
+.avatar[data-presence="idle"] { border-color: var(--presence-idle); }
 
 .feed { position: relative; display: flex; flex-direction: column; gap: var(--space-3); padding: 12px 14px 0; }
 .feed__filter { grid-template-columns: repeat(3, 1fr); }

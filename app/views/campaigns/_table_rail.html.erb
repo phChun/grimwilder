@@ -8,16 +8,17 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-gm-value="<%= gm %>" data-feed-session-value="<%= session.present? %>">
+<section class="<%= class_names("table-rail", classes) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-gm-value="<%= gm %>" data-feed-session-value="<%= session.present? %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>
       <p class="table-rail__where"><%= session ? [ session.title, scene&.title ].compact.join(" · ") : "Between sessions" %></p>
     </div>
     <% if suspense %><%= render "campaigns/suspense_meter", campaign: campaign %><% end %>
-    <span class="avatars" role="img" aria-label="At the table: <%= campaign.identities.map(&:display_name).to_sentence %>">
+    <%# Who's at the table, haloed by presence_controller.js: green in use, yellow idle, plain when away. Hovering one shows its name and presence (data-label, in presence_controller.js's tooltip). %>
+    <span class="avatars" role="group" aria-label="At the table">
       <% campaign.memberships.includes(:identity).order(:role, :created_at).first(5).each do |member| %>
-        <span class="<%= class_names("avatar", "avatar--gm": member.gm?) %>" aria-hidden="true"><%= initial(member.identity.display_name) %></span>
+        <span class="<%= class_names("avatar", "avatar--gm": member.gm?) %>" role="img" aria-label="<%= member.identity.display_name %>" data-label="<%= member.identity.display_name %>" data-presence-identity="<%= member.identity_id %>" data-presence-name="<%= member.identity.display_name %>"><%= initial(member.identity.display_name) %></span>
       <% end %>
     </span>
   </div>

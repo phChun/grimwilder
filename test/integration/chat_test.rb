@@ -80,9 +80,19 @@ class ChatTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
 
-    assert_select ".table-rail[data-controller=feed] .feed__scroller[data-feed-target=scroller]"
+    assert_select ".table-rail[data-controller~=feed] .feed__scroller[data-feed-target=scroller]"
     assert_select ".table-rail button.feed__new[hidden][data-action='feed#latest']"
     assert_select "##{dom_id(note)}[data-identity=?]", identities(:gwen).id.to_s
+  end
+
+  test "the faces atop the rail are marked for presence_controller.js to halo" do
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+
+    assert_select ".table-rail[data-controller~=presence][data-presence-campaign-value=?]", @campaign.id.to_s
+    assert_select ".table-rail__head .avatars[role=group] .avatar", 2
+    assert_select ".avatar.avatar--gm[role=img][aria-label=?][data-label=?][data-presence-identity=?][data-presence-name=?]", identities(:gwen).display_name, identities(:gwen).display_name, identities(:gwen).id.to_s, identities(:gwen).display_name
+    assert_select ".avatar:not(.avatar--gm)[data-presence-identity=?]", identities(:pip).id.to_s
   end
 
   test "whispers never reach another player's page" do
