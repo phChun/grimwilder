@@ -1980,6 +1980,17 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 
 .campaign-hero__action { flex: 1 1 340px; max-width: 420px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-3); padding: 20px; }
 .campaign-hero__go { min-height: 52px; font-size: 1.05rem; }
+
+/* "Open my character" for a player with several here: a button with a menu. */
+.go-menu { position: relative; }
+.go-menu__button { display: flex; justify-content: center; gap: var(--space-2); list-style: none; cursor: pointer; }
+.go-menu__button::-webkit-details-marker { display: none; }
+.go-menu[open] .go-menu__button .icon { transform: rotate(180deg); }
+.go-menu__list { position: absolute; z-index: 15; left: 0; right: 0; top: calc(100% + 4px); display: grid; gap: 2px; margin: 0; padding: var(--space-1); list-style: none; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: var(--shadow); }
+.go-menu__item { display: grid; gap: 2px; min-height: var(--tap); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); color: var(--text); text-decoration: none; }
+.go-menu__item:hover, .go-menu__item:focus-visible { background: var(--surface-2); }
+.go-menu__name { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+.go-menu__meta { font-size: 0.85rem; color: var(--dim); }
 .copy-invite { width: 100%; }
 .campaign-hero__hint { margin: 0; font-size: 0.87rem; color: var(--muted); }
 .inline-button { display: inline; margin: 0; }

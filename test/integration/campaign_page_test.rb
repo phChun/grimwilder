@@ -39,6 +39,21 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".campaign-hero__action button", 0, "no invite link for players"
   end
 
+  test "a player with two characters here picks which to open" do
+    moss = identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+
+    assert_select ".eyebrow", /Playing Tibbs and Moss/
+    assert_select ".campaign-hero__action a.button--primary", 0
+    assert_select ".campaign-hero__action details.go-menu" do
+      assert_select "summary.button--primary", /Open my character/
+      assert_select ".go-menu__item", 2
+      assert_select ".go-menu__item[href=?]", character_path(moss), /Moss\s+Druid · level 1/
+      assert_select ".go-menu__item[href=?]", character_path(characters(:tibbs))
+    end
+  end
+
   test "the party: a card per active character, a dashed one for a member still making theirs, and the fallen and retired below" do
     characters(:tibbs).update!(bloodied: true, marked_agility: true, conditions: [ "4d poisoned" ])
     characters(:bram).update!(status: "fallen")

@@ -12,7 +12,7 @@
 <div class="campaign-page" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
   <section class="campaign-hero" aria-labelledby="campaign-name">
     <div class="campaign-hero__about">
-      <p class="eyebrow">Campaign · <%= gm ? "You're the GM" : (@mine ? "Playing #{@mine.short_name}" : "You're a player") %></p>
+      <p class="eyebrow">Campaign · <%= gm ? "You're the GM" : (@mine ? "Playing #{@mine_all.map(&:short_name).to_sentence}" : "You're a player") %></p>
       <h1 id="campaign-name" class="campaign-hero__title"><%= campaign.name %></h1>
       <% if campaign.pitch.present? %>
         <p class="campaign-hero__pitch"><%= campaign.pitch %></p>
@@ -37,6 +37,21 @@
           Anyone with the link joins as a player and goes straight to making a character.
           <%= button_to "Reset link", campaign_join_code_path(campaign), method: :patch, class: "link-button", form: { class: "inline-button", data: { turbo_confirm: "The current link will stop working. Continue?" } } %>
         </p>
+      <% elsif @mine_all.many? %>
+        <%# More than one character here: the button opens a menu of their sheets. %>
+        <details id="open-character" class="go-menu" data-controller="menu" data-action="toggle->menu#place">
+          <summary class="button button--primary campaign-hero__go go-menu__button">Open my character <%= icon(:chevron, size: 16) %></summary>
+          <ul class="go-menu__list" data-menu-target="panel">
+            <% @mine_all.each do |character| %>
+              <li>
+                <%= link_to character_path(character), class: "go-menu__item" do %>
+                  <span class="go-menu__name"><%= character.name %></span>
+                  <span class="go-menu__meta"><%= character.path %> · level <%= character.level %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </details>
       <% elsif @mine %>
         <%= link_to "Open my character", character_path(@mine), class: "button button--primary campaign-hero__go" %>
       <% else %>

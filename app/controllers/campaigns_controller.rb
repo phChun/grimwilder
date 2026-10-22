@@ -67,6 +67,7 @@ class CampaignsController < ApplicationController
       @older = ended.offset(1).limit(OLDER_SESSIONS).to_a
       @session_count = Current.campaign.play_sessions.count
       @hidden_pools = gm? ? @pools.count(&:hidden?) : 0
-      @mine = Current.membership.seated_character
+      @mine_all = Current.membership.seated_characters.to_a
+      @mine = @mine_all.first
     end
 end
