@@ -145,8 +145,8 @@
             <% end %>
           </select>
           <span class="visually-hidden" data-crucible-picker-target="current"><%= first_crucible.name %></span>
+          <p class="crucible-picker__recent" data-crucible-picker-target="recent" hidden></p>
         </div>
-        <p class="crucible-picker__recent" data-crucible-picker-target="recent" hidden></p>
         <%= turbo_frame_tag "crucible", src: crucible_path(first_crucible, embed: 1), data: { crucible_picker_target: "frame" } do %>
           <p class="crucible__hint">Loading <%= first_crucible.name %>…</p>
         <% end %>

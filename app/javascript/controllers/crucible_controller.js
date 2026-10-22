@@ -80,7 +80,10 @@ export default class extends Controller {
 
       const label = document.createElement("p")
       label.className = "roll-result__label"
-      label.textContent = `${roll.name} · rolled ${roll.dice.join(" and ")}`
+      const dice = document.createElement("span")
+      dice.className = "roll-result__roll"
+      dice.textContent = `rolled ${roll.dice.join(" and ")}`
+      label.append(`${roll.name} `, dice)
       block.append(label)
 
       const chips = document.createElement("div")

@@ -950,13 +950,79 @@ form.button_to, .button_to { margin: 0; }
 .crucible-picker__label { margin-right: var(--space-1); font-size: 0.8rem; color: var(--ink-faint); }
 .chip--small { padding: 2px var(--space-3); font-size: 0.85rem; }
 
-.crucible--compact { display: grid; gap: var(--space-3); }
-.crucible--compact .crucible__hint { font-size: 0.9rem; }
-.crucible--compact .roll-result__smash { font-size: 1.6rem; }
-.crucible--compact .crucible__kept { border-top: 0; padding-top: 0; }
-.crucible--compact .fold__title { font-family: var(--font-body); font-size: 1rem; font-weight: 700; }
-.crucible--compact .crucible__tables { margin-top: var(--space-3); }
+.roll-result__roll { font-family: var(--font-dice); font-size: 0.8rem; color: var(--dim); white-space: nowrap; }
+
+/* The GM table's roller: results as tiles, the smash as a band, and the kept
+   list as a panel on the right once the card is wide enough. */
+.crucible--compact { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+.crucible__stage { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
 .crucible__full { margin-left: auto; font-size: 0.85rem; }
+
+.crucible--compact .crucible__results { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--space-3); }
+.crucible--compact .crucible__hint {
+  grid-column: 1 / -1;
+  padding: var(--space-5) var(--space-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-control);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.crucible--compact .roll-result {
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-control);
+}
+
+.crucible--compact .roll-result__label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.crucible--compact .roll-result__roll { letter-spacing: 0; text-transform: none; font-weight: 500; }
+
+.crucible--compact .roll-result__smash {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--ember-soft);
+  border-left: 3px solid var(--ember);
+  border-radius: var(--radius-sm);
+  font-size: 1.6rem;
+}
+
+.crucible--compact .crucible__kept {
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--rail);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-control);
+}
+
+.crucible--compact .crucible__kept .fold__title { font-family: var(--font-ui); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.crucible--compact .crucible__kept-list { display: grid; gap: var(--space-2); max-height: 16rem; overflow-y: auto; font-family: var(--font-display); font-size: 1.05rem; }
+.crucible--compact .crucible__kept-list li::marker { font-family: var(--font-dice); font-size: 0.8rem; color: var(--dim); }
+
+.crucible--compact .crucible__grids { padding-top: var(--space-4); border-top: 1px solid var(--line-soft); }
+.crucible--compact .crucible__grids .fold__title { font-family: var(--font-ui); font-size: 1rem; font-weight: 600; color: var(--text-soft); }
+.crucible--compact .crucible__tables { margin-top: var(--space-4); }
+
+@container crucible (min-width: 46rem) {
+  .crucible--compact:has(> .crucible__kept:not([hidden])) { grid-template-columns: minmax(0, 1fr) 17rem; }
+  .crucible--compact .crucible__grids { grid-column: 1 / -1; }
+}
 
 /* ---------- Sessions & scenes ---------- */
 
@@ -1688,8 +1754,10 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .gm-fold__summary::-webkit-details-marker { display: none; }
 .gm-fold[open] .gm-fold__summary { margin-bottom: var(--space-3); }
 
-.crucible-row__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
-.crucible-row__pick { flex: 1 1 14rem; max-width: 22rem; min-height: var(--tap); }
+.crucible-row { container: crucible / inline-size; }
+.crucible-row__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); margin-bottom: var(--space-5); }
+.crucible-row__pick { flex: 1 1 14rem; max-width: 20rem; min-height: var(--tap); }
+.crucible-row__head .crucible-picker__recent { margin-left: auto; }
 
 /* ---------- Campaign page (campaigns#show) ---------- */
 
