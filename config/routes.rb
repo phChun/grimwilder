@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       resource :table, only: :show
       resources :memberships, only: :destroy
       resources :story_rolls, only: :create
+      resource :feed, only: :show # older lines for the table rail, as you scroll back
       resources :quarrels, only: %i[ new create ]
       resources :montages, only: %i[ new create ]
       # The story roll, montage or quarrel waiting on its players (RollCall)

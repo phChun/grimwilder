@@ -1,6 +1,4 @@
 class CharactersController < ApplicationController
-  LOG_SIZE = 20
-
   require_authentication
 
   before_action :set_character, only: %i[ show edit update destroy ]
@@ -55,7 +53,7 @@ class CharactersController < ApplicationController
 
       if (campaign = @character.campaign)
         @membership = Current.identity.memberships.find_by!(campaign: campaign)
-        @feed = TableFeed.new(campaign, @membership, rolls: LOG_SIZE)
+        @feed = TableFeed.new(campaign, @membership)
         @speakers = Current.identity.characters.where(campaign: campaign).played.active.ordered
       end
     end

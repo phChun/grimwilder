@@ -1664,7 +1664,7 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 /* Wide screens: the rail sticks beside the page at the viewport's height, and
    the feed takes what's left, so the composer is always in view. */
 @media (min-width: 60rem) {
-  .fluid__rail.table-rail { position: sticky; top: var(--space-4); max-height: calc(100vh - 2 * var(--space-4)); }
+  .fluid__rail.table-rail { position: sticky; top: var(--space-4); max-height: min(80vh, calc(100vh - 2 * var(--space-4))); }
   .fluid__rail.table-rail .feed { flex: 1 1 auto; min-height: 0; }
   .fluid__rail.table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
 }
@@ -2112,7 +2112,9 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .feed__filter { grid-template-columns: repeat(3, 1fr); }
 
 /* Newest at the bottom: a column-reverse scroller stays pinned to the newest line as lines arrive. */
-.feed__scroller { display: flex; flex-direction: column-reverse; max-height: min(70vh, 40rem); overflow-y: auto; }
+.feed__scroller { display: flex; flex-direction: column-reverse; max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; }
+.feed__older { min-height: 1px; margin: 0 0 var(--space-3); text-align: center; font-size: 0.85rem; color: var(--dim); }
+.feed__older:empty { margin: 0; }
 .feed__items { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0 0 var(--space-3); list-style: none; }
 .feed__items:has(li) + .feed__empty { display: none; }
 .feed__empty { margin: 0 0 var(--space-3); }

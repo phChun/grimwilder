@@ -30,12 +30,31 @@ class TableLogTest < ActionDispatch::IntegrationTest
     assert_select "turbo-cable-stream-source", 7, "pool and table refreshes, the live banner, both logs, the chat and the GM's stream"
   end
 
-  test "the table shows the newest #{CampaignTable::LOG_SIZE} log entries" do
-    (CampaignTable::LOG_SIZE + 2).times { characters(:tibbs).roll!("wits", by: identities(:pip)) }
+  test "the rail shows the newest #{TableFeed::PAGE} lines, and scrolling back loads the rest" do
+    (TableFeed::PAGE + 2).times { |n| characters(:tibbs).roll!("wits", by: identities(:pip)).update_columns(created_at: (200 - n).minutes.ago) }
+    5.times { |n| @campaign.messages.create!(identity: identities(:pip), kind: "table_talk", body: "line #{n}", created_at: (100 - n).minutes.ago) }
 
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select "#table_feed > li", CampaignTable::LOG_SIZE
+    assert_select "#table_feed > li", TableFeed::PAGE
+    rail = css_select(".table-rail[data-controller~=feed]").first
+    assert_equal "true", rail["data-feed-more-value"]
+    assert_equal campaign_feed_path(@campaign), rail["data-feed-older-url-value"]
+    assert_select ".feed__scroller .feed__older[data-feed-target=older]"
+
+    get campaign_feed_path(@campaign, before: rail["data-feed-before-value"])
+    assert_response :success
+    assert_select "[data-feed-page][data-more=false] > li", 7, "the two rolls and five lines before the page, none skipped"
+    assert_select "[data-feed-page] > li.feed-item--dice", 7
+
+    get campaign_feed_path(@campaign, before: "not a time")
+    assert_response :bad_request
+  end
+
+  test "outsiders can't scroll back through a table" do
+    sign_in_as identities(:stranger)
+    get campaign_feed_path(@campaign, before: Time.current.iso8601(6))
+    assert_response :not_found
   end
 
   test "a disaster shows the spark it gave" do

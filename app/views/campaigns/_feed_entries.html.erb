@@ -1,0 +1,9 @@
+<%# locals: (feed:) %>
+<%# A TableFeed page's lines, oldest first: in the rail, and as an older page loads (campaigns/_feed_page). %>
+<% feed.entries.each do |entry| %>
+  <% if entry.is_a?(Message) %>
+    <%= render "messages/message", message: entry %>
+  <% else %>
+    <%= render "rolls/feed_item", roll: entry %>
+  <% end %>
+<% end %>

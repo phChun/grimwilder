@@ -1,0 +1,5 @@
+<%# locals: (feed:) %>
+<%# An older page of the table rail (Campaigns::FeedsController), which feed_controller.js puts above what's showing: its lines, and where the next page back starts. %>
+<div data-feed-page data-before="<%= feed.oldest_at&.iso8601(6) %>" data-more="<%= feed.more? %>">
+  <%= render "campaigns/feed_entries", feed: feed %>
+</div>
