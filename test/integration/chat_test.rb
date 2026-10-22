@@ -1,7 +1,7 @@
 require "test_helper"
 
 # The table rail: chat and log in one stream, the composer's speak-as picker,
-# whispers to the GM, the filters and the best-moment star.
+# whispers to the GM and the filters.
 class ChatTest < ActionDispatch::IntegrationTest
   setup { @campaign = campaigns(:bramblewood) }
 
@@ -136,54 +136,5 @@ class ChatTest < ActionDispatch::IntegrationTest
     get character_path(characters(:loner))
     assert_select ".play-view--solo", 1
     assert_select ".table-rail", 0
-  end
-
-  test "the star nominates a best moment, which fills in the next session's prompt" do
-    gwen, pip = identities(:gwen), identities(:pip)
-    session = PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: gwen)
-    line = @campaign.messages.create!(identity: pip, kind: "in_character", character: characters(:tibbs), body: "I'm going up the wheel.")
-    talk = @campaign.messages.create!(identity: pip, body: "lol")
-
-    sign_in_as pip
-    get character_path(characters(:tibbs))
-    assert_select "##{dom_id(line)} button.feed-item__star[data-url=?]", campaign_message_nomination_path(@campaign, line)
-    assert_select "##{dom_id(talk)} button.feed-item__star", 0, "table talk can't be a moment"
-
-    post campaign_message_nomination_path(@campaign, line), as: :turbo_stream
-    assert_response :no_content
-    assert_equal [ "I'm going up the wheel." ], session.nominations.pluck(:text)
-
-    post campaign_message_nomination_path(@campaign, talk), as: :turbo_stream
-    assert_response :unprocessable_entity
-
-    session.end!(by: gwen)
-    PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: gwen)
-    get campaign_path(@campaign)
-    assert_select "#moment-prompt textarea[name=text]", "I'm going up the wheel."
-  end
-
-  test "only the character's player or the GM can star their line" do
-    PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
-    line = @campaign.messages.create!(identity: identities(:pip), kind: "in_character", character: characters(:tibbs), body: "Up the wheel.")
-    @campaign.memberships.create!(identity: identities(:stranger), role: :player)
-
-    sign_in_as identities(:stranger)
-    post campaign_message_nomination_path(@campaign, line), as: :turbo_stream
-    assert_response :unprocessable_entity
-
-    sign_out
-    sign_in_as identities(:gwen)
-    post campaign_message_nomination_path(@campaign, line), as: :turbo_stream
-    assert_response :no_content
-  end
-
-  test "nobody can star a whisper they can't see" do
-    PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
-    whisper = @campaign.messages.create!(identity: identities(:pip), kind: "whisper", body: "psst")
-    @campaign.memberships.create!(identity: identities(:stranger), role: :player)
-
-    sign_in_as identities(:stranger)
-    post campaign_message_nomination_path(@campaign, whisper), as: :turbo_stream
-    assert_response :not_found
   end
 end

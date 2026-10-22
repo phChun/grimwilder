@@ -10,58 +10,7 @@
 </header>
 
 <div class="session-page">
-  <section class="panel stack" aria-labelledby="session-recap">
-    <h2 id="session-recap" class="panel__title">Previously on…</h2>
-    <% if @session.recap.present? %><p class="session-page__text"><%= @session.recap %></p><% elsif !@session.first? %><p class="empty">No recap.</p><% end %>
-    <% if @session.notes.present? %>
-      <h3 class="fold__heading">Notes</h3>
-      <p class="session-page__text"><%= @session.notes %></p>
-    <% end %>
-    <% if gm? %>
-      <details class="fold">
-        <summary class="fold__summary"><span class="fold__title session-page__edit">Edit recap and notes</span></summary>
-        <%= form_with model: @session, url: campaign_play_session_path(Current.campaign, @session), class: "stack" do |form| %>
-          <div class="field">
-            <%= form.label :recap, "Previously on…", class: "field__label" %>
-            <%= form.text_area :recap, rows: 5, class: "field__input" %>
-          </div>
-          <div class="field">
-            <%= form.label :notes, "Notes", class: "field__label" %>
-            <%= form.text_area :notes, rows: 4, class: "field__input" %>
-          </div>
-          <%= form.submit "Save", class: "button button--small" %>
-        <% end %>
-      </details>
-    <% end %>
-  </section>
-
-  <section id="moments" class="panel stack" aria-labelledby="session-moments">
-    <h2 id="session-moments" class="panel__title">Best moments from last session</h2>
-    <% if @session.moments.any? %>
-      <ul class="list">
-        <% @session.moments.includes(:character).each do |moment| %>
-          <li class="list__item"><span><strong><%= moment.character.name %></strong> <%= moment.text %></span></li>
-        <% end %>
-      </ul>
-    <% elsif @session.first? %>
-      <p class="empty">Session 1 has no last session.</p>
-    <% else %>
-      <p class="empty">None shared yet.</p>
-    <% end %>
-    <% if @session.open? && (writable = @session.characters_needing_moments(Current.identity)).any? %>
-      <%= render "campaigns/play_sessions/moment_form", session: @session, characters: writable, return_to: "session" %>
-    <% end %>
-  </section>
-
-  <section class="panel stack" aria-labelledby="session-attendance">
-    <h2 id="session-attendance" class="panel__title">Who was there</h2>
-    <% if @session.characters.any? %>
-      <p><%= safe_join(@session.characters.ordered.map { link_to(_1.name, character_path(_1)) }, ", ") %></p>
-    <% else %>
-      <p class="empty">No one was marked present.</p>
-    <% end %>
-  </section>
-
+  <%# The log first (each scene with its rolls, then anything outside scenes), then the recap, notes and who was there. %>
   <% @session.scenes.ordered.each do |scene| %>
     <section id="<%= dom_id(scene) %>" class="panel stack session-scene" aria-labelledby="<%= dom_id(scene, :title) %>">
       <h2 id="<%= dom_id(scene, :title) %>" class="panel__title">Scene <%= scene.number %>: <%= scene.title %></h2>
@@ -96,4 +45,38 @@
       <ol class="roll-log"><%= render partial: "rolls/roll", collection: loose, as: :roll %></ol>
     </section>
   <% end %>
+
+  <section class="panel stack" aria-labelledby="session-recap">
+    <h2 id="session-recap" class="panel__title">Previously on…</h2>
+    <% if @session.recap.present? %><p class="session-page__text"><%= @session.recap %></p><% elsif !@session.first? %><p class="empty">No recap.</p><% end %>
+    <% if @session.notes.present? %>
+      <h3 class="fold__heading">Notes</h3>
+      <p class="session-page__text"><%= @session.notes %></p>
+    <% end %>
+    <% if gm? %>
+      <details class="fold">
+        <summary class="fold__summary"><span class="fold__title session-page__edit">Edit recap and notes</span></summary>
+        <%= form_with model: @session, url: campaign_play_session_path(Current.campaign, @session), class: "stack" do |form| %>
+          <div class="field">
+            <%= form.label :recap, "Previously on…", class: "field__label" %>
+            <%= form.text_area :recap, rows: 5, class: "field__input" %>
+          </div>
+          <div class="field">
+            <%= form.label :notes, "Notes", class: "field__label" %>
+            <%= form.text_area :notes, rows: 4, class: "field__input" %>
+          </div>
+          <%= form.submit "Save", class: "button button--small" %>
+        <% end %>
+      </details>
+    <% end %>
+  </section>
+
+  <section class="panel stack" aria-labelledby="session-attendance">
+    <h2 id="session-attendance" class="panel__title">Who was there</h2>
+    <% if @session.characters.any? %>
+      <p><%= safe_join(@session.characters.ordered.map { link_to(_1.name, character_path(_1)) }, ", ") %></p>
+    <% else %>
+      <p class="empty">No one was marked present.</p>
+    <% end %>
+  </section>
 </div>

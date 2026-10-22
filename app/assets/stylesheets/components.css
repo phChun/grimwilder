@@ -1082,12 +1082,10 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .use-note { font-size: 0.85rem; }
 .pool-rows--sheet { margin-top: var(--space-2); }
 
-.moment-form { max-width: 36rem; }
 .session-form__scenes { margin: var(--space-1) 0 0; padding-left: 1.3em; }
 
-/* A grid of folds, newest first; an open one spans the row to show its log. */
-.session-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); align-items: start; }
-.session-list > li:has(> details[open]) { grid-column: 1 / -1; }
+/* One column of folds, newest first, each holding its log. */
+.session-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
 .session-card { display: grid; gap: var(--space-1); }
 .session-card__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
 .session-card__title { margin: 0; font-size: 1.4rem; }
@@ -1103,6 +1101,14 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .session-card__body { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
 .session-card__scene { margin: var(--space-2) 0 0; font-size: 1rem; color: var(--ink-soft); }
 .session-card__open { justify-self: start; margin-top: var(--space-2); }
+
+/* The Log page split in two: the rolls' folds, and the recaps beside them. */
+.session-history__title { margin: 0 0 var(--space-3); font-size: 1.1rem; color: var(--ink-soft); }
+.recap-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.recap-card__title { margin: 0; margin-right: auto; font-size: 1.15rem; }
+.recap-card__body { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
+.recap-card__label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ember); }
+.recap-card .session-card__recap { margin: 0; white-space: pre-line; }
 
 .session-page { display: grid; gap: var(--space-4); max-width: 48rem; }
 .session-page__text { margin: 0; white-space: pre-line; }
@@ -2033,21 +2039,6 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .previously__scene { flex: 1; }
 .previously__outcome { font-size: 0.85rem; color: var(--muted); text-align: right; }
 
-.previously__moment {
-  flex: 1 1 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 22px;
-  border-left: 1px solid var(--line);
-  background: var(--surface-2);
-}
-
-.previously__label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ember); }
-.previously__quote { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 1.35rem; line-height: 1.4; }
-.previously__by { margin: 0; font-size: 0.87rem; color: var(--muted); }
-
 .older-sessions { margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
 .older-sessions li + li { border-top: 1px solid var(--line-soft); }
 
@@ -2249,23 +2240,6 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__card--whisper { border: 1px dashed var(--suspense-line); }
 .chat-line__label { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ember); }
 .chat-line__card--whisper .chat-line__label { color: var(--suspense-text); letter-spacing: 0.02em; text-transform: none; font-size: 12px; }
-
-.feed-item__star {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: var(--tap);
-  padding: 0 var(--space-2);
-  border: 0;
-  background: none;
-  color: var(--dim);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.feed-item__star:hover { color: var(--spark); }
-.feed-item__star--done { color: var(--spark); }
-.feed-item__star[hidden] { display: none; }
 
 /* Composer */
 .composer { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 12px 14px; border-top: 1px solid var(--line-soft); }

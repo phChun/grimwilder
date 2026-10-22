@@ -61,7 +61,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".party-gone", /Bram, Fighter 1, fallen/
   end
 
-  test "previously on: the last session's scenes and outcomes, its best moment, and older sessions" do
+  test "previously on: the last session's scenes and outcomes, and older sessions" do
     gwen = identities(:gwen)
     first = PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: gwen)
     first.end!(by: gwen)
@@ -70,8 +70,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     scene.end!(by: gwen)
     Scene.start!(second, title: "Road to the mill", by: gwen).end!(by: gwen)
     second.end!(by: gwen)
-    third = PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: gwen)
-    third.moments.create!(character: characters(:tibbs), identity: identities(:pip), text: "Tibbs talked the toll-keeper round.")
+    PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: gwen)
     sign_in_as identities(:pip)
 
     get campaign_path(@campaign)
@@ -80,8 +79,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".previously__recap", "The ferry burned."
     assert_select ".previously__scenes li", 2
     assert_select ".previously__scenes li:first-child .previously__outcome", /\Astory roll · (perfect|messy|grim|disaster)\z/
-    assert_select ".previously__quote", "Tibbs talked the toll-keeper round."
-    assert_select ".previously__by", "Tibbs · written by Pip"
+    assert_select ".previously__quote", 0, "no best moments"
     assert_select ".older-sessions__number", "S1"
     assert_select ".older-sessions__all[href=?]", campaign_play_sessions_path(@campaign), "All 3 sessions"
   end

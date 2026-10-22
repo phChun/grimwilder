@@ -27,14 +27,24 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     assert_select "details##{dom_id(@first, :log)}:not([open])" do
       assert_select "summary .session-card__title", "Session 1"
       assert_select "summary .session-card__date", /· \d+ entries/
-      assert_select "h3.session-card__scene", "Scene 1: The bridge at Mirefall"
+      assert_select "h4.session-card__scene", "Scene 1: The bridge at Mirefall"
       assert_select "##{dom_id(@in_scene)}"
       assert_select "##{dom_id(@hidden)}", 0, "GM-only rolls stay hidden"
-      assert_select "a.session-card__open[href=?]", campaign_play_session_path(@campaign, @first)
+      assert_select ".session-card__recap, .session-card__meta", 0, "recaps sit beside the rolls"
     end
-    assert_select ".session-list[data-controller=details-memory] details[data-details-memory-target=section]", 5
+    assert_select ".session-history[data-controller=details-memory] details[data-details-memory-target=section]", 7, "5 log folds and 2 recap folds"
     assert_select ".session-list > li:first-child details#between-since[open][data-phone-open=true]", 1, "the newest starts open"
-    assert_select ".session-card__meta", /1 scene · 1 character there · \+2 XP \(standout\) · Gibbletibble "Tibbs" reached level 2/
+
+    assert_select ".session-history > .fluid__rail .recap-list" do
+      assert_select "details", 2
+      assert_select "li:first-child details##{dom_id(second, :recap)}[open]", 1, "the newest recap starts open"
+      assert_select "details##{dom_id(@first, :recap)}:not([open])" do
+        assert_select "summary .recap-card__title", "Session 1"
+        assert_select ".session-card__recap", "Next: the Mire."
+        assert_select ".session-card__meta", /1 scene · 1 character there · \+2 XP \(standout\) · Gibbletibble "Tibbs" reached level 2/
+        assert_select "a.session-card__open[href=?]", campaign_play_session_path(@campaign, @first)
+      end
+    end
     assert_select ".session-before", 0, "no single Before sessions box"
 
     cards = css_select(".session-list > li").map { _1.at_css(".session-card__title").text.strip + " | " + _1.at_css(".session-card__date").text.strip }
@@ -57,6 +67,9 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(@hidden)}", 0
     assert_select "a[href=?]", character_path(@tibbs), text: @tibbs.name
     assert_select ".session-page__edit", 0, "players can't edit"
+
+    sections = css_select(".session-page > section").map { _1.at_css("h2")&.text }
+    assert_equal [ "Scene 1: The bridge at Mirefall", "Outside scenes", "Previously on…", "Who was there" ], sections, "the rolls first, then the recap"
   end
 
   test "the GM edits the recap, notes and a scene afterwards" do
@@ -80,31 +93,7 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "players are prompted for a best moment until they've shared one" do
-    session = PlaySession.start!(@campaign, characters: [ @tibbs, characters(:bram) ], by: identities(:gwen))
-    sign_in_as identities(:gwen)
-    get campaign_path(@campaign) # the GM is prompted only for their own character
-    assert_select "#moment-prompt input[name=character_id][value=?]", characters(:bram).id.to_s
-
-    sign_out
-    sign_in_as identities(:pip)
-    get campaign_path(@campaign)
-    assert_select "#moment-prompt input[name=character_id][value=?]", @tibbs.id.to_s
-
-    post campaign_play_session_moments_path(@campaign, session), params: { character_id: characters(:bram).id, text: "Not mine" }
-    assert_response :forbidden
-
-    post campaign_play_session_moments_path(@campaign, session), params: { character_id: @tibbs.id, text: "Talked the troll down." }
-    assert_redirected_to campaign_path(@campaign)
-
-    follow_redirect!
-    assert_select "#moment-prompt", 0
-
-    get campaign_play_session_path(@campaign, session)
-    assert_select "#moments", /Talked the troll down\./
-  end
-
-  test "the next session's form shows last session's scenes and moments as prompts" do
+  test "the next session's form shows last session's scenes and notes as prompts" do
     sign_in_as identities(:gwen)
 
     get new_campaign_play_session_path(@campaign)
@@ -112,8 +101,7 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     assert_select ".session-form__scenes", /The bridge at Mirefall: Across, barely\./
 
     second = PlaySession.start!(@campaign, characters: [ @tibbs ], by: identities(:gwen))
-    second.moments.create!(character: @tibbs, identity: identities(:pip), text: "Talked the troll down.")
-    second.end!(by: identities(:gwen))
+    second.end!(by: identities(:gwen), notes: "Talked the troll down.")
 
     get new_campaign_play_session_path(@campaign)
     assert_select "h1", "Start session 3"

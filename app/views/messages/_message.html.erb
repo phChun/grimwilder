@@ -1,26 +1,19 @@
 <%# locals: (message:) %>
-<%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right and shows the best-moment star to whoever may pick it. %>
+<%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right. %>
 <% time = capture do %><time class="feed-item__time" datetime="<%= message.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= message.created_at.utc.strftime("%H:%M UTC") %></time><% end %>
-<% star = capture do %>
-  <% if message.nominatable? %>
-    <button type="button" class="feed-item__star" hidden data-feed-target="star" data-action="feed#star" data-url="<%= campaign_message_nomination_path(message.campaign, message) %>"><%= icon(:star, size: 14) %> Best moment</button>
-  <% end %>
-<% end %>
-<li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": !message.story?) %>" data-identity="<%= message.identity_id %>" data-owner="<%= message.character&.identity_id || message.identity_id %>" data-kind="<%= message.kind %>">
+<li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": !message.story?) %>" data-identity="<%= message.identity_id %>" data-kind="<%= message.kind %>">
   <% case message.kind %>
   <% when "narration" %>
     <div class="chat-line__card chat-line__card--narration">
       <p class="chat-line__label">GM · Cut to <%= time %></p>
       <p class="chat-line__body chat-line__body--voice"><%= chat_format(message.body) %></p>
     </div>
-    <%= star %>
   <% when "npc" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--npc"><%= message.name %></strong> <span class="chat-line__note">voiced by GM</span> <%= time %></p>
     <p class="chat-line__bubble chat-line__bubble--npc chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
   <% when "in_character" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--character"><%= message.name %></strong> <span class="chat-line__note">in character · <%= message.identity.display_name %></span> <%= time %></p>
     <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
-    <%= star %>
   <% when "whisper" %>
     <div class="chat-line__card chat-line__card--whisper">
       <p class="chat-line__label"><%= icon(:lock, size: 13) %> <%= message.name %> to the GM · only you and the GM <%= time %></p>

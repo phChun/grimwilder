@@ -49,14 +49,6 @@
     </div>
   </section>
 
-  <% if @session && (writable = @session.characters_needing_moments(Current.identity).select { _1.owned_by?(Current.identity) }).any? %>
-    <details id="moment-prompt" class="card moment-prompt" open data-details-memory-target="section" data-section="moments-<%= @session.id %>" data-phone-open="true">
-      <summary class="fold__summary"><span class="fold__title">Best moment from last session</span><span class="fold__meta">close to dismiss</span></summary>
-      <p class="field__hint">Recall last session and share your character's best moment (pg. 31).</p>
-      <%= render "campaigns/play_sessions/moment_form", session: @session, characters: writable %>
-    </details>
-  <% end %>
-
   <div class="fluid">
     <div class="fluid__main campaign-page__main">
       <section id="party" class="gm-section" aria-labelledby="party-title">
@@ -154,13 +146,6 @@
                 </ol>
               <% end %>
             </div>
-            <% if (moment = @previous.moments_about.first) %>
-              <div class="previously__moment">
-                <p class="previously__label">Best moment</p>
-                <blockquote class="previously__quote"><%= moment.text %></blockquote>
-                <p class="previously__by"><%= moment.character.short_name %> · written by <%= moment.identity.display_name %></p>
-              </div>
-            <% end %>
           </article>
 
           <ol class="older-sessions">

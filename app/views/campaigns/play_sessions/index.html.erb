@@ -5,52 +5,87 @@
   <h1>Sessions</h1>
 </header>
 
-<%# Newest first: what's happened since the last session, then each session with the stretch between it and the one before. Each is a fold holding its log; the newest starts open, and details-memory keeps what people open or close. %>
+<%# Split in two, newest first. The log: what's happened since the last session, then each session with the stretch between it and the one before, each a fold holding its rolls. Beside it, the recaps: a fold per session. The newest of each starts open, and details-memory keeps what people open or close. %>
 <% if @sessions.any? || @between.any? %>
-  <ol class="session-list" data-controller="details-memory" data-details-memory-campaign-value="<%= Current.campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
-    <% first = true %>
-    <% if (since = @between[nil]) %>
-      <%= render "campaigns/play_sessions/between", rolls: since, after: @sessions.first, before: nil, open: first %>
-      <% first = false %>
-    <% end %>
-    <% @sessions.each_with_index do |session, index| %>
-      <% log = @logs.fetch(session.id, {}) %>
-      <% entries = log.values.sum(&:size) %>
-      <li class="panel session-card">
-        <%= tag.details id: dom_id(session, :log), class: "fold session-card__fold", open: first, data: { details_memory_target: "section", section: dom_id(session, :log), phone_open: first.to_s } do %>
-          <summary class="fold__summary session-card__head">
-            <h2 class="session-card__title"><%= session.title %></h2>
-            <span class="session-card__date"><%= l(session.started_at.to_date, format: :long) %><%= " · going now" if session.open? %> · <%= pluralize(entries, "entry") %></span>
-          </summary>
-          <div class="session-card__body">
-            <% if session.recap.present? %><p class="session-card__recap"><%= truncate(session.recap, length: 180) %></p><% end %>
-            <p class="session-card__meta">
-              <%= pluralize(session.scenes.size, "scene") %> · <%= pluralize(session.characters.size, "character") %> there
-              <% unless session.open? %>
-                · <%= session.standout? ? "+2 XP (standout)" : "+1 XP" %>
-                <% session.level_ups.each do |level_up| %> · <%= level_up["name"] %> reached level <%= level_up["level"] %><% end %>
-              <% end %>
-            </p>
-            <% session.scenes.sort_by(&:number).each do |scene| %>
-              <% if (rolls = log[scene.id]).present? %>
-                <h3 class="session-card__scene">Scene <%= scene.number %>: <%= scene.title %></h3>
-                <ol class="roll-log"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>
-              <% end %>
-            <% end %>
-            <% if (loose = log[nil]).present? %>
-              <h3 class="session-card__scene">Outside scenes</h3>
-              <ol class="roll-log"><%= render partial: "rolls/roll", collection: loose, as: :roll %></ol>
-            <% end %>
-            <%= link_to "Open #{session.title}", campaign_play_session_path(Current.campaign, session), class: "button button--small session-card__open" %>
-          </div>
+  <div class="fluid session-history" data-controller="details-memory" data-details-memory-campaign-value="<%= Current.campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
+    <section class="fluid__main" aria-labelledby="history-log">
+      <h2 id="history-log" class="session-history__title">Rolls</h2>
+      <ol class="session-list">
+        <% first = true %>
+        <% if (since = @between[nil]) %>
+          <%= render "campaigns/play_sessions/between", rolls: since, after: @sessions.first, before: nil, open: first %>
+          <% first = false %>
         <% end %>
-      </li>
-      <% first = false %>
-      <% if (between = @between[session]) %>
-        <%= render "campaigns/play_sessions/between", rolls: between, after: @sessions[index + 1], before: session, open: false %>
-      <% end %>
+        <% @sessions.each_with_index do |session, index| %>
+          <% log = @logs.fetch(session.id, {}) %>
+          <% entries = log.values.sum(&:size) %>
+          <li class="panel session-card">
+            <%= tag.details id: dom_id(session, :log), class: "fold session-card__fold", open: first, data: { details_memory_target: "section", section: dom_id(session, :log), phone_open: first.to_s } do %>
+              <summary class="fold__summary session-card__head">
+                <h3 class="session-card__title"><%= session.title %></h3>
+                <span class="session-card__date"><%= l(session.started_at.to_date, format: :long) %><%= " · going now" if session.open? %> · <%= pluralize(entries, "entry") %></span>
+              </summary>
+              <div class="session-card__body">
+                <% session.scenes.sort_by(&:number).each do |scene| %>
+                  <% if (rolls = log[scene.id]).present? %>
+                    <h4 class="session-card__scene">Scene <%= scene.number %>: <%= scene.title %></h4>
+                    <ol class="roll-log"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>
+                  <% end %>
+                <% end %>
+                <% if (loose = log[nil]).present? %>
+                  <h4 class="session-card__scene">Outside scenes</h4>
+                  <ol class="roll-log"><%= render partial: "rolls/roll", collection: loose, as: :roll %></ol>
+                <% end %>
+                <% if entries.zero? %><p class="empty">Nothing logged.</p><% end %>
+              </div>
+            <% end %>
+          </li>
+          <% first = false %>
+          <% if (between = @between[session]) %>
+            <%= render "campaigns/play_sessions/between", rolls: between, after: @sessions[index + 1], before: session, open: false %>
+          <% end %>
+        <% end %>
+      </ol>
+    </section>
+
+    <% if @sessions.any? %>
+      <section class="fluid__rail" aria-labelledby="history-recaps">
+        <h2 id="history-recaps" class="session-history__title">Recaps</h2>
+        <ol class="recap-list">
+          <% @sessions.each_with_index do |session, index| %>
+            <li class="panel recap-card">
+              <%= tag.details id: dom_id(session, :recap), class: "fold recap-card__fold", open: index.zero?, data: { details_memory_target: "section", section: dom_id(session, :recap), phone_open: index.zero?.to_s } do %>
+                <summary class="fold__summary">
+                  <h3 class="recap-card__title"><%= session.title %></h3>
+                  <span class="session-card__date"><%= l(session.started_at.to_date, format: :long) %><%= " · going now" if session.open? %></span>
+                </summary>
+                <div class="recap-card__body">
+                  <% if session.recap.present? %>
+                    <p class="recap-card__label">Previously on…</p>
+                    <p class="session-card__recap"><%= session.recap %></p>
+                  <% elsif !session.first? %>
+                    <p class="empty">No recap.</p>
+                  <% end %>
+                  <% if session.notes.present? %>
+                    <p class="recap-card__label">Notes</p>
+                    <p class="session-card__recap"><%= session.notes %></p>
+                  <% end %>
+                  <p class="session-card__meta">
+                    <%= pluralize(session.scenes.size, "scene") %> · <%= pluralize(session.characters.size, "character") %> there
+                    <% unless session.open? %>
+                      · <%= session.standout? ? "+2 XP (standout)" : "+1 XP" %>
+                      <% session.level_ups.each do |level_up| %> · <%= level_up["name"] %> reached level <%= level_up["level"] %><% end %>
+                    <% end %>
+                  </p>
+                  <%= link_to "Open #{session.title}", campaign_play_session_path(Current.campaign, session), class: "button button--small session-card__open" %>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ol>
+      </section>
     <% end %>
-  </ol>
+  </div>
 <% end %>
 <% if @sessions.none? %>
   <p class="empty">No sessions yet.<% if gm? %> <%= link_to "Start the first one", new_campaign_play_session_path(Current.campaign) %>.<% end %></p>

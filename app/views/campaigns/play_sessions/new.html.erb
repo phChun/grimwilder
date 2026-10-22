@@ -44,9 +44,6 @@
               <% end %>
             </ol>
           <% end %>
-          <% @previous.moments.each do |moment| %>
-            <p><strong><%= moment.character.name %>:</strong> <%= moment.text %></p>
-          <% end %>
           <% if @previous.notes.present? %><p><%= @previous.notes %></p><% end %>
           <% if @previous.recap.present? %><p class="field__hint">It began: <%= @previous.recap %></p><% end %>
         </aside>

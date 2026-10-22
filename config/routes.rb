@@ -65,7 +65,6 @@ Rails.application.routes.draw do
       resources :play_sessions, only: %i[ index show new create update ] do
         scope module: :play_sessions do
           resource :ending, only: %i[ new create ]
-          resources :moments, only: :create
         end
       end
       resource :suspense, only: :update
@@ -74,9 +73,7 @@ Rails.application.routes.draw do
         resource :ending, only: %i[ new create ], module: :scenes
       end
       resources :notes, only: :create
-      resources :messages, only: :create do
-        resource :nomination, only: :create, module: :messages
-      end
+      resources :messages, only: :create
       resource :rest, only: :create
       resource :downtime, only: %i[ new create ]
 

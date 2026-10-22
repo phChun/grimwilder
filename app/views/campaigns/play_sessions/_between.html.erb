@@ -8,7 +8,7 @@
 <li class="panel session-card session-card--between">
   <%= tag.details id: key, class: "fold session-card__fold", open: open, data: { details_memory_target: "section", section: key, phone_open: open.to_s } do %>
     <summary class="fold__summary session-card__head">
-      <h2 class="session-card__title"><%= title %></h2>
+      <h3 class="session-card__title"><%= title %></h3>
       <span class="session-card__date"><%= pluralize(rolls.size, "entry") %></span>
     </summary>
     <ol class="roll-log"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>

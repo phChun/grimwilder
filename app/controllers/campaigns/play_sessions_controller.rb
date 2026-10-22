@@ -50,7 +50,7 @@ class Campaigns::PlaySessionsController < ApplicationController
 
     def set_form
       @characters = Current.campaign.characters.played.includes(:identity).ordered
-      @previous = Current.campaign.play_sessions.includes(:scenes, moments: :character).ordered.last
+      @previous = Current.campaign.play_sessions.includes(:scenes).ordered.last
       @number = @previous&.number.to_i + 1
     end
 end

@@ -59,11 +59,6 @@ class Message < ApplicationRecord
     !whisper? && !table_talk?
   end
 
-  # Lines a best moment could come from (pg. 31).
-  def nominatable?
-    in_character? || narration?
-  end
-
   private
     def copy_in_name
       self.name =

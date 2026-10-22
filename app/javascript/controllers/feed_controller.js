@@ -1,10 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 // The table's rail. Its lines render once for everyone (they arrive over
-// broadcasts), so the per-viewer parts happen here: your own lines sit on the
-// right, and the best-moment star shows to whoever may pick it (the
-// character's player or the GM for an in-character line; a player for
-// narration, as their own character). The server checks all of it again.
+// broadcasts), so the per-viewer part happens here: your own lines sit on the
+// right.
 //
 // It also keeps your place. Reading the latest, new lines scroll into view;
 // scrolled up into history, you stay put and a "3 new" pill offers the way
@@ -16,8 +14,8 @@ import { Controller } from "@hotwired/stimulus"
 const NEAR_LATEST = 48 // px from the newest line that still counts as reading it
 
 export default class extends Controller {
-  static targets = ["star", "scroller", "newPill", "newCount", "list", "older"]
-  static values = { viewer: String, gm: Boolean, session: Boolean, before: String, more: Boolean, olderUrl: String }
+  static targets = ["scroller", "newPill", "newCount", "list", "older"]
+  static values = { viewer: String, before: String, more: Boolean, olderUrl: String }
 
   connect() {
     this.element.querySelectorAll(".chat-line").forEach((line) => this.mark(line))
@@ -101,11 +99,6 @@ export default class extends Controller {
     this.olderTarget.textContent = this.loading ? "Loading earlier lines…" : this.moreValue ? "" : (this.hasListTarget && this.listTarget.children.length ? "That's the start of the table." : "")
   }
 
-  starTargetConnected(star) {
-    const line = star.closest(".chat-line")
-    star.hidden = !(line && this.sessionValue && this.canStar(line))
-  }
-
   mark(line) {
     line.classList.toggle("chat-line--mine", line.dataset.identity === this.viewerValue)
   }
@@ -159,37 +152,5 @@ export default class extends Controller {
     this.newPillTarget.hidden = this.unread === 0
     this.newCountTarget.textContent = `${this.unread} new`
     this.newPillTarget.setAttribute("aria-label", `${this.unread} new in the table's chat and log: jump to the latest`)
-  }
-
-  canStar(line) {
-    if (line.dataset.kind === "narration") return !this.gmValue
-    return this.gmValue || line.dataset.owner === this.viewerValue
-  }
-
-  async star(event) {
-    const button = event.currentTarget
-    const token = document.querySelector("meta[name=csrf-token]")?.content
-    button.disabled = true
-
-    try {
-      const response = await fetch(button.dataset.url, {
-        method: "POST",
-        headers: { "X-CSRF-Token": token, Accept: "text/vnd.turbo-stream.html" },
-        credentials: "same-origin"
-      })
-      if (response.ok) {
-        button.classList.add("feed-item__star--done")
-        button.lastChild.textContent = " Starred for next session"
-      } else {
-        this.failed(button, "That star didn't save. Try again.")
-      }
-    } catch {
-      this.failed(button, "Couldn't reach Grimwilder, so that star didn't save. Check your connection and try again.")
-    }
-  }
-
-  failed(button, message) {
-    button.disabled = false
-    document.dispatchEvent(new CustomEvent("toasts:show", { detail: { message } }))
   }
 }
