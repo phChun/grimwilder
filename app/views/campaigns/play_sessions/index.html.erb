@@ -5,9 +5,13 @@
   <h1>Sessions</h1>
 </header>
 
-<% if @sessions.any? %>
+<%# Newest first: what's happened since the last session, then each session with the stretch between it and the one before. %>
+<% if @sessions.any? || @between.any? %>
   <ol class="session-list">
-    <% @sessions.each do |session| %>
+    <% if (since = @between[nil]) %>
+      <%= render "campaigns/play_sessions/between", rolls: since, after: @sessions.first, before: nil %>
+    <% end %>
+    <% @sessions.each_with_index do |session, index| %>
       <li class="panel session-card">
         <div class="session-card__head">
           <h2 class="session-card__title"><%= link_to session.title, campaign_play_session_path(Current.campaign, session) %></h2>
@@ -22,15 +26,12 @@
           <% end %>
         </p>
       </li>
+      <% if (between = @between[session]) %>
+        <%= render "campaigns/play_sessions/between", rolls: between, after: @sessions[index + 1], before: session %>
+      <% end %>
     <% end %>
   </ol>
-<% else %>
-  <p class="empty">No sessions yet.<% if gm? %> <%= link_to "Start the first one", new_campaign_play_session_path(Current.campaign) %>.<% end %></p>
 <% end %>
-
-<% if @before.any? %>
-  <details class="fold fold--panel session-before">
-    <summary class="fold__summary"><span class="fold__title">Before sessions</span><span class="fold__meta"><%= pluralize(@before.size, "entry") %></span></summary>
-    <ol class="roll-log"><%= render partial: "rolls/roll", collection: @before, as: :roll %></ol>
-  </details>
+<% if @sessions.none? %>
+  <p class="empty">No sessions yet.<% if gm? %> <%= link_to "Start the first one", new_campaign_play_session_path(Current.campaign) %>.<% end %></p>
 <% end %>

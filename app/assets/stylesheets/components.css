@@ -1076,7 +1076,9 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .session-card__date,
 .session-card__meta { margin: 0; font-size: 0.9rem; color: var(--ink-faint); }
 .session-card__recap { margin: 0; color: var(--ink-soft); }
-.session-before { margin-top: var(--space-5); max-width: 48rem; }
+.session-card--between { border-style: dashed; background: transparent; }
+.session-card--between .session-card__title { font-size: 1.15rem; color: var(--ink-soft); }
+.session-card--between .roll-log { margin-top: var(--space-2); }
 
 .session-page { display: grid; gap: var(--space-4); max-width: 48rem; }
 .session-page__text { margin: 0; white-space: pre-line; }

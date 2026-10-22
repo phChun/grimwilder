@@ -16,13 +16,24 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     @first = first
   end
 
-  test "members see the history: sessions, XP, level-ups, and what came before" do
+  test "members see the history: sessions, XP, level-ups, and the log between them" do
+    @campaign.rest!(by: identities(:gwen))
+    second = PlaySession.start!(@campaign, characters: [ @tibbs ], by: identities(:gwen))
+    second.end!(by: identities(:gwen))
+    since = @tibbs.roll!("brawn", by: identities(:pip))
     sign_in_as identities(:pip)
 
     get campaign_play_sessions_path(@campaign)
     assert_select ".session-card__title a[href=?]", campaign_play_session_path(@campaign, @first), text: "Session 1"
     assert_select ".session-card__meta", /1 scene · 1 character there · \+2 XP \(standout\) · Gibbletibble "Tibbs" reached level 2/
-    assert_select ".session-before ##{dom_id(@before)}"
+    assert_select ".session-before", 0, "no single Before sessions box"
+
+    cards = css_select(".session-list > li").map { _1.at_css(".session-card__title").text.strip + " | " + _1.at_css(".session-card__date").text.strip }
+    assert_equal [ "Between sessions | since Session 2", "Session 2", "Between sessions | after Session 1, before Session 2", "Session 1", "Between sessions | before Session 1" ],
+      cards.map { _1.sub(/ \| [A-Z][a-z]+ \d+, \d{4}.*/, "") }
+    assert_select ".session-card--between:last-child ##{dom_id(@before)}"
+    assert_select ".session-card--between:first-child ##{dom_id(since)}"
+    assert_select ".session-card--between", text: /Rest/
   end
 
   test "a session page shows scenes with their bookends and rolls, oldest first; GM-only rolls stay hidden" do

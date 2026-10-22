@@ -1,0 +1,13 @@
+<%# locals: (rolls:, after:, before:) %>
+<%# The log between two sessions (rests, downtime, rolls, notes made outside one), in its place in the history, oldest first. after/before: the sessions either side; nil at the ends. %>
+<% span = if after && before then "after #{after.title}, before #{before.title}"
+          elsif before then "before #{before.title}"
+          else "since #{after.title}"
+          end %>
+<li class="panel session-card session-card--between">
+  <div class="session-card__head">
+    <h2 class="session-card__title">Between sessions</h2>
+    <span class="session-card__date"><%= span %></span>
+  </div>
+  <ol class="roll-log"><%= render partial: "rolls/roll", collection: rolls, as: :roll %></ol>
+</li>

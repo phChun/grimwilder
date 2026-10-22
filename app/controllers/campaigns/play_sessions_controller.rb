@@ -8,7 +8,7 @@ class Campaigns::PlaySessionsController < ApplicationController
 
   def index
     @sessions = Current.campaign.play_sessions.includes(:scenes, :characters).order(number: :desc)
-    @before = Current.campaign.rolls.where(play_session_id: nil).table_log(Current.membership)
+    @between = between_sessions
   end
 
   def show
@@ -35,6 +35,16 @@ class Campaigns::PlaySessionsController < ApplicationController
   end
 
   private
+    # The log made outside any session (rests, downtime, rolls, notes), grouped
+    # by the session that came after it, oldest first; nil holds what's come
+    # since the last one. Rolls made during a session carry it, so these are
+    # the ones without.
+    def between_sessions
+      by_start = @sessions.sort_by(&:number)
+      Current.campaign.rolls.where(play_session_id: nil).visible_to(Current.membership).includes(:identity, :pool).order(:created_at, :id)
+        .group_by { |roll| by_start.find { _1.started_at > roll.created_at } }
+    end
+
     def set_form
       @characters = Current.campaign.characters.played.includes(:identity).ordered
       @previous = Current.campaign.play_sessions.includes(:scenes, moments: :character).ordered.last
