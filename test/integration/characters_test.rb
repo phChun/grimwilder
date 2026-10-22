@@ -36,6 +36,38 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert @tibbs.bloodied?
   end
 
+  test "the form has a bond for each other character at the table, and nobody else" do
+    bram = characters(:bram)
+    @tibbs.update!(bonds: [ { "to" => "Bram", "bond" => "tense rivalry" }, { "to" => "Lillylux", "bond" => "lowkey affection" } ])
+    sign_in_as identities(:pip)
+
+    get edit_character_path(@tibbs)
+    assert_select ".bond-row", 1
+    assert_select ".bond-row label", /Bram\s+played by Gwen/
+    assert_select ".bond-row input[type=hidden][name='character[bonds][0][character_id]'][value=?]", bram.id.to_s
+    assert_select ".bond-row input[name='character[bonds][0][bond]'][value=?]", "tense rivalry"
+    assert_select ".bond-row", text: /Tibbs/, count: 0
+    assert_select ".bonds-npcs[data-controller=bonds][data-bonds-next-value=3]" do
+      assert_select "input[name='character[bonds][1][to]'][value=?]", "Lillylux"
+      assert_select "input[name='character[bonds][2][to]'][value='']", 1, "a blank row for a new NPC"
+      assert_select "button[data-action='bonds#add']", "Add an NPC"
+    end
+    assert_match %r{<template data-bonds-target="template"[^>]*>.*name="character\[bonds\]\[__INDEX__\]\[to\]"}m, response.body
+
+    patch character_path(@tibbs), params: { character: { bonds: {
+      "0" => { "character_id" => bram.id, "to" => "Bram", "bond" => "deep respect" },
+      "1" => { "to" => "", "bond" => "" },
+      "2" => { "to" => "Miller Hode", "bond" => "growing doubts" },
+      "7" => { "to" => "Sister Ivy", "bond" => "deep devotion" }
+    } } }
+    assert_equal [ { "to" => "Bram", "bond" => "deep respect", "character_id" => bram.id },
+      { "to" => "Miller Hode", "bond" => "growing doubts" }, { "to" => "Sister Ivy", "bond" => "deep devotion" } ], @tibbs.reload.bonds
+
+    get character_path(@tibbs)
+    assert_select ".facts__list li", "Bram · Deep Respect"
+    assert_select ".facts__list li", "Miller Hode · Growing Doubts"
+  end
+
   test "who they are: lists, title-cased, with what they're not" do
     @tibbs.update!(traits: [ "brave", "quick-witted" ], not_trait: "rash", desires: [ "glory" ], arcs: [ "uncover the truth" ],
       bonds: [ { "to" => "Lillylux", "bond" => "lowkey affection" } ])

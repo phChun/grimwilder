@@ -1,0 +1,6 @@
+<%# locals: (index:, bond:) %>
+<%# A bond written in by name: an NPC, or a PC not at this table. Clearing both fields removes it. %>
+<div class="two-up">
+  <input type="text" name="character[bonds][<%= index %>][to]" value="<%= bond["to"] %>" placeholder="Miller Hode" autocomplete="off" class="field__input" aria-label="Bond: who">
+  <input type="text" name="character[bonds][<%= index %>][bond]" value="<%= bond["bond"] %>" placeholder="Growing Doubts" autocomplete="off" class="field__input" aria-label="Bond: intensity and nature">
+</div>

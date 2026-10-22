@@ -279,8 +279,11 @@
         <div>
           <dt>Bonds</dt>
           <dd>
-            <% if @character.bonds.any? %>
-              <ul class="facts__list"><% @character.bonds.each do |bond| %><li><%= bond["to"] %> · <%= bond["bond"].present? ? title_case(bond["bond"]) : "not set yet" %></li><% end %></ul>
+            <%# Everyone at the table (by their name now), then bonds to anyone else. %>
+            <% party = @character.bond_party.to_a %>
+            <% bond_lines = party.map { |other| [ other.name, @character.bond_for(other)&.dig("bond") ] } + @character.bonds_beyond(party).map { [ _1["to"], _1["bond"] ] } %>
+            <% if bond_lines.any? %>
+              <ul class="facts__list"><% bond_lines.each do |to, bond| %><li><%= to %> · <%= bond.present? ? title_case(bond) : "not set yet" %></li><% end %></ul>
             <% else %>
               —
             <% end %>

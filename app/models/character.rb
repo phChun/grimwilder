@@ -52,12 +52,33 @@ class Character < ApplicationRecord
     super(words(value).first(2))
   end
 
+  # One bond toward each other PC (pg. 22, 46), as many as there are. A bond
+  # to someone at the table keeps their character_id (a row left blank is
+  # dropped); a bond to anyone else is a name. One per character or name.
   def bonds=(value)
     super(list(value).filter_map { |bond|
       bond = bond.to_h.stringify_keys
-      to, nature = bond["to"].to_s.squish, bond["bond"].to_s.squish
-      { "to" => to, "bond" => nature } if to.present? || nature.present?
-    })
+      to, nature, id = bond["to"].to_s.squish, bond["bond"].to_s.squish, bond["character_id"].presence&.to_i
+      next if id && nature.blank?
+      { "to" => to, "bond" => nature, "character_id" => id }.compact if to.present? || nature.present?
+    }.uniq { _1["character_id"] || _1["to"].downcase })
+  end
+
+  # The other characters at this one's table, each owed a bond.
+  def bond_party
+    campaign ? campaign.characters.played.active.where.not(id: id).includes(:identity).ordered : Character.none
+  end
+
+  # This character's bond toward another: by id, or for one written before
+  # bonds knew ids, by their name or short name.
+  def bond_for(other)
+    bonds.find { _1["character_id"] == other.id } ||
+      bonds.find { |bond| bond["character_id"].nil? && [ other.name, other.short_name ].any? { _1.casecmp?(bond["to"].to_s) } }
+  end
+
+  # Bonds to anyone not in this party: a character who left, or written in by hand.
+  def bonds_beyond(party)
+    bonds - party.filter_map { bond_for(_1) }
   end
 
   def core_talent

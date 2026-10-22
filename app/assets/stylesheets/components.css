@@ -676,6 +676,13 @@ form.button_to, .button_to { margin: 0; }
 .character-danger { max-width: 46rem; margin-top: var(--space-6); }
 
 .fieldset { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
+/* A bond toward someone at the table: who, then how you see them. */
+.bond-row { display: grid; gap: var(--space-1) var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); align-items: center; }
+.bond-row__name { font-family: var(--font-display); font-weight: 700; }
+.bond-row__player { font-size: 0.85rem; color: var(--dim); }
+.bonds-npcs { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
+.bonds-npcs__title { margin: 0; font-size: 0.87rem; font-weight: 600; color: var(--dim); }
+.bonds-npcs__add { justify-self: start; }
 .two-up { display: grid; gap: var(--space-2) var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
 .stat-inputs { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
 .field__input--small { min-height: var(--tap); font-size: 0.95rem; }

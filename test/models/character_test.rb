@@ -159,6 +159,32 @@ class CharacterTest < ActiveSupport::TestCase
     assert_equal [ { "to" => "Lillylux", "bond" => "lowkey affection" } ], @tibbs.bonds
   end
 
+  test "one bond toward each other character at the table, as many as there are" do
+    bram = characters(:bram)
+    moss = identities(:gwen).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: campaigns(:bramblewood))
+    assert_equal [ bram, moss ], @tibbs.bond_party
+
+    @tibbs.update!(bonds: {
+      "0" => { "character_id" => bram.id.to_s, "to" => "Bram", "bond" => "tense rivalry" },
+      "1" => { "character_id" => moss.id.to_s, "to" => "Moss", "bond" => "" },
+      "2" => { "character_id" => bram.id.to_s, "to" => "Bram", "bond" => "deep respect" },
+      "3" => { "to" => "Lillylux", "bond" => "lowkey affection" },
+      "4" => { "to" => "lillylux", "bond" => "playful envy" }
+    })
+
+    assert_equal [ { "to" => "Bram", "bond" => "tense rivalry", "character_id" => bram.id }, { "to" => "Lillylux", "bond" => "lowkey affection" } ], @tibbs.bonds,
+      "one per character, and a blank row for someone at the table is dropped"
+    assert_equal "tense rivalry", @tibbs.bond_for(bram)["bond"]
+    assert_nil @tibbs.bond_for(moss)
+    assert_equal [ { "to" => "Lillylux", "bond" => "lowkey affection" } ], @tibbs.bonds_beyond(@tibbs.bond_party)
+  end
+
+  test "a bond written by name before bonds knew ids still finds its character" do
+    @tibbs.update!(bonds: [ { "to" => "bram", "bond" => "growing kinship" } ])
+    assert_equal "growing kinship", @tibbs.bond_for(characters(:bram))["bond"]
+    assert_empty @tibbs.bonds_beyond([ characters(:bram) ])
+  end
+
   test "can only sit in your own campaigns" do
     characters(:loner).campaign = campaigns(:bramblewood)
     assert_not characters(:loner).valid?
