@@ -6,6 +6,8 @@
 class Campaigns::MessagesController < ApplicationController
   include CampaignScoped
 
+  before_action :require_gm, only: :destroy
+
   def create
     Current.campaign.messages.create!(identity: Current.identity, body: params[:body], **speaking)
 
@@ -22,8 +24,6 @@ class Campaigns::MessagesController < ApplicationController
 
   # The GM takes a line out of the chat, for everyone (Message broadcasts the removal).
   def destroy
-    return head :forbidden unless gm?
-
     Current.campaign.messages.find(params[:id]).destroy!
     respond_to do |format|
       format.turbo_stream { head :no_content }

@@ -33,9 +33,6 @@ module ApplicationHelper
     TOOLKIT_NAV
   end
 
-  # Every signed-in person's own characters, the last tab in the header inside
-  # a campaign or out: [label, path, current?]. A player's sheet in a campaign
-  # is "My character" instead.
   # The placeholder for a text box with a datalist of the book's words: it takes
   # anything typed, or one of ours. prefix: what the box is for ("But not…").
   def type_or_select(prefix = nil)
@@ -47,6 +44,9 @@ module ApplicationHelper
     [ "All campaigns", campaigns_path, controller_path == "campaigns" && action_name.in?(%w[ index create ]) ]
   end
 
+  # Every signed-in person's own characters, the last tab in the header inside
+  # a campaign or out: [label, path, current?]. A player's sheet in a campaign
+  # is "My character" instead.
   def characters_tab
     [ "Characters", characters_path, controller_path == "characters" && action_name.in?(%w[ index new create ]) ]
   end

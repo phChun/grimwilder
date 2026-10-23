@@ -116,4 +116,23 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_not @campaign.reload.done?
   end
+
+  test "a done campaign's sheets refuse play: harm, conditions, talent uses, pushes and claims" do
+    @campaign.update!(done_at: Time.current)
+    sign_in_as identities(:pip)
+
+    patch character_damage_path(@tibbs), params: { character: { bloodied: true } }
+    assert_match(/is done/, flash[:alert])
+    assert_not @tibbs.reload.bloodied?
+
+    assert_no_changes -> { @tibbs.reload.conditions } do
+      post character_conditions_path(@tibbs), params: { condition: "poisoned" }
+    end
+    @tibbs.update!(level: 2, talent_keys: %w[ according-to-plan lurker ])
+    assert_no_changes -> { @tibbs.reload.marked_wits } do
+      post character_talent_push_path(@tibbs, "lurker"), params: { stat: "wits" }
+    end
+    assert_raises(ArgumentError) { @tibbs.reload.push!("wits", talent_key: "lurker", by: identities(:pip)) }
+    assert_not @tibbs.releasable_by?(identities(:pip)), "can't give them back to a done table"
+  end
 end

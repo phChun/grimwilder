@@ -43,7 +43,7 @@ class Membership < ApplicationRecord
 
   # The other active campaign this member is at, if any (see one_campaign_limit).
   def other_active_membership
-    identity.memberships.joins(:campaign).merge(Campaign.active).where.not(campaign_id: campaign_id).first
+    identity.active_membership(except: campaign_id)
   end
 
   # The characters this member plays here: seated, and still playing.

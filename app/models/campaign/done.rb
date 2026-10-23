@@ -28,8 +28,10 @@ module Campaign::Done
 
   def reopen!(by:)
     raise ArgumentError, "#{name} isn't done." unless done?
-    if (busy = memberships.includes(:identity, :campaign).find { _1.other_active_membership })
-      raise ArgumentError, "#{busy.identity.display_name} is at #{busy.other_active_membership.campaign.name} now, so #{name} can't reopen."
+    memberships.includes(:identity).each do |member|
+      if (elsewhere = member.other_active_membership)
+        raise ArgumentError, "#{member.identity.display_name} is at #{elsewhere.campaign.name} now, so #{name} can't reopen."
+      end
     end
 
     transaction do

@@ -226,7 +226,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     assert_select "#rolls .rolls__kinds input[name=roll_kind]", 3
     assert_select "#rolls .rolls__kinds label[title=?] input[value=montage][disabled]", "Needs a character at the table"
     assert_select "#rolls .rolls__kinds label[title=?] input[value=quarrel][disabled]", "Needs two characters at the table"
-    assert_select "#rolls .rolls__kinds input[value=story]:not([disabled])"
+    assert_select "#rolls .rolls__kinds label:not([title]) input[value=story]:not([disabled])"
     assert_select "#rolls .rolls__needs", /Montages need a character in the party, and quarrels two/
   end
 end

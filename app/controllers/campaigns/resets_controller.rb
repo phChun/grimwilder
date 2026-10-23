@@ -6,7 +6,7 @@ class Campaigns::ResetsController < ApplicationController
   before_action :require_gm
 
   def create
-    Current.campaign.reset!
+    Current.campaign.reset!(by: Current.identity)
     redirect_to edit_campaign_path(Current.campaign), notice: "#{Current.campaign.name} is reset: no sessions, and a clean log."
   end
 end

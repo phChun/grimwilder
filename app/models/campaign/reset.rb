@@ -5,8 +5,9 @@
 module Campaign::Reset
   extend ActiveSupport::Concern
 
-  def reset!
+  def reset!(by:)
     transaction do
+      roll_calls.open.each { _1.cancel!(by: by) } # gives back any spark already spent into them
       roll_calls.delete_all
       rolls.delete_all # scenes' opening and closing rolls are nulled by the database
       play_sessions.delete_all # scenes and attendance go with them (on_delete: :cascade)

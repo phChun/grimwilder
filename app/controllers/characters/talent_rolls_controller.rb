@@ -4,6 +4,8 @@
 class Characters::TalentRollsController < ApplicationController
   include CharacterScoped
 
+  before_action :refuse_when_campaign_done
+
   def create
     @character.call_talent_roll!(params[:talent_id], params[:index], by: Current.identity)
     redirect_to character_path(@character, anchor: "talent-#{params[:talent_id]}")

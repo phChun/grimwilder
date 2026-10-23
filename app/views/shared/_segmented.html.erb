@@ -5,7 +5,7 @@
 <fieldset class="<%= class_names("segmented", classes) %>">
   <legend class="visually-hidden"><%= legend %></legend>
   <% options.each do |value, text, why| %>
-    <label class="segmented__option" title="<%= why %>">
+    <label class="segmented__option"<% if why %> title="<%= why %>"<% end %>>
       <%= radio_button_tag name, value, value.to_s == checked.to_s, id: "#{id_prefix}_#{value}", data: input_data, disabled: why.present? %>
       <span class="segmented__text"><%= text %></span>
     </label>

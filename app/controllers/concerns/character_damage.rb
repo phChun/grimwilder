@@ -8,6 +8,7 @@ module CharacterDamage
   included do
     require_authentication
     before_action :set_character
+    before_action :refuse_when_campaign_done
   end
 
   private

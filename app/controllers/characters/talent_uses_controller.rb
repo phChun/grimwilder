@@ -4,6 +4,7 @@ class Characters::TalentUsesController < ApplicationController
   require_authentication
 
   before_action :set_character
+  before_action :refuse_when_campaign_done
 
   def update
     before = @character.talent_uses.fetch(params[:use].to_s, 0)

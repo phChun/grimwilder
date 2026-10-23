@@ -38,4 +38,15 @@ class CampaignResetTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_equal 1, @campaign.rolls.count
   end
+
+  test "spark spent into a waiting roll call goes back on a reset" do
+    @tibbs.update!(spark: 2)
+    call = RollCall.montage!(campaign: @campaign, by: identities(:gwen), characters: [ @tibbs, characters(:bram) ])
+    call.roll!(@tibbs, by: identities(:pip), spark: 2, random: FixedDice.new([ 1, 2, 3, 4 ]))
+    assert_equal 0, @tibbs.reload.spark
+
+    @campaign.reset!(by: identities(:gwen))
+    assert_equal 2, @tibbs.reload.spark
+    assert_equal 0, @campaign.roll_calls.count
+  end
 end

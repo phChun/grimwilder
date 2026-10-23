@@ -191,7 +191,7 @@
           <%= link_to "Edit talents", new_character_talent_path(@character), class: "button button--small" %>
         <% end %>
       </div>
-      <% talent_pools = @character.talent_pools.to_a %>
+      <% talent_pools = @character.talent_pools.includes(:campaign).to_a %>
       <%# The core talent on its own, then the rest in a grid of matching heights. %>
       <% core, chosen = @character.talent_entries.partition(&:core?) %>
       <% core.each do |talent| %>
