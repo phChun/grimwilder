@@ -134,8 +134,8 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".members__item:has(.members__name:contains('Gwen')) .members__role--gm", "GM"
     assert_select ".members__item:has(.members__name:contains('Pip')) .members__role", "Tibbs"
     assert_select ".members__item:has(.members__name:contains('Stranger')) .members__role", "making one"
-    assert_select ".campaign-actions__row a[href=?]", edit_campaign_path(@campaign), "Campaign settings"
-    assert_select "[data-controller=kept-crucibles][hidden]"
+    assert_select ".campaign-actions__row a.button:not(.button--ghost)[href=?]", edit_campaign_path(@campaign), "Campaign settings"
+    assert_select "[data-controller=kept-crucibles][hidden] button[data-action=?]", "kept-crucibles#clear", "Clear"
   end
 
   test "the GM sets the pitch in settings; players can only leave" do

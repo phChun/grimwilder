@@ -1,0 +1,10 @@
+<%# The words kept from crucible rolls in this browser (kept_crucibles_controller.js), on the campaign page and the GM table, under each crucible's name in the crucibles' own order (by kind). Hidden until there are some; permanent, so a morph doesn't hide it again. %>
+<% crucibles = Crucible.grouped.flat_map(&:last).map { { key: _1.key, name: _1.name } } %>
+<section id="kept_crucibles" class="card side-card" aria-labelledby="kept-title" data-controller="kept-crucibles" data-kept-crucibles-crucibles-value="<%= crucibles.to_json %>" data-action="crucible:kept@window->kept-crucibles#refresh" data-turbo-permanent hidden>
+  <div class="side-card__head">
+    <h2 id="kept-title" class="side-card__title">Kept crucibles</h2>
+    <button type="button" class="button button--quiet button--small" data-action="kept-crucibles#clear">Clear</button>
+  </div>
+  <div class="kept-groups" data-kept-crucibles-target="list"></div>
+  <p class="side-card__note">Kept on this device, from the <%= link_to "crucibles", crucibles_path %>.</p>
+</section>

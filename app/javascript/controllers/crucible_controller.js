@@ -6,7 +6,8 @@ import { rollDie } from "grimwild/dice"
 // first reading of each table starts chosen, tap another to choose it. "Keep"
 // saves the chosen words as one line in a per-crucible list in localStorage.
 // Tapping a chip also sends crucible:pick ({ word, table }), so a form around
-// the roller can use the word (feature_fill_controller.js).
+// the roller can use the word (feature_fill_controller.js), and Keep sends
+// crucible:kept on window for the Kept crucibles card.
 export default class extends Controller {
   static targets = ["table", "results", "keepButton", "keptSection", "keptList"]
   static values = { key: String }
@@ -58,6 +59,7 @@ export default class extends Controller {
     this.kept = this.kept.slice(0, 50)
     this.saveKept()
     this.renderKept()
+    this.dispatch("kept", { target: window })
   }
 
   async copyKept() {
@@ -116,7 +118,10 @@ export default class extends Controller {
     this.keepButtonTarget.disabled = this.rolls.size === 0
   }
 
+  // The full page lists kept lines here; the compact roller leaves them to the Kept crucibles card.
   renderKept() {
+    if (!this.hasKeptListTarget) return
+
     this.keptListTarget.replaceChildren(...this.kept.map((line) => {
       const item = document.createElement("li")
       item.textContent = line

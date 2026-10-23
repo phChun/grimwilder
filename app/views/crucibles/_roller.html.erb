@@ -1,5 +1,5 @@
 <%# locals: (crucible:) %>
-<%# The GM table's compact roller. Same crucible_controller as /crucibles/:id, so kept lines are shared with it. %>
+<%# The compact roller (the GM table, the character form's features). Same crucible_controller as /crucibles/:id, so kept lines are shared with it; they show on the Kept crucibles card (campaigns/_kept_crucibles), not here. %>
 <div class="crucible crucible--compact" data-controller="crucible" data-crucible-key-value="<%= crucible.key %>">
   <div class="crucible__stage">
     <div class="crucible__actions">
@@ -14,15 +14,6 @@
       <p class="crucible__hint"><%= crucible.how %> <small>(pg. <%= crucible.page %>)</small></p>
     </div>
   </div>
-
-  <details class="crucible__kept fold" open data-crucible-target="keptSection" hidden>
-    <summary class="fold__summary"><span class="fold__title">Kept this session</span></summary>
-    <ol class="crucible__kept-list" data-crucible-target="keptList"></ol>
-    <div class="crucible__actions">
-      <button type="button" class="button button--small" data-action="crucible#copyKept">Copy list</button>
-      <button type="button" class="button button--quiet button--small" data-action="crucible#clearKept">Clear</button>
-    </div>
-  </details>
 
   <details class="fold crucible__grids">
     <summary class="fold__summary"><span class="fold__title">Show the 6×6 tables</span></summary>

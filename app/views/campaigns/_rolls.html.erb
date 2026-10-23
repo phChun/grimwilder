@@ -1,11 +1,11 @@
 <%# locals: (characters:, my_characters:) %>
-<%# The table's group rolls in one fold: a story roll, a montage or a quarrel, picked with the segmented control. CSS (:has) shows the chosen form, so switching needs no script or reload. Quarrels need two characters at the table, montages one. %>
-<% kinds = [ %w[ story Story ] ] %>
-<% kinds << %w[ montage Montage ] if characters.any? %>
-<% kinds << %w[ quarrel Quarrel ] if characters.size >= 2 %>
+<%# The table's group rolls in one fold: a story roll, a montage or a quarrel, picked with the segmented control. CSS (:has) shows the chosen form, so switching needs no script or reload. Montages need a character in the party and quarrels two; until then they're greyed out, saying so. %>
+<% montage_needs = ("Needs a character at the table" if characters.none?) %>
+<% quarrel_needs = ("Needs two characters at the table" if characters.size < 2) %>
 <div class="rolls">
-  <% if kinds.many? %>
-    <%= render "shared/segmented", name: "roll_kind", legend: "Kind of roll", options: kinds, checked: "story", classes: "segmented--auto rolls__kinds" %>
+  <%= render "shared/segmented", name: "roll_kind", legend: "Kind of roll", options: [ %w[ story Story ], [ "montage", "Montage", montage_needs ], [ "quarrel", "Quarrel", quarrel_needs ] ], checked: "story", classes: "segmented--auto rolls__kinds" %>
+  <% if quarrel_needs %>
+    <p class="field__hint rolls__needs"><%= montage_needs ? "Montages need a character in the party, and quarrels two." : "Quarrels need two characters in the party." %> Up-for-grabs characters join once a player picks them.</p>
   <% end %>
 
   <div class="rolls__panel rolls__panel--story">

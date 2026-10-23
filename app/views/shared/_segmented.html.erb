@@ -1,12 +1,12 @@
 <%# locals: (name:, legend:, options:, checked:, input_data: nil, id_prefix: nil, classes: nil) %>
-<%# Grouped toggles. They're radio inputs, so the browser and screen readers know which one is on without computed aria-pressed (which herb:state can't do). options: [[value, text], ...]; input_data: data attributes for every input, e.g. a data-herb-set binding. %>
+<%# Grouped toggles. They're radio inputs, so the browser and screen readers know which one is on without computed aria-pressed (which herb:state can't do). options: [[value, text], ...], or [value, text, why] for one that can't be picked yet (greyed out, with why as its title); input_data: data attributes for every input, e.g. a data-herb-set binding. %>
 <% input_data ||= {} %>
 <% id_prefix ||= name %>
 <fieldset class="<%= class_names("segmented", classes) %>">
   <legend class="visually-hidden"><%= legend %></legend>
-  <% options.each do |value, text| %>
-    <label class="segmented__option">
-      <%= radio_button_tag name, value, value.to_s == checked.to_s, id: "#{id_prefix}_#{value}", data: input_data %>
+  <% options.each do |value, text, why| %>
+    <label class="segmented__option" title="<%= why %>">
+      <%= radio_button_tag name, value, value.to_s == checked.to_s, id: "#{id_prefix}_#{value}", data: input_data, disabled: why.present? %>
       <span class="segmented__text"><%= text %></span>
     </label>
   <% end %>

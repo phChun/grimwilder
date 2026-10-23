@@ -65,7 +65,7 @@
           <% else %>
             <%= link_to "Make your character", new_character_path(campaign_id: campaign.id), class: "button button--primary" %>
           <% end %>
-          <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button button--ghost" %>
+          <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button" %>
         </div>
         <% if campaign.done? %>
           <p class="campaign-actions__hint"><em class="campaign-actions__done">The story's told.</em> Everything here stays to look back on.<% if @mine %> Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.<% end %></p>
@@ -243,11 +243,7 @@
         </ul>
       </section>
 
-      <section class="card side-card" aria-labelledby="kept-title" data-controller="kept-crucibles" hidden>
-        <h2 id="kept-title" class="side-card__title">Kept crucibles</h2>
-        <p class="kept-line" data-kept-crucibles-target="line"></p>
-        <p class="side-card__note">Kept on this device, from the <%= link_to "crucibles", crucibles_path %>.</p>
-      </section>
+      <%= render "campaigns/kept_crucibles" %>
 
       <% unless gm %>
         <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: @my_characters.select(&:active?), suspense: true, quick_roll: (character_path(@mine, anchor: "stats") if @mine) %>
