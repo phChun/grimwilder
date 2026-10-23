@@ -7,7 +7,7 @@ import { actionRoll } from "grimwild/dice"
 // draws the dice into the tray, and writes `outcome` + `critical` back so the
 // template can show the matching result text.
 export default class extends Controller {
-  static targets = ["tray", "summary"]
+  static targets = ["tray"]
 
   connect() {
     useState(this)
@@ -19,14 +19,12 @@ export default class extends Controller {
     const result = actionRoll(stat, thorns)
 
     this.drawTray(result)
-    this.summaryTarget.textContent = this.summarize(result)
 
     this.state.set({ outcome: result.result, critical: result.critical })
   }
 
   clear() {
     this.trayTarget.replaceChildren()
-    this.summaryTarget.textContent = ""
     this.state.set({ outcome: "", critical: false })
   }
 
@@ -39,7 +37,17 @@ export default class extends Controller {
     })
     const d8s = thorns.map((value) => this.die(value, "d8", value >= 7 ? "die--cut" : null))
 
-    this.trayTarget.replaceChildren(...d6s, ...d8s)
+    // The dice on one line, the thorns (if any) on the next.
+    this.trayTarget.replaceChildren(this.row("Dice", d6s), ...(d8s.length ? [this.row("Thorns", d8s)] : []))
+  }
+
+  row(label, dice) {
+    const el = document.createElement("div")
+    el.className = "tray__row"
+    el.setAttribute("role", "group")
+    el.setAttribute("aria-label", label)
+    el.append(...dice)
+    return el
   }
 
   // Matches shared/_die: a d6 carries its own result's tier for when it's lit.
@@ -51,12 +59,5 @@ export default class extends Controller {
     el.setAttribute("aria-label", `${kind === "d8" ? "thorn" : kind} showing ${value}`)
     el.style.setProperty("--delay", `${Math.random() * 120}ms`)
     return el
-  }
-
-  summarize({ highest, cuts, appliedCuts, critical }) {
-    if (critical) return `Multiple 6s — critical, thorns ignored${cuts ? ` (${cuts} cut${cuts > 1 ? "s" : ""} ignored)` : ""}.`
-    const parts = [`Highest d6: ${highest}`]
-    if (cuts) parts.push(`${cuts} cut${cuts > 1 ? "s" : ""}${appliedCuts < cuts ? ` (${appliedCuts} applied)` : ""}`)
-    return parts.join(" · ")
   }
 }

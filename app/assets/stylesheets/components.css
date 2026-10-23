@@ -156,10 +156,11 @@
 }
 
 @media (min-width: 52rem) {
-  .roller__grid { grid-template-columns: minmax(18rem, 22rem) 1fr; align-items: start; }
+  /* Side by side, the setup panel is as tall as the result beside it (a critical makes that taller). */
+  .roller__grid { grid-template-columns: minmax(18rem, 22rem) 1fr; align-items: stretch; }
 }
 
-.roller__controls { display: grid; gap: var(--space-5); }
+.roller__controls { display: grid; gap: var(--space-5); align-content: start; }
 
 .roller__actions { display: flex; gap: var(--space-2); }
 
@@ -260,19 +261,14 @@
 
 .roller__result { min-height: 18rem; display: flex; flex-direction: column; }
 
+/* The dice on one line, the thorns on the next (roller_controller.js). */
 .tray {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-3);
   min-height: 3.5rem;
 }
+.tray__row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 
-.tray__summary {
-  min-height: 1.55em;
-  margin: var(--space-3) 0 var(--space-4);
-  color: var(--ink-faint);
-  font-size: 0.9rem;
-}
 
 .die {
   --size: 44px;
@@ -339,8 +335,9 @@
   from { transform: translateY(-8px) rotate(-25deg) scale(0.6); opacity: 0; }
 }
 
+/* Right under the dice it came from. */
 .result {
-  margin-top: auto;
+  margin-top: var(--space-3);
   padding: var(--space-5);
   border-radius: var(--radius-sm);
   border-left: 6px solid var(--result-color, var(--line-strong));
@@ -362,8 +359,13 @@
   border-top: 1px solid color-mix(in srgb, var(--perfect) 35%, transparent);
 }
 
-.critical__title { color: var(--perfect); margin-bottom: var(--space-1); }
 .critical p { margin: 0; }
+.critical__choices { display: grid; gap: var(--space-1); margin: var(--space-1) 0 var(--space-2); padding-left: 1.2em; }
+.critical__choices li::marker { color: var(--perfect); }
+.critical__fallback { color: var(--muted); }
+/* The /roll page's critical: its choices right under the perfect text, no divider. */
+.result__critical { margin-top: var(--space-3); }
+.result__critical p { margin: 0; }
 
 .ladder {
   display: grid;
@@ -1792,26 +1794,26 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   box-shadow: var(--shadow);
 }
 
-/* Counters: a tinted [ − | count | + ] card (shared/_counter). Suspense in
+/* Tallies: a tinted [ − | count | + ] card (shared/_tally; not the /roll page's .counter steppers). Suspense in
    the GM's scene bar; spark, thread and XP on the owner's sheet. */
-.counter {
-  --counter: var(--text);
-  --counter-text: var(--muted);
-  --counter-bg: var(--surface);
-  --counter-line: var(--line-strong);
+.tally {
+  --tally: var(--text);
+  --tally-text: var(--muted);
+  --tally-bg: var(--surface);
+  --tally-line: var(--line-strong);
   display: inline-flex;
   align-items: stretch;
   min-height: var(--tap);
-  border: 1px solid var(--counter-line);
+  border: 1px solid var(--tally-line);
   border-radius: var(--radius-control);
-  background: var(--counter-bg);
-  color: var(--counter-text);
+  background: var(--tally-bg);
+  color: var(--tally-text);
 }
-.counter--suspense { --counter: var(--suspense); --counter-text: var(--suspense-text); --counter-bg: var(--suspense-bg); --counter-line: var(--suspense-line); }
-.counter--spark { --counter: var(--spark); --counter-text: var(--spark); --counter-bg: color-mix(in srgb, var(--spark) 8%, var(--surface)); --counter-line: color-mix(in srgb, var(--spark) 35%, var(--surface)); }
-.counter--thread { --counter: var(--thread); --counter-text: var(--thread); --counter-bg: color-mix(in srgb, var(--thread) 8%, var(--surface)); --counter-line: color-mix(in srgb, var(--thread) 35%, var(--surface)); }
-.counter .button_to { display: flex; margin: 0; }
-.counter__step {
+.tally--suspense { --tally: var(--suspense); --tally-text: var(--suspense-text); --tally-bg: var(--suspense-bg); --tally-line: var(--suspense-line); }
+.tally--spark { --tally: var(--spark); --tally-text: var(--spark); --tally-bg: color-mix(in srgb, var(--spark) 8%, var(--surface)); --tally-line: color-mix(in srgb, var(--spark) 35%, var(--surface)); }
+.tally--thread { --tally: var(--thread); --tally-text: var(--thread); --tally-bg: color-mix(in srgb, var(--thread) 8%, var(--surface)); --tally-line: color-mix(in srgb, var(--thread) 35%, var(--surface)); }
+.tally .button_to { display: flex; margin: 0; }
+.tally__step {
   min-width: var(--tap);
   border: 0;
   background: none;
@@ -1819,21 +1821,21 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   font: 600 18px/1 var(--font-dice);
   cursor: pointer;
 }
-.counter .button_to:first-child .counter__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
-.counter .button_to:last-child .counter__step { border-radius: 0 var(--radius-control) var(--radius-control) 0; }
-.counter__step:hover:not(:disabled) { background: color-mix(in srgb, var(--counter) 14%, transparent); }
-.counter__step:disabled { color: var(--dim); cursor: not-allowed; }
+.tally .button_to:first-child .tally__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
+.tally .button_to:last-child .tally__step { border-radius: 0 var(--radius-control) var(--radius-control) 0; }
+.tally__step:hover:not(:disabled) { background: color-mix(in srgb, var(--tally) 14%, transparent); }
+.tally__step:disabled { color: var(--dim); cursor: not-allowed; }
 /* One line: "1 of 2 spark", "4 suspense left". */
-.counter__count {
+.tally__count {
   display: flex;
   align-items: center;
   gap: 0.35em;
   padding: 0 var(--space-3);
-  border-inline: 1px solid var(--counter-line);
+  border-inline: 1px solid var(--tally-line);
   font-size: 0.87rem;
   white-space: nowrap;
 }
-.counter__value { font-family: var(--font-dice); font-weight: 600; font-size: 18px; line-height: 1; color: var(--counter); }
+.tally__value { font-family: var(--font-dice); font-weight: 600; font-size: 18px; line-height: 1; color: var(--tally); }
 
 /* Sections */
 .gm-section { display: flex; flex-direction: column; gap: var(--space-3); }

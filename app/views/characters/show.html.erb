@@ -27,7 +27,7 @@
           <%# The owner's spark, thread and XP: tap − or + right here. Everything else that changes the character is on the edit page. %>
           <% { "spark" => Grimwild::MAX_SPARK, "thread" => @character.session_thread }.each do |currency, most| %>
             <% value = @character.public_send(currency) %>
-            <%= render "shared/counter", kind: currency, noun: currency, value: value, of: most,
+            <%= render "shared/tally", kind: currency, noun: currency, value: value, of: most,
               down: { url: character_path(@character), method: :patch, params: { quick: 1, character: { currency => value - 1 } }, disabled: value.zero?, label: "Spend #{currency}" },
               up: { url: character_path(@character), method: :patch, params: { quick: 1, character: { currency => value + 1 } }, disabled: value >= most, label: "Take #{currency}" } %>
           <% end %>
@@ -38,7 +38,7 @@
             </div>
           <% else %>
             <%# + goes through gain_xp!, so filling the boxes levels up and opens the talent picker. %>
-            <%= render "shared/counter", kind: "xp", noun: "XP", group_label: "XP", value: @character.xp, of: @character.xp_to_next_level,
+            <%= render "shared/tally", kind: "xp", noun: "XP", group_label: "XP", value: @character.xp, of: @character.xp_to_next_level,
               down: { url: character_path(@character), method: :patch, params: { quick: 1, character: { xp: @character.xp - 1 } }, disabled: @character.xp.zero?, label: "Take back 1 XP" },
               up: { url: character_experience_path(@character), label: "Take 1 XP (#{@character.xp_to_next_level} fills level #{@character.level + 1})" } %>
           <% end %>

@@ -54,17 +54,23 @@
 
     <section class="panel roller__result" aria-label="Result">
       <div class="tray" data-roller-target="tray" aria-live="polite"></div>
-      <p class="tray__summary" data-roller-target="summary"></p>
 
       <% case outcome %>
       <% when "perfect" %>
         <div class="result result--perfect">
-          <h2 class="result__name">Perfect</h2>
+          <%# A critical (more than one 6) is a perfect that thorns can't cut: same text, then its choices. %>
+          <h2 class="result__name"><% if critical %>Critical<% else %>Perfect<% end %></h2>
           <p class="result__text"><% if mode == "defense" %>You avoid the impact move.<% else %>Success, and you avoid trouble.<% end %></p>
           <% if critical %>
-            <div class="critical">
-              <h3 class="critical__title">Critical</h3>
-              <p>Pick one: <strong>Greater effect</strong> (drop 1d from the task pool before rolling), <strong>Secondary effect</strong> (gain another related perfect), or <strong>Setup</strong> (a riskless assist on a follow-up). If nothing comes to mind, take spark.</p>
+            <%# Written out here, not shared/_critical_choices: this template is evaluated in the browser (herb:slots client). %>
+            <div class="result__critical">
+              <p class="critical__lede">Pick one:</p>
+              <ul class="critical__choices">
+                <li><strong>Greater effect</strong>: drop 1d from the task pool before rolling it.</li>
+                <li><strong>Secondary effect</strong>: also gain another related perfect.</li>
+                <li><strong>Setup</strong>: a riskless assist on a follow-up roll.</li>
+              </ul>
+              <p class="critical__fallback">If nothing fits, take spark.</p>
             </div>
           <% end %>
         </div>
