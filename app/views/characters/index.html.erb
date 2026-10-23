@@ -4,31 +4,33 @@
   <p class="eyebrow">Your adventurers</p>
   <h1>Characters</h1>
   <p class="page-header__lede">Keep your sheets here, and seat each character in one of your campaigns to play them at that table.</p>
-  <p><%= link_to "New character", new_character_path, class: "button button--primary" %></p>
 </header>
 
 <% playing, gone = @characters.partition(&:active?) %>
-<% if playing.any? %>
-  <ul class="tool-grid__list character-list">
-    <% playing.each do |character| %>
-      <li class="card character-list__card">
-        <%= link_to character_path(character), class: "character-list__link" do %>
-          <span class="tool-card__name"><%= character.name %></span>
-          <span class="tool-card__desc"><%= character.path %> · level <%= character.level %></span>
-        <% end %>
-        <% if character.up_for_grabs? %>
-          <p class="field__hint">Up for grabs in <%= character.campaign.name %>, until a player picks them.</p>
-        <% elsif @campaigns.any? %>
-          <%= render "characters/seat_form", character: character, campaigns: @campaigns %>
-        <% else %>
-          <p class="field__hint">Not in a campaign. <%= link_to "Start or join one", campaigns_path %> to play them at a table.</p>
-        <% end %>
-      </li>
+<%# The last card makes a new one. %>
+<ul class="tool-grid__list character-list" aria-label="Your characters">
+  <% playing.each do |character| %>
+    <li class="card character-list__card">
+      <%= link_to character_path(character), class: "character-list__link" do %>
+        <span class="tool-card__name"><%= character.name %></span>
+        <span class="tool-card__desc"><%= character.path %> · level <%= character.level %></span>
+      <% end %>
+      <% if character.up_for_grabs? %>
+        <p class="field__hint">Up for grabs in <%= character.campaign.name %>, until a player picks them.</p>
+      <% elsif @campaigns.any? %>
+        <%= render "characters/seat_form", character: character, campaigns: @campaigns %>
+      <% else %>
+        <p class="field__hint">Not in a campaign. <%= link_to "Start or join one", campaigns_path %> to play them at a table.</p>
+      <% end %>
+    </li>
+  <% end %>
+  <li>
+    <%= link_to new_character_path, class: "tool-card add-card add-card--link" do %>
+      <span class="tool-card__name">Create new character</span>
+      <span class="tool-card__desc">Pick a path, set four stats and choose a talent.</span>
     <% end %>
-  </ul>
-<% elsif gone.none? %>
-  <p class="empty">No characters yet.</p>
-<% end %>
+  </li>
+</ul>
 
 <%# Characters whose story ended (Character::Farewell): open one to bring them back. %>
 <% if gone.any? %>

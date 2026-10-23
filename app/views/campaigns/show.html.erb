@@ -77,9 +77,6 @@
       <section id="party" class="gm-section" aria-labelledby="party-title">
         <div class="gm-section__head">
           <h2 id="party-title" class="gm-section__title">The party</h2>
-          <% if gm && !campaign.done? %>
-            <%= link_to "Make one for the table", new_character_path(campaign_id: campaign.id, up_for_grabs: 1), class: "button button--ghost button--small" %>
-          <% end %>
         </div>
         <div class="party-grid party-grid--wide">
           <% table_seats(@memberships, @party).each do |membership, seated| %>
@@ -118,6 +115,13 @@
                   <%= button_to "Put up for grabs", character_claim_path(character), method: :delete, class: "button button--ghost button--small hero-card__release", form: { data: { turbo_confirm: "#{character.name} goes back to you, for any player to pick. Continue?" } } %>
                 <% end %>
               </article>
+            <% end %>
+          <% end %>
+          <%# The last card makes a character for the table, up for grabs until a player picks it. %>
+          <% if gm && !campaign.done? %>
+            <%= link_to new_character_path(campaign_id: campaign.id, up_for_grabs: 1), class: "hero-card hero-card--empty add-card--link" do %>
+              <span class="hero-card__name">Create new character</span>
+              <span class="hero-card__meta">For the table: up for grabs until a player picks it</span>
             <% end %>
           <% end %>
         </div>

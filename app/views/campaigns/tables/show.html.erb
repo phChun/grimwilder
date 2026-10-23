@@ -54,7 +54,6 @@
     <section id="table" class="gm-section" aria-labelledby="party-title">
       <div class="gm-section__head">
         <h2 id="party-title" class="gm-section__title">Party</h2>
-        <%= link_to "Add a character", new_character_path(campaign_id: campaign.id), class: "button button--ghost button--small" %>
       </div>
       <div class="party-grid">
         <% seats.each do |membership, seated| %>
@@ -92,6 +91,11 @@
               <% end %>
             </article>
           <% end %>
+        <% end %>
+        <%# The last card adds your own character to this table. %>
+        <%= link_to new_character_path(campaign_id: campaign.id), class: "party-card party-card--empty add-card--link" do %>
+          <span class="party-card__name">Create new character</span>
+          <span class="party-card__meta">Yours, seated here</span>
         <% end %>
       </div>
     </section>

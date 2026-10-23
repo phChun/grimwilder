@@ -12,8 +12,9 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
   test "a GM at one campaign can't start another" do
     sign_in_as identities(:gwen)
     get campaigns_path
-    assert_select "#campaign-new ~ p", /each account can be in one active campaign at a time\. Later, playing in as many as you like will be free, and running more than one will be part of a paid plan/
+    assert_select "#campaign-new p", /each account can be in one active campaign at a time\. Later, playing in as many as you like will be free, and running more than one will be part of a paid plan/
     assert_select "form[action=?]", campaigns_path, 0
+    assert_select ".tool-grid__list > li:last-child #campaign-new h2", "Create new campaign"
 
     assert_no_difference -> { Campaign.count } do
       post campaigns_path, params: { campaign: { name: "Elsewhere" } }

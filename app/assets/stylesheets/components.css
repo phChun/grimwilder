@@ -133,6 +133,12 @@
 .tool-card__name { font-family: var(--font-display); font-size: 1.4rem; color: var(--ink); }
 .tool-card__desc { font-size: 0.95rem; }
 
+/* The last card in a list makes a new one ("Create new …"): dashed, like an empty seat, and ember on hover when it's a link. */
+.add-card { justify-content: flex-start; }
+.add-card h2 { margin: 0; }
+.add-card--link { text-decoration: none; }
+.add-card--link:hover { border-color: var(--ember); }
+
 /* The character list: each card links to the sheet and seats it in a campaign. */
 .character-list__card { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 .character-list__card .field__hint { margin: auto 0 0; }
@@ -473,11 +479,6 @@ form.button_to, .button_to { margin: 0; }
   max-width: 40rem;
 }
 
-.campaigns { display: grid; gap: var(--space-6); }
-
-@media (min-width: 52rem) {
-  .campaigns { grid-template-columns: 1fr minmax(18rem, 22rem); align-items: start; }
-}
 
 .panel__title { font-size: 1.4rem; margin: 0; }
 

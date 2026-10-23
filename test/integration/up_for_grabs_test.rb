@@ -11,7 +11,7 @@ class UpForGrabsTest < ActionDispatch::IntegrationTest
   test "the GM makes one for the table; a player picks it and it's theirs" do
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
-    assert_select "#party a[href=?]", new_character_path(campaign_id: @campaign.id, up_for_grabs: 1), "Make one for the table"
+    assert_select "#party .party-grid a.add-card--link:last-child[href=?]", new_character_path(campaign_id: @campaign.id, up_for_grabs: 1), /Create new character/
 
     post characters_path, params: { character: { name: "Marlo", path: "Ranger", brawn: 2, agility: 3, wits: 2, presence: 1, campaign_id: @campaign.id, up_for_grabs: "1" } }
     marlo = Character.find_by!(name: "Marlo")
