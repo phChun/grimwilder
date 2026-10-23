@@ -1,10 +1,22 @@
-<%# The words kept from crucible rolls in this browser (kept_crucibles_controller.js), on the campaign page and the GM table, under each crucible's name in the crucibles' own order (by kind). Hidden until there are some; permanent, so a morph doesn't hide it again. %>
-<% crucibles = Crucible.grouped.flat_map(&:last).map { { key: _1.key, name: _1.name } } %>
-<section id="kept_crucibles" class="card side-card" aria-labelledby="kept-title" data-controller="kept-crucibles" data-kept-crucibles-crucibles-value="<%= crucibles.to_json %>" data-action="crucible:kept@window->kept-crucibles#refresh" data-turbo-permanent hidden>
-  <div class="side-card__head">
-    <h2 id="kept-title" class="side-card__title">Kept crucibles</h2>
-    <button type="button" class="button button--quiet button--small" data-action="kept-crucibles#clear">Clear</button>
-  </div>
-  <div class="kept-groups" data-kept-crucibles-target="list"></div>
-  <p class="side-card__note">Kept on this device, from the <%= link_to "crucibles", crucibles_path %>.</p>
-</section>
+<%# locals: (fold: nil) %>
+<%# The words kept from crucible rolls in this browser (kept_crucibles_controller.js), under each crucible's name in the crucibles' own order (by kind). A side card on the campaign page; on the GM table (fold: true) a fold like Rolls and Crucible, whose open state details-memory keeps. Hidden until there are some; permanent, so a morph doesn't hide it again. Written as plain tags: Herb compiles tag.details statically and drops a **splat in data:. %>
+<% crucibles = Crucible.grouped.flat_map(&:last).map { { key: _1.key, name: _1.name } }.to_json %>
+<% if fold %>
+  <details id="kept_crucibles" class="card gm-fold" data-details-memory-target="section" data-section="kept" data-controller="kept-crucibles" data-kept-crucibles-crucibles-value="<%= crucibles %>" data-action="crucible:kept@window->kept-crucibles#refresh" data-turbo-permanent hidden>
+    <summary class="gm-fold__summary"><span class="gm-section__title">Kept crucibles</span><%= icon(:chevron, size: 18) %></summary>
+    <div class="kept-groups" data-kept-crucibles-target="list"></div>
+    <div class="kept-crucibles__foot">
+      <p class="side-card__note">Kept on this device, from the <%= link_to "crucibles", crucibles_path %>.</p>
+      <button type="button" class="button button--quiet button--small" data-action="kept-crucibles#clear">Clear</button>
+    </div>
+  </details>
+<% else %>
+  <section id="kept_crucibles" class="card side-card" aria-labelledby="kept-title" data-controller="kept-crucibles" data-kept-crucibles-crucibles-value="<%= crucibles %>" data-action="crucible:kept@window->kept-crucibles#refresh" data-turbo-permanent hidden>
+    <div class="side-card__head">
+      <h2 id="kept-title" class="side-card__title">Kept crucibles</h2>
+      <button type="button" class="button button--quiet button--small" data-action="kept-crucibles#clear">Clear</button>
+    </div>
+    <div class="kept-groups" data-kept-crucibles-target="list"></div>
+    <p class="side-card__note">Kept on this device, from the <%= link_to "crucibles", crucibles_path %>.</p>
+  </section>
+<% end %>
