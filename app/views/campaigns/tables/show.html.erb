@@ -83,6 +83,9 @@
                       <span class="seat-pool__size"><%= pool.size %>d</span>
                       <% if pool.rollable? %>
                         <%= button_to "Roll", campaign_pool_roll_path(campaign, pool), class: "button button--small", "aria-label": "Roll #{pool.name}" %>
+                      <% elsif pool.depleted? %>
+                        <%# At 0d the GM can put it back, in case it was spent by accident. %>
+                        <%= button_to pool_reset_label(pool), campaign_pool_reset_path(campaign, pool), class: "button button--small", "aria-label": "Reset #{pool.name} to #{pool.starting_size}d" %>
                       <% end %>
                     </li>
                   <% end %>

@@ -185,9 +185,9 @@
       GROWTH: At levels 3 and 6, gain +1d to each rite pool.'
     page: 60
     uses:
-    - { key: major-rite, label: Major rite, pool: 6, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
-    - { key: minor-rite-1, label: Minor rite, pool: 4, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
-    - { key: minor-rite-2, label: Second minor rite, pool: 4, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
+    - { key: major-rite, label: Major rite, pool: 6, pool_kind: power, per: session, drop_first: true, growth: { 3: 1, 6: 1 } }
+    - { key: minor-rite-1, label: Minor rite, pool: 4, pool_kind: power, per: session, drop_first: true, growth: { 3: 1, 6: 1 } }
+    - { key: minor-rite-2, label: Second minor rite, pool: 4, pool_kind: power, per: session, drop_first: true, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Blessed
     summary: "Once a session, re-roll a roll you just made with no thorns. Spark on a perfect."
@@ -237,7 +237,7 @@
       GROWTH: At levels 3 and 6, gain +1d to your Wild Shape pool.'
     page: 62
     uses:
-    - { key: wild-shape, label: Wild Shape, pool: 2, pool_kind: resource, per: scene, growth: { 3: 1, 6: 1 } }
+    - { key: wild-shape, label: Wild Shape, pool: 2, pool_kind: resource, per: scene, drop_first: true, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Augury
     summary: "Roll 2 omens before each session and swap one in for any d6 rolled at the table."
@@ -429,7 +429,7 @@
     text: 'You have spellcasting as the Channel Divinity talent. Detail your god and choose 1 rite, a 4d power pool (per session). You can drop 1d and roll the pool to cast a potent spell. [Prohibited: Cleric]'
     page: 69
     uses:
-    - { key: rite, label: Rite, pool: 4, pool_kind: power, per: session }
+    - { key: rite, label: Rite, pool: 4, pool_kind: power, per: session, drop_first: true }
   - name: Guardian
     summary: "+1d when you assist on defense, and you can take an attack meant for an ally."
     text: Take +1d when you assist on a defense roll. You can also make a defense roll for an ally when they would be affected by an impact move, or push yourself to defend multiple nearby allies from a single attack, like blocking dragon fire. When you "make a defense roll for an ally", you're not assisting—the impact move is instead now targeting you, and they're no longer at risk.
@@ -518,7 +518,7 @@
     page: 72
     uses:
     - { key: designations, label: Quarry designations, count: 2, per: session }
-    - { key: quarry, label: Quarry, pool: 2, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
+    - { key: quarry, label: Quarry, pool: 2, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Animal Companion
     summary: "A loyal animal with 3 tricks (rolled at 3d), 2 flaws and a bond with each PC."
@@ -568,7 +568,7 @@
       GROWTH: At levels 3 and 6, gain +1d Competence per session and +1 skill.'
     page: 74
     uses:
-    - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, growth: { 3: 1, 6: 1 } }
+    - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
   talents:
   - name: According to Plan
     summary: "+1 thread a session; spend it to flash back to how you planned for this."
@@ -758,7 +758,7 @@
     text: Each session you have a 1d Luck pool. You can roll it as a bonus die after any roll you make and story rolls related to you. On a grim, take spark.
     page: 81
     uses:
-    - { key: luck, label: Luck, pool: 1, pool_kind: power, per: session }
+    - { key: luck, label: Luck, pool: 1, pool_kind: power, per: session, bonus_dice: true }
   - name: Provoke
     summary: "Once a session, goad the GM into targeting only you, with +1d on that defense."
     text: 'Once per session, through insult, boast, or challenge, you can goad the GM into spending suspense on an impact move targeting only you. You take +1d on the defense roll, and on a perfect, your foe: is compelled to keep lashing out—leaves an opening—is utterly embarrassed.'
@@ -907,7 +907,7 @@
     note: Trivial potions offer a single use magic effect, while minor potions bestow a single potent effect. Reflavor the container as an inscribed rune, carved twig, or even a delicious pastry!
     page: 87
     uses:
-    - { key: potions, label: Potions, pool: 4, pool_kind: resource, per: session }
+    - { key: potions, label: Potions, pool: 4, pool_kind: resource, per: session, drop_first: true }
   - name: Archivist
     summary: "2 minor and 1 major arcana, and you drop 1 fewer die when rolling their pools."
     text: You gain 2 minor, and 1 major arcana that you’ve either found or created. When you roll an arcana’s power pool, you drop 1 fewer die unless it’s the last.

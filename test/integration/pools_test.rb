@@ -151,4 +151,15 @@ class PoolsTest < ActionDispatch::IntegrationTest
     assert_select ".form-error", /Phases should be two or more/
     assert_select "input[name='pool[phases_text]'][value=?]", "4d Claws + Tail"
   end
+
+  test "a player can drop 1d first only on a task pool" do
+    sign_in_as identities(:pip)
+
+    post campaign_pool_roll_path(@campaign, pools(:lookouts)), params: { drop_first: "1" }
+    assert_redirected_to campaign_path(@campaign, anchor: dom_id(pools(:lookouts)))
+    assert_nil pools(:lookouts).reload.last_action
+
+    post campaign_pool_roll_path(@campaign, pools(:brawl)), params: { drop_first: "1" }
+    assert_equal "rolled_after_drop", pools(:brawl).reload.last_action
+  end
 end

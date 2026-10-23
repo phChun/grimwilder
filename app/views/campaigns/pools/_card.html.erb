@@ -50,7 +50,7 @@
         <summary class="button pool-card__toggle" aria-label="More for <%= pool.name %>"><%= icon(:more, size: 18) %></summary>
         <div class="pool-card__menu" data-menu-target="panel">
           <%= render "shared/popover_head", title: pool.name %>
-          <% if pool.rollable? %>
+          <% if pool.rollable? && pool.drops_first_for?(gm: true) %>
             <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(pool.campaign, pool), params: { drop_first: "1" }, class: "button button--small" %>
           <% end %>
           <% if pool.pushable? %>
@@ -64,7 +64,7 @@
           <% end %>
           <%= button_to "Delete", campaign_pool_path(pool.campaign, pool), method: :delete, class: "button button--ghost button--small button--danger-text", "aria-label": "Delete #{pool.name}", form: { data: { turbo_confirm: "Delete #{pool.name}?" } } %>
 
-          <% if pool.power? && pool.rollable? %>
+          <% if pool.rolls_as_action? && pool.rollable? %>
             <%= form_with url: campaign_pool_roll_path(pool.campaign, pool), class: "pool-card__action-roll" do %>
               <input type="hidden" name="as_action" value="1">
               <p class="field__hint">Risky use? Roll it as an action, in place of a stat: its highest die is the result, then 1–3s drop.</p>

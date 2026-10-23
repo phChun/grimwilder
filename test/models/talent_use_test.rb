@@ -23,11 +23,17 @@ class TalentUseTest < ActiveSupport::TestCase
       assert use.label.present?, use.id unless use.thread?
       assert_includes Pool::KINDS.keys, use.pool_kind, use.id if use.pool?
       assert use.pool_at(Grimwild::MAX_LEVEL).between?(1, Pool::MAX_SIZE), use.id if use.pool?
+      assert use.pool?, "#{use.id}: only a pool drops 1d first" if use.drop_first
     end
     assert_equal uses.map(&:id).uniq, uses.map(&:id)
   end
 
   test "the talents that grant thread per session" do
     assert_equal %w[ according-to-plan bardic-lore reader scout-ahead ], Talent.all.select { _1.uses.any?(&:thread?) }.map(&:key).sort
+  end
+
+  test "the talent pools that drop 1d before rolling" do
+    assert_equal %w[ alchemist/potions channel-divinity/major-rite channel-divinity/minor-rite-1 channel-divinity/minor-rite-2 divine-blessing/rite wild-shape/wild-shape ],
+      Talent.all.flat_map(&:uses).select(&:drop_first).map(&:id).sort
   end
 end

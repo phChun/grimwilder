@@ -164,4 +164,27 @@ class PoolTest < ActiveSupport::TestCase
     assert_not Pool.new(campaign: campaigns(:bramblewood), name: "Too big", starting_size: 21).valid?
     assert_not Pool.new(campaign: campaigns(:bramblewood), name: "Empty", starting_size: 0).valid?
   end
+
+  test "who may drop 1d before rolling" do
+    assert pools(:brawl).drops_first_for?(gm: false), "a task pool, for a critical's greater effect"
+    assert_not pools(:lookouts).drops_first_for?(gm: false)
+    assert pools(:lookouts).drops_first_for?(gm: true), "the GM, with suspense"
+
+    campaign = campaigns(:bramblewood)
+    cleric = identities(:pip).characters.create!(name: "Ash", path: "Cleric", brawn: 2, agility: 1, wits: 2, presence: 3, campaign: campaign, level: 2, talent_keys: [ "lucky" ])
+    cleric.refresh_talent_pools!(per: :session)
+    assert cleric.talent_pools.find_by!(use_key: "channel-divinity/major-rite").drops_first_for?(gm: false), "a potent spell"
+    assert_not cleric.talent_pools.find_by!(use_key: "lucky/luck").drops_first_for?(gm: true), "Luck never does"
+  end
+
+  test "a bonus-dice talent pool just rolls, never as an action" do
+    cleric = identities(:pip).characters.create!(name: "Ash", path: "Cleric", brawn: 2, agility: 1, wits: 2, presence: 3,
+      campaign: campaigns(:bramblewood), level: 2, talent_keys: [ "lucky" ])
+    cleric.refresh_talent_pools!(per: :session)
+    luck = cleric.talent_pools.find_by!(use_key: "lucky/luck")
+
+    assert cleric.talent_pools.find_by!(use_key: "channel-divinity/major-rite").rolls_as_action?
+    assert_not luck.rolls_as_action?
+    assert_raises(ArgumentError) { luck.roll!(by: identities(:pip), as_action: true) }
+  end
 end

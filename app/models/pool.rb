@@ -96,6 +96,27 @@ class Pool < ApplicationRecord
       result: result, spark_dice: spark_dice || [], character: character)
   end
 
+  # Who may drop 1d before rolling (pg. 10, 18–19, 96): anyone on a task pool,
+  # for a critical's Greater effect; the GM on any shared pool, with suspense;
+  # and on a talent pool only when the talent says so (a potent rite spell).
+  def drops_first_for?(gm:)
+    if character_id
+      talent_use&.drop_first || false
+    else
+      task? || gm
+    end
+  end
+
+  # A power pool rolled as an action in place of a stat (pg. 19). A talent's
+  # bonus-dice pool (Luck, Quarry, Competence) just rolls.
+  def rolls_as_action?
+    power? && !talent_use&.bonus_dice
+  end
+
+  def talent_use
+    Talent.find_by_key(use_key.to_s.split("/").first)&.uses&.find { _1.id == use_key }
+  end
+
   # A task pool roll that dropped nothing: the player takes a mark to drop 1d anyway.
   def pushable?
     task? && last_action == "rolled" && last_dropped == 0 && !depleted? && !held_by_gone_character?
@@ -131,6 +152,7 @@ class Pool < ApplicationRecord
     def check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
       if as_action
         raise ArgumentError, "Only a power pool is rolled as an action." unless power?
+        raise ArgumentError, "#{name} is rolled as bonus dice, not as an action." unless rolls_as_action?
         raise ArgumentError, "Thorns go from 0 to #{Character::Rolling::MAX_EXTRA}." unless thorns.in?(0..Character::Rolling::MAX_EXTRA)
         raise ArgumentError, "Only a character can spend spark." if character.nil? && spend_spark != 0
         raise ArgumentError, "#{character&.name} isn't seated in #{campaign.name}." if character && character.campaign_id != campaign_id

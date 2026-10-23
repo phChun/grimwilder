@@ -1,5 +1,7 @@
 <%# locals: (pool:, my_characters:, gm:, return_to: nil) %>
 <% back = { return_to: return_to }.compact %>
+<% drops_first = pool.rollable? && pool.drops_first_for?(gm: gm) %>
+<% action_roll = pool.rollable? && pool.rolls_as_action? %>
 <div id="<%= dom_id(pool) %>" class="<%= class_names("pool-row", "pool--#{pool.kind}", "pool-row--depleted": pool.depleted?) %>">
   <span class="pool-row__stripe" aria-hidden="true"></span>
 
@@ -46,12 +48,12 @@
     <% end %>
   </div>
 
-  <% if pool.rollable? || pool.pushable? || gm %>
+  <% if drops_first || action_roll || pool.pushable? || gm %>
     <details id="<%= dom_id(pool, :more) %>" class="pool-row__more">
       <summary class="pool-row__toggle" aria-label="More for <%= pool.name %>">⋯</summary>
       <div class="pool-row__panel">
         <div class="pool-row__panel-actions">
-          <% if pool.rollable? %>
+          <% if drops_first %>
             <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(pool.campaign, pool), params: { drop_first: "1", **back }, class: "button button--small" %>
           <% end %>
           <% if pool.pushable? %>
@@ -67,7 +69,7 @@
           <% end %>
         </div>
 
-        <% if pool.power? && pool.rollable? %>
+        <% if action_roll %>
           <%= form_with url: campaign_pool_roll_path(pool.campaign, pool), class: "pool-row__action-roll" do %>
             <input type="hidden" name="as_action" value="1">
             <% if return_to %><input type="hidden" name="return_to" value="<%= return_to %>"><% end %>
@@ -88,6 +90,9 @@
                 </div>
               <% end %>
             </div>
+            <% if pool.drops_first_for?(gm: gm) && pool.size > 1 %>
+              <label class="check"><input type="checkbox" name="drop_first" value="1"> <%= pool.character_id ? "Potent: drop 1d first" : "Drop 1d first" %></label>
+            <% end %>
             <button type="submit" class="button button--primary button--small">Roll as an action</button>
           <% end %>
         <% end %>

@@ -68,9 +68,52 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
 
     get character_path(@fen)
     assert_select "#talent-lucky ##{dom_id(luck)}", 1, "a talent pool sits under its talent"
+    assert_select "#talent-lucky ##{dom_id(luck)} .pool-row__more", 0, "Luck only rolls: no ⋯"
 
     post campaign_pool_roll_path(@campaign, luck), params: { return_to: "character" }
     assert_redirected_to character_path(@fen, anchor: "talent-lucky")
     assert luck.reload.last_rolled_at
+  end
+
+  test "at 0d the GM can reset a talent pool from the table" do
+    @fen.update!(level: 2, talent_keys: [ "bardic-lore", "lucky" ])
+    PlaySession.start!(@campaign, characters: [ @fen ], by: identities(:gwen))
+    luck = @fen.talent_pools.sole
+    reset = campaign_pool_reset_path(@campaign, luck)
+    sign_in_as identities(:gwen)
+
+    get campaign_table_path(@campaign)
+    assert_select ".seat-pool form[action=?]", reset, 0, "only once it's spent"
+
+    luck.roll!(by: identities(:pip), random: FixedDice.new([ 1 ] * Pool::MAX_SIZE))
+    get campaign_table_path(@campaign)
+    assert_select ".seat-pool form[action=?]", reset
+
+    get character_path(@fen)
+    assert_select "#talent-lucky form[action=?]", reset, 0, "not on the sheet"
+
+    perform_enqueued_jobs do
+      assert_turbo_stream_broadcasts @fen do
+        post reset
+      end
+    end
+    assert_redirected_to campaign_table_path(@campaign, anchor: dom_id(luck))
+    assert_equal luck.starting_size, luck.reload.size
+    assert_equal "Gwen resets Fen: Luck to 1d", @campaign.rolls.note.last.question
+  end
+
+  test "on the sheet, a talent pool gets ⋯ only when there's more than Roll" do
+    ash = identities(:pip).characters.create!(name: "Ash", path: "Cleric", brawn: 2, agility: 1, wits: 2, presence: 3,
+      campaign: @campaign, level: 2, talent_keys: [ "bulwark" ])
+    PlaySession.start!(@campaign, characters: [ ash ], by: identities(:gwen))
+    rite = ash.talent_pools.find_by!(use_key: "channel-divinity/major-rite")
+    bulwark = ash.talent_pools.find_by!(use_key: "bulwark/bulwark")
+    sign_in_as identities(:pip)
+
+    get character_path(ash)
+    assert_select "##{dom_id(bulwark)} form[action=?]", campaign_pool_roll_path(@campaign, bulwark), 1
+    assert_select "##{dom_id(bulwark)} .pool-row__more", 0
+    assert_select "##{dom_id(rite)} .pool-row__more input[name=drop_first]", 2, "drop 1d, and potent on the action roll"
+    assert_select "##{dom_id(rite)} .pool-row__more input[name=as_action]"
   end
 end
