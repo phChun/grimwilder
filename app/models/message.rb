@@ -38,6 +38,7 @@ class Message < ApplicationRecord
   # Whispers reach only the GM and the sender; everything else, the table.
   # The partial renders here, outside a request, so it must not use Current.
   after_create_commit :broadcast_to_table
+  after_destroy_commit :broadcast_removal
 
   scope :visible_to, ->(membership) {
     if membership&.gm? then all
@@ -94,7 +95,16 @@ class Message < ApplicationRecord
     end
 
     def broadcast_to_table
-      streams = whisper? ? [ [ campaign, :gm ], [ identity.membership_in(campaign), :chat ] ] : [ [ campaign, :chat ] ]
-      streams.each { broadcast_append_to _1, target: "table_feed", partial: "messages/message", locals: { message: self } }
+      table_streams.each { broadcast_append_to _1, target: "table_feed", partial: "messages/message", locals: { message: self } }
+    end
+
+    def broadcast_removal
+      table_streams.each { broadcast_remove_to _1 }
+    end
+
+    def table_streams
+      return [ [ campaign, :chat ] ] unless whisper?
+
+      [ [ campaign, :gm ], identity.membership_in(campaign)&.then { [ _1, :chat ] } ].compact
     end
 end

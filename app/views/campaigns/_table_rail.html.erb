@@ -8,7 +8,7 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
+<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>

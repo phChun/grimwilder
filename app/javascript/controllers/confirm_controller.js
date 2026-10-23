@@ -22,7 +22,7 @@ export default class extends Controller {
   ask(message, form, submitter) {
     this.answer(false)
     const button = submitter || form?.querySelector("button[type=submit], input[type=submit]")
-    const label = (button?.textContent || button?.value || "").trim() || "Continue"
+    const label = (button?.textContent || button?.value || "").trim() || button?.getAttribute("aria-label") || "Continue"
     const danger = Boolean(button?.matches(".button--danger, .button--danger-text")) || /^(delete|remove)\b/i.test(label)
 
     this.messageTarget.textContent = message

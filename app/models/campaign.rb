@@ -2,7 +2,7 @@
 # is the tenant boundary: campaign-owned records carry campaign_id, and
 # controllers load them through Current.campaign.
 class Campaign < ApplicationRecord
-  include Breaks, Done
+  include Breaks, Done, Reset
 
   JOIN_CODE_LENGTH = 12
 

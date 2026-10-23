@@ -243,11 +243,11 @@
         </ul>
       </section>
 
-      <%= render "campaigns/kept_crucibles" %>
-
       <% unless gm %>
         <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: @my_characters.select(&:active?), suspense: true, quick_roll: (character_path(@mine, anchor: "stats") if @mine) %>
       <% end %>
+
+      <%= render "campaigns/kept_crucibles" %>
     </aside>
   </div>
 </div>

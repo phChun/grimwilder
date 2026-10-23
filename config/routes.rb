@@ -76,9 +76,10 @@ Rails.application.routes.draw do
         resource :ending, only: %i[ new create ], module: :scenes
       end
       resources :notes, only: :create
-      resources :messages, only: :create
+      resources :messages, only: %i[ create destroy ]
       resource :rest, only: :create
       resource :done, only: %i[ create destroy ] # the GM marks the campaign done, or reopens it
+      resource :reset, only: :create # the GM clears sessions and the roll log
       resource :downtime, only: %i[ new create ]
 
       resources :pools, only: %i[ index create update destroy ] do

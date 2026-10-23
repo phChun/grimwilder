@@ -137,4 +137,31 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select ".play-view--solo", 1
     assert_select ".table-rail", 0
   end
+
+  test "the GM deletes a line, for everyone; nobody else can" do
+    line = @campaign.messages.create!(identity: identities(:pip), name: "Pip", kind: "table_talk", body: "oops, wrong window")
+
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select ".table-rail", 1
+    assert_select ".table-rail--gm", 0, "the delete buttons stay hidden"
+
+    assert_no_difference -> { Message.count } do
+      delete campaign_message_path(@campaign, line), as: :turbo_stream
+    end
+    assert_response :forbidden
+  end
+
+  test "the GM's rail shows the delete buttons, and deleting broadcasts the removal" do
+    line = @campaign.messages.create!(identity: identities(:pip), name: "Pip", kind: "table_talk", body: "oops, wrong window")
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
+    assert_select ".table-rail--gm ##{dom_id(line)} form.chat-line__delete-form[action=?] button[aria-label=?]", campaign_message_path(@campaign, line), "Delete this line"
+
+    assert_turbo_stream_broadcasts [ @campaign, :chat ] do
+      delete campaign_message_path(@campaign, line), as: :turbo_stream
+    end
+    assert_response :no_content
+    assert_not Message.exists?(line.id)
+  end
 end

@@ -44,7 +44,7 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select ".counter--suspense .counter__count", "0 suspense left" # session 1 adds none
     assert_select ".counter--suspense button[aria-label=?][disabled]", "Spend 1 suspense (prompts an impact move)", text: "−"
     assert_select ".counter--suspense button[aria-label=?]", "Gain 1 suspense", text: "+"
-    assert_select ".gm-view__main > details#kept_crucibles.gm-fold[data-turbo-permanent][data-section=kept][hidden] summary", /Kept crucibles/
+    assert_select "aside.gm-view__side > .table-rail + section#kept_crucibles.side-card[data-turbo-permanent][hidden]", 1, "under the chat, as on the campaign page"
     assert_select ".scene-bar__actions > *:nth-child(2)", "Cut to new scene"
     assert_select ".scene-bar__actions > *:nth-child(3)", "End session"
 

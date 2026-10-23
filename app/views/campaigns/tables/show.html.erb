@@ -148,8 +148,11 @@
       </div>
     </details>
 
-    <%= render "campaigns/kept_crucibles", fold: true %>
   </div>
 
-  <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [], quick_roll: "#rolls", classes: "fluid__rail" %>
+  <%# The chat, with Kept crucibles under it as on the campaign page; together they stick beside the page on wide screens. %>
+  <aside class="fluid__rail gm-view__side" aria-label="The table">
+    <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [], quick_roll: "#rolls" %>
+    <%= render "campaigns/kept_crucibles" %>
+  </aside>
 </div>

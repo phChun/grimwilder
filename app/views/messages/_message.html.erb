@@ -1,5 +1,5 @@
 <%# locals: (message:) %>
-<%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right. %>
+<%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right, and the delete button shows only in the GM's rail (.table-rail--gm; the server checks too). %>
 <% time = capture do %><time class="feed-item__time" datetime="<%= message.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= message.created_at.utc.strftime("%H:%M UTC") %></time><% end %>
 <li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": !message.story?) %>" data-identity="<%= message.identity_id %>" data-kind="<%= message.kind %>">
   <% case message.kind %>
@@ -22,5 +22,8 @@
   <% else %>
     <p class="chat-line__head"><strong class="chat-line__who"><%= message.name %></strong> <%= time %></p>
     <p class="chat-line__bubble chat-line__body"><%= chat_format(message.body) %></p>
+  <% end %>
+  <% if message.persisted? %>
+    <%= button_to campaign_message_path(message.campaign_id, message), method: :delete, class: "chat-line__delete", "aria-label": "Delete this line", title: "Delete this line", form: { class: "chat-line__delete-form", data: { turbo_confirm: "Delete this line from the chat, for everyone?" } } do %><%= icon(:close, size: 14) %><% end %>
   <% end %>
 </li>

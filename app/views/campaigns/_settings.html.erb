@@ -40,6 +40,15 @@
     <% end %>
   </div>
 
+  <% unless Current.campaign.done? %>
+    <%# Campaign::Reset: start play over, keeping the chat. %>
+    <div class="stack">
+      <h3 class="fold__heading">Reset</h3>
+      <p class="field__hint">Clears every session and scene and the whole roll log, so play starts again at Session 1. Chat stays, and so do pools, suspense and the characters with their XP.</p>
+      <%= button_to "Reset #{Current.campaign.name}", campaign_reset_path(Current.campaign), class: "button button--danger button--small", form: { data: { turbo_confirm: "Reset #{Current.campaign.name}? Every session and the whole roll log are deleted for everyone. Chat stays. This can't be undone." } } %>
+    </div>
+  <% end %>
+
   <div class="stack">
     <h3 class="fold__heading">Delete</h3>
     <%= button_to "Delete campaign", campaign_path(Current.campaign), method: :delete, class: "button button--danger button--small", form: { data: { turbo_confirm: "Delete #{Current.campaign.name} for everyone? This can't be undone." } } %>
