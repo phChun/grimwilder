@@ -5,6 +5,8 @@ class JoinsController < ApplicationController
 
   def show
     @membership = Current.identity&.membership_in(@campaign)
+    # One active campaign at a time (Membership.one_campaign_limit): the one they're at instead.
+    @elsewhere = Current.identity.memberships.joins(:campaign).merge(Campaign.active).first if authenticated? && !@membership
     unless authenticated?
       session[:return_to_after_authenticating] = request.url
       session[:invite_code] = @campaign.join_code # lets them sign up while sign-ups are closed

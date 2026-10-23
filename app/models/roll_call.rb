@@ -19,6 +19,7 @@ class RollCall < ApplicationRecord
 
   enum :kind, %w[ story montage quarrel ].index_by(&:itself), validate: true
   enum :status, %w[ open done cancelled ].index_by(&:itself), validate: true
+  validate(on: :create) { campaign&.refuse_new_play(self) }
 
   # A finished call keeps showing its result to the people in it for this long.
   RESULT_SHOWS_FOR = 2.minutes

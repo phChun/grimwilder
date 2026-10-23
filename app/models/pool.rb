@@ -64,7 +64,7 @@ class Pool < ApplicationRecord
   end
 
   def rollable?
-    !depleted? && !held_by_gone_character?
+    !depleted? && !held_by_gone_character? && !campaign.done?
   end
 
   # A talent pool whose character has fallen or retired waits for them to return.
@@ -81,6 +81,7 @@ class Pool < ApplicationRecord
   def roll!(by:, drop_first: false, as_action: false, thorns: 0, character: nil, spend_spark: 0, random: Random)
     raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
     raise ArgumentError, "#{self.character.name} is #{self.character.status}; return them to play to roll." if held_by_gone_character?
+    raise ArgumentError, "#{campaign.name} is done." if campaign.done?
     check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
 
     before = size
@@ -119,7 +120,7 @@ class Pool < ApplicationRecord
 
   # A task pool roll that dropped nothing: the player takes a mark to drop 1d anyway.
   def pushable?
-    task? && last_action == "rolled" && last_dropped == 0 && !depleted? && !held_by_gone_character?
+    task? && last_action == "rolled" && last_dropped == 0 && !depleted? && !held_by_gone_character? && !campaign.done?
   end
 
   def push!(by:)

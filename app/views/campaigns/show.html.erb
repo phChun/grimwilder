@@ -12,7 +12,7 @@
 <div class="campaign-page" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
   <section class="campaign-hero" aria-labelledby="campaign-name">
     <div class="campaign-hero__about">
-      <p class="eyebrow">Campaign · <%= gm ? "You're the GM" : (@mine ? "Playing #{@mine_all.map(&:short_name).to_sentence}" : "You're a player") %></p>
+      <p class="eyebrow">Campaign<% if campaign.done? %> · Done <%= l(campaign.done_at.to_date, format: :long) %><% end %> · <%= gm ? "You're the GM" : (@mine ? "Playing #{@mine_all.map(&:short_name).to_sentence}" : "You're a player") %></p>
       <h1 id="campaign-name" class="campaign-hero__title"><%= campaign.name %></h1>
       <% if campaign.pitch.present? %>
         <p class="campaign-hero__pitch"><%= campaign.pitch %></p>
@@ -30,7 +30,17 @@
     </div>
 
     <div class="card campaign-hero__action">
-      <% if gm %>
+      <%# Campaign::Done: a read-only archive. The history is the way back in; the GM reopens it from settings. %>
+      <% if campaign.done? %>
+        <p class="campaign-hero__done">The story's told. Everything here stays to look back on.</p>
+        <%= link_to "Read the history", campaign_play_sessions_path(campaign), class: "button button--primary campaign-hero__go" %>
+        <% if @mine %>
+          <p class="campaign-hero__hint">Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.</p>
+        <% end %>
+        <% if gm %>
+          <p class="campaign-hero__hint"><%= link_to "Reopen it", edit_campaign_path(campaign, anchor: "done") %> to play again.</p>
+        <% end %>
+      <% elsif gm %>
         <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary campaign-hero__go" %>
         <%= render "campaigns/copy_join_button", url: join_url(campaign.join_code) %>
         <p class="campaign-hero__hint">
@@ -70,7 +80,7 @@
       <section id="party" class="gm-section" aria-labelledby="party-title">
         <div class="gm-section__head">
           <h2 id="party-title" class="gm-section__title">The party</h2>
-          <% if gm %>
+          <% if gm && !campaign.done? %>
             <%= link_to "Make one for the table", new_character_path(campaign_id: campaign.id, up_for_grabs: 1), class: "button button--ghost button--small" %>
           <% end %>
         </div>
@@ -212,7 +222,7 @@
         <% end %>
       </section>
 
-      <% unless gm %>
+      <% unless gm || campaign.done? %>
         <details id="rolls" class="card side-card" data-details-memory-target="section" data-section="rolls">
           <summary class="gm-fold__summary"><span class="side-card__title">Rolls</span><%= icon(:chevron, size: 18) %></summary>
           <%= render "campaigns/rolls", characters: @characters, my_characters: @my_characters %>

@@ -64,6 +64,16 @@
       </div>
     </section>
 
+    <%# A done campaign's sheet is for reading (Character#in_play?); the owner can seat them somewhere new. %>
+    <% if campaign&.done? && @character.active? %>
+      <div class="claim-bar">
+        <p class="claim-bar__text"><strong><%= campaign.name %> is done.</strong> <%= editable ? "Seat #{short} somewhere new to play them again." : "This sheet is for reading now." %></p>
+        <% if editable %>
+          <%= link_to "Move #{short}", edit_character_path(@character, anchor: "at-the-table"), class: "button button--ghost button--small" %>
+        <% end %>
+      </div>
+    <% end %>
+
     <%# A fallen or retired character's sheet says so, with the player's farewell; the owner can bring them back. %>
     <% if @character.gone? %>
       <div class="<%= class_names("farewell-banner", "farewell-banner--fallen": @character.fallen?) %>">
@@ -108,7 +118,7 @@
               <span class="stat-card__dice"><%= @character.stat(stat) %>d</span>
             </div>
             <p class="stat-card__desc"><%= description %></p>
-            <% if editable && @character.active? %>
+            <% if editable && @character.in_play? %>
               <%= render "characters/roll_form", character: @character, stat: stat, allies: @allies %>
             <% end %>
           </article>
@@ -128,7 +138,7 @@
           <% end %>
         </div>
         <%# Desperate isn't death: more harm drops them, and a story roll says how bad (pg. 27). If that's the end, the owner gets a quiet way there. %>
-        <% if editable && @character.desperate? && @character.active? && !@character.up_for_grabs? %>
+        <% if editable && @character.desperate? && @character.in_play? && !@character.up_for_grabs? %>
           <div class="harm__end">
             <p class="harm__end-text">Down for good?</p>
             <%= link_to "#{short}'s story ends…", edit_character_path(@character, anchor: "story-ends"), class: "button button--danger button--small" %>
@@ -143,7 +153,7 @@
                 <span class="condition__name"><%= size ? pool_name.capitalize : condition["name"] %><% if condition["lasts"] == "scene" %> <span class="tag">clears after scene</span><% end %></span>
                 <% if size %><span class="condition__size"><%= size %>d</span><% end %>
                 <% if tends %>
-                  <% if size&.positive? && @character.active? %>
+                  <% if size&.positive? && @character.in_play? %>
                     <%= button_to "Roll", character_condition_roll_path(@character, index), class: "button button--small", "aria-label": "Roll #{condition["name"]}" %>
                   <% end %>
                   <%= button_to "Clear", character_condition_path(@character, index), method: :delete, class: "button button--ghost button--small", "aria-label": "Clear #{condition["name"]}" %>

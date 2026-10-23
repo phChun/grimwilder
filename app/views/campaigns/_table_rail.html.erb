@@ -43,30 +43,35 @@
     </button>
   </div>
 
-  <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
-    <% voices = gm ? [ %w[ narration Narrate ], [ "npc", "As NPC" ], [ "table_talk", "Table talk" ] ] : speakers.map { [ "character:#{_1.id}", "As #{_1.short_name}" ] } + [ [ "table_talk", "Table talk" ], [ "whisper", "To GM" ] ] %>
-    <%# In rows: one row of up to three, two by two for four (two characters), three across for more. %>
-    <%= render "shared/segmented", name: "speak_as", legend: "Speak as", options: voices, checked: default_voice(membership, speakers, speaker), id_prefix: "#{prefix}_voice", classes: "composer__voices composer__voices--#{voices.size == 4 ? 2 : voices.size.clamp(1, 3)}" %>
-    <div class="composer__npc">
-      <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
-      <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
-    </div>
-    <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
-    <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
-    <div class="composer__row">
-      <% if quick_roll %>
-        <%= link_to quick_roll, class: "button composer__roll", "aria-label": "Roll", title: "Roll" do %><%= icon(:die, size: 18) %><% end %>
-      <% end %>
-      <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
-      <button type="submit" class="button button--primary composer__send">Send</button>
-    </div>
-  <% end %>
-
-  <details class="table-rail__note" data-details-memory-target="section" data-section="note">
-    <summary class="table-rail__summary"><span>Log a game event</span><%= icon(:chevron) %></summary>
-    <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
-      <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="A game event for the log">
-      <button type="submit" class="button button--small">Log it</button>
+  <%# A done campaign's log is for reading (Campaign::Done). %>
+  <% if campaign.done? %>
+    <p class="table-rail__done"><%= campaign.name %> is done. The log stays here to read.</p>
+  <% else %>
+    <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
+      <% voices = gm ? [ %w[ narration Narrate ], [ "npc", "As NPC" ], [ "table_talk", "Table talk" ] ] : speakers.map { [ "character:#{_1.id}", "As #{_1.short_name}" ] } + [ [ "table_talk", "Table talk" ], [ "whisper", "To GM" ] ] %>
+      <%# In rows: one row of up to three, two by two for four (two characters), three across for more. %>
+      <%= render "shared/segmented", name: "speak_as", legend: "Speak as", options: voices, checked: default_voice(membership, speakers, speaker), id_prefix: "#{prefix}_voice", classes: "composer__voices composer__voices--#{voices.size == 4 ? 2 : voices.size.clamp(1, 3)}" %>
+      <div class="composer__npc">
+        <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
+        <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
+      </div>
+      <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
+      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
+      <div class="composer__row">
+        <% if quick_roll %>
+          <%= link_to quick_roll, class: "button composer__roll", "aria-label": "Roll", title: "Roll" do %><%= icon(:die, size: 18) %><% end %>
+        <% end %>
+        <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
+        <button type="submit" class="button button--primary composer__send">Send</button>
+      </div>
     <% end %>
-  </details>
+
+    <details class="table-rail__note" data-details-memory-target="section" data-section="note">
+      <summary class="table-rail__summary"><span>Log a game event</span><%= icon(:chevron) %></summary>
+      <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
+        <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="A game event for the log">
+        <button type="submit" class="button button--small">Log it</button>
+      <% end %>
+    </details>
+  <% end %>
 </section>

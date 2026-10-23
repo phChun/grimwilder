@@ -1,9 +1,10 @@
 <%# locals: (character:, campaigns:) %>
-<%# Character::Seating: pick which of your campaigns the character plays in. %>
+<%# Character::Seating: pick which of your campaigns the character plays in. A done one is listed only while they're still seated there. %>
+<% campaigns = campaigns.reject { _1.done? && _1.id != character.campaign_id } %>
 <%= form_with url: character_seat_path(character), method: :patch, class: "seat-form" do |form| %>
   <%= form.label :campaign_id, "Campaign", for: "seat_#{character.id}", class: "field__label" %>
   <div class="seat-form__row">
-    <%= form.select :campaign_id, campaigns.map { |campaign| [ campaign.name, campaign.id ] }, { selected: character.campaign_id, include_blank: "Not in a campaign" }, id: "seat_#{character.id}", class: "field__input field__input--small" %>
+    <%= form.select :campaign_id, campaigns.map { |campaign| [ campaign.done? ? "#{campaign.name} (done)" : campaign.name, campaign.id ] }, { selected: character.campaign_id, include_blank: "Not in a campaign" }, id: "seat_#{character.id}", class: "field__input field__input--small" %>
     <%= form.submit (character.campaign ? "Move" : "Seat"), class: "button button--small" %>
   </div>
 <% end %>

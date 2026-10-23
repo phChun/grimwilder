@@ -25,6 +25,7 @@ module Character::Rolling
   def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, random: Random)
     stat_name = stat_name.to_s
     raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
+    raise ArgumentError, "#{campaign.name} is done." if campaign&.done?
     raise ArgumentError, "Pick Brawn, Agility, Wits or Presence." unless Grimwild::STATS.include?(stat_name)
     raise ArgumentError, "Pick an action or a defense roll." unless MODES.include?(mode)
     check_spark_spend!(spend_spark)

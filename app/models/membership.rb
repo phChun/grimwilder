@@ -6,6 +6,7 @@ class Membership < ApplicationRecord
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
 
   validates :identity_id, uniqueness: { scope: :campaign_id }
+  validate :one_active_campaign, on: :create
 
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
@@ -28,6 +29,20 @@ class Membership < ApplicationRecord
     elsif seen_at && seen_at > now - PRESENCE_WINDOW then "idle"
     else "away"
     end
+  end
+
+  # While we improve Grimwilder, each account is at one active campaign at a
+  # time, GM or player; a paid plan for more comes later. Said the same way on
+  # the campaigns page, the join page and a refused join.
+  def self.one_campaign_limit(membership)
+    way_out = membership.gm? ? "mark it done in its settings" : "leave it or wait for its GM to mark it done"
+    "You're at #{membership.campaign.name}. While we're improving Grimwilder, each account can be in one active campaign at a time; " \
+      "a paid plan for more is coming later. To start or join another, #{way_out}."
+  end
+
+  # The other active campaign this member is at, if any (see one_campaign_limit).
+  def other_active_membership
+    identity.memberships.joins(:campaign).merge(Campaign.active).where.not(campaign_id: campaign_id).first
   end
 
   # The characters this member plays here: seated, and still playing.
@@ -57,6 +72,14 @@ class Membership < ApplicationRecord
       if gm? && !destroyed_by_association && campaign.memberships.gm.where.not(id: id).none?
         errors.add(:base, "A campaign needs at least one GM")
         throw :abort
+      end
+    end
+
+    def one_active_campaign
+      if campaign&.done?
+        errors.add(:base, "#{campaign.name} is done, so no one can join it.")
+      elsif (other = other_active_membership)
+        errors.add(:base, self.class.one_campaign_limit(other))
       end
     end
 end

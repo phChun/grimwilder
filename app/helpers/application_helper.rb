@@ -57,9 +57,9 @@ module ApplicationHelper
     if membership.gm?
       [
         [ "Campaign", campaign_path(campaign), on_campaign ],
-        [ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ],
+        ([ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ] unless campaign.done?),
         log
-      ]
+      ].compact
     else
       sheets = membership.seated_characters.map { [ _1.name, character_path(_1), controller_path == "characters" && @character == _1 ] }
       mine =

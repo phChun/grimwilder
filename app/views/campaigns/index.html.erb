@@ -6,16 +6,18 @@
   <p class="page-header__lede">Start a campaign to run it as GM, or open a join link from your GM to play in theirs.</p>
 </header>
 
+<%# One active campaign at a time (Membership.one_campaign_limit): while you're at one, it leads and the start form waits. Done ones follow. %>
+<% active, done = @memberships.partition { !_1.campaign.done? } %>
 <div class="campaigns">
   <section aria-labelledby="campaign-list">
     <h2 id="campaign-list" class="visually-hidden">Your campaigns</h2>
     <% if @memberships.any? %>
       <ul class="tool-grid__list">
-        <% @memberships.each do |membership| %>
+        <% (active + done).each do |membership| %>
           <li>
-            <%= link_to campaign_path(membership.campaign), class: "tool-card tool-card--ready" do %>
+            <%= link_to campaign_path(membership.campaign), class: class_names("tool-card", "tool-card--ready": !membership.campaign.done?) do %>
               <span class="tool-card__name"><%= membership.campaign.name %></span>
-              <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %></span>
+              <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if membership.campaign.done? %> · done <%= l(membership.campaign.done_at.to_date, format: :long) %><% end %></span>
             <% end %>
           </li>
         <% end %>
@@ -27,16 +29,21 @@
 
   <section class="panel stack" aria-labelledby="campaign-new">
     <h2 id="campaign-new" class="panel__title">Start a campaign</h2>
-    <%= form_with model: @campaign, class: "stack" do |form| %>
-      <% if @campaign.errors.any? %>
-        <p class="form-error"><%= @campaign.errors.full_messages.to_sentence %></p>
+    <% if (current = active.first) && @campaign.errors.none? %>
+      <p><%= Membership.one_campaign_limit(current) %></p>
+      <%= link_to "Open #{current.campaign.name}", campaign_path(current.campaign), class: "button" %>
+    <% else %>
+      <%= form_with model: @campaign, class: "stack" do |form| %>
+        <% if @campaign.errors.any? %>
+          <p class="form-error"><%= @campaign.errors.full_messages.to_sentence %></p>
+        <% end %>
+        <div class="field">
+          <%= form.label :name, "Campaign name", class: "field__label" %>
+          <%= form.text_field :name, required: true, maxlength: 80, placeholder: "The Bramblewood Accord", class: "field__input" %>
+        </div>
+        <%= form.submit "Start campaign", class: "button button--primary" %>
       <% end %>
-      <div class="field">
-        <%= form.label :name, "Campaign name", class: "field__label" %>
-        <%= form.text_field :name, required: true, maxlength: 80, placeholder: "The Bramblewood Accord", class: "field__input" %>
-      </div>
-      <%= form.submit "Start campaign", class: "button button--primary" %>
+      <p class="field__hint">You'll be its GM. Players join with a link you share.</p>
     <% end %>
-    <p class="field__hint">You'll be its GM. Players join with a link you share.</p>
   </section>
 </div>

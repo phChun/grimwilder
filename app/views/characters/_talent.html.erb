@@ -5,8 +5,8 @@
 <% pool_uses = talent.uses.select(&:pool?) %>
 <% thread = talent.uses.select(&:thread?).sum(&:thread) %>
 <% removable = editable && !talent.core? %>
-<% rolls = editable && character.campaign && !character.up_for_grabs? && character.active? ? talent.rolls : [] %>
-<% pushes = editable && character.active? && talent.pushes? %>
+<% rolls = editable && character.campaign && !character.up_for_grabs? && character.in_play? ? talent.rolls : [] %>
+<% pushes = editable && character.in_play? && talent.pushes? %>
 <article id="talent-<%= talent.key %>" class="<%= class_names("talent-card", "talent-card--core": talent.core?, "talent-card--eldritch": eldritch, "talent-card--skinned": talent.skinned?) %>">
   <div class="talent-card__head">
     <h3 class="talent-card__name"><%= talent.name %></h3>

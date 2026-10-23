@@ -7,6 +7,8 @@ class Campaigns::TablesController < ApplicationController
   before_action :require_gm
 
   def show
+    return redirect_to campaign_path(Current.campaign) if Current.campaign.done?
+
     load_table
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_22_220000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_23_042125) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -22,6 +22,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_22_220000) do
     t.json "party_is", default: [], null: false
     t.string "party_never"
     t.string "group_arc"
+    t.datetime "done_at"
+    t.index ["done_at"], name: "index_campaigns_on_done_at"
     t.index ["join_code"], name: "index_campaigns_on_join_code", unique: true
   end
 

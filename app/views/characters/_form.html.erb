@@ -25,7 +25,7 @@
     <% unless character.persisted? %>
       <div class="field">
         <%= form.label :campaign_id, "Campaign", class: "field__label" %>
-        <%= form.select :campaign_id, Current.identity.campaigns.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
+        <%= form.select :campaign_id, Current.identity.campaigns.active.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
       </div>
     <% end %>
     <% if Current.identity.memberships.gm.exists? %>

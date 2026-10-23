@@ -4,6 +4,7 @@ class CampaignsController < ApplicationController
   OLDER_SESSIONS = 2
 
   skip_before_action :set_campaign, only: %i[ index create ]
+  skip_before_action :refuse_when_done, only: %i[ update destroy ]
   before_action :require_gm, only: %i[ update destroy ]
 
   def index

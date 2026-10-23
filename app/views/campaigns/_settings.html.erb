@@ -1,5 +1,5 @@
 <%# locals: (memberships:, gm:) %>
-<% if gm %>
+<% if gm && !Current.campaign.done? %>
   <div class="stack">
     <h3 class="fold__heading">Invite players</h3>
     <p class="field__hint">Anyone with this link can sign in and join as a player.</p>
@@ -27,7 +27,19 @@
   </ul>
 </div>
 
+<%# Campaign::Done: a read-only archive that frees everyone for another campaign. %>
 <% if gm %>
+  <div id="done" class="stack">
+    <h3 class="fold__heading">Done</h3>
+    <% if Current.campaign.done? %>
+      <p class="field__hint">Done since <%= l(Current.campaign.done_at.to_date, format: :long) %>. Reopening makes it everyone's active campaign again, so it can't while someone here is at another one.</p>
+      <%= button_to "Reopen #{Current.campaign.name}", campaign_done_path(Current.campaign), method: :delete, class: "button button--small" %>
+    <% else %>
+      <p class="field__hint">When the story's told: the campaign stays to read (its page, history, log and sheets), but nothing new is played, and everyone's free to start or join another.<%= " End the session first." if Current.campaign.current_session %></p>
+      <%= button_to "Mark #{Current.campaign.name} done", campaign_done_path(Current.campaign), class: "button button--small", disabled: Current.campaign.current_session.present?, form: { data: { turbo_confirm: "Mark #{Current.campaign.name} done? It becomes read-only for everyone. You can reopen it." } } %>
+    <% end %>
+  </div>
+
   <div class="stack">
     <h3 class="fold__heading">Delete</h3>
     <%= button_to "Delete campaign", campaign_path(Current.campaign), method: :delete, class: "button button--danger button--small", form: { data: { turbo_confirm: "Delete #{Current.campaign.name} for everyone? This can't be undone." } } %>

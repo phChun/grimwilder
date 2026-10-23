@@ -2,8 +2,8 @@
 # happened and the player's line on how it ended (`farewell`). They stay on
 # the campaign page and the Characters page, under the party, and can return
 # to play. Only the owner ends their story, and not while the GM holds them
-# up for grabs. However the status changes (these methods or the edit form's
-# Status select), the table's log says so in the same transaction.
+# up for grabs. However the status changes (these methods or a status
+# update), the table's log says so in the same transaction.
 module Character::Farewell
   extend ActiveSupport::Concern
 
@@ -21,6 +21,12 @@ module Character::Farewell
 
   def gone?
     !active?
+  end
+
+  # Still playing, at a table that's still playing (or at none): rolls, pushes
+  # and talent rolls show only then. A done campaign's sheets are for reading.
+  def in_play?
+    active? && !campaign&.done?
   end
 
   # status: "fallen" or "retired".

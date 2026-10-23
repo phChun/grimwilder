@@ -41,7 +41,7 @@ class PlaySessionTest < ActiveSupport::TestCase
     assert_raises(ArgumentError) { PlaySession.start!(@campaign, characters: [ @tibbs ], by: identities(:gwen)) }
     assert_not @campaign.play_sessions.new(number: 9, started_at: Time.current).valid?
 
-    other = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:gwen))
+    other = Campaign.create_with_gm!(name: "Elsewhere", gm: Identity.create!(email_address: "elsewhere@example.com", name: "Elsie"))
     assert_raises(ArgumentError) { PlaySession.start!(other, characters: [ @tibbs ], by: identities(:gwen)) }
   end
 

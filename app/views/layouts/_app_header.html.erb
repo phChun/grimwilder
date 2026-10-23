@@ -19,7 +19,7 @@
           <li>
             <%= link_to campaign_path(seat.campaign), "aria-current": (seat == membership ? "page" : nil) do %>
               <span><%= seat.campaign.name %></span>
-              <span class="switcher__role"><%= seat.gm? ? "GM" : "Player" %></span>
+              <span class="switcher__role"><%= seat.gm? ? "GM" : "Player" %><%= " · done" if seat.campaign.done? %></span>
             <% end %>
           </li>
         <% end %>

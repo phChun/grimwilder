@@ -78,6 +78,7 @@ Rails.application.routes.draw do
       resources :notes, only: :create
       resources :messages, only: :create
       resource :rest, only: :create
+      resource :done, only: %i[ create destroy ] # the GM marks the campaign done, or reopens it
       resource :downtime, only: %i[ new create ]
 
       resources :pools, only: %i[ index create update destroy ] do

@@ -20,6 +20,7 @@ class Roll < ApplicationRecord
   enum :kind, %w[ action defense story quarrel montage pool marker note ].index_by(&:itself), validate: true
 
   validates :name, presence: true
+  validate(on: :create) { campaign&.refuse_new_play(self) }
   validates :question, presence: true, length: { maximum: 200 }, if: :note?
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, if: -> { action? || defense? || story? || montage? }
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, allow_nil: true, if: :pool? # power pools rolled as an action
@@ -33,7 +34,11 @@ class Roll < ApplicationRecord
   after_update_commit :broadcast_change_to_table, if: :campaign
 
   # A short line in the log, by someone at the table or about a character.
+  # A done campaign's log stays as it was: a sheet can still change (moving the
+  # character to a new table, marking them fallen), but nothing is noted there.
   def self.note!(campaign:, by:, text:, character: nil)
+    return if campaign&.done?
+
     create!(campaign: campaign, identity: by, kind: "note", character: character,
       name: character&.name || by.display_name, question: text.to_s.squish.first(200))
   end

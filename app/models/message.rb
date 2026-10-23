@@ -31,6 +31,7 @@ class Message < ApplicationRecord
   validates :body, presence: true, length: { maximum: MAX_LENGTH }
   validates :speaker_name, presence: true, length: { maximum: 60 }, if: :npc?
   validate :sender_may_speak_this_way
+  validate(on: :create) { campaign&.refuse_new_play(self) }
 
   before_validation :copy_in_name
 
