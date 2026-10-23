@@ -32,12 +32,13 @@ class Membership < ApplicationRecord
   end
 
   # While we improve Grimwilder, each account is at one active campaign at a
-  # time, GM or player; a paid plan for more comes later. Said the same way on
-  # the campaigns page, the join page and a refused join.
+  # time, GM or player. Planned: playing in any number stays free, and running
+  # more than one becomes the paid plan (see Roadmap in AGENTS.md). Said the
+  # same way on the campaigns page, the join page and a refused join.
   def self.one_campaign_limit(membership)
     way_out = membership.gm? ? "mark it done in its settings" : "leave it or wait for its GM to mark it done"
-    "You're at #{membership.campaign.name}. While we're improving Grimwilder, each account can be in one active campaign at a time; " \
-      "a paid plan for more is coming later. To start or join another, #{way_out}."
+    "You're at #{membership.campaign.name}. While we're improving Grimwilder, each account can be in one active campaign at a time. " \
+      "Later, playing in as many as you like will be free, and running more than one will be part of a paid plan. To start or join another, #{way_out}."
   end
 
   # The other active campaign this member is at, if any (see one_campaign_limit).

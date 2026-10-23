@@ -270,30 +270,52 @@ small { font-size: 0.8em; color: var(--dim); }
   text-transform: uppercase;
 }
 
-/* Campaign switcher: a native <details> menu. */
-.switcher { position: relative; }
 
-.switcher__button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: var(--tap);
-  max-width: 18rem;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 500;
-  list-style: none;
-  cursor: pointer;
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  flex: 1 1 100%;
+  order: 4;
 }
 
-.switcher__button::-webkit-details-marker { display: none; }
-.switcher__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.switcher[open] .switcher__button .icon { transform: rotate(180deg); }
+/* Phones: wordmark and account on one row, then the tabs. */
+.brand { order: 1; }
+.account { order: 2; margin-left: auto; }
 
-.switcher__menu {
+@media (min-width: 48rem) {
+  .tabs { order: 3; flex: 1 1 auto; }
+  .account { order: 4; }
+}
+
+.tabs__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.tabs__link:hover { color: var(--text); }
+/* The campaign you're in, by name: cut short if it's long. */
+.tabs__name { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tabs__link[aria-current="page"],
+.tabs__link--current {
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--ember);
+}
+
+/* A tab with a menu: "My characters" when a player has several seated here. */
+.tab-menu { position: relative; }
+.tab-menu__button { gap: var(--space-1); cursor: pointer; list-style: none; }
+.tab-menu__button::-webkit-details-marker { display: none; }
+.tab-menu[open] .tab-menu__button .icon { transform: rotate(180deg); }
+
+.tab-menu__menu {
   position: absolute;
   z-index: 20;
   top: calc(100% + 4px);
@@ -310,11 +332,9 @@ small { font-size: 0.8em; color: var(--dim); }
   box-shadow: var(--shadow);
 }
 
-.switcher__menu a {
+.tab-menu__menu a {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
   min-height: var(--tap);
   padding: 0 var(--space-3);
   border-radius: var(--radius-sm);
@@ -322,54 +342,8 @@ small { font-size: 0.8em; color: var(--dim); }
   text-decoration: none;
 }
 
-.switcher__menu a:hover { background: var(--surface-2); }
-.switcher__menu a[aria-current="page"] { font-weight: 600; }
-.switcher__role { color: var(--dim); font-size: 0.8rem; }
-.switcher__all { border-top: 1px solid var(--line-soft); margin-top: var(--space-1); padding-top: var(--space-1); }
-
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  flex: 1 1 100%;
-  order: 4;
-}
-
-/* Phones: wordmark and account on one row, then the switcher and the tabs. */
-.brand { order: 1; }
-.account { order: 2; margin-left: auto; }
-.switcher { order: 3; }
-
-@media (min-width: 48rem) {
-  .switcher { order: 2; }
-  .tabs { order: 3; flex: 1 1 auto; }
-  .account { order: 4; }
-}
-
-.tabs__link {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--tap);
-  padding: 0 var(--space-3);
-  color: var(--muted);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.tabs__link:hover { color: var(--text); }
-
-.tabs__link[aria-current="page"],
-.tabs__link--current {
-  color: var(--text);
-  font-weight: 600;
-  box-shadow: inset 0 -2px 0 var(--ember);
-}
-
-/* A tab with a menu: "My characters" when a player has several seated here. */
-.tab-menu { position: relative; }
-.tab-menu__button { gap: var(--space-1); cursor: pointer; list-style: none; }
-.tab-menu__button::-webkit-details-marker { display: none; }
-.tab-menu[open] .tab-menu__button .icon { transform: rotate(180deg); }
+.tab-menu__menu a:hover { background: var(--surface-2); }
+.tab-menu__menu a[aria-current="page"] { font-weight: 600; }
 
 .tabs__link--soon { color: var(--dim); cursor: default; }
 .tabs__link--soon:hover { color: var(--dim); }

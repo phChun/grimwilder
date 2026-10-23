@@ -1,31 +1,10 @@
 <%# locals: (membership:) %>
-<%# The shell: wordmark, campaign switcher, tabs and account. Inside a campaign the tabs are the campaign's; elsewhere they're the toolkit's. %>
+<%# The shell: wordmark, tabs (All campaigns first, signed in) and account. Inside a campaign the tabs are the campaign's; elsewhere they're the toolkit's. %>
 <header class="app-header">
   <%= link_to root_path, class: "brand" do %>
     <%= brand_mark %>
     <span class="brand__name">Grimwilder</span>
     <span class="brand__beta">Beta</span>
-  <% end %>
-
-  <% if authenticated? %>
-    <details class="switcher">
-      <summary class="switcher__button">
-        <span class="switcher__name"><%= membership ? membership.campaign.name : "Campaigns" %></span>
-        <%= icon(:chevron, size: 14) %>
-      </summary>
-      <ul class="switcher__menu">
-        <%= render "shared/popover_head", title: "Your campaigns", list: true %>
-        <% Current.identity.memberships.includes(:campaign).order(created_at: :desc).each do |seat| %>
-          <li>
-            <%= link_to campaign_path(seat.campaign), "aria-current": (seat == membership ? "page" : nil) do %>
-              <span><%= seat.campaign.name %></span>
-              <span class="switcher__role"><%= seat.gm? ? "GM" : "Player" %><%= " · done" if seat.campaign.done? %></span>
-            <% end %>
-          </li>
-        <% end %>
-        <li class="switcher__all"><%= link_to "All campaigns", campaigns_path %></li>
-      </ul>
-    </details>
   <% end %>
 
   <% if membership %>
@@ -35,7 +14,7 @@
           <%# More than one character seated here: a menu of their sheets. %>
           <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
             <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
-            <ul class="switcher__menu tab-menu__menu" data-menu-target="panel">
+            <ul class="tab-menu__menu" data-menu-target="panel">
               <%= render "shared/popover_head", title: text, list: true %>
               <% path.each do |name, sheet_path, open| %>
                 <li><%= link_to name, sheet_path, "aria-current": (open ? "page" : nil) %></li>
@@ -51,6 +30,10 @@
     </nav>
   <% else %>
     <nav class="tabs" aria-label="Toolkit">
+      <% if authenticated? %>
+        <% text, path, current = all_campaigns_tab %>
+        <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
+      <% end %>
       <% toolkit_nav.each do |item| %>
         <% if item[:ready] %>
           <% path = public_send(item[:path]) %>

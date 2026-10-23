@@ -9,7 +9,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".app-header .brand .brand__beta", "Beta"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", "Roll"
     assert_select ".app-header a.account--signin", "Sign in"
-    assert_select ".app-header .switcher", 0
+    assert_select ".tabs__link", text: "All campaigns", count: 0
     assert_select ".site-footer__tools a", "Crucibles"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 3
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", text: "Characters", count: 0
@@ -31,11 +31,15 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".tool-card[href=?]", new_session_path, 0
   end
 
-  test "signed in, every page's tabs end with your characters" do
+  test "signed in, every page's tabs start with all campaigns and end with your characters" do
     sign_in_as identities(:stranger)
     get root_path
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 4
+    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 5
+    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link[href=?]", characters_path, "Characters"
+
+    get campaigns_path
+    assert_select ".tabs__link[aria-current=page]", "All campaigns"
 
     get characters_path
     assert_select ".tabs__link[aria-current=page]", "Characters"
@@ -47,17 +51,16 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test "the GM gets the campaign's tabs, a switcher and an account button" do
+  test "the GM gets the campaign's tabs and an account button" do
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 4
-    assert_select ".tabs__link[aria-current=page]", "Campaign"
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 5
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
+    assert_select ".tabs__link[aria-current=page][href=?] .tabs__name", campaign_path(@campaign), @campaign.name
     assert_select ".tabs__link[href=?]", campaign_table_path(@campaign), "Table"
     assert_select ".tabs__link[href=?]", campaign_play_sessions_path(@campaign), "Log"
     assert_select ".tabs__link[href=?]", characters_path, "Characters"
-    assert_select ".switcher__name", @campaign.name
-    assert_select ".switcher__menu a[aria-current=page]", /#{@campaign.name}/
     assert_select "a.account[aria-label=?]", "Account: Gwen", "G"
   end
 
@@ -75,7 +78,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
     get character_path(characters(:tibbs))
 
     assert_select ".tabs__link[aria-current=page][href=?]", character_path(characters(:tibbs)), "My character"
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 4
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 5
     assert_select ".tabs__link", text: "Party", count: 0
   end
 

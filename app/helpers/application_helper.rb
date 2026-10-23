@@ -36,6 +36,11 @@ module ApplicationHelper
   # Every signed-in person's own characters, the last tab in the header inside
   # a campaign or out: [label, path, current?]. A player's sheet in a campaign
   # is "My character" instead.
+  # First in both navs, signed in: every campaign you're at, or have been.
+  def all_campaigns_tab
+    [ "All campaigns", campaigns_path, controller_path == "campaigns" && action_name.in?(%w[ index create ]) ]
+  end
+
   def characters_tab
     [ "Characters", characters_path, controller_path == "characters" && action_name.in?(%w[ index new create ]) ]
   end
@@ -46,17 +51,19 @@ module ApplicationHelper
     Current.membership || @membership
   end
 
-  # The header's tabs inside a campaign: [label, path, current?]. A player
-  # with more than one character seated here gets "My characters" with a menu
-  # of them instead of a path: [[name, path, current?], ...].
+  # The header's tabs inside a campaign: [label, path, current?], starting
+  # with All campaigns and then this one, by name (cut short if it's long). A
+  # player with more than one character seated here gets "My characters" with
+  # a menu of them instead of a path: [[name, path, current?], ...].
   def campaign_tabs(membership)
     campaign = membership.campaign
-    on_campaign = controller_path == "campaigns" && action_name == "show"
+    this_one = [ tag.span(campaign.name, class: "tabs__name"), campaign_path(campaign), controller_path == "campaigns" && action_name == "show" ]
     log = [ "Log", campaign_play_sessions_path(campaign), controller_path == "campaigns/play_sessions" ]
 
     if membership.gm?
       [
-        [ "Campaign", campaign_path(campaign), on_campaign ],
+        all_campaigns_tab,
+        this_one,
         ([ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ] unless campaign.done?),
         log
       ].compact
@@ -68,7 +75,7 @@ module ApplicationHelper
         when 1 then [ "My character", sheets.first[1], sheets.first[2] ]
         else [ "My characters", sheets, sheets.any?(&:last) ]
         end
-      [ [ "Campaign", campaign_path(campaign), on_campaign ], mine, log ].compact
+      [ all_campaigns_tab, this_one, mine, log ].compact
     end
   end
 
