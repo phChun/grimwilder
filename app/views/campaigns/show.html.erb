@@ -137,7 +137,7 @@
         <%# Characters whose story ended (Character::Farewell), remembered under the party. %>
         <% if @gone.any? %>
           <div id="fallen-and-retired" class="farewells">
-            <h3 class="farewells__title">Fallen and retired</h3>
+            <h3 class="farewells__title">Fallen or retired</h3>
             <div class="farewells__list">
               <% @gone.sort_by { _1.status_changed_at || _1.updated_at }.reverse_each do |character| %>
                 <%= render "characters/farewell_card", character: character, player: true %>
