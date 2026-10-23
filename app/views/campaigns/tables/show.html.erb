@@ -40,9 +40,9 @@
             <%= link_to "End session", new_campaign_play_session_ending_path(campaign, @session), class: "button button--ghost" %>
           <% end %>
           <details class="between-scenes" data-controller="menu" data-action="toggle->menu#place">
-            <summary class="button button--ghost between-scenes__toggle">Rest or downtime</summary>
+            <summary class="button button--ghost between-scenes__toggle">Respite</summary>
             <div class="between-scenes__actions" data-menu-target="panel">
-              <%= render "shared/popover_head", title: "Rest or downtime" %>
+              <%= render "shared/popover_head", title: "How long a break?" %>
               <%= button_to "Rest", campaign_rest_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Rest: clear marks and harm for #{@session ? "everyone here" : "everyone seated"}?" } } %>
               <%= link_to "Downtime", new_campaign_downtime_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
             </div>

@@ -12,7 +12,7 @@ class BreaksTest < ActionDispatch::IntegrationTest
 
     get campaign_table_path(@campaign)
     assert_select ".between-scenes form[action=?]", campaign_rest_path(@campaign)
-    assert_select ".between-scenes a[href=?][data-turbo-frame=modal]", new_campaign_downtime_path(@campaign), "Downtime…"
+    assert_select ".between-scenes a[href=?][data-turbo-frame=modal]", new_campaign_downtime_path(@campaign), "Downtime"
     assert_select "dialog#frame-modal[data-controller=frame-modal] turbo-frame#modal"
 
     post campaign_rest_path(@campaign)

@@ -1,6 +1,6 @@
 <% content_for :title, "Downtime · #{Current.campaign.name}" %>
 
-<%# Its own page, and from the GM table's "Downtime…" a modal (shared/_frame_modal): the frame is what the modal shows. The form targets _top, so taking downtime refreshes the table. %>
+<%# Its own page, and from the GM table's "Downtime" button a modal (shared/_frame_modal): the frame is what the modal shows. The form targets _top, so taking downtime refreshes the table. %>
 <%= turbo_frame_tag "modal" do %>
   <header class="page-header">
     <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
