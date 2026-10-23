@@ -273,4 +273,20 @@ class CharacterTalentsTest < ActiveSupport::TestCase
     @tibbs.talent_keys = [ "eldritch-affinity" ]
     assert_not @tibbs.valid?
   end
+
+  test "bonds are cut to a sensible length" do
+    character = characters(:tibbs)
+    character.bonds = [ { "to" => "M" * 100, "bond" => "B" * 100 } ]
+    assert_equal [ Character::BOND_LIMIT, Character::BOND_LIMIT ], character.bonds.first.values_at("to", "bond").map(&:length)
+  end
+
+  test "each detail word is cut to a sensible length" do
+    long = "x" * 100
+    character = characters(:tibbs)
+    character.assign_attributes(traits: [ long ], features: [ long ], not_trait: long, weapons: long,
+      backgrounds: [ { "name" => long, "wises" => [ long ] } ])
+    limit = Character::WORD_LIMIT
+    assert_equal [ limit ] * 6, [ character.traits.first, character.features.first, character.not_trait, character.weapons,
+      character.backgrounds.first["name"], character.backgrounds.first["wises"].first ].map(&:length)
+  end
 end

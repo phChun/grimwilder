@@ -31,11 +31,16 @@ class Character < ApplicationRecord
 
   # --- details: json columns, cleaned on the way in ---------------------------
 
+  # Each word or phrase typed into the details (a background, wise, trait,
+  # feature, weapon style, arc…) is cut to this.
+  WORD_LIMIT = 80
+  normalizes :not_trait, :not_desire, :weapons, with: ->(value) { value.to_s.squish.first(WORD_LIMIT) }
+
   def backgrounds=(value)
     super(list(value).filter_map { |background|
       background = background.to_h.stringify_keys
-      name = background["name"].to_s.squish
-      wises = list(background["wises"]).map { _1.to_s.squish }.compact_blank.first(3)
+      name = background["name"].to_s.squish.first(WORD_LIMIT)
+      wises = words(background["wises"]).first(3)
       { "name" => name, "wises" => wises } if name.present? || wises.any?
     }.first(2))
   end
@@ -55,10 +60,14 @@ class Character < ApplicationRecord
   # One bond toward each other PC (pg. 22, 46), as many as there are. A bond
   # to someone at the table keeps their character_id (a row left blank is
   # dropped); a bond to anyone else is a name. One per character or name.
+  # Who a bond is toward (an NPC's name) and the bond itself are each cut to this.
+  BOND_LIMIT = 60
+
   def bonds=(value)
     super(list(value).filter_map { |bond|
       bond = bond.to_h.stringify_keys
-      to, nature, id = bond["to"].to_s.squish, bond["bond"].to_s.squish, bond["character_id"].presence&.to_i
+      to, nature = [ bond["to"], bond["bond"] ].map { _1.to_s.squish.first(BOND_LIMIT) }
+      id = bond["character_id"].presence&.to_i
       next if id && nature.blank?
       { "to" => to, "bond" => nature, "character_id" => id }.compact if to.present? || nature.present?
     }.uniq { _1["character_id"] || _1["to"].downcase })
@@ -111,7 +120,7 @@ class Character < ApplicationRecord
     end
 
     def words(value)
-      list(value).map { _1.to_s.squish }.compact_blank
+      list(value).map { _1.to_s.squish.first(WORD_LIMIT) }.compact_blank
     end
 
     def starting_stats_add_up
