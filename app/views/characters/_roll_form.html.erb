@@ -1,13 +1,11 @@
 <%# locals: (character:, stat:, allies:) %>
-<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). %>
+<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). %>
 <% damage = character.damage_thorns(stat) %>
 <% dice = character.stat(stat) %>
 <% prefix = "roll_#{stat}" %>
 <details class="stat-roll" name="stat-roll">
-  <summary class="button stat-roll__toggle">
-    <span class="stat-roll__open">Roll <%= stat.capitalize %></span>
-    <span class="stat-roll__close">Cancel</span>
-  </summary>
+  <summary class="button stat-roll__toggle">Roll <%= stat.capitalize %></summary>
+  <%= render "shared/popover_head", title: "Roll #{stat.capitalize}" %>
 
   <%= form_with url: character_rolls_path(character), class: "stat-roll__form", data: { controller: "stat-roll", action: "input->stat-roll#update change->stat-roll#update" } do %>
     <input type="hidden" name="stat" value="<%= stat %>">

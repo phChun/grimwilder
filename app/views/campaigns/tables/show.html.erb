@@ -39,11 +39,12 @@
           <% if @session %>
             <%= link_to "End session", new_campaign_play_session_ending_path(campaign, @session), class: "button button--ghost" %>
           <% end %>
-          <details class="between-scenes">
+          <details class="between-scenes" data-controller="menu" data-action="toggle->menu#place">
             <summary class="button button--ghost between-scenes__toggle">Rest or downtime</summary>
-            <div class="between-scenes__actions">
+            <div class="between-scenes__actions" data-menu-target="panel">
+              <%= render "shared/popover_head", title: "Rest or downtime" %>
               <%= button_to "Rest", campaign_rest_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Rest: clear marks and harm for #{@session ? "everyone here" : "everyone seated"}?" } } %>
-              <%= link_to "Downtime…", new_campaign_downtime_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
+              <%= link_to "Downtime", new_campaign_downtime_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
             </div>
           </details>
         </div>
@@ -98,7 +99,7 @@
         <h2 id="pools-title" class="gm-section__title">Pools</h2>
         <%= tag.details id: "pool-new", class: "pool-new", open: @pool.errors.any?, data: { controller: "menu", action: "toggle->menu#place turbo:submit-end->menu#closeOnSuccess" } do %>
           <summary class="button pool-new__toggle">+ New pool</summary>
-          <div class="pool-new__panel card" data-menu-target="panel"><%= render "campaigns/pools/form", pool: @pool %></div>
+          <div class="pool-new__panel card" data-menu-target="panel"><%= render "shared/popover_head", title: "New pool" %><%= render "campaigns/pools/form", pool: @pool %></div>
         <% end %>
       </div>
       <% if @pools.any? %>

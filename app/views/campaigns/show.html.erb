@@ -42,6 +42,7 @@
         <details id="open-character" class="go-menu" data-controller="menu" data-action="toggle->menu#place">
           <summary class="button button--primary campaign-hero__go go-menu__button">Open my character <%= icon(:chevron, size: 16) %></summary>
           <ul class="go-menu__list" data-menu-target="panel">
+            <%= render "shared/popover_head", title: "Open which character?", list: true %>
             <% @mine_all.each do |character| %>
               <li>
                 <%= link_to character_path(character), class: "go-menu__item" do %>

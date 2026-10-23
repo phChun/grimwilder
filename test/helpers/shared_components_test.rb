@@ -13,6 +13,24 @@ class SharedComponentsTest < ActionView::TestCase
     assert_equal "5MessyHighestdie5.", Nokogiri::HTML.fragment(render("shared/roll_result", roll: roll)).text.gsub(/\s/, "")
   end
 
+  test "a close button closes the popover it's in, or calls the dialog's own action" do
+    render "shared/close_button"
+    assert_select "button.close-button[aria-label=Close][data-controller=dismiss][data-action=?]", "dismiss#close"
+    assert_equal "", Nokogiri::HTML.fragment(rendered).text.strip
+
+    render "shared/close_button", action: "confirm#cancel", label: "Cancel"
+    assert_select "button.close-button[aria-label=Cancel][data-action=?]:not([data-controller])", "confirm#cancel"
+  end
+
+  test "a popover's head is its title and a close button, as a list item in a menu" do
+    assert_equal "New pool", Nokogiri::HTML.fragment(render("shared/popover_head", title: "New pool")).text.strip
+    assert_select "div.popover__head .popover__title", "New pool"
+    assert_select "div.popover__head button.close-button[data-action=?]", "dismiss#close"
+
+    render "shared/popover_head", title: "Your campaigns", list: true
+    assert_select "li.popover__head .popover__title", "Your campaigns"
+  end
+
   test "a die shows its state, tier and size" do
     render "shared/die", value: 5, state: :highest, size: 32
     assert_select "span.die.die--d6.die--messy.die--top.die--32[aria-label=?]", "d6 showing 5", "5"

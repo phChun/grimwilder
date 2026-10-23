@@ -94,7 +94,8 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_select ".stat-card--marked button.mark-toggle[aria-pressed=true]", "Marked"
     assert_select ".stat-card button.mark-toggle[aria-pressed=false]", { count: 3, text: "Mark" }
     assert_select "#damage .mark-toggle", 0, "marks are on the stat cards now"
-    assert_select "details.stat-roll summary .stat-roll__open", text: "Roll Agility"
+    assert_select "details.stat-roll summary", text: "Roll Agility"
+    assert_select "details.stat-roll .popover__head button.close-button[aria-label=Close]", 4
     assert_select "details.stat-roll form[action=?]", character_rolls_path(@tibbs) do |forms|
       agility = forms.find { _1.at_css("input[name=stat][value=agility]") }
       assert_equal 2, agility.css("input[name=spark]").size, "0 or the 1 spark Tibbs holds"

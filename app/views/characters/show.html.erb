@@ -44,6 +44,7 @@
           <details class="adjust">
             <summary class="button button--ghost adjust__toggle">Adjust</summary>
             <div class="adjust__panel">
+              <%= render "shared/popover_head", title: "Adjust #{short}" %>
               <% { "spark" => [ Grimwild::MAX_SPARK, "Spend before a roll for +1d each. Hold up to #{Grimwild::MAX_SPARK}." ], "thread" => [ @character.session_thread, "Spend to add a story detail. Resets to #{@character.session_thread} each session." ] }.each do |currency, (most, hint)| %>
                 <% value = @character.public_send(currency) %>
                 <div class="adjust__row">

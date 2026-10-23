@@ -14,6 +14,7 @@
       <details id="talent-<%= talent.key %>-menu" class="talent-card__more-menu" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
         <summary class="button button--ghost talent-card__toggle" aria-label="More for <%= talent.name %>"><%= icon(:more, size: 18) %></summary>
         <div class="talent-card__menu" data-menu-target="panel">
+          <%= render "shared/popover_head", title: talent.name %>
           <% if tends %>
             <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
             <p class="field__hint">Rename it and describe it your way, like a wizard's Bulwark as a magical shield (pg. 52). The rules stay the book's. Leave a field blank to use the book's.</p>
@@ -106,6 +107,7 @@
         <details id="talent-<%= talent.key %>-push" class="talent-card__push" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
           <summary class="button button--small talent-card__push-toggle">Push yourself <small>mark a stat</small></summary>
           <div class="talent-card__menu talent-card__menu--push" data-menu-target="panel">
+            <%= render "shared/popover_head", title: "Push yourself" %>
             <p class="field__hint">Once you've used it, mark a stat of your choice (pg. 21). A marked stat takes harm instead.</p>
             <% Grimwild::STATS.each do |stat| %>
               <% outcome = character.mark_would_be(stat) %>

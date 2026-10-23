@@ -49,6 +49,7 @@
       <details id="<%= dom_id(pool, :more) %>" class="pool-card__more" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
         <summary class="button pool-card__toggle" aria-label="More for <%= pool.name %>"><%= icon(:more, size: 18) %></summary>
         <div class="pool-card__menu" data-menu-target="panel">
+          <%= render "shared/popover_head", title: pool.name %>
           <% if pool.rollable? %>
             <%= button_to "Drop 1d, then roll", campaign_pool_roll_path(pool.campaign, pool), params: { drop_first: "1" }, class: "button button--small" %>
           <% end %>
