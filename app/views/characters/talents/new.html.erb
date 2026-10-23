@@ -25,6 +25,9 @@
         <%= link_to "Eldritch Talents are chosen separately.", new_character_talent_path(@character, eldritch: 1) %>
       <% end %>
     </p>
+    <% if @character.talents_to_choose.positive? %>
+      <p><%= link_to "Skip for now", character_path(@character), class: "button button--ghost" %></p>
+    <% end %>
   <% end %>
 </header>
 

@@ -980,6 +980,14 @@ form.button_to, .button_to { margin: 0; }
 /* The GM table's roller: results as tiles, the smash as a band, and the kept
    list as a panel on the right once the card is wide enough. */
 .crucible--compact { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+/* The features crucible inside the character form: tapping a word fills a feature, so keeping
+   lines, the combined line and the full-page link (which would leave the form) don't apply. */
+.feature-crucible { padding: var(--space-2) var(--space-3); border: 1px solid var(--line-soft); border-radius: var(--radius-control); }
+.feature-crucible[open] > .fold__summary { margin-bottom: var(--space-2); }
+.feature-crucible .crucible__full,
+.feature-crucible [data-crucible-target="keepButton"],
+.feature-crucible .crucible__kept,
+.feature-crucible .roll-result__smash { display: none; }
 .crucible__stage { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
 .crucible__full { margin-left: auto; font-size: 0.85rem; }
 

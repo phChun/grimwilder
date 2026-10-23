@@ -36,6 +36,12 @@ module ApplicationHelper
   # Every signed-in person's own characters, the last tab in the header inside
   # a campaign or out: [label, path, current?]. A player's sheet in a campaign
   # is "My character" instead.
+  # The placeholder for a text box with a datalist of the book's words: it takes
+  # anything typed, or one of ours. prefix: what the box is for ("But not…").
+  def type_or_select(prefix = nil)
+    prefix ? "#{prefix} type one in or select from our list" : "Type one in or select from our list"
+  end
+
   # First in both navs, signed in: every campaign you're at, or have been.
   def all_campaigns_tab
     [ "All campaigns", campaigns_path, controller_path == "campaigns" && action_name.in?(%w[ index create ]) ]

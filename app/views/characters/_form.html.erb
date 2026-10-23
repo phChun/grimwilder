@@ -73,7 +73,7 @@
         <% background = character.backgrounds[i] || {} %>
         <fieldset class="fieldset">
           <legend class="field__label">Background <%= i + 1 %></legend>
-          <input type="text" name="character[backgrounds][<%= i %>][name]" value="<%= background["name"] %>" list="backgrounds-list" placeholder="Charlatan" autocomplete="off" class="field__input" aria-label="Background <%= i + 1 %> name" data-action="change->background#fill" data-index="<%= i %>">
+          <input type="text" name="character[backgrounds][<%= i %>][name]" value="<%= background["name"] %>" list="backgrounds-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Background <%= i + 1 %> name" data-action="change->background#fill" data-index="<%= i %>">
           <% 3.times do |w| %>
             <input type="text" name="character[backgrounds][<%= i %>][wises][]" value="<%= background.fetch("wises", [])[w] %>" placeholder="Wise" autocomplete="off" class="field__input field__input--small" aria-label="Background <%= i + 1 %> wise <%= w + 1 %>" data-background-target="wise" data-index="<%= i %>">
           <% end %>
@@ -88,28 +88,33 @@
       <fieldset class="fieldset">
         <legend class="field__label">Traits: 2 you are, 1 you aren't</legend>
         <% 2.times do |i| %>
-          <input type="text" name="character[traits][]" value="<%= character.traits[i] %>" list="traits-list" autocomplete="off" class="field__input" aria-label="Trait <%= i + 1 %>">
+          <input type="text" name="character[traits][]" value="<%= character.traits[i] %>" list="traits-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Trait <%= i + 1 %>">
         <% end %>
-        <%= form.text_field :not_trait, list: "traits-list", autocomplete: "off", placeholder: "But not…", class: "field__input", "aria-label": "Trait you aren't" %>
+        <%= form.text_field :not_trait, list: "traits-list", autocomplete: "off", placeholder: type_or_select("But not…"), class: "field__input", "aria-label": "Trait you aren't" %>
       </fieldset>
       <fieldset class="fieldset">
         <legend class="field__label">Desires: 2 you want, 1 you don't</legend>
         <% 2.times do |i| %>
-          <input type="text" name="character[desires][]" value="<%= character.desires[i] %>" list="desires-list" autocomplete="off" class="field__input" aria-label="Desire <%= i + 1 %>">
+          <input type="text" name="character[desires][]" value="<%= character.desires[i] %>" list="desires-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Desire <%= i + 1 %>">
         <% end %>
-        <%= form.text_field :not_desire, list: "desires-list", autocomplete: "off", placeholder: "But not…", class: "field__input", "aria-label": "Desire you don't want" %>
+        <%= form.text_field :not_desire, list: "desires-list", autocomplete: "off", placeholder: type_or_select("But not…"), class: "field__input", "aria-label": "Desire you don't want" %>
       </fieldset>
     </div>
   </section>
 
   <section class="panel stack" aria-labelledby="form-look">
     <h2 id="form-look" class="panel__title">Features and weapons</h2>
-    <fieldset class="fieldset">
+    <%# The features crucible rolls right here (a lazy frame, fetched when the fold opens): tapping a word puts it in the next empty box (feature_fill_controller.js). %>
+    <fieldset class="fieldset" data-controller="feature-fill" data-feature-fill-nouns-value="<%= { "Clothing" => "clothes", "Voice" => "voice", "Eyes" => "eyes" }.to_json %>" data-action="crucible:pick->feature-fill#fill">
       <legend class="field__label">Three distinctive features</legend>
       <% 3.times do |i| %>
-        <input type="text" name="character[features][]" value="<%= character.features[i] %>" autocomplete="off" placeholder="<%= [ "shock of brown hair", "cane", "kind eyes" ][i] %>" class="field__input" aria-label="Feature <%= i + 1 %>">
+        <input type="text" name="character[features][]" value="<%= character.features[i] %>" autocomplete="off" placeholder="<%= [ "shock of brown hair", "cane", "kind eyes" ][i] %>" class="field__input" aria-label="Feature <%= i + 1 %>" data-feature-fill-target="input">
       <% end %>
-      <p class="field__hint"><%= link_to "Roll on the features crucible", crucible_path("features"), target: "_blank" %> for ideas.</p>
+      <details class="fold feature-crucible">
+        <summary class="fold__summary"><span class="fold__title">Roll the Features Crucible for Ideas</span></summary>
+        <p class="field__hint" data-feature-fill-target="status" aria-live="polite">Roll, then tap a word to put it in the next empty box.</p>
+        <turbo-frame id="crucible" src="<%= crucible_path("features", embed: 1) %>" loading="lazy"></turbo-frame>
+      </details>
     </fieldset>
     <div class="field">
       <%= form.label :weapons, "Weapons", class: "field__label" %>
@@ -119,7 +124,7 @@
       <legend class="field__label">Two weapon styles</legend>
       <div class="two-up">
         <% 2.times do |i| %>
-          <input type="text" name="character[weapon_styles][]" value="<%= character.weapon_styles[i] %>" list="styles-list" autocomplete="off" class="field__input" aria-label="Weapon style <%= i + 1 %>">
+          <input type="text" name="character[weapon_styles][]" value="<%= character.weapon_styles[i] %>" list="styles-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Weapon style <%= i + 1 %>">
         <% end %>
       </div>
     </fieldset>
@@ -130,7 +135,7 @@
     <fieldset class="fieldset">
       <legend class="field__label">Character arcs (one or two)</legend>
       <% 2.times do |i| %>
-        <input type="text" name="character[arcs][]" value="<%= character.arcs[i] %>" list="arcs-list" autocomplete="off" class="field__input" aria-label="Arc <%= i + 1 %>">
+        <input type="text" name="character[arcs][]" value="<%= character.arcs[i] %>" list="arcs-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Arc <%= i + 1 %>">
       <% end %>
     </fieldset>
     <fieldset class="fieldset">
@@ -166,10 +171,30 @@
 
   <section class="panel stack" aria-labelledby="form-talents">
     <h2 id="form-talents" class="panel__title">Talents and notes</h2>
+    <%# The talents themselves come from the catalog (characters/talents#new), which a new character goes to right after this form. %>
+    <% if character.persisted? %>
+      <div class="field">
+        <p class="field__label">Talents</p>
+        <ul class="talent-names">
+          <% character.talent_entries.each do |talent| %>
+            <li><%= talent.name %><% if talent.key == character.core_talent_entry&.key %> <span class="tag">core</span><% end %></li>
+          <% end %>
+        </ul>
+        <p class="field__hint">
+          <% if character.talents_to_choose.positive? %>
+            <%= link_to "Choose #{pluralize(character.talents_to_choose, "more talent")}", new_character_talent_path(character) %>.
+          <% else %>
+            That's the full set for level <%= character.level %>.
+          <% end %>
+          Remove or re-skin them on the <%= link_to "sheet", character_path(character, anchor: "talents") %>.
+        </p>
+      </div>
+    <% else %>
+      <p class="field__hint">Next, you'll choose a first talent from the catalog. Your path's core talent comes with it.</p>
+    <% end %>
     <div class="field">
       <%= form.label :talents, "Talent notes", class: "field__label" %>
       <%= form.text_area :talents, rows: 4, class: "field__input", placeholder: "Choices your talents ask for (skills, spells, tricks), or homebrew talents." %>
-      <p class="field__hint">Pick talents from the catalog on the character sheet; your path's core talent is included.</p>
     </div>
     <div class="field">
       <%= form.label :notes, class: "field__label" %>

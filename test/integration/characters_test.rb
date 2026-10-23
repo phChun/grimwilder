@@ -15,9 +15,28 @@ class CharactersTest < ActionDispatch::IntegrationTest
     end
 
     ash = Character.find_by!(name: "Ash")
-    assert_redirected_to character_path(ash)
+    assert_redirected_to new_character_talent_path(ash), "next: a first talent"
     assert_equal campaigns(:bramblewood), ash.campaign
     assert_equal [ "scarred knuckles" ], ash.features
+
+    follow_redirect!
+    assert_select "a[href=?]", character_path(ash), "Skip for now"
+
+    get edit_character_path(ash)
+    assert_select ".talent-names li", 1
+    assert_select ".talent-names li .tag", "core"
+    assert_select "a[href=?]", new_character_talent_path(ash), "Choose 1 more talent"
+  end
+
+  test "the features crucible rolls inside the form and fills the feature boxes" do
+    sign_in_as identities(:gwen)
+    get new_character_path
+
+    assert_select "fieldset[data-controller=feature-fill][data-action=?]", "crucible:pick->feature-fill#fill" do
+      assert_select "input[data-feature-fill-target=input]", 3
+      assert_select "details.feature-crucible turbo-frame#crucible[loading=lazy][src=?]", crucible_path("features", embed: 1)
+    end
+    assert_select "a[href=?]", crucible_path("features"), 0, "no trip to another page"
   end
 
   test "a bad stat spread shows the form again" do

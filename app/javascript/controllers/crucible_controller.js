@@ -5,6 +5,8 @@ import { rollDie } from "grimwild/dice"
 // first die = row, second = column, and switched. Results are chips; the
 // first reading of each table starts chosen, tap another to choose it. "Keep"
 // saves the chosen words as one line in a per-crucible list in localStorage.
+// Tapping a chip also sends crucible:pick ({ word, table }), so a form around
+// the roller can use the word (feature_fill_controller.js).
 export default class extends Controller {
   static targets = ["table", "results", "keepButton", "keptSection", "keptList"]
   static values = { key: String }
@@ -43,8 +45,10 @@ export default class extends Controller {
 
   choose(event) {
     const { index, reading } = event.currentTarget.dataset
-    this.rolls.get(Number(index)).chosen = Number(reading)
+    const roll = this.rolls.get(Number(index))
+    roll.chosen = Number(reading)
     this.render()
+    this.dispatch("pick", { detail: { word: roll.readings[roll.chosen].word, table: roll.name } })
   }
 
   keep() {
