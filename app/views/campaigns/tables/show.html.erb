@@ -54,7 +54,7 @@
     <section id="table" class="gm-section" aria-labelledby="party-title">
       <div class="gm-section__head">
         <h2 id="party-title" class="gm-section__title">Party</h2>
-        <%= link_to "Add your character", new_character_path(campaign_id: campaign.id), class: "button button--ghost button--small" %>
+        <%= link_to "Add a character", new_character_path(campaign_id: campaign.id), class: "button button--ghost button--small" %>
       </div>
       <div class="party-grid">
         <% seats.each do |membership, seated| %>
