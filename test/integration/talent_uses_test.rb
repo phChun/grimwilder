@@ -28,7 +28,10 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
 
     # Bardic Lore: thread resets to 3, not 2
     get character_path(@fen)
-    assert_select ".identity .pips--thread[aria-label=?]", "2 of 3 thread"
+    assert_select ".identity .counter--thread .counter__count", "2 of 3 thread"
+    assert_select ".identity .counter--spark form[action=?] button[aria-label=?]", character_path(@fen), "Take spark"
+    assert_select ".identity .counter--xp form[action=?] button", character_experience_path(@fen)
+    assert_select ".identity a[href=?]", edit_character_path(@fen), "Edit sheet"
   end
 
   test "the GM can tick a player's uses; other players can't" do

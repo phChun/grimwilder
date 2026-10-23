@@ -1,11 +1,57 @@
 <% content_for :title, "Edit #{@character.name}" %>
+<% short = @character.short_name %>
+<% campaign = @character.campaign %>
 
 <header class="page-header">
   <p class="eyebrow"><%= link_to @character.name, character_path(@character) %></p>
   <h1>Edit sheet</h1>
 </header>
 
-<%= render "form", character: @character %>
+<%= render "characters/form", character: @character %>
+
+<%# Where the character plays (Character::Seating) and handing them back to the table (Character::Claiming). Each saves on its own, not with the sheet. %>
+<% if @character.seatable_by?(Current.identity) %>
+  <section class="panel stack character-danger" aria-labelledby="at-the-table">
+    <h2 id="at-the-table" class="panel__title">At the table</h2>
+    <%= render "characters/seat_form", character: @character, campaigns: Current.identity.campaigns.order(:name) %>
+    <% if campaign %>
+      <div class="character-danger__action">
+        <p class="field__hint"><%= short %> leaves <%= campaign.name %> and plays nowhere until you seat them again. Their talent pools there are deleted.</p>
+        <%= button_to "Take #{short} out of #{campaign.name}", character_seat_path(@character), method: :patch, params: { campaign_id: "" }, class: "button", form: { data: { turbo_confirm: "Take #{@character.name} out of #{campaign.name}?" } } %>
+      </div>
+    <% end %>
+    <% if @character.releasable_by?(Current.identity) %>
+      <% giving_back = !Current.identity.memberships.gm.exists?(campaign: campaign) %>
+      <div class="character-danger__action">
+        <p class="field__hint"><%= giving_back ? "Done with #{short}? The GM gets them back for someone else to pick." : "Let a player at the table pick #{short} to play." %></p>
+        <%= button_to (giving_back ? "Give #{short} back" : "Put #{short} up for grabs"), character_claim_path(@character), method: :delete, class: "button", form: { data: { turbo_confirm: "#{@character.name} goes back to the GM, for any player to pick. Continue?" } } %>
+      </div>
+    <% end %>
+  </section>
+<% end %>
+
+<%# Character::Farewell: mark them fallen or retired, with a farewell line, or bring them back. %>
+<% if @character.gone? %>
+  <section id="story-ends" class="panel stack character-danger" aria-labelledby="story-ends-title">
+    <h2 id="story-ends-title" class="panel__title"><%= @character.fallen? ? "Fallen" : "Retired" %></h2>
+    <p class="field__hint"><%= short %> is out of the party, remembered under it. Change the farewell above, or bring them back.</p>
+    <%= button_to "Return #{short} to play", character_story_end_path(@character), method: :delete, class: "button" %>
+  </section>
+<% elsif !@character.up_for_grabs? %>
+  <section id="story-ends" class="panel stack character-danger" aria-labelledby="story-ends-title">
+    <h2 id="story-ends-title" class="panel__title">Their story ends…</h2>
+    <%= form_with url: character_story_end_path(@character), class: "stack", data: { turbo_confirm: "#{@character.name} leaves the party, remembered under it. You can bring them back. Continue?" } do |form| %>
+      <div class="field">
+        <%= form.label :farewell, "How it ended (optional)", class: "field__label", for: "farewell" %>
+        <%= form.text_area :farewell, id: "farewell", rows: 2, maxlength: Character::Farewell::FAREWELL_LIMIT, placeholder: "Held the bridge so the others could run.", class: "field__input" %>
+      </div>
+      <div class="character-danger__buttons">
+        <button type="submit" name="status" value="fallen" class="button button--danger">Mark fallen</button>
+        <button type="submit" name="status" value="retired" class="button">Retire <%= short %></button>
+      </div>
+    <% end %>
+  </section>
+<% end %>
 
 <section class="panel stack character-danger" aria-labelledby="delete-character">
   <h2 id="delete-character" class="panel__title">Delete</h2>

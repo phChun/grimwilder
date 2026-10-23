@@ -21,10 +21,13 @@
       <%= form.select :path, Grimwild.paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
       <p class="field__hint">Your path gives its core talent. Add another talent from any path below.</p>
     </div>
-    <div class="field">
-      <%= form.label :campaign_id, "Campaign", class: "field__label" %>
-      <%= form.select :campaign_id, Current.identity.campaigns.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
-    </div>
+    <%# Once made, the edit page's "At the table" section seats or moves the character. %>
+    <% unless character.persisted? %>
+      <div class="field">
+        <%= form.label :campaign_id, "Campaign", class: "field__label" %>
+        <%= form.select :campaign_id, Current.identity.campaigns.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
+      </div>
+    <% end %>
     <% if Current.identity.memberships.gm.exists? %>
       <div class="field">
         <label class="check">
@@ -35,11 +38,6 @@
       </div>
     <% end %>
     <% if character.persisted? %>
-      <div class="field">
-        <%= form.label :status, "Status", class: "field__label" %>
-        <%= form.select :status, [ [ "Still playing", "active" ], [ "Fallen", "fallen" ], [ "Retired", "retired" ] ], {}, class: "field__input" %>
-        <p class="field__hint">Fallen and retired characters stay listed on the campaign page, under the party.</p>
-      </div>
       <% unless character.active? %>
         <div class="field">
           <%= form.label :farewell, "How it ended", class: "field__label" %>

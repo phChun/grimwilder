@@ -22,76 +22,44 @@
         </p>
       </div>
 
-      <div class="identity__meta">
-        <div class="meter">
-          <span class="meter__label">Spark</span>
-          <%= render "shared/pips", kind: "spark", value: @character.spark, max: Grimwild::MAX_SPARK %>
-        </div>
-        <div class="meter">
-          <span class="meter__label">Thread</span>
-          <%= render "shared/pips", kind: "thread", value: @character.thread, max: @character.session_thread %>
-        </div>
-        <div class="meter">
-          <span class="meter__label">XP</span>
-          <% if @character.max_level? %>
-            <span class="meter__count" aria-label="Level <%= Grimwild::MAX_LEVEL %>, the top">Max</span>
-          <% else %>
-            <span class="meter__count" aria-label="<%= @character.xp %> of <%= @character.xp_to_next_level %> XP to level <%= @character.level + 1 %>"><%= @character.xp %><span class="meter__of">/<%= @character.xp_to_next_level %></span></span>
-          <% end %>
-        </div>
-
+      <div class="<%= class_names("identity__meta", "identity__meta--controls": editable) %>">
         <% if editable %>
-          <details class="adjust">
-            <summary class="button button--ghost adjust__toggle">Adjust</summary>
-            <div class="adjust__panel">
-              <%= render "shared/popover_head", title: "Adjust #{short}" %>
-              <% { "spark" => [ Grimwild::MAX_SPARK, "Spend before a roll for +1d each. Hold up to #{Grimwild::MAX_SPARK}." ], "thread" => [ @character.session_thread, "Spend to add a story detail. Resets to #{@character.session_thread} each session." ] }.each do |currency, (most, hint)| %>
-                <% value = @character.public_send(currency) %>
-                <div class="adjust__row">
-                  <span class="adjust__name"><%= currency.capitalize %></span>
-                  <%= button_to "−", character_path(@character), method: :patch, params: { quick: 1, character: { currency => value - 1 } }, class: "stepper__step", disabled: value.zero?, "aria-label": "Spend #{currency}" %>
-                  <span class="adjust__value"><%= value %></span>
-                  <%= button_to "+", character_path(@character), method: :patch, params: { quick: 1, character: { currency => value + 1 } }, class: "stepper__step", disabled: value >= most, "aria-label": "Take #{currency}" %>
-                  <p class="adjust__hint"><%= hint %></p>
-                </div>
-              <% end %>
-              <% unless @character.max_level? %>
-                <div class="adjust__row">
-                  <span class="adjust__name">XP</span>
-                  <%= button_to "+1 XP", character_experience_path(@character), class: "button" %>
-                  <p class="adjust__hint">Take 1 XP after each session. <%= @character.xp_to_next_level %> fills level <%= @character.level + 1 %>.</p>
-                </div>
-              <% end %>
-              <% if @character.seatable_by?(Current.identity) %>
-                <%= render "characters/seat_form", character: @character, campaigns: Current.identity.campaigns.order(:name) %>
-              <% end %>
-              <%= link_to "Edit sheet", edit_character_path(@character), class: "button button--ghost" %>
-              <%# Character::Farewell: the owner ends their story here; the banner below brings them back. %>
-              <% if @character.active? && !@character.up_for_grabs? %>
-                <details class="fold adjust__farewell">
-                  <summary class="fold__summary"><span class="adjust__name">Their story ends…</span></summary>
-                  <%= form_with url: character_story_end_path(@character), class: "stack adjust__farewell-form", data: { turbo_confirm: "#{@character.name} leaves the party, remembered under it. You can bring them back. Continue?" } do |form| %>
-                    <div class="field">
-                      <%= form.label :farewell, "How it ended (optional)", class: "field__label", for: "farewell" %>
-                      <%= form.text_area :farewell, id: "farewell", rows: 2, maxlength: Character::Farewell::FAREWELL_LIMIT, placeholder: "Held the bridge so the others could run.", class: "field__input" %>
-                    </div>
-                    <div class="adjust__farewell-actions">
-                      <button type="submit" name="status" value="fallen" class="button button--danger">Mark fallen</button>
-                      <button type="submit" name="status" value="retired" class="button">Retire <%= short %></button>
-                    </div>
-                  <% end %>
-                </details>
-              <% end %>
-              <%# Character::Claiming: the owner hands it back to the table from here (a GM looking at someone else's gets the bar below). %>
-              <% if @character.releasable_by?(Current.identity) && !@character.up_for_grabs? %>
-                <% giving_back = !@membership&.gm? %>
-                <div class="adjust__claim">
-                  <p class="adjust__hint"><%= giving_back ? "Done with #{short}? The GM gets them back for someone else to pick." : "Let a player at the table pick #{short} to play." %></p>
-                  <%= button_to (giving_back ? "Give #{short} back" : "Put #{short} up for grabs"), character_claim_path(@character), method: :delete, class: "button button--ghost", form: { data: { turbo_confirm: "#{@character.name} goes back to the GM, for any player to pick. Continue?" } } %>
-                </div>
-              <% end %>
+          <%# The owner's spark, thread and XP: tap − or + right here. Everything else that changes the character is on the edit page. %>
+          <% { "spark" => Grimwild::MAX_SPARK, "thread" => @character.session_thread }.each do |currency, most| %>
+            <% value = @character.public_send(currency) %>
+            <%= render "shared/counter", kind: currency, noun: currency, value: value, of: most,
+              down: { url: character_path(@character), method: :patch, params: { quick: 1, character: { currency => value - 1 } }, disabled: value.zero?, label: "Spend #{currency}" },
+              up: { url: character_path(@character), method: :patch, params: { quick: 1, character: { currency => value + 1 } }, disabled: value >= most, label: "Take #{currency}" } %>
+          <% end %>
+          <% if @character.max_level? %>
+            <div class="meter">
+              <span class="meter__label">XP</span>
+              <span class="meter__count" aria-label="Level <%= Grimwild::MAX_LEVEL %>, the top">Max</span>
             </div>
-          </details>
+          <% else %>
+            <%# + goes through gain_xp!, so filling the boxes levels up and opens the talent picker. %>
+            <%= render "shared/counter", kind: "xp", noun: "XP", group_label: "XP", value: @character.xp, of: @character.xp_to_next_level,
+              down: { url: character_path(@character), method: :patch, params: { quick: 1, character: { xp: @character.xp - 1 } }, disabled: @character.xp.zero?, label: "Take back 1 XP" },
+              up: { url: character_experience_path(@character), label: "Take 1 XP (#{@character.xp_to_next_level} fills level #{@character.level + 1})" } %>
+          <% end %>
+          <%= link_to "Edit sheet", edit_character_path(@character), class: "button button--ghost" %>
+        <% else %>
+          <div class="meter">
+            <span class="meter__label">Spark</span>
+            <%= render "shared/pips", kind: "spark", value: @character.spark, max: Grimwild::MAX_SPARK %>
+          </div>
+          <div class="meter">
+            <span class="meter__label">Thread</span>
+            <%= render "shared/pips", kind: "thread", value: @character.thread, max: @character.session_thread %>
+          </div>
+          <div class="meter">
+            <span class="meter__label">XP</span>
+            <% if @character.max_level? %>
+              <span class="meter__count" aria-label="Level <%= Grimwild::MAX_LEVEL %>, the top">Max</span>
+            <% else %>
+              <span class="meter__count" aria-label="<%= @character.xp %> of <%= @character.xp_to_next_level %> XP to level <%= @character.level + 1 %>"><%= @character.xp %><span class="meter__of">/<%= @character.xp_to_next_level %></span></span>
+            <% end %>
+          </div>
         <% end %>
       </div>
     </section>
@@ -110,7 +78,7 @@
       </div>
     <% end %>
 
-    <%# Up for grabs (Character::Claiming): who holds it, and the way to pick it; a GM looking at someone else's can put it up for grabs. The owner gives theirs back from Adjust. %>
+    <%# Up for grabs (Character::Claiming): who holds it, and the way to pick it; a GM looking at someone else's can put it up for grabs. The owner gives theirs back from the edit page. %>
     <% if @character.up_for_grabs? %>
       <div class="claim-bar claim-bar--open">
         <p class="claim-bar__text"><strong>Up for grabs.</strong> <%= @character.claimable_by?(Current.identity) && !@membership&.gm? ? "Pick #{short} to play them: they become yours." : "Waiting for a player at the table to pick #{short}." %></p>
@@ -159,6 +127,13 @@
             <% end %>
           <% end %>
         </div>
+        <%# Desperate isn't death: more harm drops them, and a story roll says how bad (pg. 27). If that's the end, the owner gets a quiet way there. %>
+        <% if editable && @character.desperate? && @character.active? && !@character.up_for_grabs? %>
+          <div class="harm__end">
+            <p class="harm__end-text">Down for good?</p>
+            <%= link_to "#{short}'s story ends…", edit_character_path(@character, anchor: "story-ends"), class: "button button--danger button--small" %>
+          </div>
+        <% end %>
 
         <% if @character.conditions.any? %>
           <ul class="conditions">

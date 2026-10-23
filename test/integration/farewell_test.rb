@@ -1,7 +1,7 @@
 require "test_helper"
 
 # A character's story ending (Character::Farewell): the player marks them
-# fallen or retired from the sheet, and can bring them back.
+# fallen or retired from the edit page, and can bring them back.
 class FarewellTest < ActionDispatch::IntegrationTest
   setup do
     @campaign = campaigns(:bramblewood)
@@ -10,8 +10,8 @@ class FarewellTest < ActionDispatch::IntegrationTest
 
   test "the player marks their character fallen, with a farewell, and brings them back" do
     sign_in_as identities(:pip)
-    get character_path(@tibbs)
-    assert_select ".adjust__farewell form[action=?]", character_story_end_path(@tibbs) do
+    get edit_character_path(@tibbs)
+    assert_select "#story-ends form[action=?]", character_story_end_path(@tibbs) do
       assert_select "button[name=status][value=fallen]", "Mark fallen"
       assert_select "button[name=status][value=retired]", "Retire Tibbs"
     end
@@ -28,7 +28,9 @@ class FarewellTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select ".farewell-banner--fallen .farewell-banner__words", "“Held the bridge so the others could run.”"
     assert_select ".stat-roll", 0, "no rolling once they've fallen"
-    assert_select ".adjust__farewell", 0
+    get edit_character_path(@tibbs)
+    assert_select "#story-ends button[name=status]", 0
+    assert_select "#story-ends form[action=?] button", character_story_end_path(@tibbs), "Return Tibbs to play"
     assert_raises(ArgumentError) { @tibbs.roll!("wits", by: identities(:pip)) }
 
     get characters_path
@@ -52,5 +54,22 @@ class FarewellTest < ActionDispatch::IntegrationTest
     post character_story_end_path(bram), params: { status: "retired" }
     assert bram.reload.active?
     assert_raises(ArgumentError) { bram.end_story!("lost", by: identities(:gwen)) }
+  end
+
+  test "a desperate character's sheet points the owner to the story's end, quietly" do
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+    assert_select ".harm__end", 0
+
+    @tibbs.update!(desperate: true)
+    get character_path(@tibbs)
+    assert_select ".harm__end a.button--danger[href=?]", edit_character_path(@tibbs, anchor: "story-ends"), "Tibbs's story ends…"
+  end
+
+  test "the GM doesn't get the desperate character's way out" do
+    @tibbs.update!(desperate: true)
+    sign_in_as identities(:gwen)
+    get character_path(@tibbs)
+    assert_select ".harm__end", 0, "only for the owner"
   end
 end

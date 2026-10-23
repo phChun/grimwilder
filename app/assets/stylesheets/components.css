@@ -678,6 +678,9 @@ form.button_to, .button_to { margin: 0; }
 .character-form { display: grid; gap: var(--space-5); max-width: 46rem; }
 .character-form__actions { display: flex; gap: var(--space-2); }
 .character-danger { max-width: 46rem; margin-top: var(--space-6); }
+.character-danger__action { display: grid; gap: var(--space-2); justify-items: start; }
+.character-danger__action .button_to { margin: 0; }
+.character-danger__buttons { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
 .fieldset { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
 /* A bond toward someone at the table: who, then how you see them. */
@@ -1257,45 +1260,15 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .identity__name { margin: 0; font-size: clamp(2rem, 6vw, 2.5rem); line-height: 1.05; }
 .identity__line { margin: 2px 0 0; color: var(--muted); }
 
-.identity__meta { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-3) 20px; }
+.identity__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) 20px; }
+/* The owner's spark, thread, XP and Edit sheet: a row of their own, spread evenly across it. */
+.identity__meta--controls { flex-basis: 100%; justify-content: space-between; gap: var(--space-2); }
 
 .meter { display: grid; gap: 4px; }
 .meter__label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
 .meter__count { font-family: var(--font-dice); font-weight: 600; }
 .meter__of { color: var(--dim); }
 .identity .pip { width: 16px; height: 16px; }
-
-/* Owner's spark, thread and XP controls, folded away */
-.adjust { position: relative; }
-.adjust__toggle { list-style: none; }
-.adjust__toggle::-webkit-details-marker { display: none; }
-
-.adjust__panel {
-  position: absolute;
-  z-index: 15;
-  right: 0;
-  top: calc(100% + 4px);
-  display: grid;
-  gap: var(--space-3);
-  width: min(20rem, calc(100vw - 2rem));
-  padding: var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.adjust__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.adjust__row .button_to { margin: 0; }
-.adjust__name { flex: 1; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
-.adjust__value { min-width: 2ch; text-align: center; font-family: var(--font-dice); font-weight: 600; }
-.adjust__hint { flex-basis: 100%; margin: 0; font-size: 0.8rem; color: var(--dim); }
-
-/* Giving the character back: the description, then the button under it,
-   full width like Edit sheet. */
-.adjust__claim { display: grid; gap: var(--space-2); }
-.adjust__claim .button_to { margin: 0; }
-.adjust__claim .button { width: 100%; }
 
 /* Stat cards; the one rolling spans two columns. */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
@@ -1548,6 +1521,13 @@ button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 
 .harm .card__title { margin: 0; }
 .harm .button_to { margin: 0; }
 .harm__toggles { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: var(--space-2); }
+/* A desperate character's quiet way out: the hint, then the button, which drops whole onto its own line when the card is narrow. */
+.harm__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-1) var(--space-2); margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--line-soft); }
+.harm__end-text { margin: 0; font-size: 0.87rem; color: var(--muted); text-wrap: balance; }
+.harm__end .button { white-space: nowrap; }
+/* Filled harm-red, not the usual red outline: this one ends a story. */
+.harm__end .button--danger { background: var(--harm); border-color: var(--grim-ring); color: var(--text); font-family: var(--font-display); font-style: italic; }
+.harm__end .button--danger:hover { background: var(--grim-ring); color: var(--text); }
 
 .harm-toggle {
   display: inline-flex;
@@ -1813,18 +1793,26 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   box-shadow: var(--shadow);
 }
 
-/* Suspense: first in the scene bar's actions, a purple card holding [ − | count | + ]. */
-.suspense-panel {
+/* Counters: a tinted [ − | count | + ] card (shared/_counter). Suspense in
+   the GM's scene bar; spark, thread and XP on the owner's sheet. */
+.counter {
+  --counter: var(--text);
+  --counter-text: var(--muted);
+  --counter-bg: var(--surface);
+  --counter-line: var(--line-strong);
   display: inline-flex;
   align-items: stretch;
   min-height: var(--tap);
-  border: 1px solid var(--suspense-line);
+  border: 1px solid var(--counter-line);
   border-radius: var(--radius-control);
-  background: var(--suspense-bg);
-  color: var(--suspense-text);
+  background: var(--counter-bg);
+  color: var(--counter-text);
 }
-.suspense-panel .button_to { display: flex; margin: 0; }
-.suspense-panel__step {
+.counter--suspense { --counter: var(--suspense); --counter-text: var(--suspense-text); --counter-bg: var(--suspense-bg); --counter-line: var(--suspense-line); }
+.counter--spark { --counter: var(--spark); --counter-text: var(--spark); --counter-bg: color-mix(in srgb, var(--spark) 8%, var(--surface)); --counter-line: color-mix(in srgb, var(--spark) 35%, var(--surface)); }
+.counter--thread { --counter: var(--thread); --counter-text: var(--thread); --counter-bg: color-mix(in srgb, var(--thread) 8%, var(--surface)); --counter-line: color-mix(in srgb, var(--thread) 35%, var(--surface)); }
+.counter .button_to { display: flex; margin: 0; }
+.counter__step {
   min-width: var(--tap);
   border: 0;
   background: none;
@@ -1832,21 +1820,21 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   font: 600 18px/1 var(--font-dice);
   cursor: pointer;
 }
-.suspense-panel .button_to:first-child .suspense-panel__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
-.suspense-panel .button_to:last-child .suspense-panel__step { border-radius: 0 var(--radius-control) var(--radius-control) 0; }
-.suspense-panel__step:hover:not(:disabled) { background: color-mix(in srgb, var(--suspense) 14%, transparent); }
-.suspense-panel__step:disabled { color: var(--dim); cursor: not-allowed; }
-.suspense-panel__count {
+.counter .button_to:first-child .counter__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
+.counter .button_to:last-child .counter__step { border-radius: 0 var(--radius-control) var(--radius-control) 0; }
+.counter__step:hover:not(:disabled) { background: color-mix(in srgb, var(--counter) 14%, transparent); }
+.counter__step:disabled { color: var(--dim); cursor: not-allowed; }
+/* One line: "1 of 2 spark", "4 suspense left". */
+.counter__count {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-width: 4.5rem;
-  padding: 0 var(--space-2);
-  border-inline: 1px solid var(--suspense-line);
+  gap: 0.35em;
+  padding: 0 var(--space-3);
+  border-inline: 1px solid var(--counter-line);
+  font-size: 0.87rem;
+  white-space: nowrap;
 }
-.suspense-panel__value { font-family: var(--font-dice); font-weight: 600; font-size: 18px; line-height: 1.1; color: var(--suspense); }
-.suspense-panel__label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+.counter__value { font-family: var(--font-dice); font-weight: 600; font-size: 18px; line-height: 1; color: var(--counter); }
 
 /* Sections */
 .gm-section { display: flex; flex-direction: column; gap: var(--space-3); }
@@ -2107,9 +2095,6 @@ a.hero-card__name:hover { color: var(--link); text-decoration: underline; }
 .farewell-banner__words { margin: var(--space-1) 0 0; font-family: var(--font-display); font-style: italic; font-size: 1.15rem; }
 .farewell-banner__hint { margin: var(--space-1) 0 0; font-size: 0.85rem; color: var(--dim); }
 .farewell-banner .button_to { margin: 0; }
-.adjust__farewell { padding-top: var(--space-2); border-top: 1px solid var(--line-soft); }
-.adjust__farewell[open] > .fold__summary { margin-bottom: var(--space-2); }
-.adjust__farewell-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
 /* Up for grabs (Character::Claiming): characters waiting for a player to pick. */
 .hero-card__release { align-self: flex-start; margin: -6px 0 0; }

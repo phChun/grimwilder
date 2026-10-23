@@ -1,10 +1,5 @@
 <%# locals: (campaign:) %>
-<%# The GM's suspense (pg. 96), first in the scene bar's actions: a purple [ − | count | + ]. Everyone at the table sees the count; only the GM changes it. Spending prompts an impact move, so the − button says so. %>
-<div class="suspense-panel" role="group" aria-label="Suspense, players can see it">
-  <%= button_to campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, class: "suspense-panel__step", disabled: campaign.suspense.zero?, "aria-label": "Spend 1 suspense", title: "Spend 1 suspense (prompts an impact move)" do %><span aria-hidden="true">−</span><% end %>
-  <span class="suspense-panel__count">
-    <span class="suspense-panel__value" aria-label="<%= campaign.suspense %> suspense"><%= campaign.suspense %></span>
-    <span class="suspense-panel__label" aria-hidden="true">Suspense</span>
-  </span>
-  <%= button_to campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, class: "suspense-panel__step", "aria-label": "Gain 1 suspense", title: "Gain 1 suspense" do %><span aria-hidden="true">+</span><% end %>
-</div>
+<%# The GM's suspense (pg. 96), first in the scene bar's actions. Everyone at the table sees the count; only the GM changes it. Spending prompts an impact move, so the − button says so. %>
+<%= render "shared/counter", kind: "suspense", noun: "suspense", left: true, group_label: "Suspense, players can see it", value: campaign.suspense,
+  down: { url: campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, disabled: campaign.suspense.zero?, label: "Spend 1 suspense (prompts an impact move)" },
+  up: { url: campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, label: "Gain 1 suspense" } %>

@@ -23,12 +23,13 @@ class CharacterSeatingTest < ActionDispatch::IntegrationTest
     assert_equal "Stranger seats Wren at the table.", @campaign.rolls.last.question
   end
 
-  test "take a character away from the table from the sheet, with its talent pools" do
+  test "take a character away from the table from the edit page, with its talent pools" do
     @wren.update!(campaign: @campaign)
     pool = @wren.talent_pools.create!(campaign: @campaign, name: "Wren: Quarry", kind: "task", starting_size: 2, size: 2, use_key: "x/y")
     sign_in_as identities(:stranger)
-    get character_path(@wren)
-    assert_select ".adjust form.seat-form option[selected][value=?]", @campaign.id.to_s
+    get edit_character_path(@wren)
+    assert_select "#at-the-table ~ form.seat-form option[selected][value=?]", @campaign.id.to_s
+    assert_select "form[action=?] button", character_seat_path(@wren), "Take Wren out of #{@campaign.name}"
 
     patch character_seat_path(@wren), params: { campaign_id: "" }
     assert_redirected_to character_path(@wren)

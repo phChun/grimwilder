@@ -1,6 +1,6 @@
 # Seating a character in one of the owner's campaigns, moving it, or taking
 # it away from the table (Character::Seating), from the character list or the
-# sheet's Adjust menu.
+# edit page's "At the table" section.
 class Characters::SeatsController < ApplicationController
   require_authentication
 

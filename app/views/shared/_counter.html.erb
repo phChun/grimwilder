@@ -1,0 +1,9 @@
+<%# locals: (kind:, noun:, value:, down:, up:, of: nil, left: nil, group_label: nil) %>
+<%# A tinted [ − | count | + ] card: suspense on the GM table; spark, thread and XP on the owner's sheet. The count reads as a phrase: "1 of 2 spark" with of:, "4 suspense left" with left: true. down: and up: are each { url:, label:, method:, params:, disabled: } for a button_to (method defaults to POST). %>
+<% group_label ||= noun.capitalize %>
+<% words = of ? "of #{of} #{noun}" : (left ? "#{noun} left" : noun) %>
+<div class="<%= class_names("counter", "counter--#{kind}") %>" role="group" aria-label="<%= group_label %>">
+  <%= button_to down[:url], method: down[:method] || :post, params: down[:params], class: "counter__step", disabled: down[:disabled], "aria-label": down[:label], title: down[:label] do %><span aria-hidden="true">−</span><% end %>
+  <span class="counter__count"><span class="counter__value"><%= value %></span> <%= words %></span>
+  <%= button_to up[:url], method: up[:method] || :post, params: up[:params], class: "counter__step", disabled: up[:disabled], "aria-label": up[:label], title: up[:label] do %><span aria-hidden="true">+</span><% end %>
+</div>

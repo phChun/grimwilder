@@ -16,7 +16,7 @@ class GmHarmTest < ActionDispatch::IntegrationTest
     assert_select ".stat-card form[action=?] button[aria-label=?]", character_damage_path(@tibbs), "Mark Agility", text: "Mark"
     assert_select "#damage form[action=?]", character_conditions_path(@tibbs)
     assert_select "details.stat-roll", 0, "only the owner rolls"
-    assert_select ".adjust", 0, "nor spends spark or thread"
+    assert_select ".identity .counter", 0, "nor spends spark or thread"
     assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(@tibbs)
   end
 
