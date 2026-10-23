@@ -38,11 +38,14 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select "#rolls form[action=?]", campaign_quarrels_path(@campaign)
     assert_select ".scene-bar__actions a[href=?]", new_campaign_play_session_ending_path(@campaign, session), "End session"
 
-    assert_select "#table .party-grid > .suspense-panel:first-child .suspense-panel__note", "players can see it"
-    assert_select ".scene-bar .suspense-panel", 0, "suspense sits with the party, not the scene"
+    assert_select ".scene-bar__actions > .suspense-panel:first-child[aria-label=?]", "Suspense, players can see it"
+    assert_select "#table .suspense-panel", 0, "suspense sits with the session controls, not the party"
+    assert_select ".suspense-panel .pips", 0, "just the count"
     assert_select ".suspense-panel__value[aria-label=?]", "0 suspense", text: "0" # session 1 adds none
-    assert_select ".suspense-panel button[aria-label=?][disabled]", "Spend 1 suspense", text: /Spend/
-    assert_select ".suspense-panel button[aria-label=?]", "Gain 1 suspense", text: /Gain/
+    assert_select ".suspense-panel button[aria-label=?][disabled]", "Spend 1 suspense", text: "−"
+    assert_select ".suspense-panel button[aria-label=?]", "Gain 1 suspense", text: "+"
+    assert_select ".scene-bar__actions > *:nth-child(2)", "Cut to new scene"
+    assert_select ".scene-bar__actions > *:nth-child(3)", "End session"
 
     assert_select ".party-card a[href=?]", character_path(characters(:tibbs)), characters(:tibbs).name
     assert_select ".party-card__harm", "Bloodied · Agility marked · 4d poisoned"

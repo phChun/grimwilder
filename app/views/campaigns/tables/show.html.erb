@@ -10,7 +10,7 @@
 <% seats = table_seats(@memberships, @characters) %>
 <% first_crucible = @crucible_groups.first.last.first %>
 
-<%# The GM table: the scene and suspense on top, the party, pools as cards and the crucible, with the table's log and chat in the rail. %>
+<%# The GM table: the scene, suspense and the GM's session controls on top, the party, pools as cards and the crucible, with the table's log and chat in the rail. %>
 <div class="fluid gm-view" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
   <div class="fluid__main gm-view__main">
     <section class="scene-bar" aria-labelledby="scene-title">
@@ -26,11 +26,9 @@
         </p>
         <h1 id="scene-title" class="scene-bar__title"><%= scene&.title || (@session ? "Between scenes" : campaign.name) %></h1>
 
+        <%# Suspense, then the scene, the session and a break, spaced evenly across the bar, in the order the GM reaches for them. %>
         <div class="scene-bar__actions">
-          <% if @session.nil? %>
-            <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary" %>
-          <% end %>
-          <span class="scene-bar__spacer"></span>
+          <%= render "campaigns/tables/suspense_panel", campaign: campaign %>
           <% if scene %>
             <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost" %>
           <% elsif @session %>
@@ -38,6 +36,8 @@
           <% end %>
           <% if @session %>
             <%= link_to "End session", new_campaign_play_session_ending_path(campaign, @session), class: "button button--ghost" %>
+          <% else %>
+            <%= link_to "Start session", new_campaign_play_session_path(campaign), class: "button button--primary" %>
           <% end %>
           <details class="between-scenes" data-controller="menu" data-action="toggle->menu#place">
             <summary class="button button--ghost between-scenes__toggle">Respite</summary>
@@ -57,7 +57,6 @@
         <%= link_to "Add your character", new_character_path(campaign_id: campaign.id), class: "button button--ghost button--small" %>
       </div>
       <div class="party-grid">
-        <%= render "campaigns/tables/suspense_panel", campaign: campaign %>
         <% seats.each do |membership, seated| %>
           <% if seated.empty? %>
             <div class="party-card party-card--empty">

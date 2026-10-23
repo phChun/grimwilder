@@ -1,9 +1,6 @@
 <%# locals: (campaign:) %>
-<%# The GM's suspense, read-only: everyone at the table sees it, only the GM changes it. The count leads, with a short track, as on the GM table. Replaced live over [campaign, :live] when it changes. %>
+<%# The GM's suspense, read-only: everyone at the table sees it, only the GM changes it. Just the count, no track. Replaced live over [campaign, :live] when it changes. %>
 <span id="<%= campaign.suspense_meter_id %>" class="suspense-meter" role="img" aria-label="Suspense: <%= campaign.suspense %>">
   <span class="suspense-meter__label" aria-hidden="true">Suspense</span>
   <span class="suspense-meter__value" aria-hidden="true"><%= campaign.suspense %></span>
-  <% if campaign.suspense.positive? %>
-    <span aria-hidden="true"><%= render "shared/pips", kind: "suspense", value: campaign.suspense, cap: 3 %></span>
-  <% end %>
 </span>

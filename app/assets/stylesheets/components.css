@@ -1781,7 +1781,6 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .play-view__scroll { max-height: 26rem; overflow-y: auto; }
 
 .suspense-meter { display: inline-flex; align-items: center; gap: var(--space-2); font-size: 13px; font-weight: 600; color: var(--suspense-text); }
-.suspense-meter .pip { width: 9px; height: 9px; }
 .suspense-meter__value { font-family: var(--font-dice); font-weight: 600; }
 
 /* ---------- GM table (campaigns/tables#show) ---------- */
@@ -1794,9 +1793,8 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .scene-bar__scene { flex: 999 1 420px; min-width: 0; }
 .scene-bar__status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; font-size: 0.87rem; color: var(--muted); }
 .scene-bar__title { margin: var(--space-1) 0 var(--space-3); font-size: clamp(2rem, 5vw, 2.5rem); }
-.scene-bar__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.scene-bar__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
 .scene-bar__actions .button_to { margin: 0; }
-.scene-bar__spacer { flex: 1 1 var(--space-4); }
 .scene-bar .between-scenes { position: relative; }
 .scene-bar .between-scenes__toggle { list-style: none; }
 .scene-bar .between-scenes__toggle::-webkit-details-marker { display: none; }
@@ -1815,30 +1813,40 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   box-shadow: var(--shadow);
 }
 
-/* Suspense: the first card in the party grid, in the GM's purple. */
-.party-card.suspense-panel {
-  justify-content: space-between;
-  gap: var(--space-3);
-  border-color: var(--suspense-line);
+/* Suspense: first in the scene bar's actions, a purple card holding [ − | count | + ]. */
+.suspense-panel {
+  display: inline-flex;
+  align-items: stretch;
+  min-height: var(--tap);
+  border: 1px solid var(--suspense-line);
+  border-radius: var(--radius-control);
   background: var(--suspense-bg);
+  color: var(--suspense-text);
 }
-
-.suspense-panel__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
-.suspense-panel__label { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--suspense-text); }
-.suspense-panel__note { font-size: 12px; color: var(--muted); }
-.suspense-panel__count { display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap); }
-.suspense-panel__value { font-family: var(--font-dice); font-weight: 600; font-size: 30px; line-height: 1; color: var(--suspense); }
-.suspense-panel .pips { gap: 6px; }
-.suspense-panel .pip { width: 12px; height: 12px; }
-
-/* One joined control, in the regular button style, like the dice and thorn steppers. */
-.suspense-panel__control { display: flex; }
-.suspense-panel__control .button_to { flex: 1; margin: 0; }
-.suspense-panel__step { width: 100%; gap: var(--space-1); }
-.suspense-panel__control .button_to:first-child .suspense-panel__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
-.suspense-panel__control .button_to:last-child .suspense-panel__step { margin-left: -1px; border-radius: 0 var(--radius-control) var(--radius-control) 0; }
-.suspense-panel__step:hover:not(:disabled) { background: var(--surface-2); }
+.suspense-panel .button_to { display: flex; margin: 0; }
+.suspense-panel__step {
+  min-width: var(--tap);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: 600 18px/1 var(--font-dice);
+  cursor: pointer;
+}
+.suspense-panel .button_to:first-child .suspense-panel__step { border-radius: var(--radius-control) 0 0 var(--radius-control); }
+.suspense-panel .button_to:last-child .suspense-panel__step { border-radius: 0 var(--radius-control) var(--radius-control) 0; }
+.suspense-panel__step:hover:not(:disabled) { background: color-mix(in srgb, var(--suspense) 14%, transparent); }
 .suspense-panel__step:disabled { color: var(--dim); cursor: not-allowed; }
+.suspense-panel__count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.5rem;
+  padding: 0 var(--space-2);
+  border-inline: 1px solid var(--suspense-line);
+}
+.suspense-panel__value { font-family: var(--font-dice); font-weight: 600; font-size: 18px; line-height: 1.1; color: var(--suspense); }
+.suspense-panel__label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
 
 /* Sections */
 .gm-section { display: flex; flex-direction: column; gap: var(--space-3); }
