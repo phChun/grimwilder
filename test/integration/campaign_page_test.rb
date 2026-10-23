@@ -19,9 +19,9 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".campaign-hero__facts dd", "Mercenaries"
     assert_select ".campaign-hero__facts dd", "Uncover the Truth"
     assert_select ".campaign-hero__facts dd", "The Bramble Marches"
-    assert_select ".campaign-hero__action a.button--primary[href=?]", campaign_table_path(@campaign), "Open the GM table"
-    assert_select ".campaign-hero__action button[data-clipboard-text-value=?]", join_url(@campaign.join_code), text: /Copy invite link/
-    assert_select ".campaign-hero__action form[action=?] button", campaign_join_code_path(@campaign), "Reset link"
+    assert_select ".campaign-actions__row a.button--primary[href=?]", campaign_table_path(@campaign), "Open the GM table"
+    assert_select ".campaign-actions__row button[data-clipboard-text-value=?]", join_url(@campaign.join_code), text: /Copy invite link/
+    assert_select ".campaign-actions__row form[action=?] button", campaign_join_code_path(@campaign), "Reset link"
   end
 
   test "a GM with no pitch yet is asked for one; a player just gets their character" do
@@ -35,8 +35,8 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
     assert_select ".campaign-hero .eyebrow", "Campaign · Playing Tibbs"
     assert_select ".campaign-hero__pitch", 0
-    assert_select ".campaign-hero__action a.button--primary[href=?]", character_path(characters(:tibbs)), "Open my character"
-    assert_select ".campaign-hero__action button", 0, "no invite link for players"
+    assert_select ".campaign-actions__row a.button--primary[href=?]", character_path(characters(:tibbs)), "Open my character"
+    assert_select ".campaign-actions__row button", 0, "no invite link for players"
   end
 
   test "a player with two characters here picks which to open" do
@@ -45,8 +45,8 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
 
     assert_select ".eyebrow", /Playing Tibbs and Moss/
-    assert_select ".campaign-hero__action a.button--primary", 0
-    assert_select ".campaign-hero__action details.go-menu" do
+    assert_select ".campaign-actions__row a.button--primary", 0
+    assert_select ".campaign-actions__row details.go-menu" do
       assert_select "summary.button--primary", /Open my character/
       assert_select ".go-menu__item", 2
       assert_select ".go-menu__item[href=?]", character_path(moss), /Moss\s+Druid · level 1/
@@ -134,7 +134,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".members__item:has(.members__name:contains('Gwen')) .members__role--gm", "GM"
     assert_select ".members__item:has(.members__name:contains('Pip')) .members__role", "Tibbs"
     assert_select ".members__item:has(.members__name:contains('Stranger')) .members__role", "making one"
-    assert_select "a[href=?]", edit_campaign_path(@campaign), "Campaign settings"
+    assert_select ".campaign-actions__row a[href=?]", edit_campaign_path(@campaign), "Campaign settings"
     assert_select "[data-controller=kept-crucibles][hidden]"
   end
 
