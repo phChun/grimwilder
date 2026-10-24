@@ -28,7 +28,7 @@
           </td>
           <td><%= identity.email_address %></td>
           <td><%= l(identity.created_at.to_date, format: :long) %></td>
-          <td><%= (signed_in = @last_sign_ins[identity.id]) ? "#{time_ago_in_words(signed_in)} ago" : "Never" %></td>
+          <td><%= identity.last_signed_in_at ? "#{time_ago_in_words(identity.last_signed_in_at)} ago" : "Never" %></td>
           <td><%= @passkey_counts.fetch(identity.id, 0) %></td>
           <td><%= identity.memberships.map { "#{_1.campaign.name} (#{_1.gm? ? "GM" : "player"})" }.to_sentence.presence || "None" %></td>
         </tr>

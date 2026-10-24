@@ -17,15 +17,15 @@
 
 <section class="panel stack" aria-labelledby="admin-sign-ins">
   <h2 id="admin-sign-ins" class="panel__title">Latest sign-ins</h2>
-  <% if @sign_ins.any? %>
+  <% if @signed_in.any? %>
     <ul class="list">
-      <% @sign_ins.each do |sign_in| %>
+      <% @signed_in.each do |identity| %>
         <li class="list__item">
           <span>
-            <strong><%= sign_in.identity.display_name %></strong>
-            <small><%= sign_in.identity.email_address %></small>
+            <strong><%= identity.display_name %></strong>
+            <small><%= identity.email_address %></small>
           </span>
-          <small><%= time_ago_in_words(sign_in.created_at) %> ago</small>
+          <small><%= time_ago_in_words(identity.last_signed_in_at) %> ago</small>
         </li>
       <% end %>
     </ul>

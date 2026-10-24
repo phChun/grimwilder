@@ -41,6 +41,22 @@ class AdminTest < ActionDispatch::IntegrationTest
     assert_select "td", text: campaigns(:bramblewood).name
   end
 
+  test "last sign-in outlasts signing out" do
+    sign_in_as identities(:pip)
+    signed_in_at = identities(:pip).reload.last_signed_in_at
+    assert signed_in_at
+    sign_out
+
+    sign_in_as identities(:ada)
+    get admin_identities_path
+    assert_select "tr", text: /#{identities(:pip).email_address}/ do
+      assert_select "td", text: "Never", count: 0
+    end
+
+    get admin_root_path
+    assert_select ".list__item strong", text: "Pip"
+  end
+
   test "an admin makes an account, which can then sign in with sign-ups closed" do
     was_open = Rails.configuration.x.signups_open
     Rails.configuration.x.signups_open = false

@@ -24,7 +24,6 @@ class Admin::IdentitiesController < Admin::BaseController
   private
     def load_identities
       @identities = Identity.includes(memberships: :campaign).order(created_at: :desc)
-      @last_sign_ins = Session.group(:identity_id).maximum(:created_at)
       @passkey_counts = Passkey.group(:identity_id).count
     end
 end

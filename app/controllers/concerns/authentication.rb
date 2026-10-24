@@ -52,6 +52,7 @@ module Authentication
 
     def start_new_session_for(identity)
       reset_session_preserving_return_to
+      identity.touch(:last_signed_in_at)
       identity.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session_record|
         Current.session = session_record
         cookies.signed.permanent[:session_token] = { value: session_record.signed_id, httponly: true, same_site: :lax }
