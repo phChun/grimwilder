@@ -8,8 +8,9 @@ image: phchun/grimwilder
 # Deploy to these servers.
 servers:
   web:
-    # The droplet's Reserved IP.
-    - 129.212.197.211
+    # The droplet's Reserved IP, kept out of the repo so Cloudflare keeps hiding it
+    # (a production environment secret in .github/workflows/deploy.yml; 1Password).
+    - <%= ENV.fetch("DROPLET_IP") %>
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -48,6 +49,9 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    # Who gets an email when production breaks: a server error or a failed job
+    # (app/models/error_notifier.rb). Empty, nobody does.
+    - ERROR_EMAIL_TO
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
@@ -64,10 +68,6 @@ env:
     # mail. subdomain is the domain verified in Resend, so sending can't hurt
     # grimwilder.com's own reputation.
     MAILER_FROM: Grimwilder <no-reply@mail.grimwilder.com>
-
-    # Who gets an email when production breaks: a server error or a failed job
-    # (app/models/error_notifier.rb). Unset, nobody does.
-    ERROR_EMAIL_TO: shawn.jordan@me.com
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3

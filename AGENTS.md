@@ -11,7 +11,7 @@ Current state:
 - Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`), passwordless accounts (email code + passkeys), campaigns with join links, campaign pools, crucibles, character sheets and the talent catalog, and the table log (server-rolled character rolls that spend and award spark, plus pool rolls, live on the campaign page).
 - Next: see *Roadmap*.
 
-Source rulebook: `GWCE P5.2 Pages.pdf` (in the Claude project "Grimwilder", not in the repo). Page numbers below refer to it.
+Source rulebook: *Grimwild: Community Edition*, Preview 5.2 (`GWCE P5.2 Pages.pdf`, not in the repo). Page numbers below refer to it.
 
 ## Stack
 
@@ -21,7 +21,7 @@ Source rulebook: `GWCE P5.2 Pages.pdf` (in the Claude project "Grimwilder", not 
 | Views | `.html.erb` compiled by **Herb** and routed through **ReActionView 0.6** (reactionview.dev) |
 | JS | importmap-rails, Turbo, Stimulus, the `reactionview` client (pinned automatically by the gem) |
 | CSS | Plain CSS served by Propshaft. No Tailwind, no Sass |
-| DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a DigitalOcean droplet, images on ghcr.io (droplet `129.212.197.211`, image `ghcr.io/phchun/grimwilder`; Cloudflare proxies the domain and kamal-proxy serves a Cloudflare Origin CA cert from `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM`). CI runs locally: `bin/ci` ends with `gh signoff`. `main` only changes through pull requests (squash merge), which need that signoff; every push to `main` deploys via `.github/workflows/deploy.yml` |
+| DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a DigitalOcean droplet, images on ghcr.io (droplet at the Reserved IP in `DROPLET_IP`, image `ghcr.io/phchun/grimwilder`; Cloudflare proxies the domain and kamal-proxy serves a Cloudflare Origin CA cert from `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM`). CI runs locally: `bin/ci` ends with `gh signoff`. `main` only changes through pull requests (squash merge), which need that signoff; every push to `main` deploys via `.github/workflows/deploy.yml` |
 | Image | Docker Hardened Images: built in `dhi.io/ruby:4.0.7-debian13-dev`, run in `dhi.io/ruby:4.0.7-debian13` (`docker login dhi.io` first). See *Production image* |
 | Tests | Minitest (`bin/rails test`) plus Node's built-in test runner for pure JS |
 | Auth | Passwordless: emailed codes + passkeys (`webauthn` gem); no `has_secure_password` / bcrypt |
@@ -397,17 +397,17 @@ The `Dockerfile` builds on Docker Hardened Images (Debian 13). The runtime image
 Live at **https://grimwilder.com** since 2026-10-24 (`www.` redirects to it, `config/routes.rb`).
 
 - **Deploying**: work on a branch, push it, run `bin/ci` there (it ends with `gh signoff`, a green `signoff` status on the branch's latest commit), open a PR and squash-merge it. The "Main" ruleset requires a PR, the `signoff` check, signed commits (a squash merge in GitHub's UI is signed by GitHub) and linear history. Every push to `main` runs `.github/workflows/deploy.yml`, which runs `bin/kamal deploy`; it logs in to ghcr.io with the job's own `GITHUB_TOKEN`. Its other secrets live in the repo's `production` environment and are listed at the top of that file. Pushing to a branch again after a signoff needs `bin/ci` again.
-- **From the Mac**: `bin/kamal deploy`, `bin/kamal console`, `bin/kamal logs`. They need `KAMAL_REGISTRY_PASSWORD` (a classic token with `write:packages`, kept in 1Password), plus `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM` for anything that boots the proxy.
+- **From the Mac**: `bin/kamal deploy`, `bin/kamal console`, `bin/kamal logs`. They need `KAMAL_REGISTRY_PASSWORD` (a classic token with `write:packages`, kept in 1Password), `DROPLET_IP` and `ERROR_EMAIL_TO` (empty sends no error emails), plus `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM` for anything that boots the proxy.
 - **Cloudflare** proxies both names (SSL "Full (strict)"; kamal-proxy serves a Cloudflare Origin CA certificate, so there's no Let's Encrypt). Public DNS shows Cloudflare's addresses, never the droplet's, so check records in the dashboard or with `dig @adi.ns.cloudflare.com`.
-- **Droplet**: Ubuntu 24.04 at the Reserved IP `129.212.197.211`, with DigitalOcean backups on. It was set up by hand; to rebuild one:
+- **Droplet**: Ubuntu 24.04 at a Reserved IP, which stays out of the repo (`DROPLET_IP`, read by `config/deploy.yml` and `script/digitalocean_firewall.rb`; a `production` environment secret, and in 1Password) so Cloudflare keeps hiding it, with DigitalOcean backups on. It was set up by hand; to rebuild one:
   - Docker from `get.docker.com` (`kamal deploy` doesn't install it; `kamal setup` would).
   - The DigitalOcean Cloud Firewall from `script/digitalocean_firewall.rb`: 80/443 from Cloudflare's ranges only, 22 from anywhere (GitHub's runners have no fixed IPs). Re-run it when Cloudflare's ranges change. Don't use `ufw`: Docker's published ports bypass it.
-  - SSH: keys only (`/etc/ssh/sshd_config.d/00-hardening.conf`: `PermitRootLogin prohibit-password`, no passwords, no X11). `root`'s `authorized_keys` holds Shawn's key and the deploy key (`SSH_PRIVATE_KEY`, no passphrase, since the workflow's ssh-agent can't take one). Leave `MaxAuthTries` at its default: at 3, clients offering several keys get "Too many authentication failures".
+  - SSH: keys only (`/etc/ssh/sshd_config.d/00-hardening.conf`: `PermitRootLogin prohibit-password`, no passwords, no X11). `root`'s `authorized_keys` holds the maintainer's key and the deploy key (`SSH_PRIVATE_KEY`, no passphrase, since the workflow's ssh-agent can't take one). Leave `MaxAuthTries` at its default: at 3, clients offering several keys get "Too many authentication failures".
   - A 2 GB `/swapfile` (in fstab, `vm.swappiness=10`): the old and new containers overlap during a deploy on 2 GB of RAM.
   - unattended-upgrades reboots when an update needs it, at 09:00 UTC (`/etc/apt/apt.conf.d/52unattended-upgrades-reboot`); the containers restart themselves.
 - **Data**: the SQLite files live in the `grimwilder_storage` volume. `DatabaseSnapshot` copies the primary database to `storage/backups` nightly at 04:00 and keeps 7; DigitalOcean's backups carry them off the droplet. `config/master.key` is in 1Password: without it the credentials can't be read.
 - **Email**: Resend over SMTP from `no-reply@mail.grimwilder.com` (`MAILER_FROM`; `mail.grimwilder.com` is the domain in Resend, with its DKIM, SPF and return-path records under `mail.` and DMARC at the root). **Port 2587, not 587**: DigitalOcean blocks outgoing 25, 465 and 587, and a blocked port shows up as `Net::OpenTimeout` in the mail job. The key is in the credentials' `smtp:` section (`config/environments/production.rb`).
-- **Errors**: `ErrorNotifier` (a `Rails.error` subscriber, on when `ERROR_EMAIL_TO` is set) emails a server error or a failed job, at most once an hour for the same error, and skips 4xx errors such as not found. It sends through the same SMTP, so it can't report email itself being down; `bin/kamal logs` has everything.
+- **Errors**: `ErrorNotifier` (a `Rails.error` subscriber, on when `ERROR_EMAIL_TO` is set; it's a Kamal secret, so the address stays out of the repo) emails a server error or a failed job, at most once an hour for the same error, and skips 4xx errors such as not found. It sends through the same SMTP, so it can't report email itself being down; `bin/kamal logs` has everything.
 - **Sign-ups are closed** (`ALLOW_SIGNUPS: false`). An admin makes accounts at `/admin/accounts` (see *Admin*).
 
 ## Licensing (must keep)
@@ -422,4 +422,3 @@ Live at **https://grimwilder.com** since 2026-10-24 (`www.` redirects to it, `co
 - Sandboxed agent environments may be unable to `bundle install` (rubygems.org may be blocked, and the Linux VM ships Ruby 3.0). If you can't boot Rails, still run the Herb linter and the Node tests, and say plainly that the Rails tests weren't run.
 - npm packages useful for checks: `@herb-tools/linter@0.11.0`, and `reactionview@0.6.0` (its source shows the client API).
 - Don't commit or push unless asked.
-- Before a significant decision, check the project plan doc (`claude/toolkit-plan.md` in the Claude project).
