@@ -50,10 +50,10 @@ bin/ci                                    # setup, style, security audits and th
 
 ## Contributing
 
-[`AGENTS.md`](AGENTS.md) holds the project's conventions, the domain glossary and how each part is built. Read it before you change anything. It's written for coding agents and humans alike.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). [`AGENTS.md`](AGENTS.md) holds the project's conventions, the domain glossary and how each part is built. Read it before you change anything. It's written for coding agents and humans alike. To report a security problem, see [`SECURITY.md`](SECURITY.md).
 
 ## License
 
-The code is under the [O'Saasy License](LICENSE.md): use, change and share it freely, but don't offer it to others as a competing hosted service.
+The code is under the [O'Saasy License](LICENSE.md): use, change and share it freely, but don't offer it to others as a competing hosted service. Running your own copy for your group is fine.
 
 The license covers the code only. *Grimwild* is by J. D. Maxwell (Oddity Press) and is used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); the Community Edition text is CC0. The rules text quoted in the app (the talent catalog, crucibles and reference lists in `config/`) stays under those licenses. Grimwilder is unofficial and isn't endorsed by Oddity Press. It doesn't use the book's graphic assets or illustrations.

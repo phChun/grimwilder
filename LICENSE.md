@@ -8,3 +8,12 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 2. No licensee or downstream recipient may use the Software (including any modified or derivative versions) to directly compete with the original Licensor by offering it to third parties as a hosted, managed, or Software-as-a-Service (SaaS) product or cloud service where the primary value of the service is the functionality of the Software itself.
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+## Third-party content
+
+The license above covers Grimwilder's code. It doesn't cover:
+
+- ***Grimwild*** by J. D. Maxwell (Oddity Press), used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); the Community Edition text is CC0. The rules text in `config/talents.yml`, `config/crucibles.yml` and `config/grimwild.yml` stays under those licenses. Grimwilder is unofficial and isn't endorsed by Oddity Press.
+- **Fonts** in `app/assets/fonts` (Spectral and IBM Plex), under the SIL Open Font License; their license texts sit beside them.

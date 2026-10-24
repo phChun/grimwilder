@@ -5,7 +5,7 @@
 # and attaches it to the droplet behind DROPLET_IP. Safe to re-run whenever Cloudflare's ranges change.
 #
 # Usage (from the repo root on your Mac):
-#   DIGITALOCEAN_TOKEN=dop_v1_... ruby script/digitalocean_firewall.rb
+#   DROPLET_IP=... DIGITALOCEAN_TOKEN=dop_v1_... ruby script/digitalocean_firewall.rb
 #
 # The token needs read on droplet and reserved_ip, and read/create/update on firewall
 # (DigitalOcean → API → Tokens → Custom scopes).
@@ -15,7 +15,7 @@ require "json"
 require "uri"
 
 FIREWALL_NAME = "grimwilder"
-DROPLET_IP = ENV.fetch("DROPLET_IP", "129.212.197.211")
+DROPLET_IP = ENV.fetch("DROPLET_IP") { abort "Set DROPLET_IP (the droplet's Reserved IP)." }
 TOKEN = ENV.fetch("DIGITALOCEAN_TOKEN") { abort "Set DIGITALOCEAN_TOKEN (DigitalOcean → API → Tokens)." }
 API = "https://api.digitalocean.com/v2"
 

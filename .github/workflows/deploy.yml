@@ -10,6 +10,8 @@
 #   SSH_KNOWN_HOSTS          output of `ssh-keyscan <droplet ip>`
 #   CERTIFICATE_PEM          Cloudflare Origin CA certificate (PEM)
 #   PRIVATE_KEY_PEM          its private key (PEM)
+#   DROPLET_IP               the droplet's Reserved IP (config/deploy.yml servers)
+#   ERROR_EMAIL_TO           where production error emails go
 name: Deploy
 
 on:
@@ -69,4 +71,6 @@ jobs:
         env:
           CERTIFICATE_PEM: ${{ secrets.CERTIFICATE_PEM }}
           PRIVATE_KEY_PEM: ${{ secrets.PRIVATE_KEY_PEM }}
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          ERROR_EMAIL_TO: ${{ secrets.ERROR_EMAIL_TO }}
         run: bin/kamal deploy
