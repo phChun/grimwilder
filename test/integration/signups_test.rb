@@ -1,8 +1,8 @@
 require "test_helper"
 
 # ALLOW_SIGNUPS=false (config.x.signups_open): existing accounts still sign in,
-# new emails only get an account through a campaign's invite link, and the
-# pages never say whether an account exists.
+# new emails only get an account through a campaign's invite link, and anyone
+# else is told sign-ups are closed.
 class SignupsTest < ActionDispatch::IntegrationTest
   include ActionMailer::TestHelper
 
@@ -13,18 +13,16 @@ class SignupsTest < ActionDispatch::IntegrationTest
 
   teardown { Rails.configuration.x.signups_open = @was_open }
 
-  test "a new email gets no code, but the same next page" do
+  test "a new email gets no code, and is told sign-ups are closed" do
     get new_session_path
     assert_select ".page-header__lede", /invite-only/
 
     assert_no_enqueued_emails do
       post session_path, params: { email_address: "nobody-yet@example.com" }
     end
-    assert_redirected_to session_magic_link_path
+    assert_redirected_to new_session_path
+    assert_equal "We're not taking new sign-ups right now. If your GM sent you an invite link, open it first.", flash[:alert]
     assert_not MagicLink.exists?(email_address: "nobody-yet@example.com")
-
-    follow_redirect!
-    assert_select ".page-header__lede", /If there's an account for\s+nobody-yet@example.com, we've sent it a 6-character code/
   end
 
   test "an existing account still signs in" do
@@ -52,6 +50,7 @@ class SignupsTest < ActionDispatch::IntegrationTest
     assert_no_enqueued_emails do
       post session_path, params: { email_address: "latecomer@example.com" }
     end
+    assert_redirected_to new_session_path
   end
 
   test "a code sent while sign-ups were open doesn't make an account after they close" do

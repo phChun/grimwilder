@@ -5,7 +5,7 @@
     <p class="eyebrow">Account</p>
     <h1>Check your email</h1>
     <p class="page-header__lede">
-      <% if Identity.signups_open? || invited? %>We sent a 6-character code to<% else %>If there's an account for<% end %> <strong><%= email_address_pending_authentication %></strong><% unless Identity.signups_open? || invited? %>, we've sent it a 6-character code<% end %>. It works once and expires in 15 minutes.
+      We sent a 6-character code to <strong><%= email_address_pending_authentication %></strong>. It works once and expires in 15 minutes.
     </p>
   </header>
 
