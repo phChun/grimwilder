@@ -3,11 +3,12 @@
 #
 # Secrets, in the "production" environment (Settings → Environments):
 #   RAILS_MASTER_KEY         contents of config/master.key
-#   KAMAL_REGISTRY_PASSWORD  classic personal access token with write:packages (ghcr.io)
 #   DOCKERHUB_USERNAME       Docker Hub account, for the dhi.io base images
 #   DOCKERHUB_TOKEN          Docker Hub access token
 #   SSH_PRIVATE_KEY          a deploy-only key; its public half goes in the droplet's authorized_keys
 #   SSH_KNOWN_HOSTS          output of `ssh-keyscan <droplet ip>`
+#   CERTIFICATE_PEM          Cloudflare Origin CA certificate (PEM)
+#   PRIVATE_KEY_PEM          its private key (PEM)
 name: Deploy
 
 on:
@@ -29,7 +30,10 @@ jobs:
       contents: read
       packages: write
     env:
-      KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+      # The job's own token pushes the image to ghcr.io (packages: write above),
+      # and the droplet pulls with it during the deploy. Deploys from the Mac use
+      # a personal access token instead (config/deploy.yml, registry).
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout the signed-off commit
@@ -66,4 +70,7 @@ jobs:
           printf '%s' "$RAILS_MASTER_KEY" > config/master.key
 
       - name: Deploy
+        env:
+          CERTIFICATE_PEM: ${{ secrets.CERTIFICATE_PEM }}
+          PRIVATE_KEY_PEM: ${{ secrets.PRIVATE_KEY_PEM }}
         run: bin/kamal deploy
