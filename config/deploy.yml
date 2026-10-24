@@ -65,6 +65,10 @@ env:
     # grimwilder.com's own reputation.
     MAILER_FROM: Grimwilder <no-reply@mail.grimwilder.com>
 
+    # Who gets an email when production breaks: a server error or a failed job
+    # (app/models/error_notifier.rb). Unset, nobody does.
+    ERROR_EMAIL_TO: shawn.jordan@me.com
+
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
 

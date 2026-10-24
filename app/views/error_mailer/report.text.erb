@@ -1,0 +1,8 @@
+<%= @error_class %>: <%= @message %>
+
+From: <%= @source.presence || "unknown" %>
+At: <%= @at %> (UTC)
+
+<%= @backtrace.join("\n") %>
+
+The same error won't be emailed again for an hour. Full logs: bin/kamal logs
