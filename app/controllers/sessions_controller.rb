@@ -15,10 +15,12 @@ class SessionsController < ApplicationController
 
     if magic_link.invalid?
       redirect_to new_session_path, alert: "That doesn't look like an email address."
+    elsif !Identity.may_sign_in?(magic_link.email_address, invited: invited?)
+      # Sign-ups are closed and this email has no account. Saying so does reveal
+      # which emails have one; for an invite-only beta, being clear wins.
+      redirect_to new_session_path, alert: "We're not taking new sign-ups right now. If your GM sent you an invite link, open it first."
     else
-      # With sign-ups closed an unknown address gets no code, but the same next
-      # page, so this still never says whether an account exists.
-      send_code(magic_link) if Identity.may_sign_in?(magic_link.email_address, invited: invited?)
+      send_code(magic_link)
       set_pending_authentication(magic_link.email_address, expires_at: magic_link.expires_at)
       redirect_to session_magic_link_path
     end
