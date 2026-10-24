@@ -274,7 +274,8 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 ## Admin (built 2026-10-24)
 
 - `identities.admin` (boolean, default false) marks an admin. It's never set from a form: use the console, `Identity.find_by!(email_address: "…").update!(admin: true)` (`bin/kamal console` in production).
-- `/admin` (`Admin::BaseController`: `require_authentication`, then a 404 for anyone not an admin, as at a campaign you aren't in): **Stats** (counts, this week's rolls, messages and sign-ins, the latest sign-ins), **Accounts** (every identity with last sign-in, passkeys and campaigns; "Create new account" makes one by email, which then signs in with a code even with sign-ups closed) and **Campaigns** (read-only: GMs, players, characters, sessions, last roll, done). Admins get no way into campaigns they aren't in.
+- `/admin` (`Admin::BaseController`: `require_authentication`, then a 404 for anyone not an admin, as at a campaign you aren't in): **Stats** (counts, this week's rolls and messages, who signed in this week and last), **Accounts** (every identity with last sign-in, passkeys and campaigns; "Create new account" makes one by email, which then signs in with a code even with sign-ups closed) and **Campaigns** (read-only: GMs, players, characters, sessions, last roll, done). Admins get no way into campaigns they aren't in.
+- Last sign-in is `identities.last_signed_in_at`, stamped by `start_new_session_for` (code or passkey). Don't read it from `sessions`: signing out deletes the row.
 - The header ends with an Admin tab for admins (`admin_tab`), in both navs.
 
 ## Pools (built 2026-10-15)
