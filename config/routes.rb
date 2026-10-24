@@ -44,10 +44,10 @@ Rails.application.routes.draw do
 
   resource :profile, only: %i[ show update ]
 
-  # Admins only (identities.admin): site stats, accounts, campaigns
+  # Admins only (identities.admin): site stats, accounts and their plans, campaigns
   namespace :admin do
     root "dashboards#show"
-    resources :identities, only: %i[ index create ], path: "accounts"
+    resources :identities, only: %i[ index create update ], path: "accounts"
     resources :campaigns, only: :index
   end
 

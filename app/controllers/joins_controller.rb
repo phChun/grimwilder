@@ -5,8 +5,8 @@ class JoinsController < ApplicationController
 
   def show
     @membership = Current.identity&.membership_in(@campaign)
-    # One active campaign at a time (Membership.one_campaign_limit): the one they're at instead.
-    @elsewhere = Current.identity.active_membership if authenticated? && !@membership
+    # Joining needs room in their plan (Identity::Plans).
+    @no_room = authenticated? && !@membership && !Current.identity.room_to_play?
     unless authenticated?
       session[:return_to_after_authenticating] = request.url
       session[:invite_code] = @campaign.join_code # lets them sign up while sign-ups are closed

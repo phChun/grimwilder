@@ -1,0 +1,17 @@
+# Plans an account can be on (identities.plan). Limits count active
+# campaigns (not done ones); a blank limit means no limit. Only the admin
+# assigns plans for now (/admin/accounts). Later, Stripe sets free and the
+# paid plans (patron, and any tiers added later, e.g. a duet that runs 2);
+# tester is only ever given by the admin, and Stripe must leave it alone.
+- key: free
+  name: Free
+  running: 1
+  playing:
+- key: patron
+  name: Patron
+  running:
+  playing:
+- key: tester
+  name: Tester
+  running:
+  playing:

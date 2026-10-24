@@ -1,8 +1,8 @@
 # A campaign the GM has marked done: a read-only archive. Everyone can still
 # read its page, history, log and sheets, but nothing new is played there (no
 # sessions, rolls, chat, pools or joining), and it no longer counts toward
-# anyone's one active campaign (Membership). The GM can reopen it, unless that
-# would put someone at the table in two active campaigns.
+# anyone's plan (Identity::Plans). The GM can reopen it, unless that would put
+# someone at the table past their plan's limit.
 module Campaign::Done
   extend ActiveSupport::Concern
 
@@ -29,8 +29,10 @@ module Campaign::Done
   def reopen!(by:)
     raise ArgumentError, "#{name} isn't done." unless done?
     memberships.includes(:identity).each do |member|
-      if (elsewhere = member.other_active_membership)
-        raise ArgumentError, "#{member.identity.display_name} is at #{elsewhere.campaign.name} now, so #{name} can't reopen."
+      unless member.identity.room_for?(member.role, except: id)
+        plan = member.identity.current_plan
+        doing = member.gm? ? "runs" : "plays in"
+        raise ArgumentError, "#{member.identity.display_name} #{doing} as many active campaigns as the #{plan.name} plan allows, so #{name} can't reopen."
       end
     end
 

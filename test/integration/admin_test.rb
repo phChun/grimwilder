@@ -22,6 +22,37 @@ class AdminTest < ActionDispatch::IntegrationTest
       post admin_identities_path, params: { identity: { email_address: "new@example.com" } }
     end
     assert_response :not_found
+
+    patch admin_identity_path(identities(:gwen)), params: { identity: { plan: "tester" } }
+    assert_response :not_found
+    assert_equal "free", identities(:gwen).reload.plan
+  end
+
+  test "an admin chooses each account's plan" do
+    sign_in_as identities(:ada)
+
+    patch admin_identity_path(identities(:gwen)), params: { identity: { plan: "tester" } }
+    assert_redirected_to admin_identities_path
+    assert_equal "Gwen is on the Tester plan.", flash[:notice]
+    assert_equal "tester", identities(:gwen).reload.plan
+
+    patch admin_identity_path(identities(:gwen)), params: { identity: { plan: "gold" } }
+    assert_equal "tester", identities(:gwen).reload.plan
+
+    Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:gwen))
+    patch admin_identity_path(identities(:gwen)), params: { identity: { plan: "free" } }
+    assert_equal 2, identities(:gwen).memberships.count
+    get admin_identities_path
+    assert_select "tr", text: /gwen@example.com/ do
+      assert_select "select option[selected]", "Free"
+      assert_select ".admin-plan__over", "Over: runs 2 active"
+    end
+
+    post admin_identities_path, params: { identity: { email_address: "tester@example.com", plan: "tester" } }
+    assert_equal "tester", Identity.find_by(email_address: "tester@example.com").plan
+
+    get admin_root_path
+    assert_select ".admin-stats__label", text: "On Tester"
   end
 
   test "an admin sees the stats, accounts and campaigns" do

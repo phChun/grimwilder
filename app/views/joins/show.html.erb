@@ -15,9 +15,9 @@
       <%= link_to "Open campaign", campaign_path(@campaign), class: "button button--primary button--wide" %>
     <% elsif @campaign.done? %>
       <p><%= @campaign.name %> is done, so no one can join it now.</p>
-    <% elsif @elsewhere %>
-      <p><%= Membership.one_campaign_limit(@elsewhere) %> Then come back to this link.</p>
-      <%= link_to "Open #{@elsewhere.campaign.name}", campaign_path(@elsewhere.campaign), class: "button button--wide" %>
+    <% elsif @no_room %>
+      <p><%= Current.identity.plan_limit_message(:player) %> Then come back to this link.</p>
+      <%= link_to "Your campaigns", campaigns_path, class: "button button--wide" %>
     <% elsif authenticated? %>
       <%= button_to "Join as #{Current.identity.display_name}", join_path(@campaign.join_code), class: "button button--primary button--wide" %>
     <% else %>

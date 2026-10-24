@@ -6,9 +6,8 @@
   <p class="page-header__lede">Start a campaign to run it as GM, or open a join link from your GM to play in theirs.</p>
 </header>
 
-<%# One active campaign at a time (Membership.one_campaign_limit): the active one leads, done ones follow, and the last card starts a new one, or says why it can't. %>
+<%# Active campaigns lead, done ones follow, and the last card starts a new one, or says why the plan has no room (Identity::Plans). %>
 <% active, done = @memberships.partition { !_1.campaign.done? } %>
-<% current = active.first %>
 <ul class="tool-grid__list" aria-label="Your campaigns">
   <% (active + done).each do |membership| %>
     <li>
@@ -21,8 +20,8 @@
   <li>
     <section id="campaign-new" class="tool-card add-card" aria-labelledby="campaign-new-title">
       <h2 id="campaign-new-title" class="tool-card__name">Create new campaign</h2>
-      <% if current && @campaign.errors.none? %>
-        <p class="tool-card__desc"><%= Membership.one_campaign_limit(current) %></p>
+      <% if !Current.identity.room_to_run? && @campaign.errors.none? %>
+        <p class="tool-card__desc"><%= Current.identity.plan_limit_message(:gm) %></p>
       <% else %>
         <%= form_with model: @campaign, class: "stack" do |form| %>
           <% if @campaign.errors.any? %>

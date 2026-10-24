@@ -1,17 +1,14 @@
 # A person, identified by email. Signs in with an emailed code or a passkey;
-# there are no passwords. Joins campaigns through memberships.
+# there are no passwords. Joins campaigns through memberships, as many as
+# their plan allows (Identity::Plans).
 class Identity < ApplicationRecord
+  include Plans
+
   has_many :sessions, dependent: :destroy
   has_many :passkeys, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :campaigns, through: :memberships
   has_many :characters, dependent: :destroy
-
-  # The active campaign this person is at, other than except: (one at a time
-  # for now; Membership.one_campaign_limit).
-  def active_membership(except: nil)
-    memberships.joins(:campaign).merge(Campaign.active).where.not(campaign_id: except).first
-  end
 
   normalizes :email_address, with: ->(value) { value.strip.downcase }
   normalizes :name, with: ->(value) { value.squish.presence }
