@@ -90,14 +90,14 @@
         <% 2.times do |i| %>
           <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[traits][]" value="<%= character.traits[i] %>" list="traits-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Trait <%= i + 1 %>">
         <% end %>
-        <%= form.text_field :not_trait, maxlength: Character::WORD_LIMIT, list: "traits-list", autocomplete: "off", placeholder: type_or_select("But not…"), class: "field__input", "aria-label": "Trait you aren't" %>
+        <%= form.text_field :not_trait, maxlength: Character::WORD_LIMIT, list: "traits-list", autocomplete: "off", placeholder: type_or_select("But not…"), class: "field__input field__input--not", "aria-label": "Trait you aren't" %>
       </fieldset>
       <fieldset class="fieldset">
         <legend class="field__label">Desires: 2 you want, 1 you don't</legend>
         <% 2.times do |i| %>
           <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[desires][]" value="<%= character.desires[i] %>" list="desires-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Desire <%= i + 1 %>">
         <% end %>
-        <%= form.text_field :not_desire, maxlength: Character::WORD_LIMIT, list: "desires-list", autocomplete: "off", placeholder: type_or_select("But not…"), class: "field__input", "aria-label": "Desire you don't want" %>
+        <%= form.text_field :not_desire, maxlength: Character::WORD_LIMIT, list: "desires-list", autocomplete: "off", placeholder: type_or_select("But not…"), class: "field__input field__input--not", "aria-label": "Desire you don't want" %>
       </fieldset>
     </div>
   </section>

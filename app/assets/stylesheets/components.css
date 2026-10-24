@@ -427,6 +427,9 @@
 /* Room for the chevron the base select style draws. */
 select.field__input { padding-right: 2.5rem; }
 
+/* The trait or desire you aren't, set apart from the two you are. */
+.field__input--not { border-color: var(--not-line); }
+
 .field__input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: transparent; }
 /* Safari leaves a focused select (ours are drawn with appearance: none)
    without the outline, so it would lose its edge until it loses focus: keep
@@ -1590,7 +1593,7 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .facts dd { margin: 0; }
 .facts__list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding-left: 1.1rem; }
 .facts__list li::marker { color: var(--dim); }
-.facts__not { list-style: none; margin-left: -1.1rem; color: var(--muted); }
+.facts__not { list-style: none; margin: 2px 0 0 -1.1rem; padding-left: var(--space-2); border-left: 2px solid var(--not-line); color: var(--muted); }
 .facts__but { font-size: 0.87rem; color: var(--dim); }
 
 /* Who they are: a column, or a few side by side when the sheet is wide. */
