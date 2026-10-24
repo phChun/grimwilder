@@ -9,6 +9,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".app-header .brand .brand__beta", "Beta"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", "Roll"
     assert_select ".app-header a.account--signin", "Sign in"
+    assert_select ".app-header .reset-notice", 0
     assert_select ".tabs__link", text: "All campaigns", count: 0
     assert_select ".site-footer__tools a", "Crucibles"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 3
@@ -34,6 +35,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
   test "signed in, every page's tabs start with all campaigns and end with your characters" do
     sign_in_as identities(:stranger)
     get root_path
+    assert_select ".app-header .reset-notice", "While in beta, data may be reset any time"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 5
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
     assert_select "nav.tabs[aria-label=Toolkit] .tabs__link[href=?]", characters_path, "Characters"
