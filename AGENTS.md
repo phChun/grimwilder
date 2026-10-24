@@ -21,7 +21,7 @@ Source rulebook: `GWCE P5.2 Pages.pdf` (in the Claude project "Grimwilder", not 
 | Views | `.html.erb` compiled by **Herb** and routed through **ReActionView 0.6** (reactionview.dev) |
 | JS | importmap-rails, Turbo, Stimulus, the `reactionview` client (pinned automatically by the gem) |
 | CSS | Plain CSS served by Propshaft. No Tailwind, no Sass |
-| DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a DigitalOcean droplet, images on ghcr.io (droplet `129.212.197.211`, image `ghcr.io/phchun/grimwilder`; Cloudflare proxies the domain and kamal-proxy serves a Cloudflare Origin CA cert from `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM`). CI runs locally: `bin/ci` ends with `gh signoff`, and a signed-off commit on `main` deploys via `.github/workflows/deploy.yml` |
+| DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a DigitalOcean droplet, images on ghcr.io (droplet `129.212.197.211`, image `ghcr.io/phchun/grimwilder`; Cloudflare proxies the domain and kamal-proxy serves a Cloudflare Origin CA cert from `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM`). CI runs locally: `bin/ci` ends with `gh signoff`. `main` only changes through pull requests (squash merge), which need that signoff; every push to `main` deploys via `.github/workflows/deploy.yml` |
 | Image | Docker Hardened Images: built in `dhi.io/ruby:4.0.7-debian13-dev`, run in `dhi.io/ruby:4.0.7-debian13` (`docker login dhi.io` first). See *Production image* |
 | Tests | Minitest (`bin/rails test`) plus Node's built-in test runner for pure JS |
 | Auth | Passwordless: emailed codes + passkeys (`webauthn` gem); no `has_secure_password` / bcrypt |

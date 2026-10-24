@@ -1,5 +1,6 @@
-# Deploys main with Kamal once bin/ci signs a commit off (`gh signoff` sets a
-# green "signoff" commit status), or by hand from the Actions tab.
+# Deploys main with Kamal on every push to it, or by hand from the Actions tab.
+# main only changes through pull requests, and the "Main" ruleset requires the
+# "signoff" status that bin/ci sets (`gh signoff`) on the branch first.
 #
 # Secrets, in the "production" environment (Settings → Environments):
 #   RAILS_MASTER_KEY         contents of config/master.key
@@ -12,17 +13,14 @@
 name: Deploy
 
 on:
-  status:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 concurrency: deploy
 
 jobs:
   deploy:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.context == 'signoff' && github.event.state == 'success' &&
-       contains(github.event.branches.*.name, 'main'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
@@ -36,10 +34,8 @@ jobs:
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout the signed-off commit
+      - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.sha || github.sha }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
