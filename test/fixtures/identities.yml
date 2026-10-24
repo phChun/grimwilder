@@ -9,3 +9,8 @@ pip:
 stranger:
   email_address: stranger@example.com
   name: Stranger
+
+ada:
+  email_address: ada@example.com
+  name: Ada
+  admin: true

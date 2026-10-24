@@ -49,6 +49,7 @@ app/
   controllers/
     pages_controller.rb    # home
     rolls_controller.rb    # /roll (no server logic; all client-side)
+    admin/                 # /admin: admins only (see *Admin*)
   helpers/application_helper.rb   # TOOLKIT_NAV: the nav items; ready: false shows "soon"
   javascript/
     grimwild/dice.js       # PURE rules module: no DOM. Pinned as "grimwild/dice"
@@ -270,6 +271,12 @@ Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 - **The public nav** (`TOOLKIT_NAV`: header tabs outside a campaign, and the footer) is Roll, Crucibles and Talents. Characters and pools need an account (`require_authentication`), so the home page offers them as cards only when signed in; signed out, its "Start a campaign and build characters" button leads to sign-in. Signed in, the header's tabs (toolkit or campaign) end with **Characters** (`characters_tab`), your own characters list; the footer doesn't list it.
 - Tests: `sign_in_as(identity)` in integration tests goes through the real code flow. Passkey tests use `WebAuthn::FakeClient.new("http://www.example.com")`.
 
+## Admin (built 2026-10-24)
+
+- `identities.admin` (boolean, default false) marks an admin. It's never set from a form: use the console, `Identity.find_by!(email_address: "…").update!(admin: true)` (`bin/kamal console` in production).
+- `/admin` (`Admin::BaseController`: `require_authentication`, then a 404 for anyone not an admin, as at a campaign you aren't in): **Stats** (counts, this week's rolls, messages and sign-ins, the latest sign-ins), **Accounts** (every identity with last sign-in, passkeys and campaigns; "Create new account" makes one by email, which then signs in with a code even with sign-ups closed) and **Campaigns** (read-only: GMs, players, characters, sessions, last roll, done). Admins get no way into campaigns they aren't in.
+- The header ends with an Admin tab for admins (`admin_tab`), in both navs.
+
 ## Pools (built 2026-10-15)
 
 - `Pool` belongs to a campaign: `kind` (task/pressure/timer/resource/power/campaign), `starting_size` 1–20, `size` (0 = it happens), `hidden` (GM only), and the last roll (`last_dice` json, `last_dropped`, `last_action` rolled | rolled_after_drop | pushed, `last_rolled_by`).
@@ -400,7 +407,7 @@ Live at **https://grimwilder.com** since 2026-10-24 (`www.` redirects to it, `co
 - **Data**: the SQLite files live in the `grimwilder_storage` volume. `DatabaseSnapshot` copies the primary database to `storage/backups` nightly at 04:00 and keeps 7; DigitalOcean's backups carry them off the droplet. `config/master.key` is in 1Password: without it the credentials can't be read.
 - **Email**: Resend over SMTP from `no-reply@mail.grimwilder.com` (`MAILER_FROM`; `mail.grimwilder.com` is the domain in Resend, with its DKIM, SPF and return-path records under `mail.` and DMARC at the root). **Port 2587, not 587**: DigitalOcean blocks outgoing 25, 465 and 587, and a blocked port shows up as `Net::OpenTimeout` in the mail job. The key is in the credentials' `smtp:` section (`config/environments/production.rb`).
 - **Errors**: `ErrorNotifier` (a `Rails.error` subscriber, on when `ERROR_EMAIL_TO` is set) emails a server error or a failed job, at most once an hour for the same error, and skips 4xx errors such as not found. It sends through the same SMTP, so it can't report email itself being down; `bin/kamal logs` has everything.
-- **Sign-ups are closed** (`ALLOW_SIGNUPS: false`). Make an account by hand with `bin/kamal console`: `Identity.find_or_create_by!(email_address: "…") { |i| i.name = "…" }`.
+- **Sign-ups are closed** (`ALLOW_SIGNUPS: false`). An admin makes accounts at `/admin/accounts` (see *Admin*).
 
 ## Licensing (must keep)
 

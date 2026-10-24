@@ -1,0 +1,38 @@
+<% content_for :title, "Campaigns · Admin" %>
+
+<header class="page-header">
+  <p class="eyebrow">Admin</p>
+  <h1>Campaigns</h1>
+  <p class="page-header__lede"><%= pluralize(@campaigns.size, "campaign") %>, active first. Read-only: admins don't get into campaigns they aren't in.</p>
+  <%= render "admin/nav" %>
+</header>
+
+<div class="admin-table">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Campaign</th>
+        <th scope="col">GM</th>
+        <th scope="col">Players</th>
+        <th scope="col">Characters</th>
+        <th scope="col">Sessions</th>
+        <th scope="col">Last roll</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @campaigns.each do |campaign| %>
+        <% gms, players = campaign.memberships.partition(&:gm?) %>
+        <tr>
+          <td><%= campaign.name %></td>
+          <td><%= gms.map { _1.identity.display_name }.to_sentence %></td>
+          <td><%= players.size %></td>
+          <td><%= @character_counts.fetch(campaign.id, 0) %></td>
+          <td><%= @session_counts.fetch(campaign.id, 0) %></td>
+          <td><%= (rolled = @last_rolls[campaign.id]) ? "#{time_ago_in_words(rolled)} ago" : "None" %></td>
+          <td><%= campaign.done? ? "Done #{l(campaign.done_at.to_date, format: :long)}" : "Active" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
