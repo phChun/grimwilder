@@ -1,3 +1,15 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Grimwilder</title>
+  <rect width="512" height="512" rx="112" fill="#14130f"/>
+  <g transform="rotate(-8 256 256)">
+    <rect x="96" y="96" width="320" height="320" rx="66" fill="#e8834a"/>
+    <g fill="#1b120b">
+      <circle cx="185" cy="171" r="32"/>
+      <circle cx="327" cy="171" r="32"/>
+      <circle cx="185" cy="256" r="32"/>
+      <circle cx="327" cy="256" r="32"/>
+      <circle cx="185" cy="341" r="32"/>
+      <circle cx="327" cy="341" r="32"/>
+    </g>
+  </g>
 </svg>
