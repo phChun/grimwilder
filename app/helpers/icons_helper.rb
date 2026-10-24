@@ -18,9 +18,17 @@ module IconsHelper
       role: (label ? "img" : nil), "aria-label": label, "aria-hidden": (label ? nil : "true"))
   end
 
-  # The wordmark's hexagon d6.
+  # The wordmark's dice: a d6 showing a perfect 6 in front of a thorn d8, its two
+  # faces showing 8 and 7 (both cuts). The small icons (public/icon.svg) are the d6 alone.
+  BRAND_MARK = '<path class="brand__d8" d="M440 48 L590 198 L290 198Z"/>' \
+    '<path class="brand__d8 brand__d8--shade" d="M290 202 L590 202 L440 352Z"/>' \
+    '<text class="brand__d8-number" x="458" y="148" text-anchor="middle" dominant-baseline="central">8</text>' \
+    '<text class="brand__d8-number" x="458" y="252" text-anchor="middle" dominant-baseline="central">7</text>' \
+    '<g transform="rotate(-8 190 200)"><rect class="brand__d6" x="50" y="60" width="280" height="280" rx="58"/>' \
+    '<g class="brand__pips"><circle cx="128" cy="134" r="28"/><circle cx="252" cy="134" r="28"/><circle cx="128" cy="200" r="28"/>' \
+    '<circle cx="252" cy="200" r="28"/><circle cx="128" cy="266" r="28"/><circle cx="252" cy="266" r="28"/></g></g>'
+
   def brand_mark
-    tag.svg('<path d="M13 2l9.5 5.5v11L13 24l-9.5-5.5v-11z"/><path d="M13 2v22M3.5 7.5l19 11M22.5 7.5l-19 11"/>'.html_safe,
-      class: "brand__mark", width: 26, height: 26, viewBox: "0 0 26 26", fill: "none", stroke: "currentColor", "stroke-width": 1.6, "aria-hidden": "true")
+    tag.svg(BRAND_MARK.html_safe, class: "brand__mark", width: 46, height: 28, viewBox: "30 30 560 340", "aria-hidden": "true")
   end
 end

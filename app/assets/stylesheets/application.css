@@ -246,7 +246,12 @@ small { font-size: 0.8em; color: var(--dim); }
 }
 
 .brand:hover { color: var(--text); }
-.brand__mark { color: var(--ember); }
+.brand__mark { flex: none; }
+.brand__d6 { fill: var(--ember); stroke: var(--bg); stroke-width: 22; paint-order: stroke; }
+.brand__pips { fill: var(--ember-ink); }
+.brand__d8 { fill: var(--grim-ring); }
+.brand__d8--shade { opacity: 0.7; }
+.brand__d8-number { fill: var(--bg); font-family: var(--font-dice); font-weight: 600; font-size: 112px; }
 
 .brand__name {
   font-family: var(--font-display);
