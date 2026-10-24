@@ -259,7 +259,7 @@ Built in steps from a design brief: (1) sessions, (2) scenes, (3) talent uses, (
 Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
 
 - **Identity**: a person, keyed by email (`name` = display name). **Session**: one row per sign-in, found via the signed, http-only `session_token` cookie. `Current.session/identity/campaign/membership` hold request state.
-- **MagicLink**: a 6-character base32 code emailed by `MagicLinkMailer` that expires in 15 minutes and is single-use. It is keyed by *email address*, not Identity, so asking for a code never creates an account and never reveals whether one exists; the Identity is found or created when the code is redeemed. The code only works in the browser holding the signed `pending_authentication` cookie. In development the code is also shown on the page. `MagicLink.cleanup` runs hourly (config/recurring.yml).
+- **MagicLink**: a 6-character base32 code emailed by `MagicLinkMailer` that expires in 15 minutes and is single-use. It is keyed by *email address*, not Identity, so asking for a code never creates an account (with sign-ups closed, an unknown email is told so: see *Sign-ups*); the Identity is found or created when the code is redeemed. The code only works in the browser holding the signed `pending_authentication` cookie. In development the code is also shown on the page. `MagicLink.cleanup` runs hourly (config/recurring.yml).
 - **Passkey**: a WebAuthn credential (gem `webauthn` ~> 3.4). Discoverable credentials (`resident_key: required`, `user_verification: required`) allow usernameless sign-in. Challenges are kept in the Rails session between the `.../challenge` POST and the verify POST. `passkey_controller.js` does the base64url conversion by hand and needs no browser JSON helpers. `APP_ORIGIN` must equal the site's origin in production.
 - **Campaign** is the tenant. **Membership** (role `gm` | `player`) joins an Identity to a Campaign. Anyone signed in can start a campaign and becomes its GM. Players join via `/join/:code`, a reusable link the GM can reset. A campaign always keeps at least one GM.
 - **Tenancy = shared database + `campaign_id`** (decided 2026-10-15; we do *not* use activerecord-tenanted). People belong to many campaigns, and "my campaigns/characters" needs queries across all of them. Campaign-owned controllers `include CampaignScoped`, which loads the campaign *through* `Current.identity.memberships` (non-members get a 404). Use `require_gm` for GM-only actions. New campaign-owned models get `belongs_to :campaign` and are always queried through `Current.campaign`.
@@ -372,7 +372,7 @@ The UI rethink (brief "Grimwilder: night-table UI", 2026-10-20; mockups in the l
 
 5. **Plans**: today every account is at one active campaign, GM or player (`Membership#one_active_campaign`). Planned: playing in any number of campaigns is free; running (GM-ing) more than one active campaign is the paid plan. That means counting only GM memberships toward the free limit, plus billing.
 
-Open questions: deploy host and domain; whether rolls can be shared without an account.
+Open question: whether rolls can be shared without an account.
 
 ## Production image
 
@@ -383,6 +383,24 @@ The `Dockerfile` builds on Docker Hardened Images (Debian 13). The runtime image
 - What the runtime lacks is installed in the build stage and copied in: jemalloc (`/opt/jemalloc`, `LD_PRELOAD`) and time zone data (`/usr/share/zoneinfo`, which TZInfo needs). Anything else with a system library has to be copied the same way, so there's no libvips: images aren't transformed (`variant_processor = :disabled`, no image_processing).
 - It runs as uid 1000 (not the image's 65532), which owns the existing `grimwilder_storage` volume. `/rails` is created by copying, so it's that user's too.
 - Ruby versions follow what DHI publishes (4.0.7 now): keep `.ruby-version` and the `RUBY_VERSION` build arg together.
+
+## Production server
+
+Live at **https://grimwilder.com** since 2026-10-24 (`www.` redirects to it, `config/routes.rb`).
+
+- **Deploying**: work on a branch, push it, run `bin/ci` there (it ends with `gh signoff`, a green `signoff` status on the branch's latest commit), open a PR and squash-merge it. The "Main" ruleset requires a PR, the `signoff` check, signed commits (a squash merge in GitHub's UI is signed by GitHub) and linear history. Every push to `main` runs `.github/workflows/deploy.yml`, which runs `bin/kamal deploy`; it logs in to ghcr.io with the job's own `GITHUB_TOKEN`. Its other secrets live in the repo's `production` environment and are listed at the top of that file. Pushing to a branch again after a signoff needs `bin/ci` again.
+- **From the Mac**: `bin/kamal deploy`, `bin/kamal console`, `bin/kamal logs`. They need `KAMAL_REGISTRY_PASSWORD` (a classic token with `write:packages`, kept in 1Password), plus `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM` for anything that boots the proxy.
+- **Cloudflare** proxies both names (SSL "Full (strict)"; kamal-proxy serves a Cloudflare Origin CA certificate, so there's no Let's Encrypt). Public DNS shows Cloudflare's addresses, never the droplet's, so check records in the dashboard or with `dig @adi.ns.cloudflare.com`.
+- **Droplet**: Ubuntu 24.04 at the Reserved IP `129.212.197.211`, with DigitalOcean backups on. It was set up by hand; to rebuild one:
+  - Docker from `get.docker.com` (`kamal deploy` doesn't install it; `kamal setup` would).
+  - The DigitalOcean Cloud Firewall from `script/digitalocean_firewall.rb`: 80/443 from Cloudflare's ranges only, 22 from anywhere (GitHub's runners have no fixed IPs). Re-run it when Cloudflare's ranges change. Don't use `ufw`: Docker's published ports bypass it.
+  - SSH: keys only (`/etc/ssh/sshd_config.d/00-hardening.conf`: `PermitRootLogin prohibit-password`, no passwords, no X11). `root`'s `authorized_keys` holds Shawn's key and the deploy key (`SSH_PRIVATE_KEY`, no passphrase, since the workflow's ssh-agent can't take one). Leave `MaxAuthTries` at its default: at 3, clients offering several keys get "Too many authentication failures".
+  - A 2 GB `/swapfile` (in fstab, `vm.swappiness=10`): the old and new containers overlap during a deploy on 2 GB of RAM.
+  - unattended-upgrades reboots when an update needs it, at 09:00 UTC (`/etc/apt/apt.conf.d/52unattended-upgrades-reboot`); the containers restart themselves.
+- **Data**: the SQLite files live in the `grimwilder_storage` volume. `DatabaseSnapshot` copies the primary database to `storage/backups` nightly at 04:00 and keeps 7; DigitalOcean's backups carry them off the droplet. `config/master.key` is in 1Password: without it the credentials can't be read.
+- **Email**: Resend over SMTP from `no-reply@mail.grimwilder.com` (`MAILER_FROM`; `mail.grimwilder.com` is the domain in Resend, with its DKIM, SPF and return-path records under `mail.` and DMARC at the root). **Port 2587, not 587**: DigitalOcean blocks outgoing 25, 465 and 587, and a blocked port shows up as `Net::OpenTimeout` in the mail job. The key is in the credentials' `smtp:` section (`config/environments/production.rb`).
+- **Errors**: `ErrorNotifier` (a `Rails.error` subscriber, on when `ERROR_EMAIL_TO` is set) emails a server error or a failed job, at most once an hour for the same error, and skips 4xx errors such as not found. It sends through the same SMTP, so it can't report email itself being down; `bin/kamal logs` has everything.
+- **Sign-ups are closed** (`ALLOW_SIGNUPS: false`). Make an account by hand with `bin/kamal console`: `Identity.find_or_create_by!(email_address: "…") { |i| i.name = "…" }`.
 
 ## Licensing (must keep)
 
