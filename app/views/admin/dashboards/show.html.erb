@@ -1,0 +1,35 @@
+<% content_for :title, "Admin" %>
+
+<header class="page-header">
+  <p class="eyebrow">Admin</p>
+  <h1>Site stats</h1>
+  <%= render "admin/nav" %>
+</header>
+
+<ul class="admin-stats" aria-label="Counts">
+  <% @counts.each do |name, count| %>
+    <li class="card admin-stats__item">
+      <span class="admin-stats__count"><%= count %></span>
+      <span class="admin-stats__label"><%= name %></span>
+    </li>
+  <% end %>
+</ul>
+
+<section class="panel stack" aria-labelledby="admin-sign-ins">
+  <h2 id="admin-sign-ins" class="panel__title">Latest sign-ins</h2>
+  <% if @sign_ins.any? %>
+    <ul class="list">
+      <% @sign_ins.each do |sign_in| %>
+        <li class="list__item">
+          <span>
+            <strong><%= sign_in.identity.display_name %></strong>
+            <small><%= sign_in.identity.email_address %></small>
+          </span>
+          <small><%= time_ago_in_words(sign_in.created_at) %> ago</small>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="field__hint">Nobody's signed in yet.</p>
+  <% end %>
+</section>

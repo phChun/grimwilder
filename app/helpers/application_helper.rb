@@ -51,6 +51,11 @@ module ApplicationHelper
     [ "Characters", characters_path, controller_path == "characters" && action_name.in?(%w[ index new create ]) ]
   end
 
+  # After Characters, for admins only (Admin::BaseController): [label, path, current?].
+  def admin_tab
+    [ "Admin", admin_root_path, controller_path.start_with?("admin/") ] if Current.identity&.admin?
+  end
+
   # The campaign the page belongs to, for the header and live banner: the one
   # in the URL, or the campaign a sheet's character is seated in.
   def context_membership

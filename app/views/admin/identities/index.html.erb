@@ -1,0 +1,57 @@
+<% content_for :title, "Accounts · Admin" %>
+
+<header class="page-header">
+  <p class="eyebrow">Admin</p>
+  <h1>Accounts</h1>
+  <p class="page-header__lede"><%= pluralize(@identities.size, "account") %>, newest first. Sign-ups are <%= Identity.signups_open? ? "open" : "closed" %>.</p>
+  <%= render "admin/nav" %>
+</header>
+
+<div class="admin-table">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Joined</th>
+        <th scope="col">Last sign-in</th>
+        <th scope="col">Passkeys</th>
+        <th scope="col">Campaigns</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @identities.each do |identity| %>
+        <tr>
+          <td>
+            <%= identity.display_name %>
+            <% if identity.admin? %><span class="badge admin-badge">Admin</span><% end %>
+          </td>
+          <td><%= identity.email_address %></td>
+          <td><%= l(identity.created_at.to_date, format: :long) %></td>
+          <td><%= (signed_in = @last_sign_ins[identity.id]) ? "#{time_ago_in_words(signed_in)} ago" : "Never" %></td>
+          <td><%= @passkey_counts.fetch(identity.id, 0) %></td>
+          <td><%= identity.memberships.map { "#{_1.campaign.name} (#{_1.gm? ? "GM" : "player"})" }.to_sentence.presence || "None" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<section id="account-new" class="card add-card stack admin-new" aria-labelledby="account-new-title">
+  <h2 id="account-new-title" class="tool-card__name">Create new account</h2>
+  <%= form_with model: @identity, url: admin_identities_path, class: "stack" do |form| %>
+    <% if @identity.errors.any? %>
+      <p class="form-error"><%= @identity.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <div class="field">
+      <%= form.label :email_address, "Email", class: "field__label" %>
+      <%= form.email_field :email_address, required: true, autocomplete: "off", class: "field__input" %>
+    </div>
+    <div class="field">
+      <%= form.label :name, "Display name", class: "field__label" %>
+      <%= form.text_field :name, maxlength: 80, autocomplete: "off", class: "field__input" %>
+    </div>
+    <%= form.submit "Create account", class: "button button--primary" %>
+  <% end %>
+  <p class="field__hint">They sign in with an emailed code. Without a name, they're asked for one the first time.</p>
+</section>

@@ -2483,3 +2483,33 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .gm-fold__summary:active,
 .table-rail__summary:active { background: var(--line-soft); }
 
+
+/* Admin zone (/admin): counts, then wide tables that scroll on their own on a phone. */
+.admin-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.admin-nav [aria-current="page"] { color: var(--text); text-decoration: underline; text-decoration-color: var(--ember); text-underline-offset: 0.35em; }
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+.admin-stats__item { display: grid; gap: var(--space-1); }
+.admin-stats__count { font-family: var(--font-dice); font-size: 1.75rem; font-weight: 600; }
+.admin-stats__label { color: var(--muted); }
+
+.admin-table {
+  overflow-x: auto;
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.admin-table table { width: 100%; border-collapse: collapse; }
+.admin-table th,
+.admin-table td { padding: var(--space-2) var(--space-3); border-top: 1px solid var(--line-soft); text-align: left; vertical-align: top; }
+.admin-table thead th { border-top: 0; color: var(--muted); font-weight: 500; white-space: nowrap; }
+.admin-badge { margin-left: var(--space-2); background: var(--ember-soft); color: var(--ember); }
+.admin-new { max-width: 32rem; }

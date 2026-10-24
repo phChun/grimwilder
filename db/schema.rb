@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_23_042125) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_24_120000) do
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -84,6 +84,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_23_042125) do
     t.string "webauthn_user_handle"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "admin", default: false, null: false
     t.index ["email_address"], name: "index_identities_on_email_address", unique: true
     t.index ["webauthn_user_handle"], name: "index_identities_on_webauthn_user_handle", unique: true
   end

@@ -1,0 +1,6 @@
+<%# The admin zone's own links, under each page's heading. %>
+<nav class="admin-nav" aria-label="Admin">
+  <%= link_to "Stats", admin_root_path, class: "button button--ghost", "aria-current": (current_page?(admin_root_path) ? "page" : nil) %>
+  <%= link_to "Accounts", admin_identities_path, class: "button button--ghost", "aria-current": (controller_name == "identities" ? "page" : nil) %>
+  <%= link_to "Campaigns", admin_campaigns_path, class: "button button--ghost", "aria-current": (current_page?(admin_campaigns_path) ? "page" : nil) %>
+</nav>
