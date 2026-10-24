@@ -5,6 +5,7 @@ class Admin::DashboardsController < Admin::BaseController
     week = (7.days.ago..)
     @counts = {
       "Accounts" => Identity.count,
+      **Plan.all.to_h { |plan| [ "On #{plan.name}", Identity.where(plan: plan.key).count ] },
       "Active campaigns" => Campaign.active.count,
       "Done campaigns" => Campaign.done.count,
       "Characters" => Character.count,

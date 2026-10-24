@@ -1,8 +1,8 @@
 require "test_helper"
 
-# One active campaign per account (Membership#one_active_campaign), and the
-# GM marking a campaign done (Campaign::Done): a read-only archive that frees
-# everyone for another, which the GM can reopen.
+# Plans (Identity::Plans: Free runs one active campaign and plays in any
+# number), and the GM marking a campaign done (Campaign::Done): a read-only
+# archive that frees room for another, which the GM can reopen.
 class CampaignDoneTest < ActionDispatch::IntegrationTest
   setup do
     @campaign = campaigns(:bramblewood)
@@ -12,7 +12,7 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
   test "a GM at one campaign can't start another" do
     sign_in_as identities(:gwen)
     get campaigns_path
-    assert_select "#campaign-new p", /each account can be in one active campaign at a time\. Later, playing in as many as you like will be free, and running more than one will be part of a paid plan/
+    assert_select "#campaign-new p", /You run The Bramblewood Accord\. On the Free plan, you can run 1 active campaign at a time, and play in as many as you like\. To start another, mark one done/
     assert_select "form[action=?]", campaigns_path, 0
     assert_select ".tool-grid__list > li:last-child #campaign-new h2", "Create new campaign"
 
@@ -21,18 +21,27 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "a player at one campaign can't join another" do
+  test "a GM on the tester plan starts as many as they like" do
+    identities(:gwen).update!(plan: "tester")
+    sign_in_as identities(:gwen)
+    get campaigns_path
+    assert_select "form[action=?]", campaigns_path
+
+    assert_difference -> { Campaign.count } do
+      post campaigns_path, params: { campaign: { name: "Elsewhere" } }
+    end
+  end
+
+  test "a player on the free plan joins another campaign" do
     elsewhere = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:stranger))
     sign_in_as identities(:pip)
     get join_path(elsewhere.join_code)
-    assert_select ".auth__panel", /You're at The Bramblewood Accord/
-    assert_select ".auth__panel", /leave it or wait for its GM to mark it done/
-    assert_select ".auth__panel form", 0
+    assert_select ".auth__panel form[action=?]", join_path(elsewhere.join_code)
 
-    assert_no_difference -> { elsewhere.memberships.count } do
+    assert_difference -> { elsewhere.memberships.count } do
       post join_path(elsewhere.join_code)
     end
-    assert_match(/one active campaign at a time/, flash[:alert])
+    assert_redirected_to campaign_path(elsewhere)
   end
 
   test "the GM marks it done: read-only for everyone, and everyone's free" do
@@ -93,17 +102,17 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
     assert_raises(ActiveRecord::RecordInvalid) { @tibbs.seat!(@campaign, by: identities(:pip)) }
   end
 
-  test "the GM reopens it, unless someone there is at another campaign now" do
+  test "the GM reopens it, unless that puts someone there past their plan" do
     @campaign.update!(done_at: Time.current)
-    elsewhere = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:stranger))
+    elsewhere = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:gwen))
     elsewhere.memberships.create!(identity: identities(:pip))
 
     sign_in_as identities(:gwen)
     delete campaign_done_path(@campaign)
-    assert_equal "Pip is at Elsewhere now, so The Bramblewood Accord can't reopen.", flash[:alert].sub(identities(:pip).display_name, "Pip")
+    assert_equal "Gwen runs as many active campaigns as the Free plan allows, so The Bramblewood Accord can't reopen.", flash[:alert]
     assert @campaign.reload.done?
 
-    elsewhere.memberships.find_by(identity: identities(:pip)).destroy!
+    identities(:gwen).update!(plan: "tester")
     delete campaign_done_path(@campaign)
     assert_redirected_to campaign_path(@campaign)
     assert_not @campaign.reload.done?

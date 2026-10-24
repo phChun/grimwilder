@@ -6,7 +6,7 @@ class Membership < ApplicationRecord
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
 
   validates :identity_id, uniqueness: { scope: :campaign_id }
-  validate :one_active_campaign, on: :create
+  validate :within_plan, on: :create
 
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
@@ -29,21 +29,6 @@ class Membership < ApplicationRecord
     elsif seen_at && seen_at > now - PRESENCE_WINDOW then "idle"
     else "away"
     end
-  end
-
-  # While we improve Grimwilder, each account is at one active campaign at a
-  # time, GM or player. Planned: playing in any number stays free, and running
-  # more than one becomes the paid plan (see Roadmap in AGENTS.md). Said the
-  # same way on the campaigns page, the join page and a refused join.
-  def self.one_campaign_limit(membership)
-    way_out = membership.gm? ? "mark it done in its settings" : "leave it or wait for its GM to mark it done"
-    "You're at #{membership.campaign.name}. While we're improving Grimwilder, each account can be in one active campaign at a time. " \
-      "Later, playing in as many as you like will be free, and running more than one will be part of a paid plan. To start or join another, #{way_out}."
-  end
-
-  # The other active campaign this member is at, if any (see one_campaign_limit).
-  def other_active_membership
-    identity.active_membership(except: campaign_id)
   end
 
   # The characters this member plays here: seated, and still playing.
@@ -76,11 +61,13 @@ class Membership < ApplicationRecord
       end
     end
 
-    def one_active_campaign
+    # Each account runs and plays in as many active campaigns as its plan
+    # allows (Identity::Plans).
+    def within_plan
       if campaign&.done?
         errors.add(:base, "#{campaign.name} is done, so no one can join it.")
-      elsif (other = other_active_membership)
-        errors.add(:base, self.class.one_campaign_limit(other))
+      elsif identity && !identity.room_for?(role, except: campaign_id)
+        errors.add(:base, identity.plan_limit_message(role))
       end
     end
 end

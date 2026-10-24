@@ -1,5 +1,6 @@
-# Every account, and making one by hand while sign-ups are closed. A new
-# account signs in like any other, with an emailed code.
+# Every account, making one by hand while sign-ups are closed, and choosing
+# each one's plan (Identity::Plans). A new account signs in like any other,
+# with an emailed code.
 class Admin::IdentitiesController < Admin::BaseController
   def index
     load_identities
@@ -7,9 +8,9 @@ class Admin::IdentitiesController < Admin::BaseController
   end
 
   def create
-    attributes = params.expect(identity: %i[ email_address name ])
+    attributes = params.expect(identity: %i[ email_address name plan ])
     @identity = Identity.find_or_initialize_by(email_address: attributes[:email_address])
-    @identity.name = attributes[:name] if @identity.new_record?
+    @identity.assign_attributes(attributes.slice(:name, :plan)) if @identity.new_record?
 
     if @identity.persisted?
       redirect_to admin_identities_path, notice: "#{@identity.email_address} already has an account."
@@ -19,6 +20,14 @@ class Admin::IdentitiesController < Admin::BaseController
       load_identities
       render :index, status: :unprocessable_entity
     end
+  end
+
+  # A smaller plan closes nothing: someone over its limit keeps their
+  # campaigns, and can't start or join another until they're under it.
+  def update
+    identity = Identity.find(params[:id])
+    identity.update!(plan: params.expect(identity: [ :plan ])[:plan])
+    redirect_to admin_identities_path, notice: "#{identity.display_name} is on the #{identity.current_plan.name} plan."
   end
 
   private
