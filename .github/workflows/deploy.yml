@@ -1,27 +1,26 @@
-# Deploys main with Kamal once bin/ci signs a commit off (`gh signoff` sets a
-# green "signoff" commit status), or by hand from the Actions tab.
+# Deploys main with Kamal on every push to it, or by hand from the Actions tab.
+# main only changes through pull requests, and the "Main" ruleset requires the
+# "signoff" status that bin/ci sets (`gh signoff`) on the branch first.
 #
 # Secrets, in the "production" environment (Settings → Environments):
 #   RAILS_MASTER_KEY         contents of config/master.key
-#   KAMAL_REGISTRY_PASSWORD  classic personal access token with write:packages (ghcr.io)
 #   DOCKERHUB_USERNAME       Docker Hub account, for the dhi.io base images
 #   DOCKERHUB_TOKEN          Docker Hub access token
 #   SSH_PRIVATE_KEY          a deploy-only key; its public half goes in the droplet's authorized_keys
 #   SSH_KNOWN_HOSTS          output of `ssh-keyscan <droplet ip>`
+#   CERTIFICATE_PEM          Cloudflare Origin CA certificate (PEM)
+#   PRIVATE_KEY_PEM          its private key (PEM)
 name: Deploy
 
 on:
-  status:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 concurrency: deploy
 
 jobs:
   deploy:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.context == 'signoff' && github.event.state == 'success' &&
-       contains(github.event.branches.*.name, 'main'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
@@ -29,13 +28,14 @@ jobs:
       contents: read
       packages: write
     env:
-      KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+      # The job's own token pushes the image to ghcr.io (packages: write above),
+      # and the droplet pulls with it during the deploy. Deploys from the Mac use
+      # a personal access token instead (config/deploy.yml, registry).
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout the signed-off commit
+      - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.sha || github.sha }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -66,4 +66,7 @@ jobs:
           printf '%s' "$RAILS_MASTER_KEY" > config/master.key
 
       - name: Deploy
+        env:
+          CERTIFICATE_PEM: ${{ secrets.CERTIFICATE_PEM }}
+          PRIVATE_KEY_PEM: ${{ secrets.PRIVATE_KEY_PEM }}
         run: bin/kamal deploy

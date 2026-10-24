@@ -2,39 +2,45 @@
 service: grimwilder
 
 # Name of the container image, on GitHub's registry (ghcr.io/<user>/grimwilder).
-# TODO: your GitHub username, here and under registry/username.
-image: GITHUB_USER/grimwilder
+# ghcr.io image names must be lowercase.
+image: phchun/grimwilder
 
 # Deploy to these servers.
 servers:
   web:
-    # TODO: the droplet's IP address, once it exists.
-    - DROPLET_IP
+    # The droplet's Reserved IP.
+    - 129.212.197.211
   # job:
   #   hosts:
   #     - 192.168.0.1
   #   cmd: bin/jobs
 
-# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
-# If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
+# TLS: Cloudflare proxies grimwilder.com (SSL mode "Full (strict)"), so kamal-proxy
+# serves a Cloudflare Origin CA certificate instead of Let's Encrypt, whose renewal
+# challenges can't reach the origin through Cloudflare. The cert and key come from
+# .kamal/secrets (CERTIFICATE_PEM, PRIVATE_KEY_PEM).
+#
+# forward_headers passes X-Forwarded-For through to Rails, where cloudflare-rails
+# trusts it only from Cloudflare's IP ranges, so request.remote_ip (and rate_limit)
+# sees the player's address rather than Cloudflare's.
 #
 # Using an SSL proxy like this requires turning on config.assume_ssl and config.force_ssl in production.rb!
-#
-# Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
-#
 proxy:
-  ssl: true
+  ssl:
+    certificate_pem: CERTIFICATE_PEM
+    private_key_pem: PRIVATE_KEY_PEM
+  forward_headers: true
   hosts:
     - grimwilder.com
     - www.grimwilder.com # redirects to grimwilder.com (config/routes.rb)
 
 # Where you keep your container images.
 registry:
-  # GitHub Container Registry. The password is a classic personal access token
-  # with write:packages: in the production environment's secrets for
-  # .github/workflows/deploy.yml, and in your shell for deploys from the Mac.
+  # GitHub Container Registry. .github/workflows/deploy.yml logs in with the
+  # job's own GITHUB_TOKEN; deploys from the Mac need a classic personal access
+  # token with write:packages exported as KAMAL_REGISTRY_PASSWORD (from 1Password).
   server: ghcr.io
-  username: GITHUB_USER
+  username: phChun
   password:
     - KAMAL_REGISTRY_PASSWORD
 
@@ -77,6 +83,12 @@ env:
 aliases:
   console: app exec --interactive --reuse "ruby bin/rails console"
   logs: app logs -f
+
+# Cap container logs so they can't fill the droplet's disk.
+logging:
+  options:
+    max-size: 50m
+    max-file: 3
 
 # Use a persistent storage volume for sqlite database files and local Active Storage files.
 # Recommended to change this to a mounted volume path that is backed up off server.

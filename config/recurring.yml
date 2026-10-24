@@ -16,3 +16,6 @@ production:
   clear_stale_magic_links:
     command: "MagicLink.cleanup"
     schedule: every hour at minute 27
+  snapshot_database:
+    command: "DatabaseSnapshot.take"
+    schedule: every day at 4am
