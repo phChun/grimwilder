@@ -60,8 +60,10 @@ env:
     # so does anyone holding a campaign's invite link (config/application.rb).
     ALLOW_SIGNUPS: false
 
-    # Who sign-in code emails come from (app/mailers/application_mailer.rb).
-    MAILER_FROM: Grimwilder <no-reply@grimwilder.com>
+    # Who sign-in code emails come from (app/mailers/application_mailer.rb). The
+    # mail. subdomain is the domain verified in Resend, so sending can't hurt
+    # grimwilder.com's own reputation.
+    MAILER_FROM: Grimwilder <no-reply@mail.grimwilder.com>
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
