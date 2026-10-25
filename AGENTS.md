@@ -17,12 +17,12 @@ Source rulebook: *Grimwild: Community Edition*, Preview 5.2 (`GWCE P5.2 Pages.pd
 
 | Piece | Choice |
 |---|---|
-| Ruby / Rails | Ruby **4.0.7**, Rails **8.2.0.alpha** (`main` branch from GitHub) |
+| Ruby / Rails | Ruby **4.0.9**, Rails **8.2.0.alpha** (`main` branch from GitHub) |
 | Views | `.html.erb` compiled by **Herb** and routed through **ReActionView 0.6** (reactionview.dev) |
 | JS | importmap-rails, Turbo, Stimulus, the `reactionview` client (pinned automatically by the gem) |
 | CSS | Plain CSS served by Propshaft. No Tailwind, no Sass |
 | DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a DigitalOcean droplet, images on ghcr.io (droplet at the Reserved IP in `DROPLET_IP`, image `ghcr.io/phchun/grimwilder`; Cloudflare proxies the domain and kamal-proxy serves a Cloudflare Origin CA cert from `CERTIFICATE_PEM`/`PRIVATE_KEY_PEM`). CI runs locally: `bin/ci` ends with `gh signoff`. `main` only changes through pull requests (squash merge), which need that signoff; every push to `main` deploys via `.github/workflows/deploy.yml` |
-| Image | Docker Hardened Images: built in `dhi.io/ruby:4.0.7-debian13-dev`, run in `dhi.io/ruby:4.0.7-debian13` (`docker login dhi.io` first). See *Production image* |
+| Image | Docker Hardened Images: built in `dhi.io/ruby:4.0.9-debian13-dev`, run in `dhi.io/ruby:4.0.9-debian13` (`docker login dhi.io` first). See *Production image* |
 | Tests | Minitest (`bin/rails test`) plus Node's built-in test runner for pure JS |
 | Auth | Passwordless: emailed codes + passkeys (`webauthn` gem); no `has_secure_password` / bcrypt |
 
@@ -390,7 +390,7 @@ The `Dockerfile` builds on Docker Hardened Images (Debian 13). The runtime image
 - `BUNDLE_VERSION=system`: otherwise Bundler re-runs `bin/rails` to switch to the lockfile's version, which needs `env`.
 - What the runtime lacks is installed in the build stage and copied in: jemalloc (`/opt/jemalloc`, `LD_PRELOAD`) and time zone data (`/usr/share/zoneinfo`, which TZInfo needs). Anything else with a system library has to be copied the same way, so there's no libvips: images aren't transformed (`variant_processor = :disabled`, no image_processing).
 - It runs as uid 1000 (not the image's 65532), which owns the existing `grimwilder_storage` volume. `/rails` is created by copying, so it's that user's too.
-- Ruby versions follow what DHI publishes (4.0.7 now): keep `.ruby-version` and the `RUBY_VERSION` build arg together.
+- Ruby versions follow what DHI publishes (4.0.9 now): keep `.ruby-version` and the `RUBY_VERSION` build arg together.
 
 ## Production server
 
