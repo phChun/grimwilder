@@ -20,7 +20,7 @@ With an account (passwordless: an emailed code or a passkey):
 
 ## Stack
 
-Ruby 4.0.7 and Rails 8.2 (main), with views compiled by [Herb](https://herb-tools.dev) through [ReActionView](https://reactionview.dev). It uses Turbo, Stimulus and importmaps, plain CSS, SQLite with Solid Cache, Queue and Cable, and deploys with Kamal. The image is built on Docker Hardened Images.
+Ruby 4.0.9 and Rails 8.2 (main), with views compiled by [Herb](https://herb-tools.dev) through [ReActionView](https://reactionview.dev). It uses Turbo, Stimulus and importmaps, plain CSS, SQLite with Solid Cache, Queue and Cable, and deploys with Kamal. The image is built on Docker Hardened Images.
 
 ## Running it
 

@@ -13,7 +13,7 @@
 # (`ruby bin/rails console`), and debugging is `docker debug <container>`.
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=4.0.7
+ARG RUBY_VERSION=4.0.9
 
 # Throw-away build stage: gems, bootsnap and assets
 FROM dhi.io/ruby:$RUBY_VERSION-debian13-dev AS build
