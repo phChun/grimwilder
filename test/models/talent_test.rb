@@ -51,6 +51,75 @@ class TalentTest < ActiveSupport::TestCase
   end
 end
 
+class TalentChoiceTest < ActiveSupport::TestCase
+  # The book's text-layer typos, fixed in the options: { option => as printed }.
+  # Hyphens and spaces are ignored already, so "onehanded" matches "one-handed".
+  TYPO_FIXES = {}.freeze
+
+  test "every choice is well formed" do
+    choices = Talent.all.flat_map(&:choices)
+    assert_operator choices.size, :>=, 16
+
+    choices.each do |choice|
+      assert_match(/\A[a-z][a-z-]*\z/, choice.key, choice.id)
+      assert choice.label.present?, choice.id
+      assert_operator choice.label.length, :<=, 30, choice.id
+      assert_operator choice.noun.length, :<=, 30, choice.id
+      assert_operator choice.pick, :>=, 1, choice.id
+      assert choice.growth.keys.all? { (2..7).cover?(_1) }, choice.id
+      assert choice.growth.values.all?(&:positive?), choice.id
+      assert choice.source, "#{choice.id}'s same_as doesn't resolve"
+      assert choice.options.any? || choice.open?, "#{choice.id} has nothing to pick from"
+      assert_equal choice.options.map(&:downcase).uniq.size, choice.options.size, "#{choice.id} repeats an option"
+      assert choice.options.all? { _1 == _1.strip && _1.present? }, choice.id
+      assert_operator choice.min_each, :<=, 0, "#{choice.id} min_each needs groups" unless choice.grouped?
+      if choice.same_as
+        assert_empty choice.from, "#{choice.id} has same_as and its own list"
+        assert_empty choice.groups, choice.id
+      end
+    end
+
+    Talent.all.each do |talent|
+      assert_equal talent.choices.map(&:key).uniq, talent.choices.map(&:key), talent.key
+    end
+  end
+
+  test "every option in a talent's own list comes from its text" do
+    squash = ->(text) { text.to_s.downcase.gsub(/[\s\-‐–—]+/, "") }
+
+    Talent.all.each do |talent|
+      talent.choices.reject(&:same_as).each do |choice|
+        choice.options.each do |option|
+          printed = TYPO_FIXES.fetch(option, option)
+          assert_includes squash.(talent.text), squash.(printed), "#{choice.id}: #{option.inspect} isn't in the text"
+        end
+      end
+    end
+  end
+
+  test "lists, groups and growth read as the book has them" do
+    skills = Talent.find("expertise").choice(:skills)
+    assert_equal [ "Above board", "Below table" ], skills.option_groups.keys
+    assert_equal [ 3, 4, 5 ], [ 1, 3, 6 ].map { skills.slots_at(_1) }
+    assert_equal "Below table", skills.group_of("stealth")
+    assert_equal "forgery & disguise", skills.canonical("Forgery & Disguise")
+
+    moxie = Talent.find("natural-moxie").choice(:skills)
+    assert_equal skills.options, moxie.options
+    assert_equal 2, moxie.slots_at(6)
+
+    sorcery = Talent.find("sorcery").choice(:paths)
+    assert_equal 1, sorcery.min_each
+    assert_equal "Touchstones", sorcery.heading
+    assert_equal "path or technique", sorcery.noun
+    assert_equal sorcery.options, Talent.find("eldritch-affinity").choice(:paths).options
+
+    assert_includes Talent.find("weapon-mastery").choice(:style).options, "one-handed"
+    assert Talent.find("true-shape").choice(:form).open?
+    assert_equal "skill", skills.noun
+  end
+end
+
 class TalentTextTest < ActiveSupport::TestCase
   test "no stray control characters from the PDF's hyphenation" do
     Talent.all.each do |talent|
