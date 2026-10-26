@@ -17,10 +17,12 @@
 #   one of its tables), filling the boxes from the roll.
 # - `noun` names one pick when the label's singular reads badly, and
 #   `plural` names several when Rails would get a phrase wrong ("words of power").
+# - `optional: true` when the talent marks that part optional (Infusion's
+#   Everything Arcana): the sheet offers it without asking for it.
 # - `school: true` for spell theorems: each pick carries a school of magic,
 #   stored as "wild fire (evocation)".
 class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :from, :groups, :min_each, :open, :same_as, :touchstone, :growth,
-  :from_list, :from_picks, :crucible, :table, :school, :plural)
+  :from_list, :from_picks, :crucible, :table, :school, :plural, :optional)
   SCHOOLED = /\A(?<name>.+?) \((?<school>[a-z]+)\)\z/i
 
   # "wild fire (evocation)" => ["wild fire", "evocation"]; a name alone has no school.
@@ -40,7 +42,7 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
       pick: attributes.fetch(:pick), from: Array(attributes[:from]), groups: attributes[:groups] || {}, min_each: attributes[:min_each].to_i,
       open: attributes[:open] == true, same_as: attributes[:same_as], touchstone: attributes[:touchstone] == true,
       growth: (attributes[:growth] || {}).transform_keys(&:to_i), from_list: attributes[:from_list], from_picks: Array(attributes[:from_picks]),
-      crucible: attributes[:crucible], table: attributes[:table], school: attributes[:school] == true, plural: attributes[:plural])
+      crucible: attributes[:crucible], table: attributes[:table], school: attributes[:school] == true, plural: attributes[:plural], optional: attributes[:optional] == true)
   end
 
   # Unique across talents: "expertise/skills".
@@ -58,6 +60,10 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
 
   def school?
     school
+  end
+
+  def optional?
+    optional
   end
 
   # Picks with a school: theorems, or a pick from them (Mastered Theorem).

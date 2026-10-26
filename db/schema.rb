@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_25_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_26_120000) do
+  create_table "arcana", force: :cascade do |t|
+    t.integer "character_id", null: false
+    t.string "name", null: false
+    t.string "tier", default: "minor", null: false
+    t.string "function", null: false
+    t.json "touchstones", default: [], null: false
+    t.text "description"
+    t.text "limitations"
+    t.boolean "expendable", default: false, null: false
+    t.boolean "power_pool", default: false, null: false
+    t.datetime "used_at"
+    t.string "source"
+    t.json "rolled_touchstones", default: [], null: false
+    t.boolean "lock_ready", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id"], name: "index_arcana_on_character_id"
+  end
+
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.string "join_code", null: false
@@ -187,6 +206,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_25_120000) do
     t.integer "character_id"
     t.string "refresh"
     t.string "use_key"
+    t.integer "arcanum_id"
+    t.index ["arcanum_id"], name: "index_pools_on_arcanum_id", unique: true
     t.index ["campaign_id"], name: "index_pools_on_campaign_id"
     t.index ["character_id", "use_key"], name: "index_pools_on_character_id_and_use_key", unique: true
     t.index ["character_id"], name: "index_pools_on_character_id"
@@ -280,6 +301,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_25_120000) do
     t.index ["identity_id"], name: "index_sessions_on_identity_id"
   end
 
+  add_foreign_key "arcana", "characters", on_delete: :cascade
   add_foreign_key "characters", "campaigns"
   add_foreign_key "characters", "identities"
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify
@@ -292,6 +314,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_25_120000) do
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
+  add_foreign_key "pools", "arcana", column: "arcanum_id", on_delete: :cascade
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade
   add_foreign_key "pools", "identities", column: "last_rolled_by_id"

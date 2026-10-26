@@ -64,6 +64,19 @@ magic_schools:
   necromancy: Manipulates life, death, and the undead.
   transmutation: Transforms matter and alters physical properties.
 
+# Arcana functions: the general effect, and a touchstone (pg. 42)
+arcana_functions:
+  attack: Lash out to deal direct harm or destruction.
+  enhance: Temporarily boost senses, ability, or bestow something new.
+  hinder: Impede or debilitate others or areas.
+  influence: Alter thoughts, emotions, or perceptions.
+  protect: Defend yourself and others from outside harm or influence.
+  restore: Heal wounds, cleanse maladies, and mend materials.
+  reveal: Sense and reveal the hidden, and uncover new information.
+  summon: Manifest objects, creatures, or forces themselves.
+  transform: Change the nature or form of the subject.
+  traverse: Move across space, through barriers, or in a new way.
+
 # Example weapon styles (pg. 20)
 weapon_styles: [precise, quick, bashing, quiet, sweeping, piercing, vicious, entangling, sapping, disarming, heavy, balanced, dazing, nimble, concealable, ornate, brutal, long]
 

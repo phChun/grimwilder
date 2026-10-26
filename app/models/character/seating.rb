@@ -37,5 +37,6 @@ module Character::Seating
 
     def follow_with_talent_pools
       campaign ? talent_pools.update_all(campaign_id: campaign_id) : talent_pools.destroy_all
+      refresh_arcana_pools!
     end
 end

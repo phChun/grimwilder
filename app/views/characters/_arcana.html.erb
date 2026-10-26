@@ -1,0 +1,40 @@
+<%# locals: (character:, tends: nil, pools: nil) %>
+<%# The sheet's arcana (Character::Arcana): reminders from talents that grant them, each arcana's card, and adding one. Shown when there's something to show or the viewer can add one. %>
+<% pools ||= [] %>
+<% grants = character.arcana_grants %>
+<% arcana = character.arcana.ordered.to_a %>
+<% if arcana.any? || grants.any? || tends %>
+  <section id="arcana" class="card" aria-labelledby="sheet-arcana">
+    <div class="talents__head">
+      <h2 id="sheet-arcana" class="card__title">Arcana</h2>
+      <% if tends %>
+        <%= link_to "Add arcana", new_character_arcanum_path(character), class: "button button--small", data: { turbo_frame: "modal" } %>
+      <% end %>
+    </div>
+
+    <% if grants.any? %>
+      <ul class="arcana-grants">
+        <% grants.each do |grant, held| %>
+          <% wanted = grant.count_at(character.level) %>
+          <% talent = Talent.find(grant.talent_key) %>
+          <li class="arcana-grants__item">
+            <span><strong><%= talent.name %></strong>: <%= held %> of <%= grant.to_s(character.level) %><%= " (optional)" if grant.optional %></span>
+            <% if tends && held < wanted %>
+              <%= link_to grant.opus ? "Start your opus" : "Add one", new_character_arcanum_path(character, tier: grant.tier, source: grant.talent_key, expendable: (1 if grant.expendable)), data: { turbo_frame: "modal" } %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if arcana.any? %>
+      <div class="talent-list">
+        <% arcana.each do |arcanum| %>
+          <%= render "characters/arcanum", arcanum: arcanum, character: character, tends: tends, pool: pools.find { _1.arcanum_id == arcanum.id } %>
+        <% end %>
+      </div>
+    <% elsif tends %>
+      <p class="field__hint">Relics of power the character holds, found, bought or made (pg. 40).</p>
+    <% end %>
+  </section>
+<% end %>

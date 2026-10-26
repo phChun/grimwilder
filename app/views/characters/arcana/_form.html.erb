@@ -1,0 +1,77 @@
+<%# locals: (character:, arcanum:) %>
+<%# The arcana form (pg. 42's steps): name, function, tier, touchstones (rolled on the arcana crucibles, pg. 43, through choice_fill_controller.js), and what it does. A Magnum Opus gets its touchstones by rolling on the sheet, so its form leaves them out. %>
+<%= form_with model: [ character, arcanum ], class: "panel stack arcanum-form", data: { turbo_frame: "_top", controller: "choice-fill", action: "crucible:pick->choice-fill#fill" } do |form| %>
+  <% if arcanum.errors.any? %>
+    <p class="form-error"><%= arcanum.errors.full_messages.to_sentence %></p>
+  <% end %>
+  <%= form.hidden_field :source if arcanum.source %>
+
+  <div class="field">
+    <%= form.label :name, "Name", class: "field__label" %>
+    <%= form.text_field :name, maxlength: 80, autocomplete: "off", required: true, placeholder: "Lantern of Echoes", class: "field__input" %>
+  </div>
+
+  <fieldset class="arcanum-form__group">
+    <legend class="field__label">Function</legend>
+    <p class="field__hint">What it does in general. It's a touchstone too.</p>
+    <div class="arcanum-form__options">
+      <% Grimwild.arcana_functions.each do |key, does| %>
+        <label class="check arcanum-form__option">
+          <%= form.radio_button :function, key, id: "arcanum_function_#{key}" %>
+          <span><strong><%= key.capitalize %></strong> <small><%= does %></small></span>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <fieldset class="arcanum-form__group">
+    <legend class="field__label">Tier</legend>
+    <p class="field__hint">Minor: set dressing vantage, a 2d power pool, a once-a-session effect. Major: expanded vantage, a 4d pool, a once-a-session potent effect. Mythic: greatly expanded vantage and ritual magic. Expendable arcana work one tier higher; trivial is only for them (pg. 40).</p>
+    <div class="arcanum-form__options arcanum-form__options--row">
+      <% Arcanum::TIERS.each do |tier| %>
+        <label class="check">
+          <%= form.radio_button :tier, tier, id: "arcanum_tier_#{tier}" %>
+          <span><%= tier.capitalize %></span>
+        </label>
+      <% end %>
+    </div>
+    <label class="check">
+      <%= form.check_box :expendable %>
+      <span>Expendable: used once, like a potion or a scroll</span>
+    </label>
+    <label class="check">
+      <%= form.check_box :power_pool %>
+      <span>Power pool: 2d minor, 4d major, 6d mythic, refilled each session</span>
+    </label>
+  </fieldset>
+
+  <% if arcanum.opus? %>
+    <p class="field__hint">A Magnum Opus locks in its touchstones one session at a time, rolled on the sheet.</p>
+  <% else %>
+    <fieldset class="arcanum-form__group" data-choice-fill-target="choice" data-crucible="arcana" data-table="" data-words="1">
+      <legend class="field__label">Touchstones</legend>
+      <p class="field__hint">Two more besides the function, thematic and focused. Mythic arcana have any 3 or more.</p>
+      <div class="talent-choice__boxes">
+        <% [ 3, arcanum.touchstones.size + 1 ].max.clamp(..Arcanum::TOUCHSTONE_LIMIT).times do |index| %>
+          <%= text_field_tag "arcanum[touchstones][]", arcanum.touchstones[index], id: "arcanum_touchstone_#{index}", maxlength: Character::WORD_LIMIT, autocomplete: "off", "aria-label": "Touchstone #{index + 1}", placeholder: ("Optional" if index >= 2), class: "field__input" %>
+        <% end %>
+      </div>
+      <details class="fold talent-choice__crucible">
+        <summary class="fold__summary"><span class="fold__title">Roll the arcana crucibles for ideas</span></summary>
+        <p class="field__hint" data-choice-fill-target="status" aria-live="polite">Roll, then tap a word to put it in the next empty box.</p>
+        <turbo-frame id="crucible" src="<%= crucible_path("arcana", embed: 1) %>" loading="lazy"></turbo-frame>
+      </details>
+    </fieldset>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :description, "Description", class: "field__label" %>
+    <%= form.text_area :description, rows: 3, maxlength: Arcanum::LIMITS["description"], placeholder: "How the magic shows itself and what it does in the fiction.", class: "field__input" %>
+  </div>
+  <div class="field">
+    <%= form.label :limitations, "Limitations", class: "field__label" %>
+    <%= form.text_area :limitations, rows: 2, maxlength: Arcanum::LIMITS["limitations"], placeholder: "Optional: a cost, or situations it doesn't work in.", class: "field__input" %>
+  </div>
+
+  <%= form.submit arcanum.new_record? ? "Add arcana" : "Save", class: "button button--primary" %>
+<% end %>

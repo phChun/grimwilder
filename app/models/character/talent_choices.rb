@@ -54,10 +54,11 @@ module Character::TalentChoices
     [ picks_for(choice).size - choice_slots(choice), 0 ].max
   end
 
-  # [[talent, choice, how many left]] across every talent the character has.
+  # [[talent, choice, how many left]] across every talent the character has,
+  # leaving out optional ones.
   def choices_to_make
     [ *talent_entries, *eldritch_talent_entries ].flat_map do |talent|
-      talent.choices.filter_map { |choice| [ talent, choice, choices_left(choice) ] if choices_left(choice).positive? }
+      talent.choices.reject(&:optional?).filter_map { |choice| [ talent, choice, choices_left(choice) ] if choices_left(choice).positive? }
     end
   end
 

@@ -38,6 +38,7 @@ class Pool < ApplicationRecord
   belongs_to :campaign
   belongs_to :last_rolled_by, class_name: "Identity", optional: true
   belongs_to :character, optional: true # a talent pool (Character::TalentUses)
+  belongs_to :arcanum, optional: true # an arcana's power pool (Character::Arcana)
   has_many :rolls, dependent: :nullify
 
   enum :kind, KINDS.keys.index_by(&:itself), default: "task", validate: true
@@ -99,9 +100,12 @@ class Pool < ApplicationRecord
 
   # Who may drop 1d before rolling (pg. 10, 18–19, 96): anyone on a task pool,
   # for a critical's Greater effect; the GM on any shared pool, with suspense;
-  # and on a talent pool only when the talent says so (a potent rite spell).
+  # on a talent pool only when the talent says so (a potent rite spell); and
+  # on a mythic arcana's, for a potent effect (pg. 41).
   def drops_first_for?(gm:)
-    if character_id
+    if arcanum
+      arcanum.mythic?
+    elsif character_id
       talent_use&.drop_first || false
     else
       task? || gm

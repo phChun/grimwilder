@@ -20,6 +20,7 @@ module Character::Sessions
     settle_spark(take: !first)
     reset_talent_uses(per: :session)
     save!
+    reset_opus_rolls
     refresh_talent_pools!(per: :session)
   end
 

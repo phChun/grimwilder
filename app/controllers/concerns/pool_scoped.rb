@@ -12,10 +12,11 @@ module PoolScoped
       @pool = Current.campaign.pools.visible_to(Current.membership).find(params[:pool_id])
     end
 
-    # Back to the table, or to the sheet when a talent pool was rolled there.
+    # Back to the table, or to the sheet when a talent or arcana pool was rolled there.
     def back_to_pools(**options)
       if params[:return_to] == "character" && @pool.character
-        redirect_to helpers.character_path(@pool.character, anchor: "talent-#{@pool.use_key.to_s.split("/").first}"), **options
+        anchor = @pool.arcanum_id ? "arcanum-#{@pool.arcanum_id}" : "talent-#{@pool.use_key.to_s.split("/").first}"
+        redirect_to helpers.character_path(@pool.character, anchor: anchor), **options
       else
         back_to_table(anchor: helpers.dom_id(@pool), **options)
       end

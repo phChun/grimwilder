@@ -251,6 +251,8 @@
       <% end %>
     </section>
 
+    <%= render "characters/arcana", character: @character, tends: tends, pools: talent_pools %>
+
     <section class="card" aria-labelledby="sheet-who">
       <h2 id="sheet-who" class="card__title">Who <%= short %> is</h2>
       <%# Each fact that can hold several things is a list, title-cased (the book's lists are lowercase; what's stored isn't changed). Names (bonds' characters) and the weapons line are shown as written. %>

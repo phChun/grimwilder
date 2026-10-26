@@ -71,7 +71,7 @@ module Character::TalentUses
 
   # Creates, resizes and refills talent pools for this level: all of them for
   # :session, the per-scene ones for :scene. Pools for talents the character no
-  # longer has go away.
+  # longer has go away. A session refills arcana pools too (Character::Arcana).
   def refresh_talent_pools!(per:)
     return unless campaign
 
@@ -83,6 +83,7 @@ module Character::TalentUses
         last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil
       )
     end
-    talent_pools.where.not(use_key: pool_uses.map(&:id)).destroy_all
+    talent_pools.where(arcanum_id: nil).where.not(use_key: pool_uses.map(&:id)).destroy_all
+    refresh_arcana_pools!(refill: true) if per == :session
   end
 end
