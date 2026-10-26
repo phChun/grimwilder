@@ -53,6 +53,17 @@ backgrounds:
 traits: [brave, caring, confident, curious, gentle, honest, honorable, persistent, protective, quiet, rash, stubborn]
 desires: [belonging, glory, harmony, honor, justice, knowledge, love, power, renown, thrills, wealth, wisdom]
 
+# Schools of magic, for spell theorems (pg. 86)
+magic_schools:
+  abjuration: Protects, blocks, dispels, or banishes.
+  conjuration: Summons creatures, objects, and portals.
+  divination: Reveals information, predicts the future, and reads minds.
+  enchantment: Charms, influences, and curses sentient creatures.
+  evocation: Creates and controls elemental and magical forces.
+  illusion: Generates false images and sensory deceptions.
+  necromancy: Manipulates life, death, and the undead.
+  transmutation: Transforms matter and alters physical properties.
+
 # Example weapon styles (pg. 20)
 weapon_styles: [precise, quick, bashing, quiet, sweeping, piercing, vicious, entangling, sapping, disarming, heavy, balanced, dazing, nimble, concealable, ornate, brutal, long]
 

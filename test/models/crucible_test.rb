@@ -29,6 +29,21 @@ class CrucibleTest < ActiveSupport::TestCase
     assert_equal %w[Civil Social Historical Natural Mystical Practical], Crucible.find("wises").tables.first.columns
   end
 
+  test "the spell, words of power and patron crucibles, checked against the book (pg. 82, 84, 86)" do
+    spell = Crucible.find("spell")
+    assert_equal %w[ Style Essence Form ], spell.tables.map(&:name)
+    assert_equal [ "binding", "whispering", "oil", "growth", "beacon", "field" ], spell.tables.flat_map { [ _1.cell(1, 1), _1.cell(6, 6) ] }
+    assert_equal "false", spell.tables.first.cell(5, 3), "quoted, so YAML doesn't make it a boolean"
+
+    words = Crucible.find("words_of_power").tables
+    assert_equal [ "spirit", "ice", "read", "poison" ], words.flat_map { [ _1.cell(1, 1), _1.cell(6, 6) ] }
+
+    patron = Crucible.find("patron").tables
+    assert_equal %w[ Nature Desires ], patron.map(&:name)
+    assert_equal "dead god", patron.first.cell(4, 1)
+    assert_equal "entropy", patron.last.cell(6, 6)
+  end
+
   test "find raises not found for unknown keys" do
     assert_raises(ActiveRecord::RecordNotFound) { Crucible.find("nope") }
   end
