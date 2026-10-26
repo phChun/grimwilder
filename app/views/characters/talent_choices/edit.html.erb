@@ -1,0 +1,56 @@
+<% content_for :title, "#{@talent.name} · #{@character.name}" %>
+
+<%# The picks a talent asks for (Character::TalentChoices). Its own page, and from the talent card a modal (shared/_frame_modal): the frame is what the modal shows. The form targets _top, so saving refreshes the sheet. A closed list is checkboxes (grouped when the book names its groups); an open one is a type-or-pick box per slot. talent_choice_controller.js keeps the "2 of 3" count and disables the rest when full; the server checks again. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to @character.name, character_path(@character) %></p>
+    <h1><%= @talent.name %></h1>
+    <p class="page-header__lede"><%= @talent.summary %></p>
+  </header>
+
+  <%= form_with url: character_talent_choices_path(@character, @talent.key), method: :patch, class: "panel stack talent-choices", data: { turbo_frame: "_top" } do %>
+    <% if @character.errors.any? %>
+      <p class="form-error"><%= @character.errors.full_messages.to_sentence %></p>
+    <% end %>
+
+    <% @character.choices_for(@talent).each do |choice, picks| %>
+      <% slots = @character.choice_slots(choice) %>
+      <% field = "picks[#{choice.key}][]" %>
+      <fieldset class="talent-choice" data-controller="talent-choice" data-talent-choice-slots-value="<%= slots %>">
+        <legend class="talent-choice__legend">
+          <span class="field__label"><%= choice.label %></span>
+          <span class="talent-choice__count" data-talent-choice-target="count" aria-live="polite"><%= picks.size %> of <%= slots %></span>
+        </legend>
+        <% hints = [ ("Your magic's touchstones (pg. 35)." if choice.touchstone?), ("At least #{choice.min_each} from each list." if choice.min_each.positive?), ("More at #{choice.growth.keys.map { "level #{_1}" }.to_sentence}." if choice.growth.any?), ("Pick from the list or write your own." if choice.open? && choice.options.any?) ].compact %>
+        <% if hints.any? %><p class="field__hint"><%= hints.join(" ") %></p><% end %>
+        <%= hidden_field_tag field, "", id: nil %>
+
+        <% if choice.open? %>
+          <% list_id = "choice-#{choice.key}-list" %>
+          <% if choice.options.any? %>
+            <datalist id="<%= list_id %>"><% choice.options.each do |option| %><option value="<%= title_case(option) %>"></option><% end %></datalist>
+          <% end %>
+          <div class="talent-choice__boxes">
+            <% [ slots, picks.size ].max.times do |index| %>
+              <%= text_field_tag field, (title_case(picks[index]) if picks[index]), id: "choice-#{choice.key}-#{index}", list: (list_id if choice.options.any?), placeholder: (choice.options.any? ? type_or_select : "Write your own"), maxlength: Character::WORD_LIMIT, autocomplete: "off", "aria-label": "#{choice.noun.capitalize} #{index + 1}", class: "field__input", data: { talent_choice_target: "input", action: "input->talent-choice#update" } %>
+            <% end %>
+          </div>
+        <% else %>
+          <% choice.option_groups.each do |group, options| %>
+            <div class="talent-choice__group">
+              <% if group %><p class="talent-choice__group-name"><%= group %></p><% end %>
+              <% options.each do |option| %>
+                <label class="check talent-choice__option">
+                  <%= check_box_tag field, option, picks.include?(option), id: "choice-#{choice.key}-#{option.parameterize}", data: { talent_choice_target: "input", action: "talent-choice#update" } %>
+                  <span><%= title_case(option) %></span>
+                </label>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </fieldset>
+    <% end %>
+
+    <button type="submit" class="button button--primary">Save</button>
+  <% end %>
+<% end %>

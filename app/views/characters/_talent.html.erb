@@ -15,6 +15,9 @@
         <summary class="button button--ghost talent-card__toggle" aria-label="More for <%= talent.name %>"><%= icon(:more, size: 18) %></summary>
         <div class="talent-card__menu" data-menu-target="panel">
           <%= render "shared/popover_head", title: talent.name %>
+          <% if tends && talent.choices.any? %>
+            <%= link_to "Choose #{talent.choices.map { _1.noun.pluralize }.to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
+          <% end %>
           <% if tends %>
             <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
             <p class="field__hint">Rename it and describe it your way, like a wizard's Bulwark as a magical shield (pg. 52). The rules stay the book's. Leave a field blank to use the book's.</p>
@@ -51,6 +54,26 @@
   <% if talent.renamed? %><p class="talent-card__aka">Re-skinned <%= talent.book.name %></p><% end %>
   <p class="talent-card__summary"><%= talent.summary %></p>
   <% if talent.core? && talent.growth %><p class="talent-card__growth"><span class="talent-card__label">Grows</span> <%= talent.growth %></p><% end %>
+  <% if talent.choices.any? %>
+    <%# The picks it asks for (Character::TalentChoices), as chips; the owner and GM get a link to the rest. %>
+    <div class="talent-card__choices">
+      <% character.choices_for(talent).each do |choice, picks| %>
+        <% left, extra = character.choices_left(choice), character.extra_choices(choice) %>
+        <% if picks.any? %>
+          <p class="talent-card__label"><%= choice.heading %></p>
+          <ul class="talent-card__picks" aria-label="<%= choice.heading %>">
+            <% picks.each do |pick| %><li class="talent-card__pick"><%= title_case(pick) %></li><% end %>
+          </ul>
+        <% end %>
+        <% if tends && left.positive? %>
+          <%= link_to "Choose #{picks.any? ? "#{left} more" : left} #{choice.noun.pluralize(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
+        <% end %>
+        <% if tends && extra.positive? %>
+          <p class="talent-over">Level <%= character.level %> has room for <%= pluralize(character.choice_slots(choice), choice.noun) %>. <%= link_to "Drop #{extra == 1 ? "one" : extra}", edit_character_talent_choices_path(character, talent.key), data: { turbo_frame: "modal" } %>.</p>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
   <% if eldritch && talent.one_time_only? %><p class="talent-card__aka">Its "One time only" feature doesn't work as an Eldritch Talent.</p><% end %>
 
   <% if counters.any? || pool_uses.any? || thread.positive? %>

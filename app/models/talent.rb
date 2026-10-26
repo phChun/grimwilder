@@ -3,7 +3,7 @@
 # any talent (pg. 52) except those marked "[Prohibited: Path]".
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls)
+class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices)
   def self.all
     catalog[:talents]
   end
@@ -58,7 +58,8 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     key = keyify(attributes["name"])
     new(key: key, name: attributes["name"], summary: attributes["summary"], text: attributes["text"], note: (attributes["note"] unless core), page: attributes["page"],
       group: group, core: core, uses: Array(attributes["uses"]).map { Talent::Use.from(key, _1) },
-      rolls: Array(attributes["rolls"]).each_with_index.map { Talent::Roll.from(key, _2, _1) })
+      rolls: Array(attributes["rolls"]).each_with_index.map { Talent::Roll.from(key, _2, _1) },
+      choices: Array(attributes["choices"]).map { Talent::Choice.from(key, _1) })
   end
 
   def self.keyify(name)
@@ -78,6 +79,10 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
 
   def core?
     core
+  end
+
+  def choice(key)
+    choices.find { _1.key == key.to_s }
   end
 
   # What a talent does at the table, for the badges on its card. A talent

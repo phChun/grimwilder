@@ -6,6 +6,10 @@
 # book's sidebar tip for a talent. Any talent can be taken by any path (pg. 52).
 # "summary" is our own one-line gist for the character sheet (not book text);
 # keep it under 100 characters.
+# "choices" are picks a talent asks for (Talent::Choice): `pick` at level 1
+# plus `growth` by level, from `from` (or named `groups`, with `min_each`),
+# `open: true` when the book's list is only suggestions, `same_as` to reuse
+# another talent's list, `touchstone: true` for magic touchstones (pg. 35).
 - key: artificer
   name: Artificer
   kind: path
@@ -41,6 +45,15 @@
     summary: "Replacement body parts with 3 perks, each good for +1d once a session, and a drawback."
     text: 'You have enhanced replacement body parts. Choose 3 benefits for them: built-in weapon—detachable—independent—keen sense—storage—strong. Each perk can be activated once per session to take +1d on a related roll. They also have a drawback: noisy—horrifying—unreliable—power source.'
     page: 55
+    choices:
+    - key: perks
+      label: Perks
+      pick: 3
+      from: [built-in weapon, detachable, independent, keen sense, storage, strong]
+    - key: drawback
+      label: Drawback
+      pick: 1
+      from: [noisy, horrifying, unreliable, power source]
     uses:
     - { key: perks, label: Perks, count: 3, per: session }
   - name: Mischief Maker
@@ -262,6 +275,11 @@
     summary: "One favorite beast form costs no wild shape dice, or 1d less if it has wild talents."
     text: Choose 1 beast form. If it has no wild talents, you can shift into it without using a wild shape pool. If it has wild talents, you drop 1d less than normal when you shift into it.
     page: 63
+    choices:
+    - key: form
+      label: Beast form
+      pick: 1
+      open: true
   - name: Windcaller
     summary: "Once a session, summon or dismiss weather; push yourself to do it again."
     text: 'Your voice carries on the winds over great distances. Once per session, you can summon or dismiss, but not control: dense fog—extreme temperatures—heavy rain—snowfall—storms—strong winds. You can push yourself to do it again. You can perform weather rituals without anchors.'
@@ -288,6 +306,11 @@
 
       GROWTH: At levels 3 and 6, gain +1 mastery per scene.'
     page: 64
+    choices:
+    - key: style
+      label: Fighting style
+      pick: 1
+      from: [brawling, dual-wielding, one-handed, ranged, two-handed]
     uses:
     - { key: mastery, label: Mastery, count: 2, per: scene, growth: { 3: 1, 6: 1 } }
   talents:
@@ -458,6 +481,13 @@
 
       GROWTH: At levels 3, and 6, you gain +1 instability slot at 0t, and +1 bastion.'
     page: 70
+    choices:
+    - key: bastions
+      label: Bastions
+      pick: 2
+      growth: { 3: 1, 6: 1 }
+      touchstone: true
+      from: [biodynamics, clairsentience, metacreation, psychokinesis, telepathy, transposition]
   talents:
   - name: Echo
     summary: "Once a session, create a 3d duplicate of yourself to assist you or swap places."
@@ -524,6 +554,15 @@
     summary: "A loyal animal with 3 tricks (rolled at 3d), 2 flaws and a bond with each PC."
     text: 'You’re accompanied by a fiercely loyal animal. Each PC adds a reciprocal bond with it. Choose 3 tricks and 2 flaws. You roll 3d for its tricks and 1d otherwise. It has only two damage boxes, marked (for any mark) and hurt (for any harm). It can always exit a scene when hurt. If lost, you can bond with a new animal. Tricks: distract—fight—guard—perform—rescue—retrieve—scout—search—track—warn. Flaws: aggressive—clumsy—grumpy—insatiable—jumpy—noisy—overprotective—scary—unruly.'
     page: 73
+    choices:
+    - key: tricks
+      label: Tricks
+      pick: 3
+      from: [distract, fight, guard, perform, rescue, retrieve, scout, search, track, warn]
+    - key: flaws
+      label: Flaws
+      pick: 2
+      from: [aggressive, clumsy, grumpy, insatiable, jumpy, noisy, overprotective, scary, unruly]
   - name: Keen Senses
     summary: "Potent feats of tracking, and you always sense living creatures nearby."
     text: Your senses are twice as sharp as normal. You can pull off potent feats of tracking and you always notice the presence of living creatures near you, though details are unclear.
@@ -567,6 +606,14 @@
 
       GROWTH: At levels 3 and 6, gain +1d Competence per session and +1 skill.'
     page: 74
+    choices:
+    - key: skills
+      label: Skills
+      pick: 3
+      growth: { 3: 1, 6: 1 }
+      groups:
+        Above board: [duel, evade, investigate, persuade, track, traverse]
+        Below table: [ambush, "forgery & disguise", lying, sabotage, sleight of hand, stealth]
     uses:
     - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
   talents:
@@ -583,6 +630,13 @@
     summary: "Sorcery-style spellcasting with Presence and 3 paths or techniques, never potent."
     text: 'You have spellcasting, as the Sorcery talent. You roll Presence to cast and choose 3 from magic paths and techniques. You can’t cast potent spells, nor do you risk a magical twist. [Prohibited: Sorcerer]'
     page: 75
+    choices:
+    - key: paths
+      label: Paths and techniques
+      noun: path or technique
+      pick: 3
+      touchstone: true
+      same_as: sorcery.paths
   - name: Lurker
     summary: "Perfect sneaks reveal secrets or openings; push yourself to freeze and avoid detection."
     text: 'On a perfect sneaking past or secretly observing sentient creatures, they: let a secret slip—give you a golden opportunity. If caught sneaking, you can push yourself to stay completely still and avoid detection, but must leave the area immediately after.'
@@ -623,6 +677,22 @@
 
       GROWTH: At levels 2, 4, and 6, gain a new magic path or technique.'
     page: 76
+    choices:
+    - key: paths
+      label: Paths and techniques
+      noun: path or technique
+      pick: 4
+      min_each: 1
+      growth: { 2: 1, 4: 1, 6: 1 }
+      touchstone: true
+      groups:
+        Magic paths: [blood, decay, flame, frost, lux, shadow, stone, tempest]
+        Techniques: [attack, create, defend, enhance, hinder, influence, transform, traverse]
+    - key: twist
+      label: Magical twist
+      pick: 1
+      open: true
+      from: [wild surge, take vex, curse]
   talents:
   - name: Eldritch Growth
     summary: "Magic has given you a permanent physical feature, like claws or fiery breath."
@@ -654,6 +724,12 @@
     text: 'Two small magical motes float around you. Give them 2 traits such as: annoying—melancholic—mesmerizing—petty—troublesome—whimsical. You can sacrifice one to have it act independently, making a story roll if needed. They return each session.'
     note: You could send one to assist an ally, distract a foe, light the way, or even pass a message to someone. The story roll here is about how effective they are, it doesn't prompt an impact move.
     page: 77
+    choices:
+    - key: traits
+      label: Traits
+      pick: 2
+      open: true
+      from: [annoying, melancholic, mesmerizing, petty, troublesome, whimsical]
     rolls:
     - { kind: story, odds: 2, label: Send a wisp off, use: wisps }
     uses:
@@ -676,6 +752,13 @@
 
       GROWTH: At levels 3 and 6, you gain +1 aspect.'
     page: 78
+    choices:
+    - key: aspects
+      label: Aspects
+      pick: 1
+      growth: { 3: 1, 6: 1 }
+      open: true
+      from: [big enough to ride, telepathic, a thematic path talent]
     rolls:
     - { kind: story, odds: 2, label: The anchors break }
     uses:
@@ -749,6 +832,11 @@
     summary: "+1d with 2 skills from the Expertise list."
     text: 'Choose two skills from the Expertise talent (pg. 74). Take +1d when using these skills. [Prohibited: Rogue]'
     page: 81
+    choices:
+    - key: skills
+      label: Skills
+      pick: 2
+      same_as: expertise.skills
   - name: Improvise
     summary: "Push yourself and use your surroundings creatively to take +1d."
     text: You can push yourself and describe your creative use of your surroundings to take +1d. These improvised weapons and tools often stretch the bounds of reality with their use.
@@ -806,10 +894,24 @@
     summary: "Your weapon is a touchstone with a magical style; push for a secondary effect on a perfect."
     text: 'You weave blade and magic together. You can use your weapon as a touchstone, and add a magical weapon style, such as: flaming—returning—seeking. On a perfect with this weapon, you can push yourself to add a secondary effect based on the magical style. Given time, you can change the style.'
     page: 83
+    choices:
+    - key: style
+      label: Magical weapon style
+      noun: style
+      pick: 1
+      open: true
+      touchstone: true
+      from: [flaming, returning, seeking]
   - name: Otherworldly Form
     summary: "Turn into a floating, dispersed form with three abilities you choose."
     text: 'You can turn into a floating, dispersed form, flavored after your patron’s trappings. Choose three things you can do in this form: appear barely visible—fly high in the sky—interact with objects—move swiftly—slip through small gaps—speak.'
     page: 83
+    choices:
+    - key: abilities
+      label: In this form
+      noun: thing you can do
+      pick: 3
+      from: [appear barely visible, fly high in the sky, interact with objects, move swiftly, slip through small gaps, speak]
   - name: Blood Rituals
     summary: "+1d on ritual invocations, and stand in for one anchor yourself. Spark when it's done."
     text: Take +1d on a ritual’s invocation and replace any one of its anchors with yourself. When you complete a ritual in this way, take spark.
@@ -860,6 +962,12 @@
     summary: "Given time, bless a homestead: outside help on all rolls there, plus two wondrous traits."
     text: 'Given time, you can bless a homestead to overflow with power. You get outside help on all rolls while on its grounds. Choose two wondrous traits to give it such as: traveling—ritual anchor—healing—caretaker. You can only have one homestead like this at a time. charming castle mysterious cottage rickety glade unsettling manner vibrant shack whimsical temple'
     page: 85
+    choices:
+    - key: traits
+      label: Wondrous traits
+      pick: 2
+      open: true
+      from: [traveling, ritual anchor, healing, caretaker]
   - name: Evil Eye
     summary: "Hex someone with Presence (dread, misfortune, sleepiness...), timed as you choose."
     text: 'You can roll Presence to hex someone with: dread—clumsiness—confusion—forgetfulness—misfortune—sleepiness. Decide when it takes effect: now—soon—much later—specific trigger. This magic only works on someone once.'
@@ -970,12 +1078,23 @@
     summary: "End a scene bloodied or desperate and roll 2d to heal harm, with a weakness to match."
     text: 'When a scene ends while you are bloodied or desperate, make a 2d story roll as a defense against the harm. On a messy, reduce 1 harm to a mark. On a perfect, clear it.Choose a weakness that accompanies this power, such as: fire—iron—sunlight.'
     page: 89
+    choices:
+    - key: weakness
+      label: Weakness
+      pick: 1
+      open: true
+      from: [fire, iron, sunlight]
     rolls:
     - { kind: story, odds: 2, label: Heal as the scene ends }
   - name: Flight
     summary: "You can fly, with two benefits: agile, strong, swift or tireless."
     text: 'You have the ability to fly. Choose two of the following benefits that define this ability: Agile—Strong—Swift—Tireless. Be mindful of what you carry; most fliers can’t bring much with them.'
     page: 89
+    choices:
+    - key: benefits
+      label: Benefits
+      pick: 2
+      from: [agile, strong, swift, tireless]
   - name: Cultural Weapon
     summary: "Push yourself for potent feats of prowess with your people's iconic weapon."
     text: While using the iconic weapon of your society, you can push yourself to pull off a potent feat of prowess using one of the styles. These weapons are often highly coveted outside of your ancestral lands.

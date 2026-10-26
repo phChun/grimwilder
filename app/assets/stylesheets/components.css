@@ -785,6 +785,7 @@ form.button_to, .button_to { margin: 0; }
 .talent__name { margin: 0; font-size: 1.3rem; }
 .talent__meta { font-size: 0.8rem; color: var(--dim); }
 .talent__summary { margin: 0; color: var(--text-soft); }
+.talent__choices { margin: 0; font-size: 0.85rem; color: var(--muted); }
 .talent__more > .fold__summary { min-height: var(--tap); font-size: 0.87rem; font-weight: 600; color: var(--dim); }
 .talent__more[open] > .fold__summary { margin-bottom: var(--space-1); }
 .talent__more .talent__note { margin-top: var(--space-2); }
@@ -2516,3 +2517,20 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .admin-plan { display: flex; gap: var(--space-2); align-items: center; }
 .admin-plan .field__input { width: auto; min-width: 9rem; }
 .admin-plan__over { display: block; margin-top: var(--space-1); color: var(--grim); }
+
+/* Picks a talent asks for: chips on its card, and the form that picks them
+   (characters/talent_choices/edit). */
+.talent-card__choices { display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-2); }
+.talent-card__choices .talent-card__label { margin: 0; }
+.talent-card__picks { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.talent-card__pick { padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 0.85rem; color: var(--text); }
+.talent-card__pick-more { align-self: flex-start; font-size: 0.85rem; color: var(--ember); }
+.talent-card__choices .talent-over { margin: 0; }
+.talent-choice { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
+.talent-choice__legend { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); width: 100%; padding: 0; }
+.talent-choice__count { font-family: var(--font-dice); font-size: 0.85rem; color: var(--muted); }
+.talent-choice__group { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); }
+.talent-choice__group-name { flex-basis: 100%; margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.talent-choice__option { min-height: var(--tap); flex: 0 1 12rem; }
+.talent-choice__option:has(input:disabled) { opacity: 0.5; cursor: default; }
+.talent-choice__boxes { display: flex; flex-direction: column; gap: var(--space-2); }

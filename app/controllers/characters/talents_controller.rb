@@ -14,7 +14,13 @@ class Characters::TalentsController < ApplicationController
 
   def create
     talent = @eldritch ? @character.add_eldritch_talent!(params.expect(:talent)) : @character.add_talent!(params.expect(:talent))
-    redirect_to character_path(@character, anchor: "talents"), notice: "#{@character.name} took #{talent.name}#{" as an Eldritch Talent" if @eldritch}."
+    notice = "#{@character.name} took #{talent.name}#{" as an Eldritch Talent" if @eldritch}."
+    # A talent with picks to make lands on its card, which asks for them.
+    if talent.choices.any?
+      redirect_to character_path(@character, anchor: "talent-#{talent.key}"), notice: "#{notice} Choose #{talent.choices.map { _1.to_s(@character.level) }.to_sentence} on its card."
+    else
+      redirect_to character_path(@character, anchor: "talents"), notice: notice
+    end
   rescue ActiveRecord::RecordInvalid
     redirect_to new_character_talent_path(@character, eldritch: (1 if @eldritch)), alert: @character.errors.full_messages.to_sentence
   end
