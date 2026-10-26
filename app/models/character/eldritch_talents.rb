@@ -58,7 +58,7 @@ module Character::EldritchTalents
   end
 
   def remove_eldritch_talent!(key)
-    update!(eldritch_talent_keys: eldritch_talent_keys - [ key.to_s ], talent_skins: talent_skins.except(key.to_s))
+    update!(eldritch_talent_keys: eldritch_talent_keys - [ key.to_s ], talent_skins: talent_skins.except(key.to_s), talent_choices: talent_choices.except(key.to_s))
   end
 
   private
