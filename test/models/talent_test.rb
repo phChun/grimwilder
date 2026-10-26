@@ -65,6 +65,7 @@ class TalentChoiceTest < ActiveSupport::TestCase
       assert choice.label.present?, choice.id
       assert_operator choice.label.length, :<=, 30, choice.id
       assert_operator choice.noun.length, :<=, 30, choice.id
+      assert choice.plural, "#{choice.id}: say the plural of #{choice.noun.inspect}; Rails would pluralize its last word" if choice.noun.match?(/ (of|or|and|you) /)
       assert_operator choice.pick, :>=, 1, choice.id
       assert choice.growth.keys.all? { (2..7).cover?(_1) }, choice.id
       assert choice.growth.values.all?(&:positive?), choice.id
@@ -88,6 +89,7 @@ class TalentChoiceTest < ActiveSupport::TestCase
 
     Talent.all.each do |talent|
       assert_equal talent.choices.map(&:key).uniq, talent.choices.map(&:key), talent.key
+      assert_operator talent.choices.filter_map(&:crucible).uniq.size, :<=, 1, "#{talent.key}: its form rolls on one crucible"
     end
   end
 
@@ -118,6 +120,8 @@ class TalentChoiceTest < ActiveSupport::TestCase
     assert_equal 1, sorcery.min_each
     assert_equal "Touchstones", sorcery.heading
     assert_equal "path or technique", sorcery.noun
+    assert_equal "paths or techniques", sorcery.nouns
+    assert_equal "4 paths or techniques", sorcery.to_s
     assert_equal sorcery.options, Talent.find("eldritch-affinity").choice(:paths).options
 
     assert_includes Talent.find("weapon-mastery").choice(:style).options, "one-handed"

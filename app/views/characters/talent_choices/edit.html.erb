@@ -8,7 +8,9 @@
     <p class="page-header__lede"><%= @talent.summary %></p>
   </header>
 
-  <%= form_with url: character_talent_choices_path(@character, @talent.key), method: :patch, class: "panel stack talent-choices", data: { turbo_frame: "_top" } do %>
+  <%# A talent's choices roll on one crucible at most (the patron's natures and desires share it). %>
+  <% crucible = @talent.choices.find { _1.crucible && @character.choice_open?(_1) }&.roll_crucible %>
+  <%= form_with url: character_talent_choices_path(@character, @talent.key), method: :patch, class: "panel stack talent-choices", data: { turbo_frame: "_top", controller: "choice-fill", action: "crucible:pick->choice-fill#fill" } do %>
     <% if @character.errors.any? %>
       <p class="form-error"><%= @character.errors.full_messages.to_sentence %></p>
     <% end %>
@@ -16,33 +18,50 @@
     <% @character.choices_for(@talent).each do |choice, picks| %>
       <% slots = @character.choice_slots(choice) %>
       <% field = "picks[#{choice.key}][]" %>
-      <fieldset class="talent-choice" data-controller="talent-choice" data-talent-choice-slots-value="<%= slots %>">
+      <% open = @character.choice_open?(choice) %>
+      <% options = @character.choice_options(choice) %>
+      <fieldset class="talent-choice" data-controller="talent-choice" data-talent-choice-slots-value="<%= slots %>" data-choice-fill-target="choice" data-crucible="<%= choice.crucible if open %>" data-table="<%= choice.table %>" data-words="<%= choice.school? ? 2 : 1 %>">
         <legend class="talent-choice__legend">
           <span class="field__label"><%= choice.label %></span>
           <span class="talent-choice__count" data-talent-choice-target="count" aria-live="polite"><%= picks.size %> of <%= slots %></span>
         </legend>
-        <% hints = [ ("Your magic's touchstones (pg. 35)." if choice.touchstone?), ("At least #{choice.min_each} from each list." if choice.min_each.positive?), ("More at #{choice.growth.keys.map { "level #{_1}" }.to_sentence}." if choice.growth.any?), ("Pick from the list or write your own." if choice.open? && choice.options.any?) ].compact %>
+        <% hints = [ ("Your magic's touchstones (pg. 35)." if choice.touchstone?), ("At least #{choice.min_each} from each list." if choice.min_each.positive?), ("More at #{choice.growth.keys.map { "level #{_1}" }.to_sentence}." if choice.growth.any?), ("Two words from the spell crucible, and a school (pg. 87)." if choice.school?), ("Pick from the list or write your own." if open && options.any?), ("Roll for ideas below, or write your own." if open && options.empty? && choice.crucible) ].compact %>
         <% if hints.any? %><p class="field__hint"><%= hints.join(" ") %></p><% end %>
-        <%= hidden_field_tag field, "", id: nil %>
 
-        <% if choice.open? %>
+        <% if open %>
           <% list_id = "choice-#{choice.key}-list" %>
-          <% if choice.options.any? %>
-            <datalist id="<%= list_id %>"><% choice.options.each do |option| %><option value="<%= title_case(option) %>"></option><% end %></datalist>
+          <% if options.any? %>
+            <datalist id="<%= list_id %>"><% options.each do |option| %><option value="<%= title_case(option) %>"></option><% end %></datalist>
           <% end %>
           <div class="talent-choice__boxes">
             <% [ slots, picks.size ].max.times do |index| %>
-              <%= text_field_tag field, (title_case(picks[index]) if picks[index]), id: "choice-#{choice.key}-#{index}", list: (list_id if choice.options.any?), placeholder: (choice.options.any? ? type_or_select : "Write your own"), maxlength: Character::WORD_LIMIT, autocomplete: "off", "aria-label": "#{choice.noun.capitalize} #{index + 1}", class: "field__input", data: { talent_choice_target: "input", action: "input->talent-choice#update" } %>
+              <% name, school = choice.school? ? Talent::Choice.split_school(picks[index]) : [ picks[index], nil ] %>
+              <div class="talent-choice__box">
+                <%= text_field_tag field, name, id: "choice-#{choice.key}-#{index}", list: (list_id if options.any?), placeholder: (options.any? ? type_or_select : "Write your own"), maxlength: Character::WORD_LIMIT, autocomplete: "off", "aria-label": "#{choice.noun.capitalize} #{index + 1}", class: "field__input", data: { talent_choice_target: "input", action: "input->talent-choice#update" } %>
+                <% if choice.school? %>
+                  <select name="schools[<%= choice.key %>][]" class="field__input talent-choice__school" aria-label="School for <%= choice.noun %> <%= index + 1 %>">
+                    <option value="">School…</option>
+                    <% Grimwild.magic_schools.each do |key, does| %>
+                      <%= tag.option key.capitalize, value: key, title: does, selected: school == key %>
+                    <% end %>
+                  </select>
+                <% end %>
+              </div>
             <% end %>
           </div>
         <% else %>
-          <% choice.option_groups.each do |group, options| %>
+          <%= hidden_field_tag field, "", id: nil %>
+          <% if options.empty? %>
+            <p class="field__hint">Choose your <%= choice.picks_sources.map { _1.label.downcase }.uniq.to_sentence(two_words_connector: " or ", last_word_connector: " or ") %> first; this picks from them.</p>
+          <% end %>
+          <% groups = choice.from_picks? ? { nil => options } : choice.option_groups %>
+          <% groups.each do |group, group_options| %>
             <div class="talent-choice__group">
               <% if group %><p class="talent-choice__group-name"><%= group %></p><% end %>
-              <% options.each do |option| %>
+              <% group_options.each do |option| %>
                 <label class="check talent-choice__option">
                   <%= check_box_tag field, option, picks.include?(option), id: "choice-#{choice.key}-#{option.parameterize}", data: { talent_choice_target: "input", action: "talent-choice#update" } %>
-                  <span><%= title_case(option) %></span>
+                  <span><%= talent_pick_label(choice, option) %></span>
                 </label>
               <% end %>
             </div>
@@ -51,6 +70,15 @@
       </fieldset>
     <% end %>
 
+    <% if crucible %>
+      <%# The crucible rolls right here (a lazy frame, fetched when the fold opens): a tapped word goes into the next empty box of the choice it's for (choice_fill_controller.js). %>
+      <details class="fold talent-choice__crucible">
+        <summary class="fold__summary"><span class="fold__title">Roll the <%= crucible.name.sub(/ crucible\z/i, "") %> crucible for ideas</span></summary>
+        <p class="field__hint" data-choice-fill-target="status" aria-live="polite">Roll, then tap a word to put it in the next empty box.</p>
+        <turbo-frame id="crucible" src="<%= crucible_path(crucible, embed: 1) %>" loading="lazy"></turbo-frame>
+      </details>
+    <% end %>
+
     <button type="submit" class="button button--primary">Save</button>
-  <% end %>
+<% end %>
 <% end %>

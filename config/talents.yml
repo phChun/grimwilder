@@ -643,6 +643,7 @@
     - key: paths
       label: Paths and techniques
       noun: path or technique
+      plural: paths or techniques
       pick: 3
       touchstone: true
       same_as: sorcery.paths
@@ -690,6 +691,7 @@
     - key: paths
       label: Paths and techniques
       noun: path or technique
+      plural: paths or techniques
       pick: 4
       min_each: 1
       growth: { 2: 1, 4: 1, 6: 1 }
@@ -910,11 +912,13 @@
     - key: trappings
       label: Trappings
       noun: color or signature
+      plural: colors or signatures
       pick: 1
       open: true
     - key: communication
       label: Communicates by
       noun: way of communicating
+      plural: ways of communicating
       pick: 1
       open: true
       from: [telepathy, signs, projection]
@@ -956,6 +960,7 @@
     - key: abilities
       label: In this form
       noun: thing you can do
+      plural: things you can do
       pick: 3
       from: [appear barely visible, fly high in the sky, interact with objects, move swiftly, slip through small gaps, speak]
   - name: Blood Rituals
@@ -994,6 +999,7 @@
     - key: words
       label: Words of power
       noun: word of power
+      plural: words of power
       pick: 6
       growth: { 2: 2, 4: 2, 6: 2 }
       open: true
@@ -1010,6 +1016,7 @@
     - key: word
       label: Bailiwick
       noun: word of power
+      plural: words of power
       pick: 1
       from_picks: [hidden-magic.words]
       crucible: words_of_power

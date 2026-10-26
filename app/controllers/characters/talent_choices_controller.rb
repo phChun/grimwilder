@@ -29,8 +29,17 @@ class Characters::TalentChoicesController < ApplicationController
       raise ActiveRecord::RecordNotFound, "#{@talent.name} has nothing to pick" if @talent.choices.empty?
     end
 
-    # { "skills" => [...] }: each choice's list, a hidden blank keeping an emptied one.
+    # { "skills" => [...] }: each choice's list, a hidden blank keeping an emptied
+    # one. A spell theorem's school comes in its own list, box for box, and
+    # joins its name: "wild fire (evocation)".
     def picks
-      params.fetch(:picks, {}).permit(@talent.choices.to_h { [ _1.key, [] ] }).to_h
+      keys = @talent.choices.to_h { [ _1.key, [] ] }
+      picks = params.fetch(:picks, {}).permit(keys).to_h
+      schools = params.fetch(:schools, {}).permit(keys).to_h
+
+      @talent.choices.select(&:school?).each_with_object(picks) do |choice, joined|
+        next unless joined[choice.key]
+        joined[choice.key] = joined[choice.key].each_with_index.map { |name, index| Talent::Choice.join_school(name, schools.dig(choice.key, index)) }
+      end
     end
 end

@@ -122,7 +122,7 @@ module Character::TalentChoices
       unless choice_open?(choice)
         options = choice_options(choice)
         values.reject { options.include?(_1) }.each do |value|
-          errors.add(:base, "#{value.inspect} isn't one of #{talent.name}'s #{noun.pluralize}")
+          errors.add(:base, "#{value.inspect} isn't one of #{talent.name}'s #{choice.nouns}")
         end
       end
       if choice.school?
@@ -135,7 +135,7 @@ module Character::TalentChoices
         errors.add(:base, "#{talent.name} has the same #{noun} twice")
       end
       if values.size > slots
-        errors.add(:base, "At level #{level}, #{talent.name} has room for #{slots} #{noun.pluralize(slots)}")
+        errors.add(:base, "At level #{level}, #{talent.name} has room for #{slots} #{choice.nouns(slots)}")
       end
       if choice.min_each.positive? && values.size >= slots
         choice.option_groups.each do |group, options|

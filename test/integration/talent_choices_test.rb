@@ -118,4 +118,78 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
     get talents_path
     assert_select "#talent-artificial-parts .talent__choices", "Choose 3 perks and 1 drawback"
   end
+
+  test "spell theorems: a name box and a school per theorem, the spell crucible to roll on, and the school on the card" do
+    mo = identities(:pip).characters.create!(name: "Mo", path: "Wizard", brawn: 1, agility: 2, wits: 3, presence: 2, campaign: campaigns(:bramblewood))
+    sign_in_as identities(:pip)
+
+    get edit_character_talent_choices_path(mo, "spellcraft")
+    assert_select "input[type=text][name='picks[theorems][]']", 4
+    assert_select "select[name='schools[theorems][]']", 4
+    assert_select "select[name='schools[theorems][]'] option[value=necromancy]"
+    assert_select "fieldset[data-crucible=spell][data-words='2']"
+    assert_select "turbo-frame#crucible[src=?][loading=lazy]", crucible_path("spell", embed: 1)
+
+    patch character_talent_choices_path(mo, "spellcraft"), params: { picks: { theorems: [ "wild fire", "frost ring", "", "" ] }, schools: { theorems: [ "evocation", "", "illusion", "" ] } }
+    assert_redirected_to character_path(mo, anchor: "talent-spellcraft")
+    assert_equal [ "wild fire (evocation)", "frost ring" ], mo.reload.talent_choices.dig("spellcraft", "theorems")
+
+    get edit_character_talent_choices_path(mo, "spellcraft")
+    assert_select "input[name='picks[theorems][]'][value='wild fire'] + select option[value=evocation][selected]"
+
+    get character_path(mo)
+    assert_select "#talent-spellcraft .talent-card__pick", [ "Wild Fire · Evocation", "Frost Ring" ].first
+  end
+
+  test "Mastered Theorem picks from the theorems, once there are some" do
+    mo = identities(:pip).characters.create!(name: "Mo", path: "Wizard", brawn: 1, agility: 2, wits: 3, presence: 2, talent_keys: [ "mastered-theorem" ])
+    sign_in_as identities(:pip)
+
+    get edit_character_talent_choices_path(mo, "mastered-theorem")
+    assert_select ".field__hint", /Choose your spell theorems first/
+    assert_select "input[type=checkbox]", 0
+
+    mo.choose_for_talent!("spellcraft", "theorems" => [ "wild fire (evocation)", "frost ring" ])
+    get edit_character_talent_choices_path(mo, "mastered-theorem")
+    assert_select "input[type=checkbox][value='wild fire (evocation)'] + span", "Wild Fire · Evocation"
+    assert_select "turbo-frame#crucible", 0, "nothing to roll: it picks from the theorems"
+
+    patch character_talent_choices_path(mo, "mastered-theorem"), params: { picks: { theorem: [ "", "wild fire (evocation)" ] } }
+    assert_equal [ "wild fire (evocation)" ], mo.reload.talent_choices.dig("mastered-theorem", "theorem")
+  end
+
+  test "the patron rolls natures and desires on their own tables of one crucible" do
+    vex = identities(:pip).characters.create!(name: "Vex", path: "Warlock", brawn: 1, agility: 2, wits: 2, presence: 3, talent_keys: [ "affliction" ])
+    sign_in_as identities(:pip)
+    get edit_character_talent_choices_path(vex, "pact")
+
+    assert_select "fieldset[data-crucible=patron][data-table=Nature] input[name='picks[natures][]']", 2
+    assert_select "fieldset[data-crucible=patron][data-table=Desires] input[name='picks[desires][]']", 2
+    assert_select "turbo-frame#crucible[src=?]", crucible_path("patron", embed: 1)
+    assert_select "input[type=checkbox][name='picks[following][]']", 3
+
+    patch character_talent_choices_path(vex, "pact"), params: { picks: { natures: [ "Serpent", "void" ], name: [ "The Coiled One" ], following: [ "", "few" ] } }
+    assert_equal({ "natures" => [ "Serpent", "void" ], "name" => [ "The Coiled One" ], "following" => [ "few" ] }, vex.reload.talent_choices["pact"])
+  end
+
+  test "Hidden Magic's words are burned by name on the card" do
+    nell = identities(:pip).characters.create!(name: "Nell", path: "Witch", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: campaigns(:bramblewood))
+    nell.choose_for_talent!("hidden-magic", "words" => %w[ star storm ])
+    sign_in_as identities(:pip)
+
+    get character_path(nell)
+    assert_select "#talent-hidden-magic .use-words button.use-word", [ "Star", "Storm" ].first
+    assert_select "#talent-hidden-magic .use-words button.use-word", 2
+    assert_select "#talent-hidden-magic .talent-card__pick", 0, "the words show as the boxes, not twice"
+    assert_select "#talent-hidden-magic .use-tracker__resets", "2 left · resets each session"
+    assert_select "#talent-hidden-magic a.talent-card__pick-more", "Choose 4 more words of power"
+
+    patch character_talent_uses_path(nell), params: { use: "hidden-magic/words", name: "storm", note: "1" }
+    assert_equal [ "storm" ], nell.reload.burned_names(Talent.find("hidden-magic").uses.sole)
+    assert_equal "Nell burns storm", campaigns(:bramblewood).rolls.note.last.question
+
+    get character_path(nell)
+    assert_select "#talent-hidden-magic button.use-word--burned[aria-pressed=true]", "Storm"
+    assert_select "#talent-hidden-magic .use-tracker__resets", "1 left · resets each session"
+  end
 end
