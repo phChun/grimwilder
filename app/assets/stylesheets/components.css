@@ -2560,3 +2560,17 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .arcanum-form__options--row { display: flex; flex-wrap: wrap; }
 .arcanum-form__option { align-items: flex-start; min-height: var(--tap); }
 .arcanum-form__option small { display: block; color: var(--muted); }
+
+/* Talents in the roll setup (characters/_roll_form): ticks, and the ones that always apply */
+.stat-roll__talents { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.stat-roll__talent { align-items: flex-start; font-size: 0.9rem; line-height: 1.35; }
+.stat-roll__talent input { flex: none; margin-top: 0.1rem; }
+.stat-roll__talent small { color: var(--muted); white-space: nowrap; }
+.stat-roll__talent--auto { display: inline-flex; gap: var(--space-2); color: var(--muted); }
+.stat-roll__talent--auto .icon { flex: none; margin-top: 0.15rem; color: var(--perfect); }
+.stat-roll__talent--auto strong { color: var(--text); }
+.roll-call__talent { flex: 1 1 100%; align-items: flex-start; font-size: 0.9rem; line-height: 1.35; }
+.roll-call__talent small, .roll-call__talent--auto { color: var(--muted); }
+.roll-call__talent--auto { display: inline-flex; gap: var(--space-2); }
+.roll-call__talent--auto .icon { flex: none; margin-top: 0.15rem; color: var(--perfect); }
+.roll-call__talent--auto strong { color: var(--text); }

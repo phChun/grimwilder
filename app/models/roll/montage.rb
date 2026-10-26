@@ -7,8 +7,9 @@ module Roll::Montage
   DICE = 2
 
   class_methods do
-    # participants: [{ character:, spend_spark: 0, dice: nil }, ...]; dice the
-    # player already rolled at a roll call, with the spark already spent.
+    # participants: [{ character:, spend_spark: 0, dice: nil, talent_bonuses: [] }, ...];
+    # dice the player already rolled at a roll call, with the spark already
+    # spent and any talent dice in.
     def montage!(campaign:, by:, participants:, scene: nil, random: Random)
       characters = participants.pluck(:character)
       raise ArgumentError, "Pick who takes part in the montage." if participants.empty?
@@ -19,7 +20,7 @@ module Roll::Montage
       rolled = participants.map do |participant|
         spent = participant[:spend_spark].to_i
         result = participant[:dice] ? Grimwild::Dice.interpret(participant[:dice]) : Grimwild::Dice.roll(DICE + spent, 0, random: random)
-        { character: participant[:character], spent: spent, paid: participant[:dice].present?, result: result }
+        { character: participant[:character], spent: spent, paid: participant[:dice].present?, result: result, talent_bonuses: Array(participant[:talent_bonuses]) }
       end
       best = rolled.min_by { Grimwild::Dice::RESULTS.index(_1[:result].result) }[:result]
 
@@ -42,7 +43,7 @@ module Roll::Montage
         {
           "character_id" => side[:character].id, "name" => side[:character].name, "dice" => side[:result].dice,
           "outcome" => side[:result].result, "critical" => side[:result].critical,
-          "spark_spent" => side[:spent], "spark_gained" => side[:gained], "helpers" => []
+          "spark_spent" => side[:spent], "spark_gained" => side[:gained], "talent_bonuses" => side[:talent_bonuses], "helpers" => []
         }
       end
   end

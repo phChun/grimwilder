@@ -8,7 +8,7 @@ class Characters::RollsController < ApplicationController
   def create
     stat = params.expect(:stat)
     @character.roll!(stat, by: Current.identity, mode: params[:mode].presence || "action",
-      spend_spark: params[:spark].to_i, help: help(stat), thorns: situational_thorns(stat), assists: assists)
+      spend_spark: params[:spark].to_i, help: help(stat), thorns: situational_thorns(stat), assists: assists, bonuses: params[:bonuses])
     redirect_to @character
   rescue ArgumentError => error
     redirect_to @character, alert: error.message

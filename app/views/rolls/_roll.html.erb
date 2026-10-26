@@ -37,7 +37,7 @@
         <% roll.sides.each do |side| %>
           <li class="quarrel-side">
             <span class="quarrel-side__name">
-              <%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %>:
+              <%= side["name"] %><%= side_extras(side) %>:
               <%= side["outcome"] %><%= " (critical)" if side["critical"] %>
             </span>
             <span class="log-entry__dice"><%= side_dice_tags(side) %></span>
@@ -49,7 +49,7 @@
         <% roll.sides.each do |side| %>
           <li class="<%= class_names("quarrel-side", "quarrel-side--winner": side["name"] == roll.winner) %>">
             <span class="quarrel-side__name">
-              <%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if side["helpers"].any? %>, helped by <%= side["helpers"].pluck("name").to_sentence %><% end %>
+              <%= side["name"] %><%= side_extras(side) %><% if side["helpers"].any? %>, helped by <%= side["helpers"].pluck("name").to_sentence %><% end %>
             </span>
             <span class="log-entry__dice"><%= side_dice_tags(side) %></span>
           </li>

@@ -6,7 +6,7 @@ class Campaigns::RollCalls::RollsController < Campaigns::RollCallsController
     if params[:everyone] == "1"
       call.roll_everyone!(by: Current.identity)
     else
-      call.roll!(Current.campaign.characters.find(params[:character_id]), by: Current.identity, spark: params[:spark].to_i)
+      call.roll!(Current.campaign.characters.find(params[:character_id]), by: Current.identity, spark: params[:spark].to_i, bonuses: params[:bonuses])
     end
     redirect_to campaign_roll_call_path(Current.campaign)
   rescue ArgumentError, ActiveRecord::RecordNotFound => error

@@ -21,4 +21,11 @@ module RollCallsHelper
     tags += seat["thorns"].map { die_tag(_1, kind: "d8", size: 32) }
     safe_join(tags)
   end
+
+  # Under a rolled seat: "+1 spark · +1d Bardic Lore · rolled by Gwen".
+  def roll_call_seat_meta(seat)
+    [ ("+#{seat["spark"]} spark" if seat["spark"].positive?),
+      *Array(seat["talent_bonuses"]).select { _1["dice"].positive? }.map { "+#{_1["dice"]}d #{_1["name"]}" },
+      ("rolled by #{seat["rolled_by"]}" if seat["rolled_by"]) ].compact.join(" · ")
+  end
 end

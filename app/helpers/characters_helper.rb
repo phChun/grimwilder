@@ -20,6 +20,19 @@ module CharactersHelper
     "#{pluralize(reasons.size, "thorn")} from #{reasons.map { DAMAGE_SOURCES.fetch(_1) }.to_sentence}, already added" if reasons.any?
   end
 
+  # A talent's tick in the roll setup: "Using a chosen skill (Duel, Stealth)".
+  def talent_bonus_label(character, talent, bonus)
+    picks = (choice = talent.choice(bonus.choice)) ? character.picks_for(choice).map { talent_pick_label(choice, _1) } : []
+    [ bonus.label, ("(#{picks.join(", ")})" if picks.any?) ].compact.join(" ")
+  end
+
+  # What ticking it does: "+1d", "+2d · defense only", "1 of 3 left".
+  def talent_bonus_effect(character, bonus, stat)
+    dice = character.bonus_dice(bonus, stat)
+    use = character.bonus_use(bonus)
+    [ ("+#{dice}d" if dice.positive?), ("defense only" if bonus.defense_only?), ("#{character.uses_left(use)} of #{use.count_at(character.level)} left" if use) ].compact.join(" · ")
+  end
+
   # "Roll 3d + 1t"; stat_roll_controller.js keeps it current as the steppers change.
   def stat_roll_label(dice, thorns)
     "Roll #{dice}d#{" + #{thorns}t" if thorns.positive?}"

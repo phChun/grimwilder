@@ -11,6 +11,10 @@
 # `open: true` when the book's list is only suggestions, `same_as` to reuse
 # another talent's list, `touchstone: true` for magic touchstones (pg. 35).
 # "arcana" are arcana a talent grants (Talent::ArcanaGrant): tier and count.
+# "bonuses" are dice a talent adds when the situation fits (Talent::Bonus),
+# ticked in the roll setup or at a roll call: `label` is our own wording,
+# `only` limits the rolls (defense, story, montage), plus `stats`, `choice`,
+# `use`, `per_mark`, `harm`, `ignore` and `auto` (see the class).
 - key: artificer
   name: Artificer
   kind: path
@@ -31,6 +35,8 @@
 
       GROWTH: At levels 2, 4, and 6, you can create +1 major arcana, and learn 2 touchstones.'
     page: 54
+    bonuses:
+    - { key: engineer, label: "Engineer: making, fixing or breaking a mechanism or arcana" }
     choices:
     - key: touchstones
       label: Known touchstones
@@ -57,6 +63,8 @@
     summary: "Replacement body parts with 3 perks, each good for +1d once a session, and a drawback."
     text: 'You have enhanced replacement body parts. Choose 3 benefits for them: built-in weapon—detachable—independent—keen sense—storage—strong. Each perk can be activated once per session to take +1d on a related roll. They also have a drawback: noisy—horrifying—unreliable—power source.'
     page: 55
+    bonuses:
+    - { key: perk, label: "A perk helps (once a session each)", choice: perks, use: perks }
     choices:
     - key: perks
       label: Perks
@@ -123,6 +131,8 @@
     summary: "+1d on montage rolls, and a 3d power pool of know-how from your travels."
     text: You take +1d on montage rolls and have a 3d power pool to represent the smattering of knowledge from your travels.
     page: 57
+    bonuses:
+    - { key: montage, label: "Every montage", only: [ montage ], auto: true }
   - name: Forked Tongue
     summary: "Given time, tell potent lies; push yourself to do it on the spot."
     text: When given time, you can tell potent lies, such as telling the king you're their bastard or a prophecy foretelling the fall of the capital. You can push yourself to do it on the spot.
@@ -135,6 +145,8 @@
     summary: "3 wises, +1 thread a session, and +1d on story rolls about what you know."
     text: You gain any 3 wises and 1 extra thread per session. You take +1d on any story rolls pertaining to what you know or story details you add.
     page: 57
+    bonuses:
+    - { key: lore, label: "It's about what you know, or a detail you added", only: [ story ] }
     uses:
     - { key: thread, thread: 1 }
   - name: Wordplay
@@ -163,6 +175,8 @@
 
       Collateral damage acts as a narrow secondary effect, as a critical, and shouldn’t be underestimated. Treat this as a perfect on a related roll against the environment or mooks, though this won’t always be a good thing.'
     page: 58
+    bonuses:
+    - { key: frenzy, label: "In a frenzy: +1d per mark, and harm and marks add no thorns", per_mark: true, ignore: damage }
     uses:
     - { key: frenzy, label: Frenzy, count: 1, per: session, growth: { 3: 1, 6: 1 } }
   talents:
@@ -230,6 +244,8 @@
     summary: "+1d when healing, spark for both on a critical, and one return from the recently dead."
     text: You take +1d when you heal someone, with magic or treatment. On a critical, both of you take spark. One time only, you can bring back the recently dead. Common sense takes precedent.
     page: 61
+    bonuses:
+    - { key: heal, label: "Healing someone, with magic or treatment" }
   - name: Iron Will
     summary: "A 2d Iron Will resource pool each session to shrug off rattled or vex."
     text: 'Each session, you have a 2d Iron Will resource pool. When you get rattled or take vex, roll the pool to ignore it. If the situation allows for it, you can also lash out at the cause or a bystander and: instill dread in their heart—sow doubt in their mind.'
@@ -241,6 +257,8 @@
     text: You always know when someone is lying, though not necessarily the truth. You take +1d on a follow-up if you reveal you know they’re lying.
     note: This could be seen through a darker lens, flavored as having been around criminal types and ne'er-do-wells for far too long.
     page: 61
+    bonuses:
+    - { key: follow-up, label: "Following up after revealing you know they're lying" }
   - name: Sermons
     summary: "Given time, potent feats of persuasion for your faith; push yourself to do it on the spot."
     text: When given time, you can pull off potent feats of persuasion in the name of your beliefs, like commanding a crowd to bring the duke for judgment or showing the goblins the glory of your god. You can push yourself to do it on the spot. One time only, you can make this a ritual-level effect.
@@ -320,6 +338,8 @@
 
       GROWTH: At levels 3 and 6, gain +1 mastery per scene.'
     page: 64
+    bonuses:
+    - { key: style, label: "Fighting or defending in your style", choice: style }
     choices:
     - key: style
       label: Fighting style
@@ -399,6 +419,8 @@
 
       GROWTH: At levels 3 and 6, gain +1 flow per scene and +1 interrupts per session.'
     page: 66
+    bonuses:
+    - { key: flow, label: "Spend 1 flow: no thorns for being outnumbered or a single imposing foe (leave them off)", dice: 0, use: flow }
     uses:
     - { key: interrupts, label: Interrupts, count: 1, per: session, growth: { 3: 1, 6: 1 } }
     - { key: flow, label: Flow, count: 4, per: scene, growth: { 3: 1, 6: 1 } }
@@ -420,6 +442,8 @@
     summary: "Always act first, and ignore non-damage thorns on Agility defense rolls."
     text: You can always act first, unless completely surprised. You also ignore thorns on Agility defense rolls, except for those from damage.
     page: 67
+    bonuses:
+    - { key: reflexes, label: "Agility defense: only damage adds thorns", dice: 0, only: [ defense ], stats: [ agility ], ignore: situational, auto: true }
   - name: Mind Over Matter
     summary: "Take a mental mark instead of a physical one; spark when you clear a mark by rolling."
     text: When you take a physical mark, you can instead choose to take a mental mark. When you clear a mark by rolling it, take spark.
@@ -449,6 +473,8 @@
 
       GROWTH: At levels 2, 4, and 6, gain +1 smite per session.'
     page: 68
+    bonuses:
+    - { key: tenets, label: "+1d for each thorn from harm", harm: true, auto: true }
     uses:
     - { key: smite, label: Smite, count: 3, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
   talents:
@@ -456,6 +482,8 @@
     summary: "+1d defending yourself from physical harm, with extra effects on a perfect."
     text: 'You take +1d when making a defense roll to protect yourself from physical harm. On a perfect, you can also: keep their attention on you—rekindle hope in an ally—inspire action in a bystander.'
     page: 69
+    bonuses:
+    - { key: aegis, label: "Defending yourself from physical harm", only: [ defense ] }
   - name: Authority
     summary: "NPCs feel your authority, and thread sets how; push yourself for potent commands."
     text: 'Your presence fills the air with authority. The GM judges an NPC’s response, or you can spend thread to set it: admiration—obedience—respect—defiance. You can push yourself to pull off a potent feat of righteous command, such as ordering a demon to kneel or silencing a riot with a word.'
@@ -464,12 +492,16 @@
     summary: "Once a session, challenge a foe for +1d against them, but they get 1 suspense."
     text: Once per session you can challenge a foe, taking +1d on all rolls against them, but give them 1 suspense. If they do anything besides confront you, you can interrupt it. The challenge ends if an ally engages your foe, or your interrupt result is less than a perfect. You can push yourself to do it again.
     page: 69
+    bonuses:
+    - { key: challenge, label: "Against the foe you challenged" }
     uses:
     - { key: challenge, label: Challenge, count: 1, per: session }
   - name: Dauntless
     summary: "Spark when a roll is cut, +1d on story rolls when dropped, and a perfect keeps you up."
     text: Take spark when your roll is cut. Take +1d on story rolls if dropped. On a perfect, you don't get dropped.
     page: 69
+    bonuses:
+    - { key: dropped, label: "You were dropped", only: [ story ] }
   - name: Divine Blessing
     summary: "Cleric spellcasting with one 4d rite pool each session."
     text: 'You have spellcasting as the Channel Divinity talent. Detail your god and choose 1 rite, a 4d power pool (per session). You can drop 1d and roll the pool to cast a potent spell. [Prohibited: Cleric]'
@@ -484,6 +516,8 @@
     summary: "When the GM spends suspense on an impact move, +1d on your follow-up against the source."
     text: When the GM spends suspense to prompt an impact move, you take +1d on any follow-up action against the source. On a critical, take spark. (Roll, then choose an option, rewrite for clarity.)
     page: 69
+    bonuses:
+    - { key: rebuke, label: "Following up against the source of a suspense-prompted impact move" }
 - key: psion
   name: Psion
   kind: path
@@ -536,6 +570,8 @@
     text: 'You’re able to turn your psychic volatility against others. You can freely create weapons made from pure willpower, using them with Wits. You take +1d to follow up with them when you: take vex—increase your instability.'
     note: This talent can be poached by any spellcaster. Flavor the weapons with your magical trappings.
     page: 71
+    bonuses:
+    - { key: follow-up, label: "Following up with a psychic weapon after taking vex or instability" }
   - name: Shift Form
     summary: "A 2d Shifter resource pool each session to alter your features and form."
     text: Each session, you have a 2d Shifter resource pool. You can roll the pool to alter your features and form, though you keep the same basic shape.
@@ -569,6 +605,8 @@
 
       GROWTH: At levels 3 and 6, gain +1d to your Quarry pool.'
     page: 72
+    bonuses:
+    - { key: prowler, label: "Prowler: stealth, traversal or traps in familiar terrain" }
     uses:
     - { key: designations, label: Quarry designations, count: 2, per: session }
     - { key: quarry, label: Quarry, pool: 2, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
@@ -606,6 +644,8 @@
     summary: "Push yourself to shout \"Look out!\": everyone takes +1d on the defense and the follow-up."
     text: You can push yourself to tell your allies to Look Out! and goad the GM into spending suspense on a move you declare to attack your party. Anyone involved takes +1d on a defense roll and follow-up action rolls.
     page: 73
+    bonuses:
+    - { key: look-out, label: "After Look Out!: the defense or a follow-up" }
   - name: Sharpshooter
     summary: "Given time, potent feats of ranged precision; push yourself to do it on the spot."
     text: When given time, you can pull off potent feats of ranged precision, such as shooting just beyond maximum range or into near complete cover. You can push yourself to do it on the spot.
@@ -631,6 +671,8 @@
 
       GROWTH: At levels 3 and 6, gain +1d Competence per session and +1 skill.'
     page: 74
+    bonuses:
+    - { key: skill, label: "Using a chosen skill", choice: skills }
     choices:
     - key: skills
       label: Skills
@@ -647,6 +689,8 @@
     text: You gain 1 thread per session and can spend thread to flashback, establishing how you planned for the current situation. Make a montage roll, taking +1d if it fell within your expertise. The GM must take suspense in place of an impact move.
     note: 'This can cover any kinds of planning. Consider your other talents and abilities as well, for example: if you have spellcasting, perhaps you prepared by using magic ahead of time.'
     page: 75
+    bonuses:
+    - { key: expertise, label: "A flashback within your expertise", only: [ montage ] }
     rolls:
     - { kind: montage, label: "Flashback: the plan", thread: 1 }
     uses:
@@ -671,6 +715,8 @@
     summary: "+1d following up when someone nearby defends; push to add a critical bonus to an ally."
     text: When someone nearby rolls defense, you take +1d on an immediate follow-up. On a critical by a nearby ally, you can push yourself to add a critical bonus.
     page: 75
+    bonuses:
+    - { key: follow-up, label: "Following up right after someone nearby rolled defense" }
   - name: Poisoner
     summary: "A 4d Poisons resource pool each session: knockout, paralytic, truth serum and more."
     text: 'Each session, you have a 4d Poisons resource pool. You have access to the following poisons: hallucinations—knockout—memory loss—nausea—paralytic—truth serum. They each take a bit of time to work and are most effective if ingested.'
@@ -733,6 +779,8 @@
     summary: "Always notice magic nearby, +1d to disrupt it, and given time, learn its details."
     text: You always notice magical effects near you, and take +1d when you disrupt them. Given time, you can discern their details (ask 2 questions).
     page: 77
+    bonuses:
+    - { key: disrupt, label: "Disrupting a magical effect" }
   - name: Metamagic
     summary: "Twice a session, give a spell an extra touchstone: controlled, distant, subtle and more."
     text: 'Twice per session, you can alter your magic as it flows through you, modifying the effect or casting by giving it an extra touchstone: controlled—distant—intense—lasting—subtle—quick.'
@@ -765,6 +813,8 @@
     summary: "When an ally is hurt or dropped, +1d and potency on your next spell if you lash out."
     text: When a nearby ally takes harm or is dropped, you take +1d and potency on your next spell, if you immediately lash out.
     page: 77
+    bonuses:
+    - { key: wrath, label: "Lashing out with a spell after a nearby ally took harm or dropped" }
 - key: summoner
   name: Summoner
   kind: path
@@ -800,12 +850,16 @@
     text: Once per session, a creature you control can interrupt an impact move against you. On a grim, they take the impact move instead. Either way, you take +1d on your follow-up against the attacker.
     note: This isn’t limited to your vassal. Animal companions, and familiars can protect you just as well.
     page: 79
+    bonuses:
+    - { key: follow-up, label: "Following up against the attacker your creature stopped" }
     uses:
     - { key: fierce-protector, label: Fierce Protector, count: 1, per: session }
   - name: Shared Soul
     summary: "Merge with your vassal, sharing talents, aspects and harm, and using its pool or your stats."
     text: You can merge with your vassal, sharing path talents, aspects, and incoming harm. You can choose to use the power pool or your own stats, and when your anchors break, take +1d on the story roll.
     page: 79
+    bonuses:
+    - { key: anchors, label: "Your anchors broke", only: [ story ] }
   - name: Ley Magic
     summary: "Once a session, bend local leylines to draw or repel creatures, or enhance or dampen magic."
     text: 'Once per session, you can temporarily alter the leylines in the area to: draw or repel certain creatures—enhance or dampen magic. When you alter a place like this, you know when others enter the area. You can push yourself to do it again.'
@@ -859,6 +913,8 @@
     summary: "+1d with 2 skills from the Expertise list."
     text: 'Choose two skills from the Expertise talent (pg. 74). Take +1d when using these skills. [Prohibited: Rogue]'
     page: 81
+    bonuses:
+    - { key: skill, label: "Using a chosen skill", choice: skills }
     choices:
     - key: skills
       label: Skills
@@ -868,6 +924,8 @@
     summary: "Push yourself and use your surroundings creatively to take +1d."
     text: You can push yourself and describe your creative use of your surroundings to take +1d. These improvised weapons and tools often stretch the bounds of reality with their use.
     page: 81
+    bonuses:
+    - { key: improvise, label: "Improvising with your surroundings (push yourself from the card)" }
   - name: Lucky
     summary: "A 1d Luck pool each session to roll as a bonus die after any roll. Spark on a grim."
     text: Each session you have a 1d Luck pool. You can roll it as a bonus die after any roll you make and story rolls related to you. On a grim, take spark.
@@ -878,6 +936,8 @@
     summary: "Once a session, goad the GM into targeting only you, with +1d on that defense."
     text: 'Once per session, through insult, boast, or challenge, you can goad the GM into spending suspense on an impact move targeting only you. You take +1d on the defense roll, and on a perfect, your foe: is compelled to keep lashing out—leaves an opening—is utterly embarrassed.'
     page: 81
+    bonuses:
+    - { key: provoke, label: "Defending against the move you provoked", only: [ defense ] }
     uses:
     - { key: provoke, label: Provoke, count: 1, per: session }
   - name: The Legend of…
@@ -984,6 +1044,8 @@
     text: Take +1d on a ritual’s invocation and replace any one of its anchors with yourself. When you complete a ritual in this way, take spark.
     note: This stacks. Make a coven with your fellow casters!
     page: 83
+    bonuses:
+    - { key: invocation, label: "A ritual's invocation" }
   - name: Visions
     summary: "Ask the GM a question for a cryptic but true answer, then defend against rattled."
     text: You can open your mind to seek forbidden knowledge. Ask the GM a specific question. The answer may be cryptic or twisted, but it will never be a lie. Make a defense roll against rattled after the answer.
@@ -1011,6 +1073,8 @@
 
       GROWTH: At levels 2, 4, and 6, you gain +2 words of power.'
     page: 84
+    bonuses:
+    - { key: ritualist, label: "Ritualist: completing a ritual invocation" }
     choices:
     - key: words
       label: Words of power
@@ -1137,6 +1201,8 @@
     summary: "+1d and an extra potent casting each session with one spell theorem."
     text: Choose one of your spell theorems. You take +1d when casting it and gain 1 extra potent spell casting of it per session. Your name becomes linked to it, and it begins to spread in popularity throughout wizardry—track it with campaign pools.
     page: 87
+    bonuses:
+    - { key: theorem, label: "Casting your mastered theorem", choice: theorem }
     choices:
     - key: theorem
       label: Mastered theorem

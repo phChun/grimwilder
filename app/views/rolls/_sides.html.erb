@@ -3,7 +3,7 @@
 <ul class="quarrel-sides">
   <% roll.sides.each do |side| %>
     <li class="<%= class_names("quarrel-side", "quarrel-side--winner": roll.quarrel? && side["name"] == roll.winner) %>">
-      <span class="quarrel-side__name"><%= side["name"] %><% if side["spark_spent"].positive? %> + <%= side["spark_spent"] %> spark<% end %><% if roll.montage? %>: <%= side["outcome"] %><%= " (critical)" if side["critical"] %><% end %></span>
+      <span class="quarrel-side__name"><%= side["name"] %><%= side_extras(side) %><% if roll.montage? %>: <%= side["outcome"] %><%= " (critical)" if side["critical"] %><% end %></span>
       <span class="feed-roll__dice"><%= side_dice_tags(side) %></span>
     </li>
   <% end %>

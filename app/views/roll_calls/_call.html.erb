@@ -1,5 +1,5 @@
 <%# locals: (call:, error: nil) %>
-<%# A story roll, montage or quarrel waiting on its players (RollCall), as a modal for everyone in it, the GM and whoever called it. Your own seats get a spark choice and a Roll button; the GM can roll for anyone waiting, without their spark. Once everyone has rolled it shows the result. Rendered per viewer (never in a broadcast), so it can use Current. %>
+<%# A story roll, montage or quarrel waiting on its players (RollCall), as a modal for everyone in it, the GM and whoever called it. Your own seats get a spark choice, ticks for the talents that could add a die (Character::TalentBonuses; the ones that always apply are listed and counted) and a Roll button; the GM can roll for anyone waiting, without their spark. Once everyone has rolled it shows the result. Rendered per viewer (never in a broadcast), so it can use Current. %>
 <% me = Current.identity %>
 <% gm = me.membership_in(call.campaign)&.gm? %>
 <% title_id = "roll-call-title-#{call.id}" %>
@@ -47,7 +47,7 @@
             <% if seat["dice"] %>
               <div class="roll-call__rolled">
                 <span class="roll-call__dice"><%= roll_call_dice_tags(seat) %></span>
-                <small class="roll-call__meta"><% if seat["spark"].positive? %>+<%= seat["spark"] %> spark<% end %><% if seat["rolled_by"] %><%= " · " if seat["spark"].positive? %>rolled by <%= seat["rolled_by"] %><% end %></small>
+                <small class="roll-call__meta"><%= roll_call_seat_meta(seat) %></small>
               </div>
             <% elsif character&.owned_by?(me) %>
               <%= form_with url: campaign_roll_call_rolls_path(call.campaign), class: "roll-call__roll" do %>
@@ -56,7 +56,18 @@
                 <% if !call.assist?(seat) && character.spark.positive? %>
                   <%= render "shared/segmented", name: "spark", legend: "Spend spark (+1d each)", options: (0..character.spark).map { [ _1, _1.zero? ? "No spark" : "+#{_1} spark" ] }, checked: 0, id_prefix: "roll_call_#{call.id}_#{character.id}_spark", classes: "segmented--auto roll-call__spark" %>
                 <% end %>
-                <button type="submit" class="button button--primary" autofocus>Roll <%= call.base_dice(seat) %>d<% if call.story? && call.thorns.positive? %> vs <%= call.thorns %>t<% end %></button>
+                <% talents = call.assist?(seat) ? [] : character.talent_bonuses_for_call(call.kind) %>
+                <% talents.each do |talent, bonus| %>
+                  <% if bonus.auto? %>
+                    <span class="roll-call__talent roll-call__talent--auto"><%= icon(:check) %> <span><strong><%= talent.name %>:</strong> <%= bonus.label %> <small>+<%= bonus.dice %>d</small></span></span>
+                  <% else %>
+                    <label class="check roll-call__talent">
+                      <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "roll_call_#{call.id}_#{character.id}_bonus_#{bonus.id.parameterize}" %>
+                      <span><strong><%= talent.name %>:</strong> <%= bonus.label %> <small>+<%= bonus.dice %>d</small></span>
+                    </label>
+                  <% end %>
+                <% end %>
+                <button type="submit" class="button button--primary" autofocus>Roll <%= call.base_dice(seat) + talents.select { _2.auto? }.sum { _2.dice } %>d<% if call.story? && call.thorns.positive? %> vs <%= call.thorns %>t<% end %></button>
               <% end %>
             <% elsif gm %>
               <%= button_to "Roll for them", campaign_roll_call_rolls_path(call.campaign), params: { roll_call_id: call.id, character_id: seat["character_id"] }, class: "button button--small", "aria-label": "Roll for #{seat["name"]}" %>
