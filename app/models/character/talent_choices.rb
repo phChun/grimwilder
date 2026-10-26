@@ -3,6 +3,11 @@
 # talents can have them: the core, chosen ones and Eldritch Talents.
 #
 # talent_choices: { "expertise" => { "skills" => ["stealth", "lying", "duel"] } }.
+# A spell theorem keeps its school with it: "wild fire (evocation)".
+#
+# Some choices pick from the character's other picks (Bailiwick's word from
+# Hidden Magic's words, Mastered Theorem from the theorems); without those
+# talents, the player types their own.
 #
 # Picking fewer than the slots is fine (the card asks for the rest). Like the
 # talent limit, picks are checked only when they change, and only the choices
@@ -21,6 +26,18 @@ module Character::TalentChoices
 
   def picks_for(choice)
     Array(talent_choices.dig(choice.talent_key, choice.key))
+  end
+
+  # What the choice picks from: the book's list, or the character's own picks
+  # for the talents it draws on.
+  def choice_options(choice)
+    return choice.options unless choice.from_picks?
+
+    choice_sources_held(choice).flat_map { picks_for(_1) }.uniq
+  end
+
+  def choice_open?(choice)
+    choice.open? || (choice.from_picks? && choice_sources_held(choice).empty?)
   end
 
   # { choice => [picks] } for each of the talent's choices.
@@ -52,7 +69,7 @@ module Character::TalentChoices
 
     picks.to_h.each do |choice_key, values|
       choice = talent.choice(choice_key) or raise ActiveRecord::RecordNotFound, "#{talent.name} has no choice #{choice_key.inspect}"
-      values = Array(values).map { _1.to_s.squish.first(Character::WORD_LIMIT) }.compact_blank.map { choice.canonical(_1) || _1 }
+      values = Array(values).map { clean_pick(choice, _1) }.compact_blank
       values.empty? ? chosen.delete(choice.key) : chosen[choice.key] = values
     end
 
@@ -60,6 +77,20 @@ module Character::TalentChoices
   end
 
   private
+    def choice_sources_held(choice)
+      held = [ *talent_entries, *eldritch_talent_entries ].map(&:key)
+      choice.picks_sources.select { held.include?(_1.talent_key) }
+    end
+
+    # Squished and capped, in the option's own spelling when it's one of them;
+    # a theorem's school lowercased after its name.
+    def clean_pick(choice, value)
+      name, school = choice.school? ? Talent::Choice.split_school(value.to_s.squish) : [ value, nil ]
+      name = name.to_s.squish.first(Character::WORD_LIMIT)
+      name = choice_options(choice).find { _1.casecmp?(name) } || name
+      Talent::Choice.join_school(name, school)
+    end
+
     def talent_choices_fit
       before = talent_choices_was.to_h
       talents = [ *talent_entries, *eldritch_talent_entries ].index_by(&:key)
@@ -88,12 +119,19 @@ module Character::TalentChoices
       slots = choice_slots(choice)
       noun = choice.noun
 
-      unless choice.open?
-        values.reject { choice.options.include?(_1) }.each do |value|
+      unless choice_open?(choice)
+        options = choice_options(choice)
+        values.reject { options.include?(_1) }.each do |value|
           errors.add(:base, "#{value.inspect} isn't one of #{talent.name}'s #{noun.pluralize}")
         end
       end
-      if values.map(&:downcase).uniq.size < values.size
+      if choice.school?
+        values.filter_map { Talent::Choice.split_school(_1).last }.reject { Grimwild.magic_schools.key?(_1) }.each do |school|
+          errors.add(:base, "#{school.inspect} isn't a school of magic")
+        end
+      end
+      names = choice.school? ? values.map { Talent::Choice.split_school(_1).first } : values
+      if names.map(&:downcase).uniq.size < names.size
         errors.add(:base, "#{talent.name} has the same #{noun} twice")
       end
       if values.size > slots

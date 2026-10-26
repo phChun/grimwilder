@@ -19,7 +19,7 @@
 #   stored as "wild fire (evocation)".
 class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :from, :groups, :min_each, :open, :same_as, :touchstone, :growth,
   :from_list, :from_picks, :crucible, :table, :school)
-  SCHOOLED = /\A(?<name>.+?) \((?<school>[a-z]+)\)\z/
+  SCHOOLED = /\A(?<name>.+?) \((?<school>[a-z]+)\)\z/i
 
   # "wild fire (evocation)" => ["wild fire", "evocation"]; a name alone has no school.
   def self.split_school(value)
@@ -114,10 +114,5 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
 
   def group_of(value)
     option_groups.find { |_, values| values.include?(value) }&.first
-  end
-
-  # The option's own spelling for a pick typed or posted in another case.
-  def canonical(value)
-    options.find { _1.casecmp?(value) }
   end
 end

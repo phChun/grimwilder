@@ -109,7 +109,6 @@ class TalentChoiceTest < ActiveSupport::TestCase
     assert_equal [ "Above board", "Below table" ], skills.option_groups.keys
     assert_equal [ 3, 4, 5 ], [ 1, 3, 6 ].map { skills.slots_at(_1) }
     assert_equal "Below table", skills.group_of("stealth")
-    assert_equal "forgery & disguise", skills.canonical("Forgery & Disguise")
 
     moxie = Talent.find("natural-moxie").choice(:skills)
     assert_equal skills.options, moxie.options

@@ -25,8 +25,21 @@ module Character::TalentUses
     talent_use_list.select(&:thread?).sum(&:thread)
   end
 
+  # A count, or for a use named by a choice (Hidden Magic's words), the names burned.
   def uses_spent(use)
-    talent_uses.fetch(use.id, 0).to_i
+    spent = talent_uses.fetch(use.id, 0)
+    spent.is_a?(Array) ? spent.size : spent.to_i
+  end
+
+  # One label per box for a named use: the character's picks in order, then
+  # nil for boxes with no pick yet.
+  def use_box_names(use)
+    picks = use.named? ? picks_for(talent_entry(use.talent_key).choice(use.named_by)) : []
+    Array.new(use.count_at(level)) { picks[_1] }
+  end
+
+  def burned_names(use)
+    Array(talent_uses[use.id]).grep(String)
   end
 
   def uses_left(use)
@@ -37,6 +50,16 @@ module Character::TalentUses
   def spend_use!(use_id, spent:)
     use = use_counters.find { _1.id == use_id } or raise ArgumentError, "#{name} has no talent use #{use_id.inspect}."
     update!(talent_uses: talent_uses.merge(use.id => spent.to_i.clamp(0, use.count_at(level))))
+    use
+  end
+
+  # Burns or restores one named box (a word of power) by its name.
+  def toggle_named_use!(use_id, name)
+    use = use_counters.select(&:named?).find { _1.id == use_id } or raise ArgumentError, "#{self.name} has no named talent use #{use_id.inspect}."
+    raise ArgumentError, "#{name.inspect} isn't one of #{self.name}'s #{use.label.downcase}." unless use_box_names(use).compact.include?(name)
+
+    burned = burned_names(use)
+    update!(talent_uses: talent_uses.merge(use.id => burned.include?(name) ? burned - [ name ] : burned + [ name ]))
     use
   end
 

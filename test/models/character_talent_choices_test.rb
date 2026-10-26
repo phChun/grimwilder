@@ -98,4 +98,68 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
     vex.remove_eldritch_talent!("eldritch-affinity")
     assert_empty vex.reload.talent_choices
   end
+
+  test "spell theorems keep their school, which has to be a real one" do
+    wizard = identities(:pip).characters.create!(name: "Mo", path: "Wizard", brawn: 1, agility: 2, wits: 3, presence: 2)
+
+    wizard.choose_for_talent!("spellcraft", "theorems" => [ "Wild  Fire (Evocation)", "fire sentinel (transmutation)", "frost ring" ])
+    assert_equal [ "Wild Fire (evocation)", "fire sentinel (transmutation)", "frost ring" ], wizard.reload.talent_choices.dig("spellcraft", "theorems")
+
+    error = assert_raises(ActiveRecord::RecordInvalid) { wizard.choose_for_talent!("spellcraft", "theorems" => [ "wild fire (pyromancy)" ]) }
+    assert_match(/"pyromancy" isn't a school/, error.message)
+    error = assert_raises(ActiveRecord::RecordInvalid) { wizard.reload.choose_for_talent!("spellcraft", "theorems" => [ "wild fire (evocation)", "Wild fire (illusion)" ]) }
+    assert_match(/same theorem twice/, error.message)
+  end
+
+  test "Mastered Theorem picks from the character's own theorems" do
+    wizard = identities(:pip).characters.create!(name: "Mo", path: "Wizard", brawn: 1, agility: 2, wits: 3, presence: 2, talent_keys: [ "mastered-theorem" ])
+    mastered = Talent.find("mastered-theorem").choice(:theorem)
+    assert_not wizard.choice_open?(mastered)
+    assert_empty wizard.choice_options(mastered)
+
+    wizard.choose_for_talent!("spellcraft", "theorems" => [ "wild fire (evocation)", "frost ring" ])
+    assert_equal [ "wild fire (evocation)", "frost ring" ], wizard.choice_options(mastered)
+
+    wizard.choose_for_talent!("mastered-theorem", "theorem" => [ "Frost Ring" ])
+    assert_equal [ "frost ring" ], wizard.reload.talent_choices.dig("mastered-theorem", "theorem")
+    assert_raises(ActiveRecord::RecordInvalid) { wizard.choose_for_talent!("mastered-theorem", "theorem" => [ "ice storm" ]) }
+  end
+
+  test "Bailiwick without Hidden Magic: the player names their own word" do
+    @tibbs.update!(talent_keys: [ "bailiwick" ])
+    bailiwick = Talent.find("bailiwick").choice(:word)
+    assert @tibbs.choice_open?(bailiwick)
+
+    @tibbs.choose_for_talent!("bailiwick", "word" => [ "star" ])
+    assert_equal [ "star" ], @tibbs.reload.picks_for(bailiwick)
+  end
+
+  test "Specialty School picks from the book's schools" do
+    @tibbs.update!(talent_keys: [ "specialty-school" ])
+    @tibbs.choose_for_talent!("specialty-school", "school" => [ "Illusion" ])
+    assert_equal [ "illusion" ], @tibbs.reload.talent_choices.dig("specialty-school", "school")
+    assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("specialty-school", "school" => [ "pyromancy" ]) }
+  end
+
+  test "Hidden Magic burns its words by name, and a session brings them back" do
+    witch = identities(:pip).characters.create!(name: "Nell", path: "Witch", brawn: 1, agility: 2, wits: 2, presence: 3)
+    words = Talent.find("hidden-magic").uses.sole
+    assert_equal [ nil ] * 6, witch.use_box_names(words)
+
+    witch.choose_for_talent!("hidden-magic", "words" => %w[ star storm grace ])
+    assert_equal [ "star", "storm", "grace", nil, nil, nil ], witch.use_box_names(words)
+
+    witch.toggle_named_use!("hidden-magic/words", "storm")
+    witch.toggle_named_use!("hidden-magic/words", "star")
+    assert_equal %w[ storm star ], witch.reload.burned_names(words)
+    assert_equal 2, witch.uses_spent(words)
+    assert_equal 4, witch.uses_left(words)
+
+    witch.toggle_named_use!("hidden-magic/words", "storm")
+    assert_equal %w[ star ], witch.reload.burned_names(words)
+    assert_raises(ArgumentError) { witch.toggle_named_use!("hidden-magic/words", "moon") }
+
+    witch.reset_talent_uses(per: :session)
+    assert_empty witch.burned_names(words)
+  end
 end
