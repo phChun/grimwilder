@@ -14,3 +14,9 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+# One arcanum, many arcana (pg. 40). The book says "arcana" for one item too,
+# and so does the UI; the code keeps the Latin singular so Rails can tell them apart.
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "arcanum", "arcana"
+end

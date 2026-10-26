@@ -1,5 +1,5 @@
 # Reference lists from the book (config/grimwild.yml): paths, backgrounds,
-# traits, desires, schools of magic, weapon styles, bonds and arcs.
+# traits, desires, schools of magic, arcana functions, weapon styles, bonds and arcs.
 module Grimwild
   STATS = %w[ brawn agility wits presence ].freeze
   PHYSICAL_STATS = %w[ brawn agility ].freeze
@@ -14,7 +14,7 @@ module Grimwild
       @data ||= load_data
     end
 
-    %w[ stats paths backgrounds traits desires magic_schools weapon_styles bond_intensities bond_natures arcs ].each do |key|
+    %w[ stats paths backgrounds traits desires magic_schools arcana_functions weapon_styles bond_intensities bond_natures arcs ].each do |key|
       define_method(key) { data.fetch(key) }
     end
 

@@ -152,6 +152,20 @@ class TalentChoiceTest < ActiveSupport::TestCase
   end
 end
 
+class TalentArcanaGrantTest < ActiveSupport::TestCase
+  test "every arcana grant is well formed" do
+    grants = Talent.all.flat_map(&:arcana)
+    assert_equal %w[ archivist archivist infusion magnum-opus trophies ], grants.map(&:talent_key).sort
+
+    grants.each do |grant|
+      assert_includes Arcanum::TIERS, grant.tier, grant.talent_key
+      assert_operator grant.count, :>=, 1, grant.talent_key
+      assert grant.growth.keys.all? { (2..7).cover?(_1) }, grant.talent_key
+      assert_equal "mythic", grant.tier, "#{grant.talent_key}: an opus is mythic" if grant.opus
+    end
+  end
+end
+
 class TalentTextTest < ActiveSupport::TestCase
   test "no stray control characters from the PDF's hyphenation" do
     Talent.all.each do |talent|

@@ -67,7 +67,7 @@
           </ul>
         <% end %>
         <% if tends && left.positive? %>
-          <%= link_to "Choose #{picks.any? ? "#{left} more" : left} #{choice.nouns(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
+          <%= link_to "#{choice.optional? ? "Optional: choose" : "Choose"} #{picks.any? ? "#{left} more" : left} #{choice.nouns(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
         <% end %>
         <% if tends && extra.positive? %>
           <p class="talent-over">Level <%= character.level %> has room for <%= character.choice_slots(choice) %> <%= choice.nouns(character.choice_slots(choice)) %>. <%= link_to "Drop #{extra == 1 ? "one" : extra}", edit_character_talent_choices_path(character, talent.key), data: { turbo_frame: "modal" } %>.</p>
