@@ -119,7 +119,7 @@
             </div>
             <p class="stat-card__desc"><%= description %></p>
             <% if editable && @character.in_play? %>
-              <%= render "characters/roll_form", character: @character, stat: stat, allies: @allies %>
+              <%= render "characters/roll_form", character: @character, stat: stat, allies: @allies, cast: params[:cast] %>
             <% end %>
           </article>
         <% end %>

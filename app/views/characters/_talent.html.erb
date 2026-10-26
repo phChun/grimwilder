@@ -7,6 +7,7 @@
 <% removable = editable && !talent.core? %>
 <% rolls = editable && character.campaign && !character.up_for_grabs? && character.in_play? ? talent.rolls : [] %>
 <% pushes = editable && character.in_play? && talent.pushes? %>
+<% casts = editable && character.in_play? ? talent.casts : nil %>
 <article id="talent-<%= talent.key %>" class="<%= class_names("talent-card", "talent-card--core": talent.core?, "talent-card--eldritch": eldritch, "talent-card--skinned": talent.skinned?) %>">
   <div class="talent-card__head">
     <h3 class="talent-card__name"><%= talent.name %></h3>
@@ -183,8 +184,15 @@
     </div>
   <% end %>
 
-  <% if rolls.any? || pushes %>
+  <% if rolls.any? || pushes || casts %>
     <div class="talent-card__actions">
+      <% if casts == "rite" %>
+        <p class="talent-card__chip">Cast: roll a rite pool as an action from its ⋯; drop 1d first for a potent spell.</p>
+      <% elsif casts %>
+        <%= link_to character_path(character, cast: talent.key, anchor: "stats"), class: "button button--small talent-card__roll" do %>
+          <%= icon(:die, size: 16) %> <span>Cast</span> <small><%= casts.capitalize %></small>
+        <% end %>
+      <% end %>
       <% rolls.each do |roll| %>
         <%= button_to character_talent_roll_path(character, talent.key), params: { index: roll.index }, class: "button button--small talent-card__roll", form: { class: "talent-card__action" } do %>
           <%= icon(:die, size: 16) %> <span><%= roll.label %></span> <small><%= roll.dice_label %><%= " · spends #{roll.cost}" if roll.cost %></small>
