@@ -10,6 +10,7 @@
   </header>
   <%= render "talents/kinds", talent: talent %>
   <p class="talent__summary"><%= talent.summary %></p>
+  <% if talent.choices.any? %><p class="talent__choices">Choose <%= talent.choices.map(&:to_s).to_sentence %></p><% end %>
   <% if talent.core? && talent.growth %><p class="talent-card__growth"><span class="talent-card__label">Grows</span> <%= talent.growth %></p><% end %>
   <%# The summary is our gist; the book's text and tip fold away (search still matches them). %>
   <details class="fold talent__more">

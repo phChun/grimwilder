@@ -72,4 +72,50 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
     get edit_character_talent_choices_path(@tibbs, "flight")
     assert_response :not_found
   end
+
+  test "the card shows the picks as chips and asks for the rest" do
+    @tibbs.choose_for_talent!("expertise", "skills" => [ "sleight of hand" ])
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+
+    assert_select "#talent-expertise .talent-card__label", "Skills"
+    assert_select "#talent-expertise .talent-card__pick", "Sleight of Hand"
+    assert_select "#talent-expertise a.talent-card__pick-more[data-turbo-frame=modal][href=?]", edit_character_talent_choices_path(@tibbs, "expertise"), text: "Choose 2 more skills"
+    assert_select "#talent-expertise-menu a[href=?]", edit_character_talent_choices_path(@tibbs, "expertise"), text: "Choose skills…"
+  end
+
+  test "touchstones are labelled as such, and other players see picks without the links" do
+    ash = identities(:gwen).characters.create!(name: "Ash", path: "Sorcerer", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: campaigns(:bramblewood))
+    ash.choose_for_talent!("sorcery", "paths" => %w[ flame ])
+
+    sign_in_as identities(:pip)
+    get character_path(ash)
+    assert_select "#talent-sorcery .talent-card__label", "Touchstones"
+    assert_select "#talent-sorcery .talent-card__pick", "Flame"
+    assert_select "#talent-sorcery .talent-card__pick-more", 0
+  end
+
+  test "over the cap after a level drop, the card says so" do
+    @tibbs.update!(level: 3, talent_keys: %w[ lucky wisps flight ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel evade lying stealth ])
+    @tibbs.update!(level: 1, talent_keys: %w[ lucky ])
+
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+    assert_select "#talent-expertise .talent-over", /room for 3 skills/
+  end
+
+  test "taking a talent with picks lands on its card" do
+    @tibbs.update!(talent_keys: [])
+    sign_in_as identities(:pip)
+    post character_talents_path(@tibbs), params: { talent: "flight" }
+
+    assert_redirected_to character_path(@tibbs, anchor: "talent-flight")
+    assert_equal "Gibbletibble \"Tibbs\" took Flight. Choose 2 benefits on its card.", flash[:notice]
+  end
+
+  test "the catalog says what a talent asks you to pick" do
+    get talents_path
+    assert_select "#talent-artificial-parts .talent__choices", "Choose 3 perks and 1 drawback"
+  end
 end

@@ -36,6 +36,12 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
     touchstone? ? "Touchstones" : label
   end
 
+  # "3 skills", at level 1 or the one given.
+  def to_s(level = 1)
+    slots = slots_at(level)
+    "#{slots} #{noun.pluralize(slots)}"
+  end
+
   def slots_at(level)
     pick + growth.sum { |at, more| at <= level ? more : 0 }
   end
