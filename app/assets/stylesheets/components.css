@@ -2545,3 +2545,18 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .talent-choice__box > .field__input { flex: 1 1 12rem; min-width: 0; }
 .talent-choice__box > .talent-choice__school { flex: 0 1 11rem; }
 .talent-choice__crucible .crucible { margin-top: var(--space-2); }
+
+/* Arcana on the sheet (characters/_arcana, _arcanum) and their form. */
+.arcana-grants { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 var(--space-3); padding: 0; list-style: none; font-size: 0.9rem; color: var(--muted); }
+.arcana-grants__item { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); align-items: baseline; }
+.arcana-grants__item a { color: var(--ember); }
+.arcanum-card--mythic { border-color: color-mix(in srgb, var(--spark) 45%, var(--line)); }
+.arcanum-card--used { opacity: 0.6; }
+.arcanum-card__function { border-color: var(--ember); color: var(--ember); }
+.arcanum-card__opus { display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-2); }
+.arcanum-card__opus .talent-card__label { margin: 0; }
+.arcanum-form__group { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
+.arcanum-form__options { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--space-1) var(--space-3); }
+.arcanum-form__options--row { display: flex; flex-wrap: wrap; }
+.arcanum-form__option { align-items: flex-start; min-height: var(--tap); }
+.arcanum-form__option small { display: block; color: var(--muted); }

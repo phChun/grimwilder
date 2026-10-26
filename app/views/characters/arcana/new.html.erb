@@ -1,0 +1,11 @@
+<% content_for :title, "New arcana · #{@character.name}" %>
+
+<%# Its own page, and from the sheet's Arcana section a modal (shared/_frame_modal). %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to @character.name, character_path(@character) %></p>
+    <h1><%= @arcanum.granted_by ? "Arcana from #{@arcanum.granted_by.name}" : "New arcana" %></h1>
+    <p class="page-header__lede">A relic of power: start with an idea, pick a function, add two touchstones, decide its tier and describe it (pg. 42).</p>
+  </header>
+  <%= render "characters/arcana/form", character: @character, arcanum: @arcanum %>
+<% end %>

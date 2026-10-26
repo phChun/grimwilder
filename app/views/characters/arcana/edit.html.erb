@@ -1,0 +1,10 @@
+<% content_for :title, "#{@arcanum.name} · #{@character.name}" %>
+
+<%# Its own page, and from an arcana's ⋯ menu a modal (shared/_frame_modal). %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to @character.name, character_path(@character) %></p>
+    <h1><%= @arcanum.name %></h1>
+  </header>
+  <%= render "characters/arcana/form", character: @character, arcanum: @arcanum %>
+<% end %>

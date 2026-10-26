@@ -28,6 +28,10 @@ Rails.application.routes.draw do
         resource :push, only: :create, controller: "talent_pushes"
       end
       resource :talent_uses, only: :update
+      resources :arcana, only: %i[ new create edit update destroy ] do
+        resource :use, only: %i[ create destroy ], controller: "arcana_uses"
+        resource :opus, only: %i[ create update ], controller: "magnum_opuses"
+      end
       resource :claim, only: %i[ create destroy ]
       resource :seat, only: :update
       resource :story_end, only: %i[ create destroy ]
