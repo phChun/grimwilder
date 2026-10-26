@@ -326,6 +326,15 @@
     summary: "Wizard spellcasting: 3 spells and 1 potent spell a session from 3 theorems."
     text: 'You have spellcasting as the Spellcraft talent. You can cast 3 spells and 1 potent spell per session. You know 3 spell theorems, created with the Spell Crucible, and can learn new spells from scrolls. [Prohibited: Wizard]'
     page: 65
+    choices:
+    - key: theorems
+      label: Spell theorems
+      noun: theorem
+      pick: 3
+      open: true
+      touchstone: true
+      school: true
+      crucible: spell
     uses:
     - { key: spells, label: Spells, count: 3, per: session }
     - { key: potent-spells, label: Potent spells, count: 1, per: session }
@@ -875,8 +884,45 @@
       GROWTH: At levels 3 and 6, gain +1 Eldritch Talent.
 
 
-      Patron: roll or choose 2 natures and 2 desires (patron crucible), give your patron a name, trappings, a way of communicating and a following.'
+      Patron: roll or choose 2 natures and 2 desires (patron crucible), give your patron a name and trappings (a distinct color or visual signature to their influence), and decide how they communicate (telepathy, signs, projection) and how many followers they have (many, few, one).'
     page: 82
+    choices:
+    - key: natures
+      label: Patron's nature
+      noun: nature
+      pick: 2
+      open: true
+      touchstone: true
+      crucible: patron
+      table: Nature
+    - key: desires
+      label: Patron's desires
+      noun: desire
+      pick: 2
+      open: true
+      crucible: patron
+      table: Desires
+    - key: name
+      label: Patron's name
+      noun: name
+      pick: 1
+      open: true
+    - key: trappings
+      label: Trappings
+      noun: color or signature
+      pick: 1
+      open: true
+    - key: communication
+      label: Communicates by
+      noun: way of communicating
+      pick: 1
+      open: true
+      from: [telepathy, signs, projection]
+    - key: following
+      label: Following
+      noun: following
+      pick: 1
+      from: [many, few, one]
     rolls:
     - { kind: story, odds: 3, label: "Wield your patron's magic" }
   talents:
@@ -944,14 +990,29 @@
 
       GROWTH: At levels 2, 4, and 6, you gain +2 words of power.'
     page: 84
+    choices:
+    - key: words
+      label: Words of power
+      noun: word of power
+      pick: 6
+      growth: { 2: 2, 4: 2, 6: 2 }
+      open: true
+      crucible: words_of_power
     uses:
-    - { key: words, label: Words of power, count: 6, per: session, growth: { 2: 2, 4: 2, 6: 2 } }
+    - { key: words, label: Words of power, count: 6, per: session, growth: { 2: 2, 4: 2, 6: 2 }, named_by: words }
   talents:
   - name: Bailiwick
     summary: "One word of power is your domain: burn any other word to use it; a critical restores all."
     text: You are known to other witches by a title and the power inherent in your magical domain—your Bailiwick. Choose 1 word of power. You can burn any other word to use it, and on a critical, you regain the use of all words.
     note: This isn’t just a specialty. You’re not just a witch that knows the word for Star, you’re The Witch of Sacred Stars. This means you have the responsibility of upholding it, as well.
     page: 85
+    choices:
+    - key: word
+      label: Bailiwick
+      noun: word of power
+      pick: 1
+      from_picks: [hidden-magic.words]
+      crucible: words_of_power
   - name: Familiar
     summary: "A small magical creature you can see through, send on tasks and cast spells through."
     text: You manifest a small magical creature. You can communicate telepathically, use its senses, and send it on simple tasks, making a story roll to see how it goes. You can also push yourself to cast a spell through it. If your familiar takes damage, it vanishes and reappears at the start of the next scene.
@@ -1005,6 +1066,16 @@
 
       GROWTH: At levels 2, 4, and 6, gain +1 spell and potent spell per session, +1 theorem.'
     page: 86
+    choices:
+    - key: theorems
+      label: Spell theorems
+      noun: theorem
+      pick: 4
+      growth: { 2: 1, 4: 1, 6: 1 }
+      open: true
+      touchstone: true
+      school: true
+      crucible: spell
     uses:
     - { key: spells, label: Spells, count: 4, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
     - { key: potent-spells, label: Potent spells, count: 2, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
@@ -1040,12 +1111,24 @@
     summary: "+1d and an extra potent casting each session with one spell theorem."
     text: Choose one of your spell theorems. You take +1d when casting it and gain 1 extra potent spell casting of it per session. Your name becomes linked to it, and it begins to spread in popularity throughout wizardry—track it with campaign pools.
     page: 87
+    choices:
+    - key: theorem
+      label: Mastered theorem
+      noun: theorem
+      pick: 1
+      from_picks: [spellcraft.theorems, arcane-training.theorems]
     uses:
     - { key: theorem, label: Potent theorem, count: 1, per: session }
   - name: Specialty School
     summary: "Add your arcane school to every theorem; spark on a critical with it."
     text: Choose the arcane school of your focus. All of your spell theorems now have it plus another school. When casting, choose which school to use. When you get a critical with this arcane school, take spark.
     page: 87
+    choices:
+    - key: school
+      label: Specialty school
+      noun: school
+      pick: 1
+      from_list: magic_schools
 - key: backgrounds
   name: Background and heritage
   kind: background

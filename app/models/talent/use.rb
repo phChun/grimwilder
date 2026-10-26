@@ -8,8 +8,11 @@
 #   roll (Luck, Quarry, Competence), never as an action in place of a stat;
 # - extra thread per session (`thread`), from Bardic Lore, Reader and the like.
 #
+# A count can be `named_by` one of the talent's choices: each box is one of
+# the character's picks (Hidden Magic burns its words of power by name).
+#
 # `growth` adds to the count or pool at those levels: { 2 => 1, 4 => 1, 6 => 1 }.
-class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, :pool_kind, :thread, :growth, :drop_first, :bonus_dice)
+class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, :pool_kind, :thread, :growth, :drop_first, :bonus_dice, :named_by)
   PERS = %w[ session scene ].freeze
 
   def self.from(talent_key, attributes)
@@ -17,7 +20,7 @@ class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, 
     new(talent_key: talent_key, key: attributes.fetch(:key), label: attributes[:label], per: attributes[:per] || "session",
       count: attributes[:count], pool: attributes[:pool], pool_kind: attributes[:pool_kind], thread: attributes[:thread],
       growth: (attributes[:growth] || {}).transform_keys(&:to_i), drop_first: attributes[:drop_first] == true,
-      bonus_dice: attributes[:bonus_dice] == true)
+      bonus_dice: attributes[:bonus_dice] == true, named_by: attributes[:named_by])
   end
 
   # Unique across talents: "inspiration/inspiration", "spellcraft/spells".
@@ -35,6 +38,10 @@ class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, 
 
   def thread?
     !thread.nil?
+  end
+
+  def named?
+    !named_by.nil?
   end
 
   def per_scene?

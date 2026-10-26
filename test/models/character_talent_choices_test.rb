@@ -93,7 +93,7 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
 
     vex.choose_for_talent!("eldritch-affinity", "paths" => %w[ shadow hinder Influence ])
     assert_equal %w[ shadow hinder influence ], vex.reload.talent_choices.dig("eldritch-affinity", "paths")
-    assert_empty vex.choices_to_make
+    assert_not_includes vex.choices_to_make.map { _1.first.key }, "eldritch-affinity"
 
     vex.remove_eldritch_talent!("eldritch-affinity")
     assert_empty vex.reload.talent_choices

@@ -24,6 +24,10 @@ class TalentUseTest < ActiveSupport::TestCase
       assert_includes Pool::KINDS.keys, use.pool_kind, use.id if use.pool?
       assert use.pool_at(Grimwild::MAX_LEVEL).between?(1, Pool::MAX_SIZE), use.id if use.pool?
       assert use.pool?, "#{use.id}: only a pool drops 1d first" if use.drop_first
+      if use.named?
+        assert use.counter?, "#{use.id}: only a count's boxes are named"
+        assert Talent.find(use.talent_key).choice(use.named_by), "#{use.id} is named by a choice its talent lacks"
+      end
     end
     assert_equal uses.map(&:id).uniq, uses.map(&:id)
   end

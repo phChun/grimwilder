@@ -69,7 +69,7 @@ class TalentChoiceTest < ActiveSupport::TestCase
       assert choice.growth.keys.all? { (2..7).cover?(_1) }, choice.id
       assert choice.growth.values.all?(&:positive?), choice.id
       assert choice.source, "#{choice.id}'s same_as doesn't resolve"
-      assert choice.options.any? || choice.open?, "#{choice.id} has nothing to pick from"
+      assert choice.options.any? || choice.open? || choice.from_picks?, "#{choice.id} has nothing to pick from"
       assert_equal choice.options.map(&:downcase).uniq.size, choice.options.size, "#{choice.id} repeats an option"
       assert choice.options.all? { _1 == _1.strip && _1.present? }, choice.id
       assert_operator choice.min_each, :<=, 0, "#{choice.id} min_each needs groups" unless choice.grouped?
@@ -77,6 +77,13 @@ class TalentChoiceTest < ActiveSupport::TestCase
         assert_empty choice.from, "#{choice.id} has same_as and its own list"
         assert_empty choice.groups, choice.id
       end
+      assert_equal choice.from_picks.size, choice.picks_sources.size, "#{choice.id}'s from_picks don't all resolve"
+      assert_empty choice.from + choice.groups.keys, "#{choice.id} has from_picks and its own list" if choice.from_picks?
+      if choice.crucible
+        tables = choice.roll_crucible.tables.map(&:name)
+        assert_includes tables, choice.table, choice.id if choice.table
+      end
+      assert choice.open?, "#{choice.id}: a school goes with a theorem the player names" if choice.school?
     end
 
     Talent.all.each do |talent|
@@ -88,7 +95,7 @@ class TalentChoiceTest < ActiveSupport::TestCase
     squash = ->(text) { text.to_s.downcase.gsub(/[\s\-‐–—]+/, "") }
 
     Talent.all.each do |talent|
-      talent.choices.reject(&:same_as).each do |choice|
+      talent.choices.reject { _1.same_as || _1.from_list }.each do |choice|
         choice.options.each do |option|
           printed = TYPO_FIXES.fetch(option, option)
           assert_includes squash.(talent.text), squash.(printed), "#{choice.id}: #{option.inspect} isn't in the text"
@@ -117,6 +124,28 @@ class TalentChoiceTest < ActiveSupport::TestCase
     assert_includes Talent.find("weapon-mastery").choice(:style).options, "one-handed"
     assert Talent.find("true-shape").choice(:form).open?
     assert_equal "skill", skills.noun
+  end
+
+  test "crucibles, other picks and the book's lists" do
+    words = Talent.find("hidden-magic").choice(:words)
+    assert_equal [ 6, 8, 12 ], [ 1, 2, 6 ].map { words.slots_at(_1) }
+    assert_equal "Words of power", words.roll_crucible.name
+    assert_equal "words", Talent.find("hidden-magic").uses.sole.named_by
+
+    assert_equal %w[ spellcraft/theorems arcane-training/theorems ], Talent.find("mastered-theorem").choice(:theorem).picks_sources.map(&:id)
+    assert_equal Grimwild.magic_schools.keys, Talent.find("specialty-school").choice(:school).options
+    assert_includes Grimwild.magic_schools.keys, "necromancy"
+
+    pact = Talent.find("pact")
+    assert_equal %w[ natures desires name trappings communication following ], pact.choices.map(&:key)
+    assert_equal "Nature", pact.choice(:natures).table
+    assert_not pact.choice(:following).open?
+
+    assert Talent.find("spellcraft").choice(:theorems).school?
+    assert_equal [ "wild fire", "evocation" ], Talent::Choice.split_school("wild fire (evocation)")
+    assert_equal [ "wild fire", nil ], Talent::Choice.split_school("wild fire")
+    assert_equal "wild fire (evocation)", Talent::Choice.join_school(" wild  fire ", "Evocation")
+    assert_equal "wild fire", Talent::Choice.join_school("wild fire", "")
   end
 end
 
