@@ -2600,3 +2600,4 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .talent-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .talent-state__dice { display: inline-flex; gap: 4px; }
 .talent-state__on { color: var(--grim); }
+.stat-progression { position: relative; margin-top: var(--space-2); }

@@ -20,8 +20,9 @@ module Character::Talents
     talent_keys.filter_map { |key| Talent.find_by_key(key) }
   end
 
+  # One per level, less one given up for a stat (Character::StatProgression).
   def expected_talent_count
-    level
+    level - (stat_progressed? ? 1 : 0)
   end
 
   def talents_to_choose
