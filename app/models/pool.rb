@@ -81,6 +81,7 @@ class Pool < ApplicationRecord
   # or join the pool. A use that isn't risky just rolls: it works, and dice drop.
   def roll!(by:, drop_first: false, as_action: false, thorns: 0, character: nil, spend_spark: 0, random: Random)
     raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
+    return tick!(by: by) if tick?
     raise ArgumentError, "#{self.character.name} is #{self.character.status}; return them to play to roll." if held_by_gone_character?
     raise ArgumentError, "#{campaign.name} is done." if campaign.done?
     check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
@@ -118,7 +119,8 @@ class Pool < ApplicationRecord
   # on a talent pool only when the talent says so (a potent rite spell); and
   # on a mythic arcana's, for a potent effect (pg. 41).
   def drops_first_for?(gm:)
-    if arcanum
+    if tick? then false
+    elsif arcanum
       arcanum.mythic?
     elsif character_id
       talent_use&.drop_first || false
@@ -130,7 +132,7 @@ class Pool < ApplicationRecord
   # A power pool rolled as an action in place of a stat (pg. 19). A talent's
   # bonus-dice pool (Luck, Quarry, Competence) just rolls.
   def rolls_as_action?
-    power? && !talent_use&.bonus_dice
+    power? && !tick? && !talent_use&.bonus_dice
   end
 
   # The Talent::Use (or Talent::MadePool) a talent pool comes from.
@@ -148,6 +150,15 @@ class Pool < ApplicationRecord
     raise ArgumentError, "#{name} can't be pushed right now" unless pushable?
 
     record!(size: size - 1, dice: last_dice, dropped: 1, action: "pushed", by: by)
+  end
+
+  # A tick pool (optional rule, pg. 177) is never rolled: each time it's
+  # triggered, exactly 1d drops.
+  def tick!(by:)
+    raise ArgumentError, "#{name} is at 0d" if depleted?
+    raise ArgumentError, "#{campaign.name} is done." if campaign.done?
+
+    record!(size: size - 1, dice: [], dropped: 1, action: "ticked", by: by)
   end
 
   # Oathsworn's smite (pg. 68): after a task pool is rolled, spend smite 1-for-1

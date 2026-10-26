@@ -38,6 +38,6 @@ class Campaigns::PoolsController < ApplicationController
     end
 
     def pool_params
-      params.expect(pool: [ :name, :kind, :starting_size, :phases_text, :hidden ])
+      params.expect(pool: [ :name, :kind, :starting_size, :phases_text, :hidden, :tick ])
     end
 end

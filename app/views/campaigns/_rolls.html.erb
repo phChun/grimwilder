@@ -10,7 +10,7 @@
 
   <div class="rolls__panel rolls__panel--story">
     <%# The GM can call on anyone at the table for a story roll; a player on their own characters. %>
-    <%= render "campaigns/story_roll", my_characters: (gm? ? characters : my_characters) %>
+    <%= render "campaigns/story_roll", my_characters: (gm? ? characters : my_characters), party: characters %>
   </div>
 
   <% if characters.any? %>

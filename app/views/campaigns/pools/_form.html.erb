@@ -40,6 +40,11 @@
   </div>
 
   <label class="check">
+    <%= form.check_box :tick %>
+    Tick pool: drops exactly 1d each time, never rolled (optional rule, pg. 177)
+  </label>
+
+  <label class="check">
     <%= form.check_box :hidden %>
     Hide from players
   </label>

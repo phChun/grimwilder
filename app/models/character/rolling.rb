@@ -21,14 +21,15 @@ module Character::Rolling
     has_many :rolls, dependent: :nullify
   end
 
-  # help: extra dice from outside help (an NPC, the scene) or anything else.
+  # help: extra dice from outside help (an NPC, the scene) or anything else;
+  # help_from: who or what they're from, for the log.
   # assists: other characters seated alongside this one, each rolling 1d.
   # thorns: situational thorns, on top of the ones damage adds.
   # bonuses: the talent bonuses ticked (Talent::Bonus#id); automatic ones apply anyway.
   # assist_bonuses: { ally id => bonus ids } ticked for an assist (Shepherd).
   # panache: Panache spent to remove thorns; removing them all rolls them as
   # panache dice instead (pg. 81).
-  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], assist_bonuses: {}, panache: 0, random: Random)
+  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], assist_bonuses: {}, panache: 0, help_from: nil, random: Random)
     stat_name = stat_name.to_s
     raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
     raise ArgumentError, "#{campaign.name} is done." if campaign&.done?
@@ -53,7 +54,7 @@ module Character::Rolling
     roll = rolls.build(
       campaign: campaign, identity: by, kind: mode, name: name, stat: stat_name, dice: own.dice, thorns: own.thorns,
       boosts: Array.new(removed.positive? && reasons.empty? && thorns.zero? ? removed : 0) { random.rand(1..8) },
-      stat_dice: stat(stat_name), help_dice: help, spark_spent: spend_spark, damage_reasons: reasons,
+      stat_dice: stat(stat_name), help_dice: help, help_from: (help_from.to_s.squish.first(60).presence if help.positive?), spark_spent: spend_spark, damage_reasons: reasons,
       talent_bonuses: bonus_records(talent_rolled, ignored: ignored) + panache_records(removed),
       assists: helping.flat_map { |ally, rolled| ally.assist_entries(rolled, random: random) }
     )

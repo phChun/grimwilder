@@ -26,6 +26,18 @@ class RollCallTest < ActiveSupport::TestCase
     assert_equal 1, @tibbs.reload.spark, "spent 1 to roll, took 1 for the disaster"
   end
 
+  test "a story roll call with an assist: they roll 1d of their own, which counts" do
+    call = RollCall.story!(campaign: @campaign, by: @gwen, character: @tibbs, odds: 1, thorns: 1, assists: [ @bram ])
+    assert_equal [ 1, 1 ], call.seats.map { call.base_dice(_1) }
+
+    call.roll!(@tibbs, by: @pip, random: FixedDice.new([ 2, 3 ]))
+    call.roll!(@bram, by: @gwen, random: FixedDice.new([ 6 ]))
+    roll = call.reload.roll
+    assert_equal [ [ 2 ], [ 3 ], [ "Bram", 6 ], "perfect" ], [ roll.dice, roll.thorns, roll.assists.sole.values_at("name", "die"), roll.outcome ]
+    assert_empty call.seats.last["thorns"], "the assist rolls no thorns"
+    assert_match "Bram assisting", ApplicationController.helpers.roll_setup(roll)
+  end
+
   test "a quarrel call: each side and each assist rolls, and the highest die wins" do
     call = RollCall.quarrel!(campaign: @campaign, by: @pip, stakes: "The map",
       sides: [ { character: @tibbs, helpers: [] }, { character: @bram, helpers: [] } ])

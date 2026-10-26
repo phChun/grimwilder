@@ -1,5 +1,6 @@
-<%# locals: (my_characters:) %>
-<p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster). Pick a character and their player rolls it.</p>
+<%# locals: (my_characters:, party: nil) %>
+<% party ||= [] %>
+<p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster). Pick a character and their player rolls it; anyone assisting rolls 1d of their own.</p>
 <%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack" do %>
   <div class="field">
     <label class="field__label" for="story_question">Question <small>(optional)</small></label>
@@ -7,6 +8,17 @@
   </div>
 
   <%= render "campaigns/story_fields", my_characters: my_characters, spark: false %>
+
+  <% if my_characters.any? && party.many? %>
+    <fieldset class="roll-setup__group">
+      <legend class="field__label">Assists <small>1d each, shares the risk; they roll it</small></legend>
+      <div class="stat-roll__assists">
+        <% party.each do |character| %>
+          <label class="check"><%= check_box_tag "assists[]", character.id, false, id: "story_assist_#{character.id}" %> <%= character.name %></label>
+        <% end %>
+      </div>
+    </fieldset>
+  <% end %>
 
   <button type="submit" class="button button--primary">Roll</button>
 <% end %>

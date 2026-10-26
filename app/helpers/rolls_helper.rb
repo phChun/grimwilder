@@ -143,7 +143,7 @@ module RollsHelper
     dice = [ roll.story? ? "#{roll.stat_dice}d (#{roll.odds})" : "#{roll.stat_dice}d #{roll.stat.capitalize}" ]
     dice << "#{roll.spark_spent} spark" if roll.spark_spent.positive?
     roll.talent_bonuses.each { dice << "#{_1["dice"]}d #{_1["name"]}" if _1["dice"].positive? }
-    dice << "#{roll.help_dice}d extra" if roll.help_dice.positive?
+    dice << "#{roll.help_dice}d #{roll.help_from ? "from #{roll.help_from}" : "extra"}" if roll.help_dice.positive?
     dice << roll_assists_line(roll) if roll.assists.any?
 
     thorns = roll.damage_reasons.tally.map { |reason, count| count > 1 ? "#{count} #{reason}" : reason }
@@ -286,6 +286,7 @@ module RollsHelper
 
     case roll.pool_action
     when "pushed" then "Pushed: 1d dropped, take a mark. #{left}"
+    when "ticked" then "Ticked: 1d dropped. #{left}"
     when "smite" then "#{roll.character&.name || "Someone"} smites: 1d dropped. #{left}"
     when "rolled_after_drop" then "Dropped 1d, then rolled #{roll.dice.size}d: #{roll.dropped}d dropped in all. #{left}"
     else "Rolled #{roll.dice.size}d: #{roll.dropped.zero? ? "nothing dropped" : "#{roll.dropped}d dropped"}. #{left}"

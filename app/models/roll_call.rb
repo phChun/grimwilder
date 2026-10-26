@@ -27,11 +27,14 @@ class RollCall < ApplicationRecord
   after_commit :broadcast_to_table
 
   class << self
-    def story!(campaign:, by:, character:, question: nil, odds: 2, thorns: 0)
+    # assists: others at the table who help (pg. 13): each rolls 1d of their
+    # own, which counts toward the result, and shares the risk.
+    def story!(campaign:, by:, character:, question: nil, odds: 2, thorns: 0, assists: [])
       raise ArgumentError, "Pick 1d, 2d or 3d for the odds." unless Roll::ODDS.key?(odds)
       raise ArgumentError, "Thorns go from 0 to #{Character::Rolling::MAX_EXTRA}." unless thorns.in?(0..Character::Rolling::MAX_EXTRA)
 
-      call!(campaign, by, kind: "story", question: question, odds: odds, thorns: thorns, seats: [ seat(character) ])
+      call!(campaign, by, kind: "story", question: question, odds: odds, thorns: thorns,
+        seats: [ seat(character), *assists.map { seat(_1, lead: character) } ])
     end
 
     # bonus: extra dice for everyone in it (a talent's 3d montage, say).
@@ -115,8 +118,8 @@ class RollCall < ApplicationRecord
 
   # Before spark: the odds for a story roll, 1d to assist, else 2d plus any bonus.
   def base_dice(seat)
-    if story? then odds
-    elsif assist?(seat) then 1
+    if assist?(seat) then 1
+    elsif story? then odds
     else Roll::Quarrel::DICE + seat["bonus"].to_i
     end
   end
@@ -186,7 +189,7 @@ class RollCall < ApplicationRecord
       character.save!
       rolled = seat.merge(
         "dice" => Array.new(base_dice(seat) + spark + talents.sum(&:last)) { random.rand(1..6) },
-        "thorns" => story? ? Array.new(thorns) { random.rand(1..8) } : [],
+        "thorns" => story? && !assist?(seat) ? Array.new(thorns) { random.rand(1..8) } : [],
         "spark" => spark, "talent_bonuses" => character.bonus_records(talents), "rolled_by" => (by.display_name unless character.owned_by?(by))
       )
       # Replaced by id, not changed in place: rolling everyone left goes
@@ -204,9 +207,10 @@ class RollCall < ApplicationRecord
     def resolved_roll
       case kind
       when "story"
-        seat = seats.first
+        seat = seats.reject { assist?(_1) }.first
+        assists = seats.select { assist?(_1) }.map { { "character_id" => _1["character_id"], "name" => _1["name"], "die" => _1["dice"].first } }
         Roll.story!(campaign: campaign, by: identity, question: question, odds: odds, thorns: thorns, character: character_for(seat),
-          spend_spark: seat["spark"], talent_bonuses: Array(seat["talent_bonuses"]), rolled: { dice: seat["dice"], thorns: seat["thorns"] })
+          spend_spark: seat["spark"], talent_bonuses: Array(seat["talent_bonuses"]), assists: assists, rolled: { dice: seat["dice"], thorns: seat["thorns"] })
       when "montage"
         Roll.montage!(campaign: campaign, by: identity, scene: question,
           participants: seats.map { { character: character_for(_1), spend_spark: _1["spark"], dice: _1["dice"], talent_bonuses: Array(_1["talent_bonuses"]) } })
