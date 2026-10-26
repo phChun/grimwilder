@@ -27,6 +27,12 @@
                 <% @roll.all_dice.select { _1 < 6 }.uniq.sort.reverse.each do |value| %>
                   <%= button_to "#{value} → #{value + 1}", campaign_roll_follow_up_path(Current.campaign, @roll), params: { character_id: actor.id, follow_up: follow_up.id, die: value }, class: "button button--small", form: { data: { turbo_frame: "_top" } }, "aria-label": "Raise a #{value} to #{value + 1}" %>
                 <% end %>
+              <% elsif follow_up.kind == "omen" %>
+                <% actor.omens.uniq.each do |omen| %>
+                  <% @roll.all_dice.uniq.sort.reject { _1 == omen }.each do |value| %>
+                    <%= button_to "#{value} → omen #{omen}", campaign_roll_follow_up_path(Current.campaign, @roll), params: { character_id: actor.id, follow_up: follow_up.id, die: value, omen: omen }, class: "button button--small", form: { data: { turbo_frame: "_top" } }, "aria-label": "Swap a #{value} for the omen #{omen}" %>
+                  <% end %>
+                <% end %>
               <% else %>
                 <%= button_to follow_up_button(actor, follow_up), campaign_roll_follow_up_path(Current.campaign, @roll), params: { character_id: actor.id, follow_up: follow_up.id }, class: "button button--small", form: { data: { turbo_frame: "_top" } } %>
               <% end %>

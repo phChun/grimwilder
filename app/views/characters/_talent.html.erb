@@ -77,8 +77,9 @@
   <% end %>
   <% if eldritch && talent.one_time_only? %><p class="talent-card__aka">Its "One time only" feature doesn't work as an Eldritch Talent.</p><% end %>
 
-  <% if counters.any? || pool_uses.any? || thread.positive? %>
+  <% if counters.any? || pool_uses.any? || thread.positive? || talent.makes.any? || talent.state %>
     <div class="talent-card__uses">
+      <%= render "characters/talent_states/#{talent.state}", character: character, talent: talent, editable: editable if talent.state %>
       <% counters.each do |use| %>
         <% names = use.named? ? character.use_box_names(use).compact : [] %>
         <% if names.any? %>
@@ -86,17 +87,33 @@
           <% burned = character.burned_names(use) %>
           <div class="use-tracker use-tracker--named">
             <span class="use-tracker__name"><%= use.label %></span>
-            <span class="use-words" role="group" aria-label="<%= use.label %>: <%= names.size - burned.size %> of <%= names.size %> left">
+            <span class="use-words" role="group" aria-label="<%= use.label %>: <%= use_words_left(use, names.size, burned.size) %>">
               <% names.each do |name| %>
                 <% spent = burned.include?(name) %>
                 <% if tends %>
-                  <%= button_to title_case(name), character_talent_uses_path(character), method: :patch, params: { use: use.id, name: name }, class: class_names("use-word", "use-word--burned": spent), "aria-pressed": spent.to_s, title: spent ? "Burned: restore #{title_case(name)}" : "Burn #{title_case(name)}", form: { class: "use-box__form" } %>
+                  <%= button_to title_case(name), character_talent_uses_path(character), method: :patch, params: { use: use.id, name: name }, class: class_names("use-word", "use-word--#{use.verb}", "use-word--burned": spent), "aria-pressed": spent.to_s, title: use_word_title(use, title_case(name), spent), form: { class: "use-box__form" } %>
                 <% else %>
-                  <span class="<%= class_names("use-word", "use-word--burned": spent) %>"><%= title_case(name) %></span>
+                  <span class="<%= class_names("use-word", "use-word--#{use.verb}", "use-word--burned": spent) %>"><%= title_case(name) %></span>
                 <% end %>
               <% end %>
             </span>
-            <span class="use-tracker__resets"><%= names.size - burned.size %> left · <%= use.resets %></span>
+            <span class="use-tracker__resets"><%= use_words_left(use, names.size, burned.size) %> · <%= use.resets %></span>
+          </div>
+          <% next %>
+        <% end %>
+        <% if use.tally? %>
+          <%# A count with no most (Mischief Maker's overloads), up and down. %>
+          <% spent = character.uses_spent(use) %>
+          <div class="use-tracker use-tracker--tally">
+            <span class="use-tracker__name"><%= use.label %></span>
+            <% if tends %>
+              <%= button_to "−", character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: spent - 1 }, class: "button button--small use-tally__step", disabled: spent.zero?, "aria-label": "One fewer #{use.label.downcase}", form: { class: "use-box__form" } %>
+            <% end %>
+            <strong class="use-tally__count" aria-label="<%= spent %> <%= use.label.downcase %> this session"><%= spent %></strong>
+            <% if tends %>
+              <%= button_to "+", character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: spent + 1 }, class: "button button--small use-tally__step", "aria-label": "One more #{use.label.downcase}", form: { class: "use-box__form" } %>
+            <% end %>
+            <span class="use-tracker__resets">this session · <%= use.resets %></span>
           </div>
           <% next %>
         <% end %>
@@ -104,18 +121,20 @@
         <div class="use-tracker">
           <span class="use-tracker__name"><%= use.label %></span>
           <span class="use-boxes" role="group" aria-label="<%= use.label %>: <%= total - spent %> of <%= total %> left">
+            <% track = use.track? ? use.track_at(character.level) : [] %>
             <% total.times do |index| %>
               <% used = index < spent %>
               <% if tends %>
-                <%= button_to character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: used ? index : index + 1 }, class: class_names("use-box", "use-box--spent": used), "aria-pressed": used.to_s, form: { class: "use-box__form" } do %>
+                <%= button_to character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: used ? index : index + 1 }, class: class_names("use-box", "use-box--spent": used, "use-box--track": track.any?), "aria-pressed": used.to_s, form: { class: "use-box__form" } do %>
                   <span class="visually-hidden"><%= used ? "Unspend" : "Spend" %> <%= use.label.downcase %> <%= index + 1 %></span>
+                  <% if track.any? %><span class="use-box__thorns" aria-hidden="true">+<%= track[index] %>t</span><% end %>
                 <% end %>
               <% else %>
-                <span class="<%= class_names("use-box", "use-box--spent": used) %>"></span>
+                <span class="<%= class_names("use-box", "use-box--spent": used, "use-box--track": track.any?) %>"><% if track.any? %><span class="use-box__thorns">+<%= track[index] %>t</span><% end %></span>
               <% end %>
             <% end %>
           </span>
-          <span class="use-tracker__resets"><%= total - spent %> left · <%= use.resets %></span>
+          <span class="use-tracker__resets"><% if use.track? %>+<%= character.track_thorns(use) %>t now<%= ", no more potent spells" if spent >= total %><% else %><%= total - spent %> left<% end %> · <%= use.resets %></span>
         </div>
       <% end %>
 
@@ -131,6 +150,30 @@
             <%= render "shared/pool_track", pool: Pool.new(starting_size: size, size: size) %>
             <span class="use-tracker__resets"><%= size %>d <%= use.pool_kind %> pool · ready at the first session, <%= use.resets %></span>
           </div>
+        <% end %>
+      <% end %>
+
+      <%# Pools the talent makes when used (Talent::MadePool): those made so far, then a form to make another. %>
+      <% talent.makes.each do |made| %>
+        <% made_pools = pools.select { |candidate| candidate.use_key == made.id } %>
+        <% if made_pools.any? %>
+          <div class="pool-rows pool-rows--sheet">
+            <% made_pools.each do |pool| %>
+              <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
+            <% end %>
+          </div>
+        <% end %>
+        <% if editable && character.can_make_pool?(made) %>
+          <%= form_with url: character_talent_made_pools_path(character, talent.key), class: "talent-card__make" do %>
+            <input type="hidden" name="made" value="<%= made.key %>">
+            <% if made.named %>
+              <label class="visually-hidden" for="make-<%= made.id.parameterize %>">What is it?</label>
+              <input id="make-<%= made.id.parameterize %>" name="name" class="field__input" maxlength="40" autocomplete="off" placeholder="What is it? (optional)">
+            <% end %>
+            <button type="submit" class="button button--small">Make <%= made.label.downcase %> <small><%= made.pool %>d <%= made.kind %><%= ", ticks #{made.use.tr("-", " ")}" if made.use %></small></button>
+          <% end %>
+        <% elsif made_pools.empty? %>
+          <p class="talent-card__chip"><%= made.label %>: a <%= made.pool %>d <%= made.kind %> pool when used, for the <%= made.lasts %></p>
         <% end %>
       <% end %>
 

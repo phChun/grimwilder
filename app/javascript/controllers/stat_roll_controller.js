@@ -23,8 +23,9 @@ export default class extends Controller {
     const leftOut = Math.max(0, ...talents.map((talent) => Number(talent.dataset.ignoreThorns) || 0))
     const dice = number("dice") + spark + assists + diceOf(talents)
     const before = Math.max(0, number("total_thorns") - leftOut)
-    const thorns = Math.max(0, before - panache)
-    const panacheDice = panache > 0 && thorns === 0 ? Math.min(panache, before) : 0
+    const added = talents.reduce((sum, talent) => sum + (Number(talent.dataset.addThorns) || 0), 0) // instability: panache can't remove it
+    const thorns = Math.max(0, before - panache) + added
+    const panacheDice = panache > 0 && thorns === 0 ? Math.min(panache, before) : 0 // only when every thorn is gone
 
     this.labelTarget.textContent = `Roll ${dice}d${thorns > 0 ? ` + ${thorns}t` : ""}${panacheDice > 0 ? ` + ${panacheDice} panache` : ""}`
   }

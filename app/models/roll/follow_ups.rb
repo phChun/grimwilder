@@ -35,16 +35,20 @@ module Roll::FollowUps
     end
   end
 
-  # die: the value a raise lifts by 1.
-  def follow_up!(actor, follow_up_id, by:, die: nil, random: Random)
+  # die: the value a raise lifts by 1, or an omen replaces; omen: its value.
+  def follow_up!(actor, follow_up_id, by:, die: nil, omen: nil, random: Random)
     with_lock do
       actor.reload unless actor.id == character_id # the roller's own comes fresh with the lock
       offered = follow_ups_for([ actor ]).find { _3.id == follow_up_id.to_s }
       raise ArgumentError, "That talent can't change this roll now." unless offered
 
       actor, talent, follow_up = offered
-      die = Integer(die, exception: false) if follow_up.kind == "raise"
+      die = Integer(die, exception: false) if follow_up.kind.in?(%w[ raise omen ])
       raise ArgumentError, "Pick a die below 6 to raise." if follow_up.kind == "raise" && !(die&.between?(1, 5) && all_dice.include?(die))
+      if follow_up.kind == "omen"
+        omen = Integer(omen, exception: false)
+        raise ArgumentError, "Pick a die and one of #{actor.short_name}'s omens." unless die && all_dice.include?(die) && actor.omens.include?(omen) && die != omen
+      end
       entry = { "id" => follow_up.id, "kind" => follow_up.kind, "talent" => talent.name, "by" => actor.name, "character_id" => actor.id, "was_outcome" => outcome }
 
       transaction do
@@ -53,7 +57,7 @@ module Roll::FollowUps
         end
         entry["pool_dice"] = follow_up_pool(actor, follow_up).roll_into!(by: by, random: random) if follow_up.pool
 
-        apply_follow_up(follow_up, entry, actor, die: die, random: random)
+        apply_follow_up(follow_up, entry, actor, die: die, omen: omen, random: random)
         result = interpretation
         self.outcome, self.critical = result.result, result.critical
         entry["spark"] = follow_up_spark(follow_up, entry, actor).select { _1.settle_spark(take: true) }.map(&:name)
@@ -85,6 +89,7 @@ module Roll::FollowUps
         when "reroll" then follow_ups.empty? # "a roll you just made"
         when "raise" then all_dice.any? { _1 < 6 }
         when "assist" then assists.none? { _1["character_id"] == actor.id }
+        when "omen" then actor.omens.any? { |omen| all_dice.any? { _1 != omen } }
         else true
         end
     end
@@ -93,7 +98,7 @@ module Roll::FollowUps
       actor.talent_pools.find_by(use_key: follow_up.pool_id)
     end
 
-    def apply_follow_up(follow_up, entry, actor, die:, random:)
+    def apply_follow_up(follow_up, entry, actor, die:, omen:, random:)
       case follow_up.kind
       when "bonus"
         self.dice = dice + entry["pool_dice"]
@@ -101,7 +106,10 @@ module Roll::FollowUps
         entry["was"], entry["was_thorns"] = dice, thorns
         self.dice, self.thorns = Array.new(dice.size) { random.rand(1..6) }, []
       when "raise"
-        raise_die(die, entry)
+        set_die(die, die + 1, entry)
+      when "omen"
+        set_die(die, omen, entry)
+        actor.erase_omen(omen)
       when "assist"
         entry["die"] = random.rand(1..6)
         self.assists = assists + [ { "character_id" => actor.id, "name" => actor.name, "die" => entry["die"] } ]
@@ -109,14 +117,14 @@ module Roll::FollowUps
     end
 
     # The roller's own die if one shows that value, else an assist's.
-    def raise_die(value, entry)
+    def set_die(value, to, entry)
       if (index = dice.index(value))
-        self.dice = dice.dup.tap { _1[index] += 1 }
+        self.dice = dice.dup.tap { _1[index] = to }
       else
         index = assists.index { _1["die"] == value }
-        self.assists = assists.map.with_index { |assist, i| i == index ? assist.merge("die" => value + 1) : assist }
+        self.assists = assists.map.with_index { |assist, i| i == index ? assist.merge("die" => to) : assist }
       end
-      entry["from"], entry["to"] = value, value + 1
+      entry["from"], entry["to"] = value, to
     end
 
     def follow_up_spark(follow_up, entry, actor)

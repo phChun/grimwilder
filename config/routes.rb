@@ -26,6 +26,8 @@ Rails.application.routes.draw do
         resource :choices, only: %i[ edit update ], controller: "talent_choices"
         resource :roll, only: :create, controller: "talent_rolls"
         resource :push, only: :create, controller: "talent_pushes"
+        resources :made_pools, only: :create, controller: "talent_made_pools"
+        resource :state, only: :update, controller: "talent_states"
       end
       resource :talent_uses, only: :update
       resources :arcana, only: %i[ new create edit update destroy ] do
@@ -102,6 +104,7 @@ Rails.application.routes.draw do
         scope module: :pools do
           resource :roll, only: :create
           resource :push, only: :create
+          resource :smite, only: :create
           resource :reset, only: :create
         end
       end

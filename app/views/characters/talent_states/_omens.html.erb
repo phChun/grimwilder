@@ -1,0 +1,11 @@
+<%# locals: (character:, **) %>
+<%# Augury's omens: rolled before each session, swapped into any roll from "After the roll", then erased. %>
+<div class="talent-state">
+  <span class="use-tracker__name">Omens</span>
+  <% if character.omens.any? %>
+    <span class="talent-state__dice"><% character.omens.each do |omen| %><%= die_tag(omen, size: 28, title: "Omen") %><% end %></span>
+    <span class="use-tracker__resets">swap one into any roll at the table, then it's gone</span>
+  <% else %>
+    <span class="use-tracker__resets">none left · two more before the next session</span>
+  <% end %>
+</div>

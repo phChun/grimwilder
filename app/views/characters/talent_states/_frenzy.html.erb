@@ -1,0 +1,18 @@
+<%# locals: (character:, talent:, editable:) %>
+<%# In a frenzy for the scene: its bonus applies to every roll then (Character::TalentBonuses). Entering ticks a frenzy, or is free when bloodied or taking vex. %>
+<div class="talent-state">
+  <span class="use-tracker__name">Frenzy</span>
+  <% if character.in_frenzy? %>
+    <strong class="talent-state__on">In a frenzy</strong>
+    <span class="use-tracker__resets">until the scene ends</span>
+    <% if editable %>
+      <%= button_to "Come out of it", character_talent_state_path(character, talent.key), method: :patch, params: { change: "calm" }, class: "button button--small", form: { class: "talent-card__action" } %>
+    <% end %>
+  <% elsif editable && character.in_play? %>
+    <% use = character.use_counters.find { _1.id == "#{talent.key}/frenzy" } %>
+    <%= button_to "Enter a frenzy", character_talent_state_path(character, talent.key), method: :patch, params: { change: "frenzy" }, class: "button button--small", disabled: !(use && character.uses_left(use).positive?), form: { class: "talent-card__action" } %>
+    <%= button_to "Free: bloodied or took vex", character_talent_state_path(character, talent.key), method: :patch, params: { change: "frenzy", free: 1 }, class: "button button--small button--ghost", form: { class: "talent-card__action" } %>
+  <% else %>
+    <span class="use-tracker__resets">not in a frenzy</span>
+  <% end %>
+</div>

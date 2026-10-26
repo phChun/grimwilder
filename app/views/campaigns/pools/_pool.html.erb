@@ -2,6 +2,7 @@
 <% back = { return_to: return_to }.compact %>
 <% drops_first = pool.rollable? && pool.drops_first_for?(gm: gm) %>
 <% action_roll = pool.rollable? && pool.rolls_as_action? %>
+<% smiters = pool.smitable? ? my_characters.select { |character| (use = character.use_counters.find { _1.id == Pool::SMITE }) && character.uses_left(use).positive? } : [] %>
 <div id="<%= dom_id(pool) %>" class="<%= class_names("pool-row", "pool--#{pool.kind}", "pool-row--depleted": pool.depleted?) %>">
   <span class="pool-row__stripe" aria-hidden="true"></span>
 
@@ -27,6 +28,8 @@
         Not rolled yet
       <% elsif pool.last_action == "pushed" %>
         Pushed by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped, take a mark
+      <% elsif pool.last_action == "smite" %>
+        Smitten by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped
       <% else %>
         <span class="pool-row__dice-line">Last: <% pool.last_dice.each do |die| %><span class="<%= class_names("pool-row__die", "pool-row__die--dropped": die < 4) %>"><%= die %></span> <% end %>·</span>
         <%= pool.last_dropped.to_i.zero? ? "nothing dropped" : "#{pool.last_dropped}d dropped" %><%= " (1d first)" if pool.last_action == "rolled_after_drop" %>
@@ -48,7 +51,7 @@
     <% end %>
   </div>
 
-  <% if drops_first || action_roll || pool.pushable? || gm %>
+  <% if drops_first || action_roll || pool.pushable? || smiters.any? || gm %>
     <details id="<%= dom_id(pool, :more) %>" class="pool-row__more">
       <summary class="pool-row__toggle" aria-label="More for <%= pool.name %>">⋯</summary>
       <div class="pool-row__panel">
@@ -58,6 +61,9 @@
           <% end %>
           <% if pool.pushable? %>
             <%= button_to "Push (take a mark)", campaign_pool_push_path(pool.campaign, pool), params: back, class: "button button--small button--push" %>
+          <% end %>
+          <% smiters.each do |character| %>
+            <%= button_to "Smite: drop 1d", campaign_pool_smite_path(pool.campaign, pool), params: { character_id: character.id, **back }, class: "button button--small", "aria-label": "#{character.short_name} smites: drop 1d from #{pool.name}" %>
           <% end %>
           <% if gm %>
             <span class="pool-row__spacer"></span>

@@ -109,7 +109,7 @@ class Pool < ApplicationRecord
     dice = Array.new(size) { random.rand(1..6) }
     kept = dice.count { |die| die >= 4 }
     update!(size: kept, last_dice: dice, last_dropped: size - kept, last_action: "rolled", last_rolled_by: by, last_rolled_at: Time.current,
-      **next_phase_attributes(kept).to_h)
+      **next_phase_attributes(kept).to_h, **refill_attributes(kept.zero? && refills_left?))
     dice
   end
 
@@ -133,8 +133,10 @@ class Pool < ApplicationRecord
     power? && !talent_use&.bonus_dice
   end
 
+  # The Talent::Use (or Talent::MadePool) a talent pool comes from.
   def talent_use
-    Talent.find_by_key(use_key.to_s.split("/").first)&.uses&.find { _1.id == use_key }
+    talent = Talent.find_by_key(use_key.to_s.split("/").first)
+    talent && (made_by_talent? ? talent.makes : talent.uses).find { _1.id == use_key }
   end
 
   # A task pool roll that dropped nothing: the player takes a mark to drop 1d anyway.
@@ -148,12 +150,37 @@ class Pool < ApplicationRecord
     record!(size: size - 1, dice: last_dice, dropped: 1, action: "pushed", by: by)
   end
 
+  # Oathsworn's smite (pg. 68): after a task pool is rolled, spend smite 1-for-1
+  # to drop its dice.
+  SMITE = "oathsworn/smite"
+
+  def smitable?
+    task? && !hidden? && rollable? && last_action.in?(%w[ rolled rolled_after_drop smite ])
+  end
+
+  def smite!(character:, by:)
+    use = character.use_counters.find { _1.id == SMITE }
+    raise ArgumentError, "Only a task pool that's just been rolled can be smitten." unless smitable?
+    raise ArgumentError, "#{character.short_name} has no smite left." unless use && character.in_play? && character.campaign_id == campaign_id && character.uses_left(use).positive?
+
+    transaction do
+      character.update!(talent_uses: character.talent_uses.merge(use.id => character.uses_spent(use) + 1))
+      record!(size: size - 1, dice: last_dice, dropped: 1, action: "smite", by: by, character: character)
+    end
+  end
+
+  # A talent pool that comes back at 0d (Talent::Use#refill): Pact's Patience
+  # every time (the patron visits), the Vassal once before it resets.
+  def refills_left?
+    (refills = talent_use&.refills) ? refills_used < refills : false
+  end
+
   def resettable?
     last_action.present? || size != starting_size || phase.positive?
   end
 
   def reset!
-    update!(**first_phase_attributes, last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil)
+    update!(**first_phase_attributes, refills_used: 0, last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil)
   end
 
   def outcome
@@ -188,20 +215,25 @@ class Pool < ApplicationRecord
     # nothing, so its entry has no dice. An action roll's entry keeps its spark
     # dice after the pool's own, and its result. A linked pool's entry names the
     # phase rolled, and the next one if this roll unlocked it.
+    def refill_attributes(refilled)
+      refilled ? { size: starting_size, refills_used: refills_used + 1 } : {}
+    end
+
     def record!(size:, dice:, dropped:, action:, by:, result: nil, spark_dice: [], character: nil)
       rolled_phase, unlocked = phase_name, (next_phase if size.zero?)
+      refilled = size.zero? && refills_left?
 
       transaction do
         gained = character&.settle_spark(spent: spark_dice.size, take: result&.result == "disaster") || false
         character&.save!
 
         update!(size: size, last_dice: dice, last_dropped: dropped, last_action: action, last_rolled_by: by, last_rolled_at: Time.current,
-          **next_phase_attributes(size).to_h)
+          **next_phase_attributes(size).to_h, **refill_attributes(refilled))
         rolls.create!(campaign: campaign, identity: by, kind: "pool", name: name, dice: (action == "pushed" ? [] : dice + spark_dice),
           pool_action: action, dropped: dropped, remaining: size, gm_only: hidden?,
           phase: rolled_phase, next_phase: (unlocked && "#{unlocked["size"]}d #{unlocked["name"]}"),
           thorns: result&.thorns || [], outcome: result&.result, critical: result&.critical || false,
-          character: character, spark_spent: spark_dice.size, spark_gained: gained)
+          character: character, spark_spent: spark_dice.size, spark_gained: gained, refilled: refilled)
       end
     end
 end

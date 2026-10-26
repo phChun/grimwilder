@@ -75,10 +75,16 @@ class TalentBonusTest < ActiveSupport::TestCase
 
   test "Frenzy: +1d for each mark, and marks and harm add no thorns" do
     @tibbs.update!(path: "Berserker", talent_keys: [], marked_agility: true, marked_wits: true, bloodied: true)
-    roll = @tibbs.roll!("agility", by: @pip, thorns: 1, bonuses: [ "frenzy/frenzy" ], random: FixedDice.new([ 2, 2, 2, 2, 3, 8 ]))
+    assert_empty @tibbs.talent_bonuses_for("agility"), "only while in a frenzy"
+    @tibbs.enter_frenzy!(by: @pip, free: true)
+    assert_equal 0, @tibbs.uses_spent(@tibbs.use_counters.find { _1.key == "frenzy" }), "free when bloodied"
+    roll = @tibbs.roll!("agility", by: @pip, thorns: 1, random: FixedDice.new([ 2, 2, 2, 2, 3, 8 ]))
     assert_equal [ 5, 1, [] ], [ roll.dice.size, roll.thorns.size, roll.damage_reasons ], "3 + 2 marks; only the situational thorn"
     assert_equal 2, roll.talent_bonuses.sole["ignored"]
     refute @tibbs.reload.marked_agility?, "the mark still clears"
+
+    @tibbs.end_scene!
+    refute @tibbs.reload.in_frenzy?, "a frenzy lasts the scene"
   end
 
   test "automatic bonuses: Oathsworn's +1d for harm, Lightning Reflexes on an Agility defense" do

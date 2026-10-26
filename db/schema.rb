@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_27_120200) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_130000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -93,6 +93,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_120200) do
     t.datetime "status_changed_at"
     t.string "farewell"
     t.json "talent_choices", default: {}, null: false
+    t.json "talent_state", default: {}, null: false
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"
@@ -207,9 +208,11 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_120200) do
     t.string "refresh"
     t.string "use_key"
     t.integer "arcanum_id"
+    t.integer "refills_used", default: 0, null: false
+    t.boolean "made_by_talent", default: false, null: false
     t.index ["arcanum_id"], name: "index_pools_on_arcanum_id", unique: true
     t.index ["campaign_id"], name: "index_pools_on_campaign_id"
-    t.index ["character_id", "use_key"], name: "index_pools_on_character_id_and_use_key", unique: true
+    t.index ["character_id", "use_key"], name: "index_pools_on_character_id_and_use_key", unique: true, where: "made_by_talent = 0"
     t.index ["character_id"], name: "index_pools_on_character_id"
     t.index ["last_rolled_by_id"], name: "index_pools_on_last_rolled_by_id"
   end
@@ -266,6 +269,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_120200) do
     t.json "talent_bonuses", default: [], null: false
     t.json "follow_ups", default: [], null: false
     t.json "boosts", default: [], null: false
+    t.boolean "refilled", default: false, null: false
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"

@@ -54,9 +54,14 @@ module Character::TalentBonuses
     end
   end
 
+  # Thorns it adds that nothing removes: Awakened Mind's instability.
+  def bonus_thorns(bonus)
+    (use = use_counters.find { _1.id == bonus.thorns_from_id }) ? track_thorns(use) : 0
+  end
+
   # Thorns it leaves out of a roll with this stat, before any situational ones.
   def bonus_ignored_damage(bonus, stat)
-    bonus.ignore == "damage" ? damage_thorns(stat) : 0
+    bonus.ignore == "damage" ? (damage_reasons(stat) & Character::Damage::MARK_AND_HARMS).size : 0
   end
 
   def bonus_use(bonus)
@@ -100,13 +105,14 @@ module Character::TalentBonuses
     end
 
     def harm_reasons(stat)
-      damage_reasons(stat) - [ "marked" ]
+      damage_reasons(stat) & Character::Damage::HARMS
     end
 
     # Offered only when it could change something: a bonus that counts marks
     # or harm needs some, and a talent's use needs the talent to have it.
     def bonus_fits?(bonus, stat)
-      if bonus.harm then harm_reasons(stat).any?
+      if bonus.during == "frenzy" then in_frenzy?
+      elsif bonus.harm then harm_reasons(stat).any?
       elsif bonus.per_mark then Grimwild::STATS.any? { marked?(_1) } || damage_thorns(stat).positive?
       elsif bonus.use then bonus_use(bonus).present?
       else true

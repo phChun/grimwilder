@@ -47,7 +47,7 @@
                 <% end %>
               <% else %>
                 <label class="check stat-roll__talent">
-                  <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), defense_only: bonus.defense_only? } %>
+                  <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), add_thorns: character.bonus_thorns(bonus), defense_only: bonus.defense_only? } %>
                   <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
                 </label>
               <% end %>

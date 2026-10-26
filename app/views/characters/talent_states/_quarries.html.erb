@@ -1,0 +1,17 @@
+<%# locals: (character:, talent:, editable:) %>
+<%# Quarry's designations this session, by name; designating one ticks a designation. %>
+<div class="talent-state">
+  <span class="use-tracker__name">Quarries</span>
+  <% if character.quarries.any? %>
+    <ul class="talent-card__picks" aria-label="Quarries"><% character.quarries.each do |quarry| %><li class="talent-card__pick"><%= quarry %></li><% end %></ul>
+  <% end %>
+  <% designations = character.use_counters.find { _1.id == "#{talent.key}/designations" } %>
+  <% if editable && designations && character.uses_left(designations).positive? %>
+    <%= form_with url: character_talent_state_path(character, talent.key), method: :patch, class: "talent-card__make" do %>
+      <input type="hidden" name="change" value="quarry">
+      <label class="visually-hidden" for="quarry-name">Who's the quarry?</label>
+      <input id="quarry-name" name="name" class="field__input" maxlength="60" autocomplete="off" placeholder="Who's the quarry?" required>
+      <button type="submit" class="button button--small">Designate</button>
+    <% end %>
+  <% end %>
+</div>

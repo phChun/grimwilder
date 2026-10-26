@@ -20,7 +20,10 @@
 #   dice join the assist (Guardian, Shepherd), and `counts_as: teamwork`
 #   counts the assist's 5s as 6s. `spark: perfect_both`: on a perfect, the
 #   roller and the assist both take spark (Shepherd).
-class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats, :choice, :use, :per_mark, :harm, :ignore, :auto, :counts_as, :cast, :assist, :spark)
+# - `thorns_from`: one of the talent's track uses whose thorns it adds, and
+#   that nothing removes (Awakened Mind's instability on a psionic spell).
+# - `during: frenzy`: only while in a frenzy (Character::TalentState).
+class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats, :choice, :use, :per_mark, :harm, :ignore, :auto, :counts_as, :cast, :assist, :spark, :thorns_from, :during)
   ROLLS = %w[ action defense ].freeze
   GROUP_ROLLS = %w[ story montage ].freeze
   IGNORES = %w[ damage situational ].freeze
@@ -30,7 +33,8 @@ class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats,
     new(talent_key: talent_key, key: attributes.fetch(:key), label: attributes.fetch(:label), dice: attributes.fetch(:dice, 1),
       on: Array(attributes[:only] || ROLLS), stats: Array(attributes[:stats]), choice: attributes[:choice], use: attributes[:use],
       per_mark: attributes[:per_mark] || false, harm: attributes[:harm] || false, ignore: attributes[:ignore], auto: attributes[:auto] || false,
-      counts_as: attributes[:counts_as], cast: attributes[:cast] || false, assist: attributes[:assist] || false, spark: attributes[:spark])
+      counts_as: attributes[:counts_as], cast: attributes[:cast] || false, assist: attributes[:assist] || false, spark: attributes[:spark],
+      thorns_from: attributes[:thorns_from], during: attributes[:during])
   end
 
   # "expertise/skill", what the roll setup posts.
@@ -40,6 +44,10 @@ class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats,
 
   def use_id
     "#{talent_key}/#{use}" if use
+  end
+
+  def thorns_from_id
+    "#{talent_key}/#{thorns_from}" if thorns_from
   end
 
   def auto?

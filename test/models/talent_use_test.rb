@@ -26,10 +26,24 @@ class TalentUseTest < ActiveSupport::TestCase
       assert use.pool?, "#{use.id}: only a pool drops 1d first" if use.drop_first
       if use.named?
         assert use.counter?, "#{use.id}: only a count's boxes are named"
-        assert Talent.find(use.talent_key).choice(use.named_by), "#{use.id} is named by a choice its talent lacks"
+        assert Talent.find(use.talent_key).choice(use.named_by), "#{use.id} is named by a choice its talent lacks" if use.named_by
       end
+      assert use.counter? && use.track.all?(Integer), use.id if use.track?
+      assert use.pool?, "#{use.id}: only a pool refills" if use.refill
+      assert use.refill == "always" || use.refill.to_i.positive?, use.id if use.refill
     end
     assert_equal uses.map(&:id).uniq, uses.map(&:id)
+  end
+
+  test "fixed names, tallies and tracks" do
+    bonds = Talent.find("primordial-bonds").uses.sole
+    assert_equal [ 4, %w[ Fire Earth Air Water ], "kept until spent" ], [ bonds.count_at(1), bonds.names, bonds.resets ]
+    instability = Talent.find("awakened-mind").uses.sole
+    assert_equal [ [ 0, 1, 2 ], [ 0, 0, 0, 1, 2 ] ], [ instability.track_at(1), instability.track_at(6) ]
+    overloads = Talent.find("mischief-maker").uses.sole
+    assert overloads.tally?
+    assert_nil overloads.count_at(3)
+    assert_equal Float::INFINITY, Talent.find("pact").uses.sole.refills
   end
 
   test "the talents that grant thread per session" do

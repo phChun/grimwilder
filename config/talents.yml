@@ -15,6 +15,9 @@
 # ticked in the roll setup or at a roll call: `label` is our own wording,
 # `only` limits the rolls (defense, story, montage), plus `stats`, `choice`,
 # `use`, `per_mark`, `harm`, `ignore` and `auto` (see the class).
+# "state" names what the talent keeps between rolls (Character::TalentState):
+# omens, herbs, frenzy, quarries. "makes" are pools made when it's used
+# (Talent::MadePool).
 # "follow_ups" change a roll after it's made (Talent::FollowUp): bonus dice
 # from a talent pool, a re-roll, +1 to a die, a late assist, or a noted effect.
 - key: artificer
@@ -55,6 +58,8 @@
     summary: "Given time, bring objects to life as a 2d power pool that follows one-word commands."
     text: Given time, you can bestow a semblance of life into objects, giving them a 2d Animated power pool, and controlling them with simple one-word commands. They can roll 1d of their power pool to assist you. You can reliably command up to three of these at a time, with others following their nature. “Following their nature” means they mindlessly do what they were created to do. Brooms sweep, wrenches crank bolts, daggers attack—all without direction from you.
     page: 55
+    makes:
+    - { key: animated, label: Animated, pool: 2, at_once: 3, lasts: session, named: true }
   - name: Grenades
     summary: "A 3d Grenades resource pool each session for area bombs: entangle, force, fiery and more."
     text: 'Each session, you have a 3d Grenades resource pool. You have access to the following bombs: entangle—force—fiery—gravity—obscuring—stun. These grenades affect multiple targets or an area.'
@@ -82,8 +87,10 @@
     summary: "Overload arcana for a potent 2d story roll, adding +1t for each extra use in a session."
     text: You can overload arcana to create a potent effect with it. Make a 2d story roll as the magic goes haywire. Add +1t to the story roll each time you use this after the first, clearing them each session.
     page: 55
+    uses:
+    - { key: overloads, label: Overloads, tally: true }
     rolls:
-    - { kind: story, odds: 2, label: Overload the arcana }
+    - { kind: story, odds: 2, label: Overload the arcana, use: overloads, rising: true }
   - name: Magnum Opus
     summary: "Build a mythic arcana: a 6d power pool whose touchstones you roll and lock in over time."
     text: You’re in the process of creating a mythic arcana. It has a 6d power pool as normal, but before each session, roll 3 random touchstones. Each time, you can choose 1 touchstone to lock in, never rolling for it again.
@@ -135,6 +142,8 @@
     summary: "+1d on montage rolls, and a 3d power pool of know-how from your travels."
     text: You take +1d on montage rolls and have a 3d power pool to represent the smattering of knowledge from your travels.
     page: 57
+    uses:
+    - { key: knowledge, label: Knowledge, pool: 3, pool_kind: power, per: session }
     bonuses:
     - { key: montage, label: "Every montage", only: [ montage ], auto: true }
   - name: Forked Tongue
@@ -179,8 +188,9 @@
 
       Collateral damage acts as a narrow secondary effect, as a critical, and shouldn’t be underestimated. Treat this as a perfect on a related roll against the environment or mooks, though this won’t always be a good thing.'
     page: 58
+    state: frenzy
     bonuses:
-    - { key: frenzy, label: "In a frenzy: +1d per mark, and harm and marks add no thorns", per_mark: true, ignore: damage }
+    - { key: frenzy, label: "In a frenzy: +1d per mark, and harm and marks add no thorns", per_mark: true, ignore: damage, auto: true, during: frenzy }
     uses:
     - { key: frenzy, label: Frenzy, count: 1, per: session, growth: { 3: 1, 6: 1 } }
   talents:
@@ -300,10 +310,15 @@
     summary: "Roll 2 omens before each session and swap one in for any d6 rolled at the table."
     text: You can read the world around you and interpret its signs. Before each session, roll 2d and record the results. These are your Omens. During the session, you can replace any rolled d6 (by anyone) with an omen result, then erase it.
     page: 63
+    follow_ups:
+    - { key: omen, kind: omen, label: "Swap a rolled d6 for one of your omens", who: anyone, rolls: [ action, defense, story ] }
+    state: omens
   - name: Awaken
     summary: "Once a scene, awaken nature nearby as a 3d power pool you can direct."
     text: Once per scene, you may awaken a living natural feature—plants, animals, fungi, or the like—within or nearby the scene. It gains awareness and purpose, forming a 3d power pool you can direct, guided by its nature. One time only, you can make this a ritual-level effect.
     page: 63
+    makes:
+    - { key: awakened, label: Awakened, pool: 3, use: awaken, lasts: scene, named: true }
     uses:
     - { key: awaken, label: Awaken, count: 1, per: scene }
   - name: Kindred Spirits
@@ -315,6 +330,8 @@
     summary: "Cast elemental spells with Presence; criticals charge an element for a potent spell."
     text: You have spellcasting ability, using raw elemental power (Fire, Earth, Air, or Water) as the touchstone, and casting spells with Presence. On a critical using an element, charge it. Spend it to cast a potent spell with that element. If the elements are spirits in your setting, consider adding bonds for them. You may find alternative ways to charge an element, such as through great deeds or ritual.
     page: 63
+    uses:
+    - { key: charges, label: Charged elements, names: [ Fire, Earth, Air, Water ], verb: charge, per: never }
   - name: True Shape
     summary: "One favorite beast form costs no wild shape dice, or 1d less if it has wild talents."
     text: Choose 1 beast form. If it has no wild talents, you can shift into it without using a wild shape pool. If it has wild talents, you drop 1d less than normal when you shift into it.
@@ -492,6 +509,8 @@
 
       GROWTH: At levels 2, 4, and 6, gain +1 smite per session.'
     page: 68
+    choices:
+    - { key: tenets, label: Tenets, noun: tenet, pick: 3, open: true }
     bonuses:
     - { key: tenets, label: "+1d for each thorn from harm", harm: true, auto: true }
     uses:
@@ -559,6 +578,11 @@
 
       GROWTH: At levels 3, and 6, you gain +1 instability slot at 0t, and +1 bastion.'
     page: 70
+    bonuses:
+    - { key: cast, label: "Casting a psionic spell: instability adds its thorns", dice: 0, stats: [ wits ], thorns_from: instability }
+    - { key: potent, label: "Make it potent: tick instability", dice: 0, stats: [ wits ], use: instability }
+    uses:
+    - { key: instability, label: Instability, track: [ 0, 1, 2 ], growth: { 3: 1, 6: 1 } }
     choices:
     - key: bastions
       label: Bastions
@@ -572,6 +596,8 @@
     text: 'Once per session, you can create a duplicate as a 3d power pool. It is a second version of you, acting as you with shared knowledge, ability, and resources. You can drop 1d of its pool to have it: assist you—trade places with you.'
     note: This isn’t an interrupt, if you’re targeted by an impact move, it’s too late to switch.
     page: 71
+    makes:
+    - { key: echo, label: Echo, pool: 3, use: echo, lasts: session }
     uses:
     - { key: echo, label: Echo, count: 1, per: session }
   - name: Mind Blast
@@ -626,6 +652,7 @@
 
       GROWTH: At levels 3 and 6, gain +1d to your Quarry pool.'
     page: 72
+    state: quarries
     follow_ups:
     - { key: quarry, kind: bonus, label: "Roll Quarry: it's against your quarry", pool: quarry, who: anyone, rolls: [ action, defense, story ], spark: six }
     bonuses:
@@ -638,6 +665,11 @@
     summary: "A loyal animal with 3 tricks (rolled at 3d), 2 flaws and a bond with each PC."
     text: 'You’re accompanied by a fiercely loyal animal. Each PC adds a reciprocal bond with it. Choose 3 tricks and 2 flaws. You roll 3d for its tricks and 1d otherwise. It has only two damage boxes, marked (for any mark) and hurt (for any harm). It can always exit a scene when hurt. If lost, you can bond with a new animal. Tricks: distract—fight—guard—perform—rescue—retrieve—scout—search—track—warn. Flaws: aggressive—clumsy—grumpy—insatiable—jumpy—noisy—overprotective—scary—unruly.'
     page: 73
+    rolls:
+    - { kind: action, dice: 3, as: trick, label: "One of its tricks" }
+    - { kind: action, dice: 1, as: companion, label: "Anything else it does" }
+    uses:
+    - { key: damage, label: Companion damage, names: [ Marked, Hurt ], verb: mark, per: rest }
     choices:
     - key: tricks
       label: Tricks
@@ -868,7 +900,8 @@
     rolls:
     - { kind: story, odds: 2, label: The anchors break }
     uses:
-    - { key: vassal, label: Vassal, pool: 4, pool_kind: power, per: scene }
+    - { key: vassal, label: Vassal, pool: 4, pool_kind: power, per: scene, refill: 1 }
+    - { key: damage, label: Vassal damage, names: [ Mark, Harm ], verb: mark, per: scene }
   talents:
   - name: Binding Word
     summary: "Contracts are a wise, and you can make agreements you witness magically binding."
@@ -909,6 +942,8 @@
     summary: "Bonds with 3 creatures, each with its own aspects; choose which answers your summons."
     text: You have a bond with 3 different creatures, all with their own aspects. When you summon a vassal, you can choose which answers the call.
     page: 79
+    choices:
+    - { key: creatures, label: Creatures, noun: creature, pick: 3, open: true }
 - key: swashbuckler
   name: Swashbuckler
   kind: path
@@ -997,6 +1032,8 @@
 
       Patron: roll or choose 2 natures and 2 desires (patron crucible), give your patron a name and trappings (a distinct color or visual signature to their influence), and decide how they communicate (telepathy, signs, projection) and how many followers they have (many, few, one).'
     page: 82
+    uses:
+    - { key: patience, label: Patience, pool: 8, pool_kind: timer, per: never, refill: always }
     choices:
     - key: natures
       label: Patron's nature
@@ -1157,6 +1194,10 @@
     summary: "Once a session, tag a local spirit for a 3d Spirit pool of bonus dice in its domain."
     text: 'Once per session, you can tag a spirit in the local area. They offer a 3d Spirit pool rolled as bonus dice when you or an ally invokes their domain. They may ask for aid in return. Spirit domains include things such as: rivers—the night sky—art—furry critters.'
     page: 85
+    follow_ups:
+    - { key: spirit, kind: bonus, label: "Roll the Spirit pool: it's the spirit's domain", pool: spirit, who: anyone, rolls: [ action, defense, story ] }
+    makes:
+    - { key: spirit, label: Spirit, pool: 3, use: soothsayer, lasts: session, named: true, bonus_dice: true }
     uses:
     - { key: soothsayer, label: Tag a spirit, count: 1, per: session }
   - name: Wonder Magnet
@@ -1171,9 +1212,11 @@
     summary: "Two herb names each session, and 1 trivial and 1 minor potion to use."
     text: Before each session, use the herbalism crucible to make two herb names. Each session, you have 1 trivial and 1 minor potion, chosen when they’re used. The name is the touchstone. One time only, you can have 1 major potion.
     page: 85
+    state: herbs
     uses:
     - { key: trivial-potion, label: Trivial potion, count: 1, per: session }
     - { key: minor-potion, label: Minor potion, count: 1, per: session }
+    - { key: major-potion, label: Major potion (one time only), count: 1, per: never }
 - key: wizard
   name: Wizard
   kind: path
