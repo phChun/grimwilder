@@ -76,6 +76,10 @@ Rails.application.routes.draw do
       resource :roll_call, only: %i[ show destroy ] do
         resources :rolls, only: :create, module: :roll_calls
       end
+      # Talents that change a roll after it's made (Roll::FollowUps)
+      resources :rolls, only: [] do
+        resource :follow_up, only: %i[ new create ], module: :rolls
+      end
 
       resources :play_sessions, only: %i[ index show new create update ] do
         scope module: :play_sessions do

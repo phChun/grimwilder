@@ -1,0 +1,39 @@
+<% content_for :title, "After the roll · #{Current.campaign.name}" %>
+
+<%# What the viewer's characters can do to a roll after it's made (Roll::FollowUps). Its own page, and from the roll toast or the log a modal (shared/_frame_modal): the frame is what the modal shows. Its forms target _top, so a follow-up refreshes the page behind and the log entry updates for everyone. A raise offers a button per die value it could lift. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+    <h1>After the roll</h1>
+    <p class="page-header__lede"><%= @roll.name %>'s <%= @roll.story? ? "story roll" : "#{@roll.stat.capitalize}#{" defense" if @roll.defense?}" %>: what your talents can do to it now.</p>
+  </header>
+
+  <div class="panel stack follow-ups">
+    <%= render "shared/roll_result", roll: @roll, size: 32, detail: roll_result_text(@roll) %>
+    <p class="roll-toast__setup"><%= roll_setup(@roll) %></p>
+
+    <% if !@roll.follow_up_open? %>
+      <p class="field__hint">That roll's moment has passed: talents change a character's latest roll, within <%= Roll::FollowUps::WINDOW.in_minutes.to_i %> minutes of it.</p>
+    <% elsif @options.empty? %>
+      <p class="field__hint">None of your talents can change this roll now.</p>
+    <% else %>
+      <ul class="follow-ups__list">
+        <% @options.each do |actor, talent, follow_up| %>
+          <li class="follow-ups__item">
+            <p class="follow-ups__what"><strong><%= talent.name %></strong><% if @options.map(&:first).uniq.many? || actor.id != @roll.character_id %> <small>· <%= actor.name %></small><% end %></p>
+            <p class="follow-ups__label"><%= follow_up.label %><% if (cost = follow_up_cost(actor, follow_up)) %> <small><%= cost %></small><% end %></p>
+            <div class="follow-ups__actions">
+              <% if follow_up.kind == "raise" %>
+                <% @roll.all_dice.select { _1 < 6 }.uniq.sort.reverse.each do |value| %>
+                  <%= button_to "#{value} → #{value + 1}", campaign_roll_follow_up_path(Current.campaign, @roll), params: { character_id: actor.id, follow_up: follow_up.id, die: value }, class: "button button--small", form: { data: { turbo_frame: "_top" } }, "aria-label": "Raise a #{value} to #{value + 1}" %>
+                <% end %>
+              <% else %>
+                <%= button_to follow_up_button(actor, follow_up), campaign_roll_follow_up_path(Current.campaign, @roll), params: { character_id: actor.id, follow_up: follow_up.id }, class: "button button--small", form: { data: { turbo_frame: "_top" } } %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+<% end %>

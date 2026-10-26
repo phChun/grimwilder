@@ -2574,3 +2574,12 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .roll-call__talent--auto { display: inline-flex; gap: var(--space-2); }
 .roll-call__talent--auto .icon { flex: none; margin-top: 0.15rem; color: var(--perfect); }
 .roll-call__talent--auto strong { color: var(--text); }
+
+/* After the roll (campaigns/rolls/follow_ups/new): what talents can do to a roll once it's made */
+.follow-ups__list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.follow-ups__item { display: grid; gap: var(--space-1); padding-top: var(--space-3); border-top: 1px solid var(--line); }
+.follow-ups__what, .follow-ups__label { margin: 0; }
+.follow-ups__what small, .follow-ups__label small { color: var(--muted); }
+.follow-ups__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.roll-toast__follow-up { margin: var(--space-2) 0 0; }
+.feed-item__follow-up { font-size: 0.85rem; }

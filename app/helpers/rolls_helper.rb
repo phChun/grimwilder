@@ -141,7 +141,47 @@ module RollsHelper
 
     left_out = roll.talent_bonuses.select { _1["ignored"].positive? }.map { "#{_1["name"]} left out #{pluralize(_1["ignored"], "thorn")}" }
 
-    [ dice.join(" + "), ("vs #{roll.thorns.size}t (#{thorns.join(", ")})" if thorns.any?), *left_out ].compact.join(", ")
+    setup = [ dice.join(" + "), ("vs #{roll.thorns.size}t (#{thorns.join(", ")})" if thorns.any?), *left_out ].compact.join(", ")
+    roll.follow_ups.any? ? "#{setup}; then #{roll.follow_ups.map { follow_up_line(_1) }.join("; ")}" : setup
+  end
+
+  # Whether the viewer's characters can do anything to this roll now: the
+  # roll toast then links to the follow-ups.
+  def roll_follow_ups_offered?(roll)
+    membership = roll.campaign && Current.identity&.membership_in(roll.campaign)
+    membership.present? && roll.follow_ups_for(membership.follow_up_characters).any?
+  end
+
+  # "2 of 3 left", "Luck 1d", for a follow-up's use or pool.
+  def follow_up_cost(actor, follow_up)
+    if (use = actor.use_counters.find { _1.id == follow_up.use_id })
+      "#{actor.uses_left(use)} of #{use.count_at(actor.level)} #{use.label.downcase} left"
+    elsif (pool = actor.talent_pools.find_by(use_key: follow_up.pool_id))
+      "#{pool.name.split(": ").last} #{pool.size}d"
+    end
+  end
+
+  def follow_up_button(actor, follow_up)
+    case follow_up.kind
+    when "bonus" then "Roll #{actor.talent_pools.find_by(use_key: follow_up.pool_id)&.size}d"
+    when "reroll" then "Re-roll"
+    when "assist" then "Assist with 1d"
+    else "Spend 1"
+    end
+  end
+
+  # What a talent did after the roll: "Fen's Inspiration raised a 3 to 4",
+  # "Luck +1d (2), and Tibbs takes spark".
+  def follow_up_line(entry)
+    whose = "#{entry["by"]}'s #{entry["talent"]}"
+    line = case entry["kind"]
+    when "bonus" then "#{whose} +#{entry["pool_dice"].size}d (#{entry["pool_dice"].join(", ")})"
+    when "reroll" then "#{whose} re-rolled it without thorns (it was #{entry["was"].join(", ")})"
+    when "raise" then "#{whose} raised a #{entry["from"]} to #{entry["to"]}"
+    when "assist" then "#{entry["by"]} assisted after the roll with #{entry["talent"]} (#{entry["die"]})"
+    when "critical_effect" then "#{whose} adds a critical effect"
+    end
+    Array(entry["spark"]).any? ? "#{line}, and #{entry["spark"].to_sentence} #{entry["spark"].one? ? "takes" : "take"} spark" : line
   end
 
   def roll_summary(roll)
@@ -158,7 +198,9 @@ module RollsHelper
     who = roll.pool? ? roll.character&.name : roll.name
     return unless who
 
-    if roll.spark_gained? && roll.critical?
+    if roll.spark_gained? && roll.first_outcome == "disaster" && !roll.disaster?
+      "It was a disaster at first, so #{who} took spark."
+    elsif roll.spark_gained? && roll.critical?
       "Critical: nothing fit, so #{who} takes spark."
     elsif roll.spark_gained?
       "Disaster: #{who} takes spark."
