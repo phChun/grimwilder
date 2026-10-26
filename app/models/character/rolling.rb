@@ -25,7 +25,10 @@ module Character::Rolling
   # assists: other characters seated alongside this one, each rolling 1d.
   # thorns: situational thorns, on top of the ones damage adds.
   # bonuses: the talent bonuses ticked (Talent::Bonus#id); automatic ones apply anyway.
-  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], random: Random)
+  # assist_bonuses: { ally id => bonus ids } ticked for an assist (Shepherd).
+  # panache: Panache spent to remove thorns; removing them all rolls them as
+  # panache dice instead (pg. 81).
+  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], assist_bonuses: {}, panache: 0, random: Random)
     stat_name = stat_name.to_s
     raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
     raise ArgumentError, "#{campaign.name} is done." if campaign&.done?
@@ -34,31 +37,43 @@ module Character::Rolling
     check_spark_spend!(spend_spark)
     raise ArgumentError, "Extra dice and thorns go from 0 to #{MAX_EXTRA}." unless [ help, thorns ].all? { _1.in?(0..MAX_EXTRA) }
     check_assists!(assists)
+    check_panache!(panache)
     talent_rolled = talent_bonuses_rolled(stat_name, mode, bonuses)
+    helping = assists.map { |ally| [ ally, ally.assist_bonuses_rolled(mode, assist_bonuses.to_h.transform_keys(&:to_s)[ally.id.to_s]) ] }
 
     ignored = { "damage" => damage_thorns(stat_name), "situational" => thorns }
     reasons = talent_rolled.any? { _2.ignore == "damage" } ? [] : damage_reasons(stat_name)
     thorns = 0 if talent_rolled.any? { _2.ignore == "situational" }
+    reasons, thorns, removed = remove_thorns_with_panache(panache, reasons, thorns)
     talent_dice = talent_rolled.sum(&:last)
+
     own = Grimwild::Dice.roll(stat(stat_name) + spend_spark + help + talent_dice, reasons.size + thorns, random: random)
-    assist_dice = assists.map { random.rand(1..6) }
-    result = Grimwild::Dice.interpret(own.dice + assist_dice, own.thorns)
+    roll = rolls.build(
+      campaign: campaign, identity: by, kind: mode, name: name, stat: stat_name, dice: own.dice, thorns: own.thorns,
+      boosts: Array.new(removed.positive? && reasons.empty? && thorns.zero? ? removed : 0) { random.rand(1..8) },
+      stat_dice: stat(stat_name), help_dice: help, spark_spent: spend_spark, damage_reasons: reasons,
+      talent_bonuses: bonus_records(talent_rolled, ignored: ignored) + panache_records(removed),
+      assists: helping.flat_map { |ally, rolled| ally.assist_entries(rolled, random: random) }
+    )
+    result = roll.interpretation
+    roll.outcome, roll.critical = result.result, result.critical
 
     transaction do
-      gained = settle_spark(spent: spend_spark, take: result.result == "disaster")
+      roll.spark_gained = settle_spark(spent: spend_spark, take: result.result == "disaster")
       self.changed_by = by
       self[:"marked_#{stat_name}"] = false
       talent_rolled.filter_map { bonus_use(_2) }.each { |use| self.talent_uses = talent_uses.merge(use.id => uses_spent(use) + 1) }
+      settle_panache(spent: removed, cut: result.applied_cuts.positive?)
+      settle_assist_spark(roll, helping)
       save!
-
-      rolls.create!(
-        campaign: campaign, identity: by, kind: mode, name: name, stat: stat_name,
-        dice: own.dice, thorns: own.thorns, outcome: result.result, critical: result.critical,
-        stat_dice: stat(stat_name), help_dice: help, spark_spent: spend_spark, damage_reasons: reasons, spark_gained: gained,
-        talent_bonuses: bonus_records(talent_rolled, ignored: ignored),
-        assists: assists.zip(assist_dice).map { |ally, die| { "character_id" => ally.id, "name" => ally.name, "die" => die } }
-      )
+      roll.save!
+      roll
     end
+  end
+
+  def check_panache!(amount)
+    left = panache_use ? uses_left(panache_use) : 0
+    raise ArgumentError, "#{name} can spend 0–#{left} panache." unless amount.to_i.in?(0..left)
   end
 
   def check_assists!(allies)
@@ -79,8 +94,46 @@ module Character::Rolling
     (take && spark < Grimwild::MAX_SPARK).tap { |taken| self.spark += 1 if taken }
   end
 
+  # Panache (pg. 81): spend it before a roll to remove that many thorns,
+  # situational ones first. Returns the thorns left and how many it removed.
+  PANACHE = "panache/panache"
+
+  def panache_use
+    use_counters.find { _1.id == PANACHE }
+  end
+
   def can_take_spark_for?(roll)
     (roll.action? || roll.defense?) && roll.critical? && !roll.spark_gained? && spark < Grimwild::MAX_SPARK && rolls.recent.first == roll
+  end
+
+  def remove_thorns_with_panache(panache, reasons, thorns)
+    removed = [ panache.to_i, reasons.size + thorns ].min
+    from_situational = [ removed, thorns ].min
+    [ reasons.first(reasons.size - (removed - from_situational)), thorns - from_situational, removed ]
+  end
+
+  def panache_records(removed)
+    removed.positive? ? [ { "id" => PANACHE, "name" => talent_entry("panache").name, "dice" => 0, "ignored" => removed } ] : []
+  end
+
+  # Spent panache is ticked; a roll cut by a thorn gives 1 back, past the
+  # most it can hold (so the spent count can go below 0).
+  def settle_panache(spent:, cut:)
+    return unless panache_use
+
+    self.talent_uses = talent_uses.merge(PANACHE => uses_spent(panache_use) + spent - (cut ? 1 : 0))
+  end
+
+  # Shepherd: on a perfect, the roller and the assist both take spark.
+  def settle_assist_spark(roll, helping)
+    return unless roll.outcome == "perfect"
+
+    helping.each do |ally, rolled|
+      next unless rolled.any? { _2.spark == "perfect_both" }
+
+      settle_spark(take: true)
+      ally.save! if ally.settle_spark(take: true)
+    end
   end
 
   def take_spark_for_critical!(roll)

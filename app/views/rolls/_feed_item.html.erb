@@ -55,7 +55,7 @@
           </li>
         <% end %>
       </ul>
-      <p class="feed-item__result"><%= roll.quarrel? ? quarrel_result(roll) : "Montage: #{roll.outcome}" %></p>
+      <p class="feed-item__result"><%= roll.quarrel? ? quarrel_result(roll) : montage_result(roll) %></p>
       <p class="feed-item__meta"><% if roll.montage? %>The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.<% else %><% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %><% end %></p>
     <% else %>
       <%= render "shared/roll_result", roll: roll, size: 32 %>

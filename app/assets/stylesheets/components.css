@@ -2583,3 +2583,9 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .follow-ups__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .roll-toast__follow-up { margin: var(--space-2) 0 0; }
 .feed-item__follow-up { font-size: 0.85rem; }
+.die--d8.die--panache.die--cut { color: var(--perfect); }
+.die--d8.die--panache::before { border-style: dashed; }
+.die--d8.die--panache.die--cut::before { border-color: var(--perfect); background: transparent; }
+.stat-roll__assists { align-items: flex-start; }
+.stat-roll__assist { display: grid; gap: var(--space-1); }
+.stat-roll__assist .stat-roll__talent { margin-left: 1.6rem; }

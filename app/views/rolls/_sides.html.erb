@@ -8,5 +8,5 @@
     </li>
   <% end %>
 </ul>
-<p class="roll-toast__result"><%= roll.quarrel? ? quarrel_result(roll) : "Montage: #{roll.outcome}" %></p>
+<p class="roll-toast__result"><%= roll.quarrel? ? quarrel_result(roll) : montage_result(roll) %></p>
 <p class="roll-toast__setup"><% if roll.montage? %>The highest result is the scene's outcome. Zoom in on anything unlikely or interesting.<% else %><% if roll.tie? %>Compromise, or keep quarreling. <% end %><%= quarrel_spark_note(roll) %><% end %></p>

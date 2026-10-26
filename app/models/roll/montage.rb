@@ -23,6 +23,7 @@ module Roll::Montage
         { character: participant[:character], spent: spent, paid: participant[:dice].present?, result: result, talent_bonuses: Array(participant[:talent_bonuses]) }
       end
       best = rolled.min_by { Grimwild::Dice::RESULTS.index(_1[:result].result) }[:result]
+      critical = rolled.any? { _1[:result].critical? } || teamwork_critical?(rolled)
 
       transaction do
         rolled.each do |side|
@@ -32,13 +33,20 @@ module Roll::Montage
 
         create!(
           campaign: campaign, identity: by, kind: "montage", name: characters.map(&:name).to_sentence,
-          question: scene.to_s.squish.first(200).presence, outcome: best.result,
+          question: scene.to_s.squish.first(200).presence, outcome: best.result, critical: critical,
           spark_spent: rolled.sum { _1[:spent] }, sides: rolled.map { |side| side_result(side) }
         )
       end
     end
 
     private
+      # Teamwork (pg. 89): in a group montage, your 6 counts toward a critical,
+      # so it and anyone else's 6 make one.
+      def teamwork_critical?(rolled)
+        sixes = rolled.select { _1[:result].dice.include?(6) }
+        sixes.size > 1 && sixes.any? { _1[:character].teamwork? }
+      end
+
       def side_result(side)
         {
           "character_id" => side[:character].id, "name" => side[:character].name, "dice" => side[:result].dice,

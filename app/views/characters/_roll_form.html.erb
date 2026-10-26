@@ -1,5 +1,5 @@
 <%# locals: (character:, stat:, allies:) %>
-<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. %>
+<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. Each ally's assist talents (Guardian, Shepherd, Teamwork) sit under their name, and Panache is a choice like spark. %>
 <% damage = character.damage_thorns(stat) %>
 <% dice = character.stat(stat) %>
 <% prefix = "roll_#{stat}" %>
@@ -22,6 +22,13 @@
       <div class="stat-roll__group">
         <span class="stat-roll__label" id="<%= prefix %>_spark_label">Spend spark <small>+1d each</small></span>
         <%= render "shared/segmented", name: "spark", legend: "Spend spark", options: (0..character.spark).map { [ _1, _1.zero? ? "None" : "+#{_1}" ] }, checked: 0, id_prefix: "#{prefix}_spark", classes: "segmented--auto" %>
+      </div>
+    <% end %>
+
+    <% if (panache = character.panache_use) && character.uses_left(panache).positive? %>
+      <div class="stat-roll__group">
+        <span class="stat-roll__label">Spend panache <small>−1 thorn each; remove them all and they roll as panache dice</small></span>
+        <%= render "shared/segmented", name: "panache", legend: "Spend panache", options: (0..character.uses_left(panache)).map { [ _1, _1.zero? ? "None" : "−#{_1}t" ] }, checked: 0, id_prefix: "#{prefix}_panache", classes: "segmented--auto" %>
       </div>
     <% end %>
 
@@ -55,10 +62,26 @@
         <legend class="stat-roll__label">Assists <small>1d each, shares the risk</small></legend>
         <div class="stat-roll__assists">
           <% allies.each do |ally| %>
-            <label class="check">
-              <%= check_box_tag "assists[]", ally.id, false, id: "#{prefix}_assist_#{ally.id}" %>
-              <%= ally.name %>
-            </label>
+            <div class="stat-roll__assist">
+              <label class="check">
+                <%= check_box_tag "assists[]", ally.id, false, id: "#{prefix}_assist_#{ally.id}" %>
+                <%= ally.name %>
+              </label>
+              <% ally.assist_bonuses.each do |talent, bonus| %>
+                <% effect = [ ("+#{bonus.dice}d" if bonus.dice.positive?), ("defense only" if bonus.defense_only?) ].compact.join(" · ") %>
+                <% if bonus.auto? %>
+                  <%= tag.span class: "stat-roll__talent stat-roll__talent--auto", data: { stat_roll_target: "allyAuto", ally: ally.id, dice: bonus.dice, defense_only: bonus.defense_only? } do %>
+                    <%= icon(:check) %>
+                    <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(ally, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                  <% end %>
+                <% else %>
+                  <label class="check stat-roll__talent">
+                    <%= tag.input type: "checkbox", name: "assist_bonuses[#{ally.id}][]", value: bonus.id, id: "#{prefix}_assist_#{ally.id}_#{bonus.id.parameterize}", data: { ally: ally.id, dice: bonus.dice, defense_only: bonus.defense_only? } %>
+                    <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(ally, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                  </label>
+                <% end %>
+              <% end %>
+            </div>
           <% end %>
         </div>
       </fieldset>

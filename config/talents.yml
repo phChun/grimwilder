@@ -197,6 +197,8 @@
     summary: "First in: 5s count as 6s and 4s as 1s on your first roll, and you set up whoever follows."
     text: When you’re the first into an intense situation, 5s count as 6s, but 4s count as 1s on your first roll. You also setup the first person following you regardless of your roll outcome.
     page: 59
+    bonuses:
+    - { key: first, label: "Your first roll, first into an intense situation: 5s count as 6s, 4s as 1s", dice: 0, counts_as: reckless }
   - name: Joyful Warrior
     summary: "On a critical or when bloodied, take spark and clear allies' marks or bring one back."
     text: 'On a critical or when bloodied in battle, you take spark and can: clear one mark from each ally—bring a dropped (not dead) ally back into the scene.'
@@ -275,6 +277,8 @@
     summary: "+1d when you assist an ally's defense against rattled or vex; spark for both on a perfect."
     text: When you assist an ally on a defense roll that would leave them rattled or with vex, you can invoke your bond to take +1d on the roll. On a perfect, you both take spark.
     page: 61
+    bonuses:
+    - { key: bond, label: "Invoking your bond: it would leave them rattled or with vex", only: [ defense ], assist: true, spark: perfect_both }
 - key: druid
   name: Druid
   kind: path
@@ -350,6 +354,7 @@
     - { key: mastery, kind: critical_effect, label: "Spend mastery to add a critical effect", use: mastery, after: weapon-mastery/style, results: [ perfect, messy ] }
     bonuses:
     - { key: style, label: "Fighting or defending in your style", choice: style }
+    - { key: assist-style, label: "Assisting in your style", choice: style, assist: true }
     choices:
     - key: style
       label: Fighting style
@@ -471,6 +476,8 @@
     summary: "With your life on the line, 5s count as 6s and 4s count as 1s."
     text: When putting your life or something you hold equally dear on the line, 5s count as 6s, and 4s count as 1s. This generally occurs with high stakes or after being bloodied in battle.
     page: 67
+    bonuses:
+    - { key: on-the-line, label: "Your life, or something as dear, is on the line: 5s count as 6s, 4s as 1s", dice: 0, counts_as: reckless }
 - key: paladin
   name: Paladin
   kind: path
@@ -524,6 +531,8 @@
     summary: "+1d when you assist on defense, and you can take an attack meant for an ally."
     text: Take +1d when you assist on a defense roll. You can also make a defense roll for an ally when they would be affected by an impact move, or push yourself to defend multiple nearby allies from a single attack, like blocking dragon fire. When you "make a defense roll for an ally", you're not assisting—the impact move is instead now targeting you, and they're no longer at risk.
     page: 69
+    bonuses:
+    - { key: guard, label: "Assisting on a defense", only: [ defense ], assist: true, auto: true }
   - name: Rebuke
     summary: "When the GM spends suspense on an impact move, +1d on your follow-up against the source."
     text: When the GM spends suspense to prompt an impact move, you take +1d on any follow-up action against the source. On a critical, take spark. (Roll, then choose an option, rewrite for clarity.)
@@ -765,6 +774,8 @@
 
       GROWTH: At levels 2, 4, and 6, gain a new magic path or technique.'
     page: 76
+    bonuses:
+    - { key: cast, label: "Casting a spell: two or more 1s, thorns included, are a magical twist", dice: 0, stats: [ presence ], cast: true }
     choices:
     - key: paths
       label: Paths and techniques
@@ -791,6 +802,8 @@
     summary: "On potent spells, 5s count as 6s and 4s as 1s, with a twist on two or more 1s."
     text: You open yourself fully to the maelstrom of raw magic. When you cast a potent spell, 5s count as 6s, but 4s count as 1s. When rolling two or more 1s (including these 4s), you trigger a magical twist, as Sorcery.
     page: 77
+    bonuses:
+    - { key: potent, label: "Casting a potent spell: 5s count as 6s, 4s as 1s, and two or more 1s are a twist", dice: 0, counts_as: reckless, cast: true }
   - name: Magic Sense
     summary: "Always notice magic nearby, +1d to disrupt it, and given time, learn its details."
     text: You always notice magical effects near you, and take +1d when you disrupt them. Given time, you can discern their details (ask 2 questions).
@@ -921,6 +934,8 @@
     summary: "Reckless acts: 5s count as 6s and 4s as 1s, and onlookers are struck by what you did."
     text: 'When you act with pure reckless abandon, 5s count as 6s, but 4s count as 1s. Regardless of the outcome, those around you are briefly struck by: awe—bewilderment—panic—excitement. These aren''t your garden variety bad ideas, these are the kinds of ideas that leave bystanders frozen in place trying to figure out what just happened, and often a part of tangles.'
     page: 81
+    bonuses:
+    - { key: abandon, label: "Pure reckless abandon: 5s count as 6s, 4s as 1s", dice: 0, counts_as: reckless }
   - name: Fancy Footwork
     summary: "On a perfect when fighting for position, roll a related task pool."
     text: 'On a perfect when you fight to setup an advantage or otherwise improve your positioning, you can roll a related task pool by: seizing an opening—unnerving your foe.'
@@ -1148,6 +1163,8 @@
     summary: "Your spells can surge wildly, with a 3d story roll for the result; spark on a perfect."
     text: You can cause wild surges when spellcasting, as the magical twist in Sorcery. When it triggers, make a 3d story roll for the results. On a perfect, take spark. When strange things happen, they happen to you.
     page: 85
+    bonuses:
+    - { key: cast, label: "Casting a spell: two or more 1s, thorns included, cause a wild surge", dice: 0, cast: true }
     rolls:
     - { kind: story, odds: 3, label: The wild surge }
   - name: Herbalism
@@ -1257,6 +1274,8 @@
     summary: "Assisting and sharing the risk, 5s count as 6s; your 6 counts toward a group montage critical."
     text: Time in a squad or crew taught you to work well with others. When you assist a roll and share the risk, your 5s count as 6s. When taking part in a group montage roll, your 6 result counts towards a critical success.
     page: 89
+    bonuses:
+    - { key: teamwork, label: "Your assist's 5s count as 6s", dice: 0, assist: true, auto: true, counts_as: teamwork }
   - name: Simple Deduction
     summary: "Once a session, guess at a puzzle and the GM tells you something right, wrong or missed."
     text: 'Once per session when trying to solve a question or puzzle to give a specific guess. The GM will tell you: something right about it—something wrong about it—a detail you missed. Use a story roll if the answer is unclear.'
