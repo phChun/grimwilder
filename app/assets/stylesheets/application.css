@@ -86,19 +86,6 @@
   --space-7: 3rem;
   --measure: 62ch;
   --page: 80rem;
-
-  /* Older names, kept so screens not yet rebuilt render in the new palette.
-     New components use the tokens above. */
-  --paper: var(--bg);
-  --paper-raised: var(--surface);
-  --paper-sunken: var(--surface-2);
-  --ink: var(--text);
-  --ink-soft: var(--muted);
-  --ink-faint: var(--dim);
-  --moss: var(--ember);
-  --moss-ink: var(--ember-ink);
-  --font-body: var(--font-ui);
-  --radius: var(--radius-control);
 }
 
 /* ---------- Base ---------- */
