@@ -6,12 +6,16 @@ class Characters::TalentUsesController < ApplicationController
   before_action :set_character
   before_action :refuse_when_campaign_done
 
+  # spent: how many are spent, or for a named use (Hidden Magic's words),
+  # name: the box to burn or restore.
   def update
-    before = @character.talent_uses.fetch(params[:use].to_s, 0)
-    use = @character.spend_use!(params.expect(:use), spent: params[:spent])
+    use_id = params.expect(:use)
+    before = @character.use_counters.find { _1.id == use_id }&.then { @character.uses_spent(_1) } || 0
+    use = params[:name].present? ? @character.toggle_named_use!(use_id, params[:name]) : @character.spend_use!(use_id, spent: params[:spent])
 
     if params[:note] == "1" && @character.uses_spent(use) > before && @character.campaign
-      Roll.note!(campaign: @character.campaign, by: Current.identity, character: @character, text: "#{@character.name} spends #{use.label.downcase}")
+      spent = params[:name].present? ? "burns #{params[:name]}" : "spends #{use.label.downcase}"
+      Roll.note!(campaign: @character.campaign, by: Current.identity, character: @character, text: "#{@character.name} #{spent}")
     end
     @character.campaign&.broadcast_table_refresh
     redirect_to character_path(@character, anchor: "talent-#{use.talent_key}")

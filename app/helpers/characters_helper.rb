@@ -8,6 +8,12 @@ module CharactersHelper
   end
   alias_method :can_change_damage?, :can_spend_talent_uses?
 
+  # A talent pick as the sheet shows it: "Wild Fire · Evocation" for a theorem.
+  def talent_pick_label(choice, pick)
+    name, school = choice.schooled? ? Talent::Choice.split_school(pick) : [ pick, nil ]
+    [ title_case(name), school&.capitalize ].compact.join(" · ")
+  end
+
   # "1 thorn from the mark, already added"
   def damage_thorns_note(character, stat)
     reasons = character.damage_reasons(stat)

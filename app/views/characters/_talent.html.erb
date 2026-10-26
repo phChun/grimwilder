@@ -16,7 +16,7 @@
         <div class="talent-card__menu" data-menu-target="panel">
           <%= render "shared/popover_head", title: talent.name %>
           <% if tends && talent.choices.any? %>
-            <%= link_to "Choose #{talent.choices.map { _1.noun.pluralize }.to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
+            <%= link_to "Choose #{talent.choices.map(&:nouns).to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
           <% end %>
           <% if tends %>
             <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
@@ -59,17 +59,18 @@
     <div class="talent-card__choices">
       <% character.choices_for(talent).each do |choice, picks| %>
         <% left, extra = character.choices_left(choice), character.extra_choices(choice) %>
-        <% if picks.any? %>
+        <%# Picks that name a use's boxes (Hidden Magic's words) show there instead, as the boxes to burn. %>
+        <% if picks.any? && talent.uses.none? { _1.named_by == choice.key } %>
           <p class="talent-card__label"><%= choice.heading %></p>
           <ul class="talent-card__picks" aria-label="<%= choice.heading %>">
-            <% picks.each do |pick| %><li class="talent-card__pick"><%= title_case(pick) %></li><% end %>
+            <% picks.each do |pick| %><li class="talent-card__pick"><%= talent_pick_label(choice, pick) %></li><% end %>
           </ul>
         <% end %>
         <% if tends && left.positive? %>
-          <%= link_to "Choose #{picks.any? ? "#{left} more" : left} #{choice.noun.pluralize(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
+          <%= link_to "Choose #{picks.any? ? "#{left} more" : left} #{choice.nouns(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
         <% end %>
         <% if tends && extra.positive? %>
-          <p class="talent-over">Level <%= character.level %> has room for <%= pluralize(character.choice_slots(choice), choice.noun) %>. <%= link_to "Drop #{extra == 1 ? "one" : extra}", edit_character_talent_choices_path(character, talent.key), data: { turbo_frame: "modal" } %>.</p>
+          <p class="talent-over">Level <%= character.level %> has room for <%= character.choice_slots(choice) %> <%= choice.nouns(character.choice_slots(choice)) %>. <%= link_to "Drop #{extra == 1 ? "one" : extra}", edit_character_talent_choices_path(character, talent.key), data: { turbo_frame: "modal" } %>.</p>
         <% end %>
       <% end %>
     </div>
@@ -79,6 +80,26 @@
   <% if counters.any? || pool_uses.any? || thread.positive? %>
     <div class="talent-card__uses">
       <% counters.each do |use| %>
+        <% names = use.named? ? character.use_box_names(use).compact : [] %>
+        <% if names.any? %>
+          <%# Boxes named by the talent's picks: burn a word of power by name. %>
+          <% burned = character.burned_names(use) %>
+          <div class="use-tracker use-tracker--named">
+            <span class="use-tracker__name"><%= use.label %></span>
+            <span class="use-words" role="group" aria-label="<%= use.label %>: <%= names.size - burned.size %> of <%= names.size %> left">
+              <% names.each do |name| %>
+                <% spent = burned.include?(name) %>
+                <% if tends %>
+                  <%= button_to title_case(name), character_talent_uses_path(character), method: :patch, params: { use: use.id, name: name }, class: class_names("use-word", "use-word--burned": spent), "aria-pressed": spent.to_s, title: spent ? "Burned: restore #{title_case(name)}" : "Burn #{title_case(name)}", form: { class: "use-box__form" } %>
+                <% else %>
+                  <span class="<%= class_names("use-word", "use-word--burned": spent) %>"><%= title_case(name) %></span>
+                <% end %>
+              <% end %>
+            </span>
+            <span class="use-tracker__resets"><%= names.size - burned.size %> left · <%= use.resets %></span>
+          </div>
+          <% next %>
+        <% end %>
         <% total, spent = use.count_at(character.level), character.uses_spent(use) %>
         <div class="use-tracker">
           <span class="use-tracker__name"><%= use.label %></span>

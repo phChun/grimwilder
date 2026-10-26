@@ -352,3 +352,80 @@
     - [shattering, scatter, feeling, pop, brief, shimmer]
     - [shift, size, surface, agitation, apparition, sparkle]
     - [notes, vision, voice, mark, glow, dazzle]
+- key: spell
+  name: Spell crucible
+  group: magic
+  page: 86
+  blurb: Spell theorems for a wizard's spellbook.
+  how: 'Roll on each table, then take two of the three (style + essence, style + form or essence + form) as the theorem, and add a school (pg. 87).'
+  tables:
+  - name: Style
+    rows:
+    - [binding, soothing, grasping, shielding, curious, shadowy]
+    - [flaming, slow, dire, petrifying, ethereal, majestic]
+    - [alluring, silent, dazzling, piercing, sense, frenzied]
+    - [cryptic, withering, primal, toxic, thunderous, prismatic]
+    - [freezing, shredding, 'false', harmonic, molten, wild]
+    - [mesmerizing, unseen, expanding, swift, phantom, whispering]
+  - name: Essence
+    rows:
+    - [oil, earth, lore, spirit, ash, barb]
+    - [crystal, air, fire, lightning, acid, memory]
+    - [slime, spore, shroud, stasis, sound, water]
+    - [light, star, trick, siphon, thought, rift]
+    - [gravity, smoke, sight, mist, bloom, poison]
+    - [echo, death, bone, mirror, emotion, growth]
+  - name: Form
+    rows:
+    - [beacon, servant, vision, sentinel, ray, spray]
+    - [ring, crown, bond, shift, guide, embers]
+    - [chains, word, step, gate, wall, bolt]
+    - [eye, aura, gust, tendril, wings, wave]
+    - [lock, shield, swarm, pillar, claw, dream]
+    - [bubble, hand, dance, explosion, anchor, field]
+- key: words_of_power
+  name: Words of power
+  group: magic
+  page: 84
+  blurb: The language of the universe, for a witch's Hidden Magic.
+  how: Roll on either table for a word of power, or come up with your own to fit your witch.
+  tables:
+  - name: Table A
+    rows:
+    - [spirit, grace, wither, path, star, color]
+    - [wall, sleep, fire, gate, storm, wind]
+    - [absorb, pain, adapt, break, dream, sun]
+    - [ward, luck, shape, reduce, compel, silence]
+    - [might, vigor, vex, open, obscure, cloud]
+    - [blood, grave, time, move, ask, ice]
+  - name: Table B
+    rows:
+    - [read, puzzle, call, lost, plant, life]
+    - [reveal, guide, shackle, bind, sea, hunt]
+    - [secret, stone, trick, voice, growth, travel]
+    - [message, fable, speak, kindred, weather, beast]
+    - [memory, know, aid, sanctum, food, instinct]
+    - [light, truth, rebuke, blend, bird, poison]
+- key: patron
+  name: Patron crucible
+  group: magic
+  page: 82
+  blurb: A warlock's otherworldly patron.
+  how: Roll 2 on each table, smash them together and interpret. Then give the patron a name, trappings, a way of communicating and a following.
+  tables:
+  - name: Nature
+    rows:
+    - [cogs, abyss, scourge, veil, shadow, hollow]
+    - [chimera, serpent, flame, outsider, green, balance]
+    - [void, forge, phoenix, trickster, whisper, fiend]
+    - [dead god, thorn, depths, tempest, reaper, storm]
+    - [eternal, harbinger, tide, leviathan, prism, dragon]
+    - [shroud, echo, starborn, light, dreamer, oddity]
+  - name: Desires
+    rows:
+    - [chaos, beauty, minds, wealth, rarities, destruction]
+    - [secrets, fun, control, magic, everything, monuments]
+    - [power, victory, judgment, unity, souls, biomass]
+    - [worshipers, adoration, fear, fame, revenge, knowledge]
+    - [promises, purity, progress, curios, truth, experiences]
+    - [influence, life, territory, perfection, order, entropy]
