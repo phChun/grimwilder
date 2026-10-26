@@ -5,7 +5,7 @@
   <div class="talent-catalog__tools">
     <div class="talent-catalog__pick">
       <label class="visually-hidden" for="talent-path">Show talents for</label>
-      <%= select_tag :path, options_for_select([ [ "All talents", "" ], *groups.map { [ _1.path? ? _1.name : "Background and heritage", _1.key ] } ], selected), id: "talent-path", class: "field__input talent-catalog__path", data: { talent_filter_target: "path", action: "change->talent-filter#filter" } %>
+      <%= select_tag :path, options_for_select([ [ "All talents", "" ], *groups.map { [ _1.name, _1.key ] } ], selected), id: "talent-path", class: "field__input talent-catalog__path", data: { talent_filter_target: "path", action: "change->talent-filter#filter" } %>
     </div>
     <input type="search" class="field__input talent-catalog__search" placeholder="Search talents: stealth, spark, potent…" autocomplete="off" aria-label="Search talents" data-talent-filter-target="query" data-action="input->talent-filter#filter">
     <p class="field__hint" data-talent-filter-target="count" aria-live="polite"></p>

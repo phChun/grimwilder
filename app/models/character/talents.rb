@@ -12,8 +12,9 @@ module Character::Talents
     validate :talents_fit_level, if: -> { will_save_change_to_talent_keys? || will_save_change_to_level? }
   end
 
+  # The path's core talent, or with legacy_core its older version (pg. 178).
   def core_talent_entry
-    Talent.core_for(path)
+    Talent.core_for(path, legacy: legacy_core?)
   end
 
   def chosen_talents

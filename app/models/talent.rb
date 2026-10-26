@@ -3,7 +3,7 @@
 # any talent (pg. 52) except those marked "[Prohibited: Path]".
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses, :follow_ups, :makes, :state, :casts)
+class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses, :follow_ups, :makes, :state, :casts, :crucible, :legacy_core_of)
   def self.all
     catalog[:talents]
   end
@@ -20,13 +20,19 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     all.find { |talent| talent.key == key.to_s }
   end
 
-  def self.core_for(path)
-    all.find { |talent| talent.core? && talent.group.name == path }
+  # legacy: the older core talent in its place (Legacy talents, pg. 178), where there is one.
+  def self.core_for(path, legacy: false)
+    (legacy && legacy_core_for(path)) || all.find { |talent| talent.core? && talent.group.name == path }
   end
 
-  # Talents a character can choose: never a core talent, never one prohibited for their path.
+  def self.legacy_core_for(path)
+    all.find { |talent| talent.legacy_core_of == path }
+  end
+
+  # Talents a character can choose: never a core talent (legacy ones
+  # included), never one prohibited for their path.
   def self.choosable_for(path)
-    all.reject { |talent| talent.core? || talent.prohibited_for?(path) }
+    all.reject { |talent| talent.core? || talent.legacy_core_of || talent.prohibited_for?(path) }
   end
 
   def self.catalog
@@ -63,7 +69,8 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
       arcana: Array(attributes["arcana"]).map { Talent::ArcanaGrant.from(key, _1) },
       bonuses: Array(attributes["bonuses"]).map { Talent::Bonus.from(key, _1) },
       follow_ups: Array(attributes["follow_ups"]).map { Talent::FollowUp.from(key, _1) },
-      makes: Array(attributes["makes"]).map { Talent::MadePool.from(key, _1) }, state: attributes["state"], casts: attributes["casts"])
+      makes: Array(attributes["makes"]).map { Talent::MadePool.from(key, _1) }, state: attributes["state"], casts: attributes["casts"], crucible: attributes["crucible"],
+      legacy_core_of: attributes["legacy_core_of"])
   end
 
   def self.keyify(name)

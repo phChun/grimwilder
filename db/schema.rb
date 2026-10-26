@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_27_150000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_160000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -95,6 +95,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_150000) do
     t.json "talent_choices", default: {}, null: false
     t.json "talent_state", default: {}, null: false
     t.string "stat_progression"
+    t.boolean "legacy_core", default: false, null: false
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"

@@ -1,24 +1,33 @@
-# A crucible: one or more 6x6 tables of inspiration words from the book
+# A crucible: one or more tables of inspiration words from the book
 # (config/crucibles.yml). Read-only reference data, so it isn't in the DB.
 #
 # Rolling (pg. 6): 2d6, one die picks the row and the other the column, "or
-# switch them", so every roll reads two ways. Rolls happen in the browser
-# (crucible_controller.js); this class just serves the tables.
+# switch them", so every roll on a 6x6 table reads two ways. Some crucibles
+# are narrower (six rows of 1, 2 or 3 words: the seasons' lists, Build-a-
+# vassal): the first die picks the row and the second the column, one
+# reading. Rolls happen in the browser (crucible_controller.js); this class
+# just serves the tables. `credit` names whoever made one, where the book does.
 class Crucible
   GROUPS = {
     "gm" => "For the GM",
     "places" => "Places and factions",
     "characters" => "Characters",
-    "magic" => "Magic"
+    "magic" => "Magic",
+    "time" => "Time passing"
   }.freeze
+  WIDTHS = [ 1, 2, 3, 6 ].freeze
 
   Table = Data.define(:name, :rows, :columns) do
     def cell(row, column)
       rows.fetch(row - 1).fetch(column - 1)
     end
+
+    def width
+      rows.first.size
+    end
   end
 
-  attr_reader :key, :name, :group, :page, :blurb, :how, :tables
+  attr_reader :key, :name, :group, :page, :blurb, :how, :tables, :credit
 
   class << self
     def all
@@ -41,8 +50,8 @@ class Crucible
       end
   end
 
-  def initialize(key:, name:, group:, page:, blurb:, how:, tables:)
-    @key, @name, @group, @page, @blurb, @how = key, name, group, page, blurb, how
+  def initialize(key:, name:, group:, page:, blurb:, how:, tables:, credit: nil)
+    @key, @name, @group, @page, @blurb, @how, @credit = key, name, group, page, blurb, how, credit
     @tables = tables.map { |table| Table.new(name: table["name"], rows: table["rows"], columns: table["columns"]) }
   end
 
