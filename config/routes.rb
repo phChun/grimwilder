@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :conditions, only: %i[ create destroy ] do
         resource :roll, only: :create, module: :conditions
       end
+      resource :talent_list, only: :update
       resources :talents, only: %i[ new create destroy ] do
         resource :skin, only: %i[ update destroy ], controller: "talent_skins"
         resource :choices, only: %i[ edit update ], controller: "talent_choices"
