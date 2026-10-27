@@ -639,3 +639,830 @@
   tables:
   - { name: Effect, columns: [Effect], rows: [[stunning], [falling], [noisy], [poisonous], [entangling], [injuring]] }
   - { name: Trigger, columns: [Trigger], rows: [[tripwire], [pressure plate], [snare loop], [bait], [hidden], [proximity]] }
+# Monster tables (P6 pg. 146–172): the d6 lists on the monster pages, one die each.
+- key: monster_fairy_circles
+  name: Fairy Circles
+  group: monsters
+  page: 146
+  blurb: From the monsters on pg. 146.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Fairy Circles"
+    rows:
+    - ["Mushrooms glowing faintly in the dusk."]
+    - ["Ring of sunflowers in a grassy field."]
+    - ["Fallen leaves after a rain."]
+    - ["Precarious pebble towers, defying gravity."]
+    - ["Dancing fireflies in a glowing spiral."]
+    - ["Ring of acorns around a sapling."]
+- key: monster_feeding_grounds
+  name: Feeding Grounds
+  group: monsters
+  page: 147
+  blurb: From the monsters on pg. 147.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Feeding Grounds"
+    rows:
+    - ["The remnants of a horrific battle."]
+    - ["The result of a successful death cult."]
+    - ["A recently thawed graveyard."]
+    - ["A plague that killed herds of farm animals."]
+    - ["A fleet of invasion ships dashed against rocks."]
+    - ["Mass sacrifices to it, worshiped as a god."]
+- key: monster_hiding_spots
+  name: Hiding Spots
+  group: monsters
+  page: 147
+  blurb: From the monsters on pg. 147.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Hiding Spots"
+    rows:
+    - ["Beneath a crumbling, but still-used bridge."]
+    - ["Within the rotting carcass of a fallen dragon."]
+    - ["On the fifth floor of a derelict watchtower."]
+    - ["In a field full of half-eaten bear statues."]
+    - ["Within a maze of rusted, echoing pipes."]
+    - ["Among the twisted roots of a giant tree."]
+- key: monster_cyclopean_curses
+  name: Cyclopean Curses
+  group: monsters
+  page: 148
+  blurb: From the monsters on pg. 148.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Cyclopean Curses"
+    rows:
+    - ["It can only see at night."]
+    - ["It can only venture outside in the rain."]
+    - ["Its every footstep causes a tremor."]
+    - ["It's terrified of small mammals."]
+    - ["It can never stop walking."]
+    - ["It's lonely, the last of its kind."]
+- key: monster_sacred_task
+  name: Sacred Task
+  group: monsters
+  page: 148
+  blurb: From the monsters on pg. 148.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Sacred Task"
+    rows:
+    - ["Retrieve a sacred artifact, your sword."]
+    - ["Protect a chosen one, your enemy."]
+    - ["Find ancient knowledge, your secret."]
+    - ["Teach you a forgotten language."]
+    - ["Stop you from destroying the world."]
+    - ["Tricked by a devil into destroying you."]
+- key: monster_broken_summoning_circles
+  name: Broken Summoning Circles
+  group: monsters
+  page: 150
+  blurb: From the monsters on pg. 150.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Broken Summoning Circles"
+    rows:
+    - ["In a temple by a priest who lost their faith."]
+    - ["In a farmhouse by a grief-stricken mother."]
+    - ["In a tower by a wizard consumed with jealousy."]
+    - ["In the study of a hero haunted by failure."]
+    - ["In a tavern by a minstrel obsessed with fame."]
+    - ["In a cobbler's cellar, by a long-held prisoner."]
+- key: monster_impish_snares
+  name: Impish Snares
+  group: monsters
+  page: 150
+  blurb: From the monsters on pg. 150.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Impish Snares"
+    rows:
+    - ["Spoon that makes food taste slightly rotten."]
+    - ["Quill that weaves insults into messages."]
+    - ["Candle that goes out at the worst time."]
+    - ["Map that shifts landmarks and roads."]
+    - ["Compass that always points towards fun."]
+    - ["Doll that moves to a new spot each night."]
+- key: monster_dire_hermit_crab_shells
+  name: Dire Hermit Crab Shells
+  group: monsters
+  page: 151
+  blurb: From the monsters on pg. 151.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Dire Hermit Crab Shells"
+    rows:
+    - ["Sunken pirate ship, now haunted."]
+    - ["Fallen castle turret, filled with explosives."]
+    - ["Giant's skull, with a gleaming gold tooth."]
+    - ["Whale ribcage, covered in barnacles."]
+    - ["Gnomish submarine, still water-tight."]
+    - ["Iron cauldron once used by a giant."]
+- key: monster_home_tunnels
+  name: Home Tunnels
+  group: monsters
+  page: 151
+  blurb: From the monsters on pg. 151.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Home Tunnels"
+    rows:
+    - ["Tunnels filled with towering mushrooms."]
+    - ["The ruins of a lavish underground palace."]
+    - ["Enormous cavern full of bioluminescence."]
+    - ["Through the bones of a buried giant."]
+    - ["Flooded sea caves, where it hunts for sharks."]
+    - ["Through twisting roots of colossal trees."]
+- key: monster_territory_woes
+  name: Territory Woes
+  group: monsters
+  page: 151
+  blurb: From the monsters on pg. 151.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Territory Woes"
+    rows:
+    - ["It has far too many cubs."]
+    - ["Grand hunt has been called for it."]
+    - ["Another dire apex predator has arrived."]
+    - ["Civilization encroaches on its borders."]
+    - ["Totemic wards restrict its roaming grounds."]
+    - ["Goblins wage war against orcs on its lands."]
+- key: monster_destroyed_ships
+  name: Destroyed Ships
+  group: monsters
+  page: 152
+  blurb: From the monsters on pg. 152.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Destroyed Ships"
+    rows:
+    - ["Royal flagship, crown jewels still aboard."]
+    - ["War galleon, with the spoils of war."]
+    - ["Passenger liner, still barely floating."]
+    - ["Submarine, the survivors in a deep sea cave."]
+    - ["Ghost ship, having cursed the waters for decades."]
+    - ["Orcish warship, fused to its back by dark magic."]
+- key: monster_dire_spider_varieties
+  name: Dire Spider Varieties
+  group: monsters
+  page: 152
+  blurb: From the monsters on pg. 152.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Dire Spider Varieties"
+    rows:
+    - ["Netcaster, trapping from far away."]
+    - ["Jumping, catching prey off-guard with a leap."]
+    - ["Longlegs, moving quickly through foliage."]
+    - ["Pitdweller, striking from well-hidden holes."]
+    - ["Waterglider, skimming across marshes."]
+    - ["Divingbell, living completely underwater."]
+- key: monster_lunar_behaviors
+  name: Lunar Behaviors
+  group: monsters
+  page: 152
+  blurb: From the monsters on pg. 152.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Lunar Behaviors"
+    rows:
+    - ["New moon, restless border patrols."]
+    - ["Crescent, young grow unruly."]
+    - ["Full moon, deafening howls."]
+    - ["Gibbous, pack dominance shifts."]
+    - ["Blood moon, rampage outside their borders."]
+    - ["Blue moon, dire wolf litter is born."]
+- key: monster_unique_eyries
+  name: Unique Eyries
+  group: monsters
+  page: 152
+  blurb: From the monsters on pg. 152.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Unique Eyries"
+    rows:
+    - ["Spire of a still-occupied wizard's tower."]
+    - ["Atop a giant redwood tree, the tallest in the world."]
+    - ["Rocky outcrop above a foggy elephant graveyard."]
+    - ["Desolate mesatop, bones surrounding the nest."]
+    - ["Between the stone arches of an ancient bridge."]
+    - ["In the hand of an enormous carved statue."]
+- key: monster_bizarre_phenomena
+  name: Bizarre Phenomena
+  group: monsters
+  page: 153
+  blurb: From the monsters on pg. 153.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Bizarre Phenomena"
+    rows:
+    - ["Mundane sounds, completely out of place."]
+    - ["Fleeting reflections from alternate worlds."]
+    - ["Shadows elongate unnaturally and linger."]
+    - ["Echoes ricochet unpredictably."]
+    - ["Colors bleed into neighboring hues."]
+    - ["Invisible ripples that distort vision."]
+- key: monster_webbed_domains
+  name: Webbed Domains
+  group: monsters
+  page: 155
+  blurb: From the monsters on pg. 155.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Webbed Domains"
+    rows:
+    - ["Bramble patch, every inch covered in webs."]
+    - ["Long, narrow, winding canyons."]
+    - ["Massive, abandoned library in the capital."]
+    - ["Granaries abandoned during the famine."]
+    - ["Derelict shipwreck, sails webbed over."]
+    - ["Sunken pitfall in the middle of the woods."]
+- key: monster_arboreal_lineage
+  name: Arboreal Lineage
+  group: monsters
+  page: 156
+  blurb: From the monsters on pg. 156.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Arboreal Lineage"
+    rows:
+    - ["Weeping willow, shy but playful."]
+    - ["Oak, stern and steadfast."]
+    - ["Maple, sweet and protective."]
+    - ["Ash, resilient and wise."]
+    - ["Elm, mournful but warm-hearted."]
+    - ["Yew, resilient and vengeful."]
+- key: monster_warband_bosses
+  name: Warband Bosses
+  group: monsters
+  page: 156
+  blurb: From the monsters on pg. 156.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Warband Bosses"
+    rows:
+    - ["Goretooth, feared even by its kin."]
+    - ["Bloodsoak, who bathes in blood."]
+    - ["Rotfoot, who would rule the fey."]
+    - ["Nocap, the hatless one."]
+    - ["Redeyes, born of a murder most foul."]
+    - ["Feybane, who is called betrayer."]
+- key: monster_genie_twists
+  name: Genie Twists
+  group: monsters
+  page: 157
+  blurb: From the monsters on pg. 157.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Genie Twists"
+    rows:
+    - ["Tries to destroy itself with the wish."]
+    - ["Tries too hard to improve the wish."]
+    - ["Makes the wish somehow achieve the opposite."]
+    - ["Mishears, changing one letter in the wish."]
+    - ["Splits the wish around unevenly."]
+    - ["Can't actually grant wishes, but will not admit it."]
+- key: monster_odd_wards
+  name: Odd Wards
+  group: monsters
+  page: 157
+  blurb: From the monsters on pg. 157.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Odd Wards"
+    rows:
+    - ["Door that must remain opened."]
+    - ["Throne meant for a fallen king."]
+    - ["Gate that seemingly leads nowhere."]
+    - ["Altar long without its god."]
+    - ["Bell tower, never once chimed."]
+    - ["Empty stepwell, its community now dust."]
+- key: monster_voices_in_the_chaos
+  name: Voices in the Chaos
+  group: monsters
+  page: 157
+  blurb: From the monsters on pg. 157.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Voices in the Chaos"
+    rows:
+    - ["Familiar voices calling your name."]
+    - ["Fragments of broken promises."]
+    - ["Pleas for help and forgiveness."]
+    - ["Mocking tones from an old enemy."]
+    - ["Chants from forgotten rituals."]
+    - ["Your own voice, screaming your thoughts."]
+- key: monster_golem_construction
+  name: Golem Construction
+  group: monsters
+  page: 158
+  blurb: From the monsters on pg. 158.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Golem Construction"
+    rows:
+    - ["Clay, with a malleable form."]
+    - ["Iron, with a strong magnetic pull."]
+    - ["Crystal, refracting light into dazzling shards."]
+    - ["Jade, with a mind and will of its own."]
+    - ["Flesh, forming tiny flesh or blood golems if cut."]
+    - ["Wood, regrowing damaged parts quickly."]
+- key: monster_metallic_variation
+  name: Metallic Variation
+  group: monsters
+  page: 158
+  blurb: From the monsters on pg. 158.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Metallic Variation"
+    rows:
+    - ["Titanium, light and incredibly fast."]
+    - ["Lead, slow but nearly indestructible."]
+    - ["Steel, covered in sharp spikes."]
+    - ["Silver, blindingly reflecting light."]
+    - ["Brass, emitting an unsettling hum."]
+    - ["Bronze, resisting all magic."]
+- key: monster_people_it_terrorizes
+  name: People it Terrorizes
+  group: monsters
+  page: 158
+  blurb: From the monsters on pg. 158.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "People it Terrorizes"
+    rows:
+    - ["Satyrs, drawn by their celebrations."]
+    - ["Hags, which it hunts for sport."]
+    - ["Shepherds, raiding their flocks."]
+    - ["Merchant caravans, curious about their carts."]
+    - ["Hunters, in revenge for killing kin."]
+    - ["Bandits, scaring them out of its lands."]
+- key: monster_side_effects_of_magical_experimentation
+  name: Side Effects of Magical Experimentation
+  group: monsters
+  page: 158
+  blurb: From the monsters on pg. 158.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Side Effects of Magical Experimentation"
+    rows:
+    - ["Cloaks the whole area in darkness."]
+    - ["Bursts into blinding light when it strikes."]
+    - ["Releases a cloud of sleep gas when struck."]
+    - ["Lets out shrill, echoing whistles."]
+    - ["Absorbs all sound into utter silence."]
+    - ["Tentacles stretch three times normal length."]
+- key: monster_unexpected_locations
+  name: Unexpected Locations
+  group: monsters
+  page: 159
+  blurb: From the monsters on pg. 159.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Unexpected Locations"
+    rows:
+    - ["Entire tower built around it, keeping it frozen."]
+    - ["Steps through a portal and onto a sandy beach."]
+    - ["Riding on a floating iceberg towards a port city."]
+    - ["In a grand wizard's laboratory."]
+    - ["Emerging from a bizarre mid-spring blizzard."]
+    - ["Tied down in the middle of a vast desert."]
+- key: monster_quirks
+  name: Quirks
+  group: monsters
+  page: 160
+  blurb: From the monsters on pg. 160.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Quirks"
+    rows:
+    - ["Always brewing up a brand new stew."]
+    - ["Hoards small, shiny objects—like mirrors."]
+    - ["Roams with a large pack of stray dogs."]
+    - ["Exceptionally rotund, even for a hill giant."]
+    - ["Extremely short, for a hill giant."]
+    - ["Thinks even the slightest odd thing is hilarious."]
+- key: monster_call_to_hunt
+  name: Call to Hunt
+  group: monsters
+  page: 162
+  blurb: From the monsters on pg. 162.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Call to Hunt"
+    rows:
+    - ["Pursuing souls marked by broken oaths."]
+    - ["Stalking souls escaped from the underworld."]
+    - ["Hunting traitors who betrayed their own kin."]
+    - ["Tracking those who spilled innocent blood."]
+    - ["Hounding those who flee from justice."]
+    - ["Wrongly on the trail of the completely innocent."]
+- key: monster_unique_head_regrowths
+  name: Unique Head Regrowths
+  group: monsters
+  page: 162
+  blurb: From the monsters on pg. 162.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Unique Head Regrowths"
+    rows:
+    - ["Sludge head, which spews a poisonous fog."]
+    - ["Only the skull, filled with necrotic energy."]
+    - ["Eyeless head, which can read minds."]
+    - ["Beautiful head with a hypnotic singsong."]
+    - ["Horned head that can ram with force."]
+    - ["The cut head rolls away to form a new hydra."]
+- key: monster_false_renown
+  name: False Renown
+  group: monsters
+  page: 163
+  blurb: From the monsters on pg. 163.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "False Renown"
+    rows:
+    - ["Whispers that prophecies fall from their lips."]
+    - ["Claimed to show past secrets through dreams."]
+    - ["Rumored to bind with honeyed promises."]
+    - ["Fabled to recall lost souls from death’s grasp."]
+    - ["Promised to reveal one’s deepest purpose."]
+    - ["Songs tell of dreams woven into reality."]
+- key: monster_how_it_wants_to_shape_the_future
+  name: How it Wants to Shape the Future
+  group: monsters
+  page: 163
+  blurb: From the monsters on pg. 163.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "How it Wants to Shape the Future"
+    rows:
+    - ["Send dreams to coastal villagers to found a cult."]
+    - ["Spread a plague to turn people into deep-sea thralls."]
+    - ["Create a new volcano to house its fiery lair."]
+    - ["Steal memories from sailors to gain their knowledge."]
+    - ["Manipulate pirates to awaken its mate."]
+    - ["Sink an island of people who no longer worship it."]
+- key: monster_where_the_tunnel_ends
+  name: Where the Tunnel Ends
+  group: monsters
+  page: 163
+  blurb: From the monsters on pg. 163.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Where the Tunnel Ends"
+    rows:
+    - ["A forgotten city, from an unknown civilization."]
+    - ["A vast cavern, illuminated by pulsing light."]
+    - ["A maze of roots, below a truly ancient tree."]
+    - ["An abandoned mine, that met a disastrous end."]
+    - ["A hidden homestead, clearly still used by someone."]
+    - ["A fungal network, illuminated by its mushrooms."]
+- key: monster_curse_origins
+  name: Curse Origins
+  group: monsters
+  page: 164
+  blurb: From the monsters on pg. 164.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Curse Origins"
+    rows:
+    - ["Vanity, punished by a mirror that never reflects."]
+    - ["Lies, broke a promise made in desperation."]
+    - ["Greed, forced to forever protect the relic it stole."]
+    - ["Paranoia, having been betrayed countless times."]
+    - ["Jealousy, spawned from unfulfilled longing."]
+    - ["Hubris, having believed itself above the gods."]
+- key: monster_object_forms
+  name: Object Forms
+  group: monsters
+  page: 164
+  blurb: From the monsters on pg. 164.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Object Forms"
+    rows:
+    - ["Simple, like a barrel, rug, or bookshelf."]
+    - ["Tricky, like a door, book, or cupboard."]
+    - ["Inviting, like a plush chair, bed, or vanity table."]
+    - ["Horrific, like a doll, mask, or coffin."]
+    - ["Nostalgic, like a children's toy, old hat, or lute."]
+    - ["Necessary, like a toilet, staircase, or well."]
+- key: monster_symbiotic_pairings
+  name: Symbiotic Pairings
+  group: monsters
+  page: 164
+  blurb: From the monsters on pg. 164.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Symbiotic Pairings"
+    rows:
+    - ["Wyvern, hunts down injured prey."]
+    - ["Hill giant, makes for a comfortable bed."]
+    - ["Basilisk, waits to petrify escaping targets."]
+    - ["Minotaur, lets it lair in the labyrinth."]
+    - ["Chimera, a tense hunting pact."]
+    - ["Underscourge, follows along from below."]
+- key: monster_labyrinth_layouts
+  name: Labyrinth Layouts
+  group: monsters
+  page: 165
+  blurb: From the monsters on pg. 165.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Labyrinth Layouts"
+    rows:
+    - ["Intricate sewer system of the ancient capital."]
+    - ["Thorn-choked paths hiding mischievous fey."]
+    - ["Tunnels of a sea cave, half-filled with water."]
+    - ["Stone paths lined with fragile mirrors."]
+    - ["Deep stepwell with various paths cut off."]
+    - ["Enchanted woods with shifting pathways."]
+- key: monster_wrathful_riders
+  name: Wrathful Riders
+  group: monsters
+  page: 165
+  blurb: From the monsters on pg. 165.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Wrathful Riders"
+    rows:
+    - ["Exiled knight, who did nothing wrong."]
+    - ["Betrayed queen, who deserved what she got."]
+    - ["Hanged poet, whose words rang too true."]
+    - ["Wayward prince, who will never go home."]
+    - ["Desperate rebel, the last one alive."]
+    - ["Bitter seer, whose warnings were ignored."]
+- key: monster_carried_messages
+  name: Carried Messages
+  group: monsters
+  page: 166
+  blurb: From the monsters on pg. 166.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Carried Messages"
+    rows:
+    - ["Royal summons, sealed with enchanted wax."]
+    - ["Love letter filled with terrible poetry."]
+    - ["Battle plan hastily scrawled."]
+    - ["Desperate plea from a sworn enemy."]
+    - ["Ransom note tied with black string."]
+    - ["Official declaration of invasion."]
+- key: monster_filthy_accomplices
+  name: Filthy Accomplices
+  group: monsters
+  page: 166
+  blurb: From the monsters on pg. 166.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Filthy Accomplices"
+    rows:
+    - ["Spewing animated fungus swarms."]
+    - ["Driven forward by a cult of ruin."]
+    - ["Controlled by city sanitation workers."]
+    - ["Followed by a horde of plague-ridden rats."]
+    - ["Ridden by a foul goblin shaman."]
+    - ["Possessed by a fallen druid's spirit."]
+- key: monster_buried_within
+  name: Buried Within
+  group: monsters
+  page: 168
+  blurb: From the monsters on pg. 168.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Buried Within"
+    rows:
+    - ["Grand druid, sleeping within a cocoon."]
+    - ["Ancient coffin, sealing away a cursed vampire."]
+    - ["Nearly endless amount of animated skeletons."]
+    - ["Mask of twisted vines that whispers riddles."]
+    - ["Fey gateway, pulsing with otherworldly energy."]
+    - ["Warbanner of the true queen."]
+- key: monster_how_it_survives_scrutiny
+  name: How it Survives Scrutiny
+  group: monsters
+  page: 168
+  blurb: From the monsters on pg. 168.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "How it Survives Scrutiny"
+    rows:
+    - ["Mimics dripping water, distant echoes."]
+    - ["Moves incredibly quickly when not watched."]
+    - ["Makes you feel like you are being watched."]
+    - ["Absorbs light, creating longer shadows."]
+    - ["Stays deathly still, even under attack."]
+    - ["Leaves no trace of its previous meals."]
+- key: monster_potential_egg_buyers
+  name: Potential Egg Buyers
+  group: monsters
+  page: 168
+  blurb: From the monsters on pg. 168.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Potential Egg Buyers"
+    rows:
+    - ["Dying empress, who will feed on it to live."]
+    - ["Dragon, who will use it to barter for its life."]
+    - ["Ancient lich, who will create its greatest minion."]
+    - ["Storm giant, who will raise it as a mount."]
+    - ["Infamous pirate, who sees it as a future skyship."]
+    - ["Druidic order, who will unleash it on the world."]
+- key: monster_residual_effects_of_eating_arcana
+  name: Residual Effects of Eating Arcana
+  group: monsters
+  page: 168
+  blurb: From the monsters on pg. 168.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Residual Effects of Eating Arcana"
+    rows:
+    - ["Glows in the dark."]
+    - ["Leaves a trail of sparks behind it."]
+    - ["Floats slightly above the ground."]
+    - ["Speaks in very basic terms."]
+    - ["Vibrates like a tuning fork when struck."]
+    - ["Is completely invisible."]
+- key: monster_overlooked_lairs
+  name: Overlooked Lairs
+  group: monsters
+  page: 169
+  blurb: From the monsters on pg. 169.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Overlooked Lairs"
+    rows:
+    - ["Abandoned mill, half-sunk in the swamp."]
+    - ["Ruined bathhouse, flooded with muck."]
+    - ["Crumbling fort lost in dense woods."]
+    - ["Hollowed-out tree astride a grain field."]
+    - ["Ruined chapel overtaken by brambles."]
+    - ["Rocky cave behind a waterfall."]
+- key: monster_wish_choices
+  name: Wish Choices
+  group: monsters
+  page: 169
+  blurb: From the monsters on pg. 169.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Wish Choices"
+    rows:
+    - ["Ask any yes or no question."]
+    - ["Ask for any one item and it is yours."]
+    - ["Ask to be any age you would like—forever?"]
+    - ["Ask for any one being to cease to be."]
+    - ["Ask for any one being to be brought back."]
+    - ["Ask for a chance to correct a single regret."]
+- key: monster_bygone_plagues
+  name: Bygone Plagues
+  group: monsters
+  page: 170
+  blurb: From the monsters on pg. 170.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Bygone Plagues"
+    rows:
+    - ["The Weeping Rot, turning flesh to black ooze."]
+    - ["The Crimson Blight, causing veins to burst."]
+    - ["The Ashen Grip, hardening limbs into stone."]
+    - ["The Vile Verdancy, growing plants from wounds."]
+    - ["The Choking Miasma, filling lungs with sludge."]
+    - ["The Thorned Decay, sprouting barbs from skin."]
+- key: monster_overly_grandiose_dark_rituals
+  name: Overly Grandiose Dark Rituals
+  group: monsters
+  page: 170
+  blurb: From the monsters on pg. 170.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Overly Grandiose Dark Rituals"
+    rows:
+    - ["Enslave every soul in the realm to its will."]
+    - ["Steal the life essence of the royal bloodline."]
+    - ["Summon the Bonegrinder, eater of legends."]
+    - ["Sing the song that will end the world."]
+    - ["Raise a necropolis from which to rule."]
+    - ["Twist the vast forests into a maze of undead trees."]
+- key: monster_cursed_armaments
+  name: Cursed Armaments
+  group: monsters
+  page: 171
+  blurb: From the monsters on pg. 171.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Cursed Armaments"
+    rows:
+    - ["Heartstealer, a blade that drains courage."]
+    - ["Mindpiercer, a spear that devours memories."]
+    - ["Blackhelm, a helm that compels obedience."]
+    - ["Soulcrusher, a mace that fills with dread."]
+    - ["Rise, a sword that raises new wights."]
+    - ["Wailer, a spiked chain that binds spirits to it."]
+- key: monster_horrific_origins
+  name: Horrific Origins
+  group: monsters
+  page: 171
+  blurb: From the monsters on pg. 171.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Horrific Origins"
+    rows:
+    - ["Untold number of dead from the war."]
+    - ["Royal court and family massacred during a coup."]
+    - ["Serial killer's decades long reign of terror."]
+    - ["Massacre of innocent \"monstrous\" village."]
+    - ["Plague spread by one person jumping ship."]
+    - ["Community's noble sacrifice going unnoticed."]
+- key: monster_siring_intentions
+  name: Siring Intentions
+  group: monsters
+  page: 171
+  blurb: From the monsters on pg. 171.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Siring Intentions"
+    rows:
+    - ["Punish them for betraying your trust."]
+    - ["Offer them a twisted redemption."]
+    - ["Teach them the vanity of mortal life."]
+    - ["Preserve their forbidden love."]
+    - ["Trap them in unending regret."]
+    - ["Use them to control those they once loved."]
+- key: monster_blessings
+  name: Blessings
+  group: monsters
+  page: 172
+  blurb: From the monsters on pg. 172.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Blessings"
+    rows:
+    - ["Five more healthy years of old age."]
+    - ["Sixth sense for when you're being deceived."]
+    - ["Immunity to poisons and diseases."]
+    - ["You can understand any language."]
+    - ["Cleanse any water you touch of impurities."]
+    - ["Always know the direction to home."]
+- key: monster_secrets_to_reveal
+  name: Secrets to Reveal
+  group: monsters
+  page: 172
+  blurb: From the monsters on pg. 172.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Secrets to Reveal"
+    rows:
+    - ["Final resting place of a hero never mourned."]
+    - ["Wooden mask marked with a lost clan's sigil."]
+    - ["Secret names of the will-o'-wisps."]
+    - ["Undying flame hidden in the swamp’s heart."]
+    - ["Waterlogged diary with half-legible confessions."]
+    - ["Still-beating heart buried within twisted roots."]
+- key: monster_under_the_ice
+  name: Under the Ice
+  group: monsters
+  page: 172
+  blurb: From the monsters on pg. 172.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Under the Ice"
+    rows:
+    - ["City frozen in time, its bells still ringing."]
+    - ["Souls wandering, lost beneath the ice."]
+    - ["Portal to a realm of eternal winter."]
+    - ["Cursed blade locked in unmelting ice."]
+    - ["Phoenix stuck in a cycle of death and rebirth."]
+    - ["Balor shackled in ice-forged chains."]
+- key: monster_wyvern_masters
+  name: Wyvern Masters
+  group: monsters
+  page: 172
+  blurb: From the monsters on pg. 172.
+  how: Roll one die and use the line, or pick one that fits.
+  tables:
+  - name: "Wyvern Masters"
+    rows:
+    - ["Gorrak, infamous sky pirate."]
+    - ["Laraen, rogue mage bent on vengeance."]
+    - ["Zurak, black-market smuggler of wyvern eggs."]
+    - ["Tylara, a druid wielding the power of storms."]
+    - ["Drazul, assassin for the highest bidder."]
+    - ["Serdrak, mercenary lord of the skies."]
+- key: vassal_aspects
+  name: Vassal aspects
+  group: characters
+  page: 79
+  blurb: Planar creatures and an aspect each, an existing talent.
+  how: Roll for a creature and the talent it lends your vassal as an aspect, or pick one.
+  tables:
+  - name: Aspects
+    columns: [Aspect, Aspect]
+    rows:
+    - ["dragon: Eldritch Growth", "unicorn: Healing Hands"]
+    - ["ghost: Otherworldly Form", "shadow: Lurker"]
+    - ["demon: Knowing Gaze", "zombie swarm: Bulwark"]
+    - ["pixie: Arcane Training", "warrior spirit: Guardian"]
+    - ["air elemental: Windcaller", "treant: Primal Growth"]
+    - ["oozeling: Shift Form", "tentacles: Fearsome"]

@@ -984,6 +984,7 @@
       growth: { 3: 1, 6: 1 }
       open: true
       from: [big enough to ride, telepathic, a thematic path talent]
+      crucible: vassal_aspects
     bonuses:
     - { key: rituals, label: "Performing a summoning ritual" }
     rolls:

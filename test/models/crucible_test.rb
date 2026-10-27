@@ -61,4 +61,14 @@ class CrucibleTest < ActiveSupport::TestCase
   test "find raises not found for unknown keys" do
     assert_raises(ActiveRecord::RecordNotFound) { Crucible.find("nope") }
   end
+
+  test "the monster pages' d6 tables and the vassal's aspects, checked against the book (pg. 79, 146–172)" do
+    monsters = Crucible.all.select { _1.group == "monsters" }
+    assert_equal 54, monsters.size
+    assert monsters.all? { _1.tables.sole.width == 1 }
+    assert_equal "It's lonely, the last of its kind.", Crucible.find("monster_cyclopean_curses").tables.sole.cell(6, 1)
+    assert_equal "Lies, broke a promise made in desperation.", Crucible.find("monster_curse_origins").tables.sole.cell(2, 1)
+    assert_equal [ "dragon: Eldritch Growth", "tentacles: Fearsome" ], Crucible.find("vassal_aspects").tables.sole.then { [ _1.cell(1, 1), _1.cell(6, 2) ] }
+    assert_equal "vassal_aspects", Talent.find("vassal").choice("aspects").crucible
+  end
 end

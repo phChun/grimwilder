@@ -19,4 +19,13 @@ class CruciblesControllerTest < ActionDispatch::IntegrationTest
     get crucible_path("nope")
     assert_response :not_found
   end
+
+  test "the monster tables are listed under Monsters and roll with one die" do
+    get crucibles_path
+    assert_select "h2", "Monsters"
+
+    get crucible_path("monster_cyclopean_curses")
+    assert_response :success
+    assert_select "*", text: /It's lonely, the last of its kind\./
+  end
 end
