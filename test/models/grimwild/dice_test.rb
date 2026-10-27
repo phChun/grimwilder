@@ -6,10 +6,13 @@ class Grimwild::DiceTest < ActiveSupport::TestCase
 
   test "matches every shared example" do
     EXAMPLES.each do |example|
-      result = Grimwild::Dice.interpret(example["dice"], example["thorns"])
+      dice = Grimwild::Dice.count_as(example["dice"], example["countAs"])
+      result = Grimwild::Dice.interpret(dice, example["thorns"], boosts: example.fetch("boosts", []))
 
       assert_equal example.values_at("result", "critical", "cuts", "appliedCuts"),
         [ result.result, result.critical, result.cuts, result.applied_cuts ], example["note"]
+      assert_equal example["appliedBoosts"], result.applied_boosts, example["note"] if example.key?("appliedBoosts")
+      assert_equal example["twist"], Grimwild::Dice.twist?(dice, example["thorns"]), example["note"] if example.key?("twist")
     end
   end
 

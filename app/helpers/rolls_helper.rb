@@ -73,28 +73,33 @@ module RollsHelper
   # a critical); pool rolls light up the dice that stay and strike out the ones
   # that drop, and mark a power pool's spark dice, which never drop.
   def roll_dice_tags(roll, small: false, size: small ? 32 : 44)
-    highest = roll.all_dice.max
+    counted = roll.counted_dice
+    highest = counted.max
     lit_one = false
     light = ->(value) do
       if roll.pool? then value >= 4 ? :highest : :dropped
       elsif value == highest && (!lit_one || roll.critical?) then lit_one = true; :highest
       end
     end
+    counts = ->(value, as) { as == value ? {} : { counts_as: as, title: "Counts as #{as}" } }
 
     pool_dice = roll.pool? ? roll.dice.size - roll.spark_spent : roll.dice.size
     d6s = roll.dice.map.with_index do |value, index|
       if index < pool_dice
-        die_tag(value, state: light.(value), size: size)
+        die_tag(value, state: light.(counted[index]), size: size, **counts.(value, counted[index]))
       else
         die_tag(value, size: size, extra: "die--spark", aria_label: "spark die showing #{value}", title: "Spark")
       end
     end
-    assists = roll.assists.map do |assist|
-      die_tag(assist["die"], state: light.(assist["die"]), size: size, extra: "die--assist", aria_label: "#{assist["name"]}'s assist die showing #{assist["die"]}", title: assist["name"])
+    assists = roll.assists.map.with_index do |assist, index|
+      as = counted[roll.dice.size + index]
+      die_tag(assist["die"], state: light.(as), size: size, extra: "die--assist", aria_label: "#{assist["name"]}'s assist die showing #{assist["die"]}",
+        title: [ assist["name"], assist["talent"], ("counts as #{as}" if as != assist["die"]) ].compact.join(" · "), counts_as: (as if as != assist["die"]))
     end
     d8s = roll.thorns.map { |value| die_tag(value, kind: "d8", size: size) }
+    boosts = roll.boosts.map { |value| die_tag(value, kind: "d8", size: size, extra: "die--panache", aria_label: "panache die showing #{value}", title: "Panache") }
 
-    safe_join(d6s + assists + d8s)
+    safe_join(d6s + assists + d8s + boosts)
   end
 
   def die_tag(value, **options)
@@ -112,19 +117,24 @@ module RollsHelper
 
   # One line on how the dice got there: "Messy, cut to grim by a thorn".
   def roll_reason(roll)
-    result = Grimwild::Dice.interpret(roll.all_dice, roll.thorns)
-
-    if result.critical?
-      "More than one 6, so thorns can't cut it"
-    elsif result.applied_cuts.positive?
-      base = Grimwild::Dice::RESULTS[Grimwild::Dice::RESULTS.index(result.result) - result.applied_cuts]
-      thorns = result.applied_cuts == 1 ? "a thorn" : "#{result.applied_cuts} thorns"
-      "#{base.capitalize}, cut to #{result.result} by #{thorns}"
-    elsif roll.thorns.any?
-      "Highest die #{result.highest}, and no thorn cut it"
-    else
-      "Highest die #{result.highest}"
-    end
+    result = roll.interpretation
+    reason =
+      if result.critical?
+        "More than one 6, so thorns can't cut it"
+      elsif result.applied_cuts.positive?
+        base = Grimwild::Dice::RESULTS[Grimwild::Dice::RESULTS.index(result.result) - result.applied_cuts + result.applied_boosts]
+        thorns = result.applied_cuts == 1 ? "a thorn" : "#{result.applied_cuts} thorns"
+        "#{base.capitalize}, cut to #{result.result} by #{thorns}"
+      elsif result.applied_boosts.positive?
+        base = Grimwild::Dice::RESULTS[Grimwild::Dice::RESULTS.index(result.result) + result.applied_boosts]
+        "#{base.capitalize}, raised to #{result.result} by #{result.applied_boosts == 1 ? "a panache die" : "#{result.applied_boosts} panache dice"}"
+      elsif roll.thorns.any?
+        "Highest die #{result.highest}, and no thorn cut it"
+      else
+        "Highest die #{result.highest}"
+      end
+    reason += ", with 5s as 6s and 4s as 1s" if roll.reckless?
+    roll.magical_twist? ? "#{reason}. Magical twist: two or more 1s" : reason
   end
 
   # "3d Agility + 1d Expertise + 1 spark + 1d extra + Wren assisting, vs 2t (marked, 1 situational)",
@@ -134,12 +144,14 @@ module RollsHelper
     dice << "#{roll.spark_spent} spark" if roll.spark_spent.positive?
     roll.talent_bonuses.each { dice << "#{_1["dice"]}d #{_1["name"]}" if _1["dice"].positive? }
     dice << "#{roll.help_dice}d extra" if roll.help_dice.positive?
-    dice << "#{roll.assists.pluck("name").to_sentence} assisting" if roll.assists.any?
+    dice << roll_assists_line(roll) if roll.assists.any?
 
     thorns = roll.damage_reasons.dup
     thorns << "#{roll.situational_thorns} situational" if roll.situational_thorns.positive?
 
-    left_out = roll.talent_bonuses.select { _1["ignored"].positive? }.map { "#{_1["name"]} left out #{pluralize(_1["ignored"], "thorn")}" }
+    left_out = roll.talent_bonuses.select { _1["ignored"].positive? }.map do |bonus|
+      "#{bonus["name"]} left out #{pluralize(bonus["ignored"], "thorn")}#{" for #{roll.boosts.size == 1 ? "a panache die" : "#{roll.boosts.size} panache dice"}" if bonus["id"] == Character::Rolling::PANACHE && roll.boosts.any?}"
+    end
 
     setup = [ dice.join(" + "), ("vs #{roll.thorns.size}t (#{thorns.join(", ")})" if thorns.any?), *left_out ].compact.join(", ")
     roll.follow_ups.any? ? "#{setup}; then #{roll.follow_ups.map { follow_up_line(_1) }.join("; ")}" : setup
@@ -170,6 +182,12 @@ module RollsHelper
     end
   end
 
+  # "Wren assisting (+1d Guardian)", "Bram and Wren assisting".
+  def roll_assists_line(roll)
+    extras = roll.assists.select { _1["talent"] }.group_by { _1["talent"] }.map { |talent, dice| "+#{dice.size}d #{talent}" }
+    "#{roll.assists.pluck("name").uniq.to_sentence} assisting#{" (#{extras.join(", ")})" if extras.any?}"
+  end
+
   # What a talent did after the roll: "Fen's Inspiration raised a 3 to 4",
   # "Luck +1d (2), and Tibbs takes spark".
   def follow_up_line(entry)
@@ -185,7 +203,7 @@ module RollsHelper
   end
 
   def roll_summary(roll)
-    result = Grimwild::Dice.interpret(roll.all_dice, roll.thorns)
+    result = roll.interpretation
 
     if result.critical?
       "Multiple 6s: a critical, so thorns can't cut it."
@@ -206,6 +224,16 @@ module RollsHelper
       "Disaster: #{who} takes spark."
     elsif roll.disaster?
       "Disaster: #{who} already holds #{Grimwild::MAX_SPARK} spark."
+    end
+  end
+
+  # "Montage: perfect", or "Montage: critical (Teamwork)" when Teamwork's 6
+  # joins another's.
+  def montage_result(roll)
+    if roll.critical? && roll.sides.none? { _1["critical"] }
+      "Montage: critical (Teamwork)"
+    else
+      "Montage: #{roll.critical? ? "critical" : roll.outcome}"
     end
   end
 

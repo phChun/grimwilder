@@ -16,8 +16,35 @@ module Character::TalentBonuses
   # The same for a story roll or montage at a roll call (RollCall).
   def talent_bonuses_for_call(kind)
     [ *talent_entries, *eldritch_talent_entries ].flat_map do |talent|
-      talent.bonuses.select { _1.on.include?(kind.to_s) }.map { [ talent, _1 ] }
+      talent.bonuses.select { !_1.assist && _1.on.include?(kind.to_s) }.map { [ talent, _1 ] }
     end
+  end
+
+  # What this character brings when assisting someone's action or defense
+  # roll: Guardian's +1d on a defense, Teamwork's 5s as 6s.
+  def assist_bonuses
+    [ *talent_entries, *eldritch_talent_entries ].flat_map do |talent|
+      talent.bonuses.select(&:assist).map { [ talent, _1 ] }
+    end
+  end
+
+  def assist_bonuses_rolled(mode, ticked)
+    picked_bonuses(assist_bonuses, ticked, "an assist").select { _2.on.include?(mode.to_s) }.map { |talent, bonus| [ talent, bonus, bonus.dice ] }
+  end
+
+  # The assist's dice for the roll's `assists`: its own 1d, then 1d for each
+  # die its talents add, named by the talent. Teamwork counts every one's 5s
+  # as 6s.
+  def assist_entries(rolled, random: Random)
+    counts_as = rolled.filter_map { _2.counts_as }.first
+    base = { "character_id" => id, "name" => name, "counts_as" => counts_as }.compact
+    [ base.merge("die" => random.rand(1..6)) ] +
+      rolled.flat_map { |talent, _, dice| Array.new(dice) { base.merge("die" => random.rand(1..6), "talent" => talent.name) } }
+  end
+
+  # Teamwork's montage rule (Roll::Montage); its assist rule is a bonus.
+  def teamwork?
+    [ *talent_entries, *eldritch_talent_entries ].any? { _1.key == "teamwork" }
   end
 
   def bonus_dice(bonus, stat = nil)
@@ -56,7 +83,9 @@ module Character::TalentBonuses
 
   # How a roll stores them, under the talent's name as this character has it.
   def bonus_records(rolled, ignored: {})
-    rolled.map { |talent, bonus, dice| { "id" => bonus.id, "name" => talent.name, "dice" => dice, "ignored" => ignored.fetch(bonus.ignore, 0) } }
+    rolled.map do |talent, bonus, dice|
+      { "id" => bonus.id, "name" => talent.name, "dice" => dice, "ignored" => ignored.fetch(bonus.ignore, 0), "counts_as" => bonus.counts_as, "cast" => (true if bonus.cast) }.compact
+    end
   end
 
   private

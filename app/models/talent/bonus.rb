@@ -12,7 +12,15 @@
 # - `harm`: +1d for each thorn harm adds to this stat (Oathsworn).
 # - `ignore`: thorns it leaves out: `damage` (marks and harm) or `situational`.
 # - `auto`: always applies when it fits, so it's shown rather than ticked.
-class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats, :choice, :use, :per_mark, :harm, :ignore, :auto)
+# - `counts_as: reckless`: the roller's 5s count as 6s and 4s as 1s (Into the
+#   Fray, Audacity…; Grimwild::Dice.count_as).
+# - `cast`: the roll casts a spell, so two or more 1s, thorns included, are a
+#   magical twist (Sorcery, Maelstrom, Wonder Magnet).
+# - `assist`: it applies when this character assists someone else's roll: its
+#   dice join the assist (Guardian, Shepherd), and `counts_as: teamwork`
+#   counts the assist's 5s as 6s. `spark: perfect_both`: on a perfect, the
+#   roller and the assist both take spark (Shepherd).
+class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats, :choice, :use, :per_mark, :harm, :ignore, :auto, :counts_as, :cast, :assist, :spark)
   ROLLS = %w[ action defense ].freeze
   GROUP_ROLLS = %w[ story montage ].freeze
   IGNORES = %w[ damage situational ].freeze
@@ -21,7 +29,8 @@ class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats,
     attributes = attributes.transform_keys(&:to_sym)
     new(talent_key: talent_key, key: attributes.fetch(:key), label: attributes.fetch(:label), dice: attributes.fetch(:dice, 1),
       on: Array(attributes[:only] || ROLLS), stats: Array(attributes[:stats]), choice: attributes[:choice], use: attributes[:use],
-      per_mark: attributes[:per_mark] || false, harm: attributes[:harm] || false, ignore: attributes[:ignore], auto: attributes[:auto] || false)
+      per_mark: attributes[:per_mark] || false, harm: attributes[:harm] || false, ignore: attributes[:ignore], auto: attributes[:auto] || false,
+      counts_as: attributes[:counts_as], cast: attributes[:cast] || false, assist: attributes[:assist] || false, spark: attributes[:spark])
   end
 
   # "expertise/skill", what the roll setup posts.
@@ -41,7 +50,7 @@ class Talent::Bonus < Data.define(:talent_key, :key, :label, :dice, :on, :stats,
   # modes share one setup, so a defense-only bonus is offered on both and
   # counted only on a defense.
   def for_stat?(stat)
-    (on & ROLLS).any? && (stats.empty? || stats.include?(stat.to_s))
+    !assist && (on & ROLLS).any? && (stats.empty? || stats.include?(stat.to_s))
   end
 
   def applies_to?(mode, stat)

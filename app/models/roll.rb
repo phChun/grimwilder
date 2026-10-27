@@ -53,6 +53,25 @@ class Roll < ApplicationRecord
     dice + assists.pluck("die")
   end
 
+  # The same dice as they count: a reckless roll's 5s as 6s and 4s as 1s, a
+  # Teamwork assist's 5s as 6s (Grimwild::Dice.count_as).
+  def counted_dice
+    Grimwild::Dice.count_as(dice, own_rule) + assists.map { Grimwild::Dice.count_as([ _1["die"] ], _1["counts_as"]).first }
+  end
+
+  def interpretation
+    Grimwild::Dice.interpret(counted_dice, thorns, boosts: boosts)
+  end
+
+  def reckless?
+    own_rule.present?
+  end
+
+  # A spell cast (Sorcery, Maelstrom, Wonder Magnet) with two or more 1s, thorns included.
+  def magical_twist?
+    talent_bonuses.any? { _1["cast"] } && Grimwild::Dice.twist?(Grimwild::Dice.count_as(dice, own_rule), thorns)
+  end
+
   def damage_thorns
     damage_reasons.size
   end
@@ -66,6 +85,10 @@ class Roll < ApplicationRecord
   end
 
   private
+    def own_rule
+      talent_bonuses.find { _1["counts_as"] }&.dig("counts_as")
+    end
+
     def stamp_session
       self.play_session ||= campaign&.current_session
       self.scene ||= campaign&.current_scene if play_session&.open?

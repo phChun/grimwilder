@@ -54,7 +54,7 @@ module Roll::FollowUps
         entry["pool_dice"] = follow_up_pool(actor, follow_up).roll_into!(by: by, random: random) if follow_up.pool
 
         apply_follow_up(follow_up, entry, actor, die: die, random: random)
-        result = Grimwild::Dice.interpret(all_dice, thorns)
+        result = interpretation
         self.outcome, self.critical = result.result, result.critical
         entry["spark"] = follow_up_spark(follow_up, entry, actor).select { _1.settle_spark(take: true) }.map(&:name)
         self.follow_ups = follow_ups + [ entry ]

@@ -9,5 +9,15 @@
   { "note": "a cut grim is a disaster", "dice": [2], "thorns": [8], "result": "disaster", "critical": false, "cuts": 1, "appliedCuts": 1 },
   { "note": "cuts stop at disaster", "dice": [1], "thorns": [7, 8, 8], "result": "disaster", "critical": false, "cuts": 3, "appliedCuts": 1 },
   { "note": "multiple 6s: a critical thorns can't cut", "dice": [6, 6, 1], "thorns": [7, 8], "result": "perfect", "critical": true, "cuts": 2, "appliedCuts": 0 },
-  { "note": "a single 6 isn't a critical", "dice": [6, 5], "thorns": [], "result": "perfect", "critical": false, "cuts": 0, "appliedCuts": 0 }
+  { "note": "a single 6 isn't a critical", "dice": [6, 5], "thorns": [], "result": "perfect", "critical": false, "cuts": 0, "appliedCuts": 0 },
+  { "note": "reckless: a 5 counts as a 6", "dice": [5, 2], "thorns": [], "countAs": "reckless", "result": "perfect", "critical": false, "cuts": 0, "appliedCuts": 0 },
+  { "note": "reckless: a 4 counts as a 1", "dice": [4, 3], "thorns": [], "countAs": "reckless", "result": "grim", "critical": false, "cuts": 0, "appliedCuts": 0 },
+  { "note": "reckless: a 5 and a 6 make a critical", "dice": [5, 6], "thorns": [8], "countAs": "reckless", "result": "perfect", "critical": true, "cuts": 1, "appliedCuts": 0 },
+  { "note": "teamwork: 5s count as 6s, 4s stay", "dice": [5, 4], "thorns": [], "countAs": "teamwork", "result": "perfect", "critical": false, "cuts": 0, "appliedCuts": 0 },
+  { "note": "a panache die on a 7 raises grim to messy", "dice": [3], "thorns": [], "boosts": [7], "result": "messy", "critical": false, "cuts": 0, "appliedCuts": 0, "appliedBoosts": 1 },
+  { "note": "panache dice stop at perfect", "dice": [5], "thorns": [], "boosts": [8, 8], "result": "perfect", "critical": false, "cuts": 0, "appliedCuts": 0, "appliedBoosts": 1 },
+  { "note": "a panache die below 7 does nothing", "dice": [2], "thorns": [], "boosts": [6], "result": "grim", "critical": false, "cuts": 0, "appliedCuts": 0, "appliedBoosts": 0 },
+  { "note": "two 1s, a thorn included: a magical twist", "dice": [1, 5], "thorns": [1], "result": "messy", "critical": false, "cuts": 0, "appliedCuts": 0, "twist": true },
+  { "note": "Maelstrom: a 4 counted as a 1 makes a twist", "dice": [4, 1], "thorns": [], "countAs": "reckless", "result": "grim", "critical": false, "cuts": 0, "appliedCuts": 0, "twist": true },
+  { "note": "a single 1 is no twist", "dice": [1, 6], "thorns": [3], "result": "perfect", "critical": false, "cuts": 0, "appliedCuts": 0, "twist": false }
 ]

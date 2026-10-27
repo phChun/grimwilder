@@ -5,6 +5,7 @@ require "test_helper"
 class TalentBonusTest < ActiveSupport::TestCase
   setup do
     @tibbs = characters(:tibbs) # a Rogue: Expertise is the core talent
+    @bram = characters(:bram) # a Fighter at the same table
     @pip = identities(:pip)
   end
 
@@ -110,5 +111,65 @@ class TalentBonusTest < ActiveSupport::TestCase
     side = montage.reload.roll.sides.first
     assert_equal [ [ 1, 1, 6 ], "Jack of All Trades" ], [ side["dice"], side["talent_bonuses"].sole["name"] ]
     assert_equal "perfect", montage.roll.outcome
+  end
+
+  test "a reckless roll counts 5s as 6s and 4s as 1s; a cast with two 1s is a magical twist" do
+    @tibbs.update!(path: "Sorcerer", talent_keys: [ "audacity", "maelstrom" ], level: 2)
+    roll = @tibbs.roll!("agility", by: @pip, bonuses: [ "audacity/abandon" ], random: FixedDice.new([ 5, 4, 2 ]))
+    assert_equal [ [ 5, 4, 2 ], [ 6, 1, 2 ], "perfect" ], [ roll.dice, roll.counted_dice, roll.outcome ]
+    assert roll.reckless?
+    refute roll.magical_twist?
+
+    roll = @tibbs.roll!("presence", by: @pip, bonuses: [ "maelstrom/potent" ], thorns: 1, random: FixedDice.new([ 4, 6, 1 ]))
+    assert_equal [ [ 1, 6 ], "perfect" ], [ roll.counted_dice, roll.outcome ], "the thorn's 1 doesn't cut"
+    assert roll.magical_twist?, "a 4 counted as a 1, and a thorn's 1"
+    assert_match "Magical twist", ApplicationController.helpers.roll_reason(roll)
+  end
+
+  test "panache removes thorns, rolls them as panache dice when it removes them all, and comes back when a roll is cut" do
+    @tibbs.update!(path: "Swashbuckler", talent_keys: [], marked_agility: true)
+    panache = @tibbs.panache_use
+    roll = @tibbs.roll!("agility", by: @pip, thorns: 1, panache: 2, random: FixedDice.new([ 3, 2, 1, 7, 2 ]))
+    assert_equal [ [], [], [ 7, 2 ], "messy" ], [ roll.thorns, roll.damage_reasons, roll.boosts, roll.outcome ], "a 7 raises grim to messy"
+    assert_equal 2, @tibbs.reload.uses_spent(panache)
+    assert_match "Panache left out 2 thorns for 2 panache dice", ApplicationController.helpers.roll_setup(roll)
+    assert_raises(ArgumentError) { @tibbs.roll!("agility", by: @pip, panache: 1) }
+
+    @tibbs.update!(talent_uses: {})
+    roll = @tibbs.roll!("wits", by: @pip, thorns: 2, panache: 1, random: FixedDice.new([ 5, 5, 8 ]))
+    assert_equal [ [ 8 ], [], "grim" ], [ roll.thorns, roll.boosts, roll.outcome ], "only some removed: no panache dice"
+    assert_equal 0, @tibbs.reload.uses_spent(panache), "spent 1, and the cut gives 1 back"
+  end
+
+  test "assist talents: Guardian's +1d on a defense, Shepherd's bond and spark, Teamwork's 5s" do
+    @bram.update!(path: "Paladin", talent_keys: [ "guardian" ])
+    defense = @tibbs.roll!("brawn", by: @pip, mode: "defense", assists: [ @bram ], random: FixedDice.new([ 2, 3, 4 ]))
+    assert_equal [ [ "Bram", nil ], [ "Bram", "Guardian" ] ], defense.assists.map { _1.values_at("name", "talent") }
+    action = @tibbs.roll!("brawn", by: @pip, assists: [ @bram ], random: FixedDice.new([ 2, 3 ]))
+    assert_equal 1, action.assists.size, "Guardian is for defense"
+
+    @bram.update!(path: "Cleric", talent_keys: [ "shepherd", "teamwork" ], level: 2, spark: 0)
+    @tibbs.update!(spark: 0)
+    roll = @tibbs.roll!("brawn", by: @pip, mode: "defense", assists: [ @bram ], assist_bonuses: { @bram.id.to_s => [ "shepherd/bond" ] }, random: FixedDice.new([ 1, 5, 2 ]))
+    assert_equal [ 1, 6, 2 ], roll.counted_dice, "Teamwork counts Bram's 5 as a 6"
+    assert_equal "perfect", roll.outcome
+    assert_equal [ 1, 1 ], [ @tibbs.reload.spark, @bram.reload.spark ], "Shepherd: both take spark on a perfect"
+    assert_match "Bram assisting (+1d Shepherd)", ApplicationController.helpers.roll_setup(roll)
+
+    error = assert_raises(ArgumentError) { @tibbs.roll!("brawn", by: @pip, assists: [ @bram ], assist_bonuses: { @bram.id => [ "guardian/guard" ] }) }
+    assert_match "no talent bonus", error.message
+  end
+
+  test "Teamwork in a montage: its 6 and anyone else's make a critical" do
+    @tibbs.update!(talent_keys: [ "teamwork" ])
+    montage = Roll.montage!(campaign: campaigns(:bramblewood), by: @pip,
+      participants: [ { character: @tibbs, dice: [ 6, 2 ] }, { character: @bram, dice: [ 6, 3 ] } ])
+    assert_equal [ "perfect", true ], [ montage.outcome, montage.critical ]
+    assert_equal "Montage: critical (Teamwork)", ApplicationController.helpers.montage_result(montage)
+
+    @tibbs.update!(talent_keys: [])
+    plain = Roll.montage!(campaign: campaigns(:bramblewood), by: @pip,
+      participants: [ { character: @tibbs, dice: [ 6, 2 ] }, { character: @bram, dice: [ 6, 3 ] } ])
+    refute plain.critical
   end
 end
