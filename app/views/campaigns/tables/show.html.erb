@@ -79,6 +79,7 @@
               <p class="party-card__currency">Spark <%= character.spark %> · Thread <%= character.thread %></p>
               <% uses = talent_use_summary(character) %>
               <% if uses.present? %><p class="party-card__uses"><%= uses %></p><% end %>
+              <% if (picks = picks_to_make_line(character)) %><p class="party-card__picks"><%= picks %></p><% end %>
               <% if (pools = @talent_pools[character.id]) %>
                 <ul class="party-card__pools">
                   <% pools.each do |pool| %>

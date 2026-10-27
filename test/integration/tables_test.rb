@@ -119,4 +119,17 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select "details#crucibles summary .gm-section__title", "Crucible"
     assert_select "details#crucibles turbo-frame#crucible[loading=lazy]"
   end
+
+  test "a party card says what a character still has to pick" do
+    tibbs = characters(:tibbs) # level 1, one talent, no Expertise skills picked
+    tibbs.update!(level: 2)
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
+    assert_select ".party-card__picks", text: "Picks to make: 1 talent, 3 skills (Expertise)"
+
+    tibbs.update!(level: 1)
+    tibbs.choose_for_talent!("expertise", "skills" => %w[ charm stealth network ])
+    get campaign_table_path(@campaign)
+    assert_select ".party-card__picks", text: /Expertise/, count: 0
+  end
 end

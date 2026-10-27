@@ -1,4 +1,12 @@
 module CampaignsHelper
+  # What a character still has to pick, for the GM table's party card: "Picks
+  # to make: 1 talent, 2 skills (Expertise)". Nil when there's nothing.
+  def picks_to_make_line(character)
+    picks = [ (pluralize(character.talents_to_choose, "talent") if character.talents_to_choose.positive?),
+      *character.choices_to_make.map { |talent, choice, left| "#{left} #{choice.nouns(left)} (#{talent.name})" } ].compact
+    "Picks to make: #{picks.join(", ")}" if picks.any?
+  end
+
   HARM = %w[ bloodied rattled desperate ].freeze
 
   # Each player at the table with their seated characters (none yet is fine),
