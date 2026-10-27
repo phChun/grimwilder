@@ -66,4 +66,31 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "#talent-magus .use-tracker__resets", "not enchanted"
   end
+
+  test "Oathsworn's card: violate and atone each tenet, and give Affirmation's spark" do
+    @tibbs.update!(path: "Paladin", talent_keys: %w[ aegis lurker ])
+    @tibbs.choose_for_talent!("oathsworn", "tenets" => [ "never flee" ])
+    sign_in_as identities(:pip)
+
+    patch character_talent_state_path(@tibbs, "oathsworn"), params: { change: "violate", tenet: "never flee" }
+    follow_redirect!
+    assert_select "#talent-oathsworn .oath-tenets__tenet--violated", "Never Flee"
+    assert_select "#talent-oathsworn .oath-tenets", /1 less smite/
+    assert_select "#talent-oathsworn select[name=ally_id] option", text: "Bram"
+
+    patch character_talent_state_path(@tibbs, "oathsworn"), params: { change: "affirm", ally_id: characters(:bram).id }
+    follow_redirect!
+    assert_select "#talent-oathsworn select[name=ally_id]", 0, "once a session"
+  end
+
+  test "Monster Menagerie's card picks the creature that answers" do
+    @tibbs.update!(path: "Summoner", talent_keys: %w[ monster-menagerie lurker ])
+    @tibbs.choose_for_talent!("monster-menagerie", "creatures" => [ "Grimfang", "Mote" ])
+    sign_in_as identities(:pip)
+
+    patch character_talent_state_path(@tibbs, "monster-menagerie"), params: { change: "answer", creature: "Grimfang" }
+    follow_redirect!
+    assert_select "#talent-monster-menagerie .talent-state__on", "Grimfang"
+    assert_select "#talent-monster-menagerie button", text: "Mote"
+  end
 end

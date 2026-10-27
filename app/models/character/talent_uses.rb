@@ -46,8 +46,16 @@ module Character::TalentUses
     Array(talent_uses[use.id]).grep(String)
   end
 
+  # How many boxes a count has now: its count at this level, less anything
+  # its `less_by` takes off (1 smite for each tenet in violation).
+  def use_count(use)
+    return if use.tally?
+
+    [ use.count_at(level) - (use.less_by ? public_send(use.less_by) : 0), 0 ].max
+  end
+
   def uses_left(use)
-    use.tally? ? Float::INFINITY : use.count_at(level) - uses_spent(use)
+    use.tally? ? Float::INFINITY : [ use_count(use) - uses_spent(use), 0 ].max
   end
 
   # Awakened Mind's instability: the thorns on the last box ticked.
@@ -59,7 +67,7 @@ module Character::TalentUses
   # Sets how many of a talent's uses are spent this session or scene.
   def spend_use!(use_id, spent:)
     use = use_counters.find { _1.id == use_id } or raise ArgumentError, "#{name} has no talent use #{use_id.inspect}."
-    update!(talent_uses: talent_uses.merge(use.id => spent.to_i.clamp(0, use.count_at(level) || TALLY_MAX)))
+    update!(talent_uses: talent_uses.merge(use.id => spent.to_i.clamp(0, use_count(use) || TALLY_MAX)))
     use
   end
 

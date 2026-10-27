@@ -23,8 +23,10 @@
 # Vassal).
 #
 # `growth` adds to the count or pool at those levels: { 2 => 1, 4 => 1, 6 => 1 }.
+# `less_by` names a character method whose number comes off a count
+# (Oathsworn's smite: `tenets_in_violation`; Character::TalentUses#use_count).
 class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, :pool_kind, :thread, :growth, :drop_first, :bonus_dice, :named_by,
-  :names, :verb, :tally, :track, :refill)
+  :names, :verb, :tally, :track, :refill, :less_by)
   PERS = %w[ session scene rest never ].freeze
 
   def self.from(talent_key, attributes)
@@ -34,7 +36,7 @@ class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, 
       count: attributes[:count] || attributes[:names]&.size || track&.size, pool: attributes[:pool], pool_kind: attributes[:pool_kind], thread: attributes[:thread],
       growth: (attributes[:growth] || {}).transform_keys(&:to_i), drop_first: attributes[:drop_first] == true,
       bonus_dice: attributes[:bonus_dice] == true, named_by: attributes[:named_by], names: attributes[:names], verb: attributes[:verb] || "burn",
-      tally: attributes[:tally] == true, track: track, refill: attributes[:refill])
+      tally: attributes[:tally] == true, track: track, refill: attributes[:refill], less_by: attributes[:less_by])
   end
 
   # Unique across talents: "inspiration/inspiration", "spellcraft/spells".

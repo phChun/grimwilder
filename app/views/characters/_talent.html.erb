@@ -121,7 +121,7 @@
           </div>
           <% next %>
         <% end %>
-        <% total, spent = use.count_at(character.level), character.uses_spent(use) %>
+        <% total, spent = character.use_count(use), character.uses_spent(use) %>
         <div class="use-tracker">
           <span class="use-tracker__name"><%= use.label %></span>
           <span class="use-boxes" role="group" aria-label="<%= use.label %>: <%= total - spent %> of <%= total %> left">

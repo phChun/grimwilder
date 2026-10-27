@@ -12,7 +12,7 @@ module CampaignsHelper
 
   # "Inspiration 2/3 · Mastery 1/2": uses left this session or scene.
   def talent_use_summary(character)
-    character.use_counters.map { "#{_1.label} #{character.uses_left(_1)}/#{_1.count_at(character.level)}" }.join(" · ")
+    character.use_counters.map { "#{_1.label} #{character.uses_left(_1)}/#{character.use_count(_1)}" }.join(" · ")
   end
 
   def pool_reset_label(pool)
