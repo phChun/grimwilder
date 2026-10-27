@@ -191,6 +191,23 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_select ".roll-toast__setup", text: /3d Agility \+ 1d Expertise/
   end
 
+  test "Cast opens the casting stat's setup with the spell ticked" do
+    @tibbs.update!(path: "Wizard", talent_keys: [])
+    sign_in_as identities(:pip)
+
+    get character_path(@tibbs)
+    assert_select "#talent-spellcraft a[href='#{character_path(@tibbs, cast: "spellcraft", anchor: "stats")}']", text: /Cast/
+    assert_select "details.stat-roll[open]", 0
+
+    get character_path(@tibbs, cast: "spellcraft")
+    assert_select "details.stat-roll[open]", 1
+    assert_select "details.stat-roll[open] #roll_wits_bonus_spellcraft-cast[checked]", 1
+    assert_select "#roll_wits_bonus_spellcraft-potent[checked]", 0
+
+    post character_rolls_path(@tibbs), params: { stat: "wits", mode: "action", dice: 2, total_thorns: 0, bonuses: [ "spellcraft/cast" ] }
+    assert_equal 1, @tibbs.reload.uses_spent(@tibbs.use_counters.find { _1.id == "spellcraft/spells" })
+  end
+
   test "a stat that isn't one never reaches the character" do
     sign_in_as identities(:pip)
 

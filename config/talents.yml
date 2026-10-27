@@ -15,6 +15,8 @@
 # ticked in the roll setup or at a roll call: `label` is our own wording,
 # `only` limits the rolls (defense, story, montage), plus `stats`, `choice`,
 # `use`, `per_mark`, `harm`, `ignore` and `auto` (see the class).
+# "casts" is the stat a spellcaster casts with (or `rite`, a rite pool), for
+# the Cast button on its card.
 # "state" names what the talent keeps between rolls (Character::TalentState):
 # omens, herbs, frenzy, quarries. "makes" are pools made when it's used
 # (Talent::MadePool).
@@ -243,6 +245,7 @@
 
       GROWTH: At levels 3 and 6, gain +1d to each rite pool.'
     page: 60
+    casts: rite
     uses:
     - { key: major-rite, label: Major rite, pool: 6, pool_kind: power, per: session, drop_first: true, growth: { 3: 1, 6: 1 } }
     - { key: minor-rite-1, label: Minor rite, pool: 4, pool_kind: power, per: session, drop_first: true, growth: { 3: 1, 6: 1 } }
@@ -330,6 +333,9 @@
     summary: "Cast elemental spells with Presence; criticals charge an element for a potent spell."
     text: You have spellcasting ability, using raw elemental power (Fire, Earth, Air, or Water) as the touchstone, and casting spells with Presence. On a critical using an element, charge it. Spend it to cast a potent spell with that element. If the elements are spirits in your setting, consider adding bonds for them. You may find alternative ways to charge an element, such as through great deeds or ritual.
     page: 63
+    casts: presence
+    bonuses:
+    - { key: cast, label: "Casting with an element (a critical charges it; spend a charge for a potent spell)", dice: 0, stats: [ presence ] }
     uses:
     - { key: charges, label: Charged elements, names: [ Fire, Earth, Air, Water ], verb: charge, per: never }
   - name: True Shape
@@ -392,6 +398,10 @@
     summary: "Wizard spellcasting: 3 spells and 1 potent spell a session from 3 theorems."
     text: 'You have spellcasting as the Spellcraft talent. You can cast 3 spells and 1 potent spell per session. You know 3 spell theorems, created with the Spell Crucible, and can learn new spells from scrolls. [Prohibited: Wizard]'
     page: 65
+    casts: wits
+    bonuses:
+    - { key: cast, label: "Casting a spell (ticks one of your spells)", dice: 0, stats: [ wits ], use: spells, choice: theorems }
+    - { key: potent, label: "Casting a potent spell (ticks a potent spell instead)", dice: 0, stats: [ wits ], use: potent-spells }
     choices:
     - key: theorems
       label: Spell theorems
@@ -544,6 +554,7 @@
     summary: "Cleric spellcasting with one 4d rite pool each session."
     text: 'You have spellcasting as the Channel Divinity talent. Detail your god and choose 1 rite, a 4d power pool (per session). You can drop 1d and roll the pool to cast a potent spell. [Prohibited: Cleric]'
     page: 69
+    casts: rite
     uses:
     - { key: rite, label: Rite, pool: 4, pool_kind: power, per: session, drop_first: true }
   - name: Guardian
@@ -578,6 +589,7 @@
 
       GROWTH: At levels 3, and 6, you gain +1 instability slot at 0t, and +1 bastion.'
     page: 70
+    casts: wits
     bonuses:
     - { key: cast, label: "Casting a psionic spell: instability adds its thorns", dice: 0, stats: [ wits ], thorns_from: instability }
     - { key: potent, label: "Make it potent: tick instability", dice: 0, stats: [ wits ], use: instability }
@@ -756,6 +768,9 @@
     summary: "Sorcery-style spellcasting with Presence and 3 paths or techniques, never potent."
     text: 'You have spellcasting, as the Sorcery talent. You roll Presence to cast and choose 3 from magic paths and techniques. You can’t cast potent spells, nor do you risk a magical twist. [Prohibited: Sorcerer]'
     page: 75
+    casts: presence
+    bonuses:
+    - { key: cast, label: "Casting a spell (never potent, never a twist)", dice: 0, stats: [ presence ], choice: paths }
     choices:
     - key: paths
       label: Paths and techniques
@@ -806,8 +821,10 @@
 
       GROWTH: At levels 2, 4, and 6, gain a new magic path or technique.'
     page: 76
+    casts: presence
     bonuses:
     - { key: cast, label: "Casting a spell: two or more 1s, thorns included, are a magical twist", dice: 0, stats: [ presence ], cast: true }
+    - { key: potent, label: "Making it potent: push yourself from the card after", dice: 0, stats: [ presence ] }
     choices:
     - key: paths
       label: Paths and techniques
@@ -1143,8 +1160,10 @@
 
       GROWTH: At levels 2, 4, and 6, you gain +2 words of power.'
     page: 84
+    casts: presence
     bonuses:
     - { key: ritualist, label: "Ritualist: completing a ritual invocation" }
+    - { key: cast, label: "Casting with two words of power (burn them on the card)", dice: 0, stats: [ presence ] }
     choices:
     - key: words
       label: Words of power
@@ -1231,6 +1250,10 @@
 
       GROWTH: At levels 2, 4, and 6, gain +1 spell and potent spell per session, +1 theorem.'
     page: 86
+    casts: wits
+    bonuses:
+    - { key: cast, label: "Casting a spell (ticks one of your spells)", dice: 0, stats: [ wits ], use: spells, choice: theorems }
+    - { key: potent, label: "Casting a potent spell (ticks a potent spell instead)", dice: 0, stats: [ wits ], use: potent-spells }
     choices:
     - key: theorems
       label: Spell theorems

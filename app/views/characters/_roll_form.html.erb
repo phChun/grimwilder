@@ -1,9 +1,11 @@
-<%# locals: (character:, stat:, allies:) %>
-<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. Each ally's assist talents (Guardian, Shepherd, Teamwork) sit under their name, and Panache is a choice like spark. %>
+<%# locals: (character:, stat:, allies:, cast: nil) %>
+<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. Each ally's assist talents (Guardian, Shepherd, Teamwork) sit under their name, and Panache is a choice like spark. A talent's Cast button links here with cast: its key, which opens the setup with its cast ticked. %>
 <% damage = character.damage_thorns(stat) %>
 <% dice = character.stat(stat) %>
 <% prefix = "roll_#{stat}" %>
-<details class="stat-roll" name="stat-roll">
+<% bonuses = character.talent_bonuses_for(stat) %>
+<% casting = bonuses.map { _2.id } & (cast && character.talent_entries.find { _1.key == cast }&.cast_bonus_ids).to_a %>
+<%= tag.details class: "stat-roll", name: "stat-roll", open: casting.any? do %>
   <summary class="button stat-roll__toggle">Roll <%= stat.capitalize %></summary>
   <%= render "shared/popover_head", title: "Roll #{stat.capitalize}" %>
 
@@ -32,7 +34,6 @@
       </div>
     <% end %>
 
-    <% bonuses = character.talent_bonuses_for(stat) %>
     <% if bonuses.any? %>
       <fieldset class="stat-roll__group">
         <legend class="stat-roll__label">Talents <small>tick what fits; the log names them</small></legend>
@@ -47,7 +48,7 @@
                 <% end %>
               <% else %>
                 <label class="check stat-roll__talent">
-                  <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), add_thorns: character.bonus_thorns(bonus), defense_only: bonus.defense_only? } %>
+                  <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), checked: casting.include?(bonus.id), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), add_thorns: character.bonus_thorns(bonus), defense_only: bonus.defense_only? } %>
                   <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
                 </label>
               <% end %>
@@ -92,4 +93,4 @@
       <button type="submit" name="mode" value="defense" class="button">Defense</button>
     </div>
   <% end %>
-</details>
+<% end %>
