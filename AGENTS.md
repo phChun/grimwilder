@@ -8,8 +8,8 @@ Guidance for AI coding agents (and humans) working in this repo. Read this befor
 It is **not** a rules reference/SRD. Each tool should quote only as much rule text as a player needs at the table.
 
 Current state:
-- Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`), passwordless accounts (email code + passkeys) with plans, campaigns with join links, campaign pools, crucibles, character sheets and the talent catalog, and the table log (server-rolled character rolls that spend and award spark, plus pool rolls, live on the campaign page).
-- Next: see *Roadmap*.
+- Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`, with talent dice), passwordless accounts (email code + passkeys) with plans, campaigns with join links, pools, crucibles, character sheets and the talent catalog (Preview 6), the GM table and campaign page, table chat, sessions and scenes, optional rules, and the table log (server-rolled rolls that spend and award spark, live on the campaign page).
+- Next: nothing scheduled; see *Roadmap* for what's set aside.
 
 Source rulebook: *Grimwild: Community Edition*, Preview 6 (not in the repo; the edition is `Grimwild::EDITION`, shown in the footer). Page numbers are Preview 6's (`GWCE P6 Pages.pdf`), checked against its text on 2026-10-27.
 
@@ -391,16 +391,30 @@ The UI rethink (brief "Grimwilder: night-table UI", 2026-10-20; mockups in the l
 
 ## Roadmap
 
-1. **Pools**: built, with linked phases (`Pool::Phases`: `phases` JSON plus a current `phase` index, entered as the book writes them, e.g. `4d Claws + 4d Tail`; only the current phase rolls, and a 0d phase unlocks the next one; log entries record `phase` and `next_phase`).
-2. **Crucibles**: built (see above), with the spell, words of power and patron crucibles. Next: the other path-specific crucibles.
-3. **Characters**: built, with the talent catalog, talent choices, arcana and spark spent into rolls (see above).
-4. **Campaign play**: the table log is built, and so are sessions and scenes (see "Sessions & scenes"). Action, defense, story, montage and quarrel rolls are built, with spark and assists. Power pools roll as action rolls too. Story rolls take assists (`RollCall.story!(assists:)`: each rolls 1d in the dialog, no thorns, and it counts toward the result; `Roll.story!(assists:)`), and outside help on a stat roll can be named (`help_from`: "1d from the innkeeper").
+Updated 2026-10-27. The app follows Preview 6 (the P6 update brief's phases 1–5 are all built), and the to-do list is clear.
 
-5. **Plans**: built, assigned by an admin (see *Plans* under Accounts). Next, payments: each paid plan's Stripe price in `config/plans.yml`, `stripe_customer_id` on identities, Stripe Checkout and the Customer Portal, and a webhook that sets `identities.plan`. The webhook only moves accounts between Free and the paid plans and must never touch one on Tester, so testers aren't downgraded; a `plan_source` (admin or stripe) can come with it.
+**Built**
+1. **Pools**, with linked phases (`Pool::Phases`: `phases` JSON plus a current `phase` index, entered as the book writes them, e.g. `4d Claws + 4d Tail`; only the current phase rolls, and a 0d phase unlocks the next one; log entries record `phase` and `next_phase`) and tick pools.
+2. **Crucibles**: 91 of them, including the talent and path-builder crucibles and the monster pages' tables (see *Crucibles*).
+3. **Characters**: the talent catalog with all 18 paths (the Adventurer too), talent choices and path builders, arcana with their optional additions, Oathbreaker, Level 0 and stat progression (see *Characters* and *Talents*).
+4. **Campaign play**: the table log, sessions and scenes, rest, downtime and the optional rules' resets and milestones. Action, defense, story, montage and quarrel rolls, with spark, assists and the talents that change a roll before or after it. Power pools roll as action rolls. Story rolls take assists (`RollCall.story!(assists:)`), and outside help on a stat roll can be named (`help_from`).
+5. **Optional rules** as campaign settings (`Campaign::OptionalRules`), with the per-character ones on the sheet.
+6. **Plans**, assigned by an admin (see *Plans* under Accounts).
 
-Open question: whether rolls can be shared without an account (asked 2026-10-27: not now).
+**Set aside** (2026-10-27, at Shawn's request)
+- **Payments**: each paid plan's Stripe price in `config/plans.yml`, `stripe_customer_id` on identities, Stripe Checkout and the Customer Portal, and a webhook that sets `identities.plan`. The webhook only moves accounts between Free and the paid plans and must never touch one on Tester, so testers aren't downgraded; a `plan_source` (admin or stripe) can come with it.
+- **Sharing a roll without an account** (asked 2026-10-27: not now).
 
-Decided 2026-10-27: Sorcery's magical twist is one pick (open), not all three described; the quarry die is a follow-up on action rolls only, added after the roll.
+**Not modelled** (the book gives no rules to build from)
+- Wild Shape's and the Vassal's per-form details, and the vassal's thematic path talent aspect.
+- Augury's omens on others' story rolls while the roll call is still open (they apply once it's rolled).
+- "Using picks in the roll setup": bonus labels already name the picks.
+- The hex flowers (pg. 190) and the lich's spell list (pg. 170).
+
+**Waiting on others**
+- Open-sourcing the repo under O'Saasy, after groov's licensing review.
+
+**Decided** (2026-10-27): Sorcery's magical twist is one pick (open), not all three described; the quarry die is a follow-up on action rolls only, added after the roll.
 
 ## Production image
 
