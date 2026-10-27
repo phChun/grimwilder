@@ -1,11 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 import { useState } from "reactionview"
-import { actionRoll } from "grimwild/dice"
+import { talentRoll } from "grimwild/dice"
 
-// Rolls the dice for the action roller. The stat/thorns/mode inputs live in
+// Rolls the dice for the action roller. The stat/thorns/mode inputs and the
+// talent dice rules (assists, Teamwork, reckless, Panache, a spell) live in
 // herb:state on the template (roll/show); this controller reads them, rolls,
-// draws the dice into the tray, and writes `outcome` + `critical` back so the
-// template can show the matching result text.
+// draws the dice into the tray, and writes `outcome`, `critical` and `twist`
+// back so the template can show the matching result text.
 export default class extends Controller {
   static targets = ["tray"]
 
@@ -14,31 +15,38 @@ export default class extends Controller {
   }
 
   roll() {
-    const stat = this.state.get("stat")
-    const thorns = this.state.get("thorns")
-    const result = actionRoll(stat, thorns)
+    const get = (name) => this.state.get(name)
+    const result = talentRoll({
+      dice: get("stat"), thorns: get("thorns"), assists: get("assists"), panache: get("panache"),
+      reckless: get("reckless"), teamwork: get("teamwork"), spell: get("spell")
+    })
 
     this.drawTray(result)
 
-    this.state.set({ outcome: result.result, critical: result.critical })
+    this.state.set({ outcome: result.result, critical: result.critical, twist: result.twist })
   }
 
   clear() {
     this.trayTarget.replaceChildren()
-    this.state.set({ outcome: "", critical: false })
+    this.state.set({ outcome: "", critical: false, twist: false })
   }
 
-  drawTray({ dice, thorns, highest }) {
+  // The highest die is lit by what it counts as (a reckless 5 counts as a 6).
+  drawTray({ dice, assistDice, thorns, boosts, counted, highest }) {
     let markedHighest = false
-    const d6s = dice.map((value) => {
-      const top = value === highest && (!markedHighest || value === 6)
+    const light = (value, index) => {
+      const top = counted[index] === highest && (!markedHighest || highest === 6)
       if (top) markedHighest = true
-      return this.die(value, "d6", top ? "die--top" : null)
-    })
+      return top ? "die--top" : null
+    }
+    const d6s = dice.map((value, index) => this.die(value, "d6", light(value, index)))
+    const assists = assistDice.map((value, index) => this.die(value, "d6", light(value, dice.length + index)))
     const d8s = thorns.map((value) => this.die(value, "d8", value >= 7 ? "die--cut" : null))
+    const panache = boosts.map((value) => this.die(value, "d8", "die--panache"))
 
-    // The dice on one line, the thorns (if any) on the next.
-    this.trayTarget.replaceChildren(this.row("Dice", d6s), ...(d8s.length ? [this.row("Thorns", d8s)] : []))
+    // Your dice on one line, then the assists, thorns and Panache dice (if any).
+    this.trayTarget.replaceChildren(this.row("Dice", d6s),
+      ...[ [ "Assists", assists ], [ "Thorns", d8s ], [ "Panache", panache ] ].filter(([ , row ]) => row.length).map(([ label, row ]) => this.row(label, row)))
   }
 
   row(label, dice) {

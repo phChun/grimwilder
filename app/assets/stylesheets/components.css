@@ -163,6 +163,8 @@
 .roller__controls { display: grid; gap: var(--space-5); align-content: start; }
 
 .roller__actions { display: flex; gap: var(--space-2); }
+.roller__talents > :not(summary) { margin-top: var(--space-3); }
+.result__twist { margin: var(--space-2) 0 0; color: var(--grim); font-weight: 600; }
 
 .segmented {
   display: grid;
