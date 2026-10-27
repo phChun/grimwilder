@@ -13,7 +13,8 @@ class Crucible
     "places" => "Places and factions",
     "characters" => "Characters",
     "magic" => "Magic",
-    "time" => "Time passing"
+    "time" => "Time passing",
+    "monsters" => "Monsters"
   }.freeze
   WIDTHS = [ 1, 2, 3, 6 ].freeze
 
