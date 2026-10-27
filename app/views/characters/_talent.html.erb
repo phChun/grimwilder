@@ -17,7 +17,7 @@
         <div class="talent-card__menu" data-menu-target="panel">
           <%= render "shared/popover_head", title: talent.name %>
           <% if tends && talent.choices.any? %>
-            <%= link_to "Choose #{talent.choices.map(&:nouns).to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
+            <%= link_to "Choose #{(talent.choices.reject(&:optional?).presence || talent.choices).map(&:nouns).uniq.to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
           <% end %>
           <% if tends %>
             <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
@@ -54,6 +54,9 @@
   <%= render "talents/kinds", talent: talent %>
   <% if talent.renamed? %><p class="talent-card__aka">Re-skinned <%= talent.book.name %></p><% end %>
   <p class="talent-card__summary"><%= talent.summary %></p>
+  <% if talent.crucible && (crucible = Crucible.find(talent.crucible)) %>
+    <p class="talent-card__crucible"><%= link_to "Roll on #{crucible.name.downcase.delete_suffix(" crucible")}", crucible_path(crucible) %></p>
+  <% end %>
   <% if talent.core? && talent.growth %><p class="talent-card__growth"><span class="talent-card__label">Grows</span> <%= talent.growth %></p><% end %>
   <% if talent.choices.any? %>
     <%# The picks it asks for (Character::TalentChoices), as chips; the owner and GM get a link to the rest. %>

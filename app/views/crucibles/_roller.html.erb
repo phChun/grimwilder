@@ -11,15 +11,15 @@
     </div>
 
     <div class="crucible__results" data-crucible-target="results" aria-live="polite">
-      <p class="crucible__hint"><%= crucible.how %> <small>(pg. <%= crucible.page %>)</small></p>
+      <p class="crucible__hint"><%= crucible.how %> <small>(pg. <%= crucible.page %><%= "; #{crucible.credit}" if crucible.credit %>)</small></p>
     </div>
   </div>
 
   <details class="fold crucible__grids">
-    <summary class="fold__summary"><span class="fold__title">Show the 6×6 tables</span></summary>
+    <summary class="fold__summary"><span class="fold__title">Show the tables</span></summary>
     <div class="crucible__tables">
       <% crucible.tables.each_with_index do |table, index| %>
-        <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" aria-labelledby="embed-<%= crucible.key %>-<%= index %>">
+        <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" data-width="<%= table.width %>" aria-labelledby="embed-<%= crucible.key %>-<%= index %>">
           <header class="crucible-table__header">
             <h3 id="embed-<%= crucible.key %>-<%= index %>" class="crucible-table__name"><%= table.name %></h3>
             <button type="button" class="button button--small" data-action="crucible#rollOne" data-index="<%= index %>">Roll</button>
@@ -29,7 +29,7 @@
               <thead>
                 <tr>
                   <th scope="col"><span class="visually-hidden">Row</span></th>
-                  <% 6.times do |column| %>
+                  <% table.width.times do |column| %>
                     <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
                   <% end %>
                 </tr>

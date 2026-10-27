@@ -1,8 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import { rollDie } from "grimwild/dice"
 
-// Rolls on a crucible's 6x6 tables. Each roll is 2d6 read two ways (pg. 6):
-// first die = row, second = column, and switched. Results are chips; the
+// Rolls on a crucible's tables. On a 6x6 table each roll is 2d6 read two
+// ways (pg. 6): first die = row, second = column, and switched. A narrower
+// table (six rows of 1, 2 or 3 words) reads once: the first die picks the
+// row, the second the column (a list needs only the first). Results are chips; the
 // first reading of each table starts chosen, tap another to choose it. "Keep"
 // saves the chosen words as one line in a per-crucible list in localStorage.
 // Tapping a chip also sends crucible:pick ({ word, table }), so a form around
@@ -30,9 +32,10 @@ export default class extends Controller {
 
   roll(index) {
     const table = this.tableTargets[index]
+    const width = Number(table.dataset.width) || 6
     const a = rollDie(6)
-    const b = rollDie(6)
-    const pairs = a === b ? [[a, b]] : [[a, b], [b, a]]
+    const b = width === 1 ? null : rollDie(6)
+    const pairs = width === 6 ? (a === b ? [[a, b]] : [[a, b], [b, a]]) : [[a, b ? Math.ceil((b * width) / 6) : 1]]
 
     table.querySelectorAll("td.is-hit").forEach((cell) => cell.classList.remove("is-hit"))
     const readings = pairs.map(([row, col]) => {
@@ -41,7 +44,7 @@ export default class extends Controller {
       return { row, col, word: cell.textContent.trim() }
     })
 
-    this.rolls.set(index, { name: table.dataset.name, dice: [a, b], readings, chosen: 0 })
+    this.rolls.set(index, { name: table.dataset.name, dice: [a, b].filter(Boolean), readings, chosen: 0 })
   }
 
   choose(event) {

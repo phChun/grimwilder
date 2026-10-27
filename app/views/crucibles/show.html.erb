@@ -7,6 +7,7 @@
     <p class="eyebrow"><%= link_to "Crucibles", crucibles_path %> · <%= @crucible.group_name %></p>
     <h1><%= @crucible.name %></h1>
     <p class="page-header__lede"><%= @crucible.how %> <small>(pg. <%= @crucible.page %>)</small></p>
+    <% if @crucible.credit %><p class="crucible__credit"><%= @crucible.credit %></p><% end %>
   </header>
 
   <section class="panel crucible__roller" aria-label="Roll">
@@ -40,7 +41,7 @@
 
   <div class="crucible__tables" hidden="<%= !show_tables %>">
     <% @crucible.tables.each_with_index do |table, index| %>
-      <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" aria-labelledby="table-<%= index %>">
+      <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" data-width="<%= table.width %>" aria-labelledby="table-<%= index %>">
         <header class="crucible-table__header">
           <h3 id="table-<%= index %>" class="crucible-table__name"><%= table.name %></h3>
           <button type="button" class="button button--small" data-action="crucible#rollOne" data-index="<%= index %>">Roll</button>
@@ -50,7 +51,7 @@
           <thead>
             <tr>
               <th scope="col"><span class="visually-hidden">Row</span></th>
-              <% 6.times do |column| %>
+              <% table.width.times do |column| %>
                 <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
               <% end %>
             </tr>

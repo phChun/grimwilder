@@ -15,6 +15,8 @@
 # ticked in the roll setup or at a roll call: `label` is our own wording,
 # `only` limits the rolls (defense, story, montage), plus `stats`, `choice`,
 # `use`, `per_mark`, `harm`, `ignore` and `auto` (see the class).
+# "crucible" is one to roll on for it (Herbalism's herb names, the Vassal's
+# form), linked from its card.
 # "casts" is the stat a spellcaster casts with (or `rite`, a rite pool), for
 # the Cast button on its card.
 # "state" names what the talent keeps between rolls (Character::TalentState):
@@ -463,6 +465,11 @@
 
       GROWTH: At levels 3 and 6, gain +1 flow per scene and +1 interrupts per session.'
     page: 66
+    choices:
+    - { key: concept, label: Style concept, noun: concept, pick: 2, optional: true, from_list: martial_concepts, crucible: martial_arts, table: Concept }
+    - { key: moves, label: Stances and moves, noun: stance or move, plural: stances and moves, pick: 3, optional: true, from_list: martial_moves, crucible: martial_arts, table: Stances and moves }
+    - { key: weapons, label: Style weapons, noun: weapon, pick: 2, optional: true, from_list: martial_weapons, crucible: martial_arts, table: Weapons }
+    crucible: martial_arts
     bonuses:
     - { key: flow, label: "Spend 1 flow: no thorns for being outnumbered or a single imposing foe (leave them off)", dice: 0, use: flow }
     uses:
@@ -738,6 +745,7 @@
 
       GROWTH: At levels 3 and 6, gain +1d Competence per session and +1 skill.'
     page: 74
+    crucible: criminal_history
     follow_ups:
     - { key: competence, kind: bonus, label: "Roll Competence as bonus dice", pool: competence, after: expertise/skill }
     bonuses:
@@ -750,6 +758,8 @@
       groups:
         Above board: [duel, evade, investigate, persuade, track, traverse]
         Below table: [ambush, "forgery & disguise", lying, sabotage, sleight of hand, stealth]
+    - { key: guild, label: Thieves guild, noun: guild trait, pick: 2, optional: true, from_list: thieves_guild }
+    - { key: guild-isnt, label: But the guild isn't, noun: guild trait, pick: 1, optional: true, from_list: thieves_guild }
     uses:
     - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
   talents:
@@ -907,6 +917,7 @@
 
       GROWTH: At levels 3 and 6, you gain +1 aspect.'
     page: 78
+    crucible: vassal
     choices:
     - key: aspects
       label: Aspects
@@ -978,6 +989,7 @@
 
       GROWTH: At levels 2, 4, and 6, you gain +1 panache per scene.'
     page: 80
+    crucible: entanglements
     uses:
     - { key: panache, label: Panache, count: 2, per: scene, growth: { 2: 1, 4: 1, 6: 1 } }
     - { key: quick-wit, label: Quick Wit, count: 1, per: session }
@@ -1029,6 +1041,7 @@
     summary: "Tales of your exploits spread; take spark when you play into your legend."
     text: 'Many recognize you as a hero, others as a cad and ne''er-do-well. Track tales of your exploits with campaign pools. Take spark when you play into it by: leaving a calling card—saying your catchphrase in a dramatic moment—indulging a fan.'
     page: 81
+    crucible: legend
 - key: warlock
   name: Warlock
   kind: path
@@ -1199,6 +1212,7 @@
     summary: "Given time, bless a homestead: outside help on all rolls there, plus two wondrous traits."
     text: 'Given time, you can bless a homestead to overflow with power. You get outside help on all rolls while on its grounds. Choose two wondrous traits to give it such as: traveling—ritual anchor—healing—caretaker. You can only have one homestead like this at a time. charming castle mysterious cottage rickety glade unsettling manner vibrant shack whimsical temple'
     page: 85
+    crucible: hovel
     choices:
     - key: traits
       label: Wondrous traits
@@ -1231,6 +1245,7 @@
     summary: "Two herb names each session, and 1 trivial and 1 minor potion to use."
     text: Before each session, use the herbalism crucible to make two herb names. Each session, you have 1 trivial and 1 minor potion, chosen when they’re used. The name is the touchstone. One time only, you can have 1 major potion.
     page: 85
+    crucible: herbalism
     state: herbs
     uses:
     - { key: trivial-potion, label: Trivial potion, count: 1, per: session }
@@ -1399,3 +1414,112 @@
     page: 89
     rolls:
     - { kind: story, odds: 2, label: Play to the crowd }
+- key: legacy
+  name: Legacy talents
+  kind: legacy
+  page: 178
+  aka: null
+  tagline: Talents from Grimwild v1.4 and earlier Community Edition versions, dropped for balance or theme. Ask your GM before taking one.
+  core: null
+  talents:
+  - name: Weapon Mastery (Legacy)
+    summary: "Legacy Fighter core: a mastery die in your style; a 6 on it is a critical."
+    text: 'Choose a fighting style that you have mastered: brawling—dual-wielding—one-handed weapons—ranged weapons—thrown weapons—two-handed weapons. You have a mastery die, a special d6. When you fight in your style, take +1d (the mastery die) on the roll. If the mastery die is a 6, it counts as a critical. If it’s already a critical, take spark.
+
+
+      GROWTH: At levels 3 and 6, you gain +1d mastery die.'
+    note: 'Rationale: This talent gets overpowered at higher levels, with a near 50% chance to critical and a minuscule 1.5% chance to fail at level 6. This trivializes fights and can be boring.'
+    page: 178
+    legacy_core_of: Fighter
+    choices:
+    - { key: style, label: Fighting style, pick: 1, from: [ brawling, dual-wielding, one-handed weapons, ranged weapons, thrown weapons, two-handed weapons ] }
+    bonuses:
+    - { key: style, label: "Fighting in your style: the mastery die (a 6 on it is a critical)", choice: style }
+  - name: Awakened Mind (Legacy)
+    summary: "Legacy Psion core: 8 power points a session to cast and augment spells."
+    text: 'You have spellcasting ability. Your bastions act as touchstones for your magic. Each session, you have 8 power points. Spend 1 power point to cast a spell. You can augment it by spending 1 or more points to: cast a potent spell—take +1d (max once) on the roll—ignore thorns from damage—add another bastion as a touchstone.
+
+
+      GROWTH: At levels 2, 4, and 6, you gain +1 bastion, and 2 power points per session.'
+    note: 'Rationale: While somewhat overpowered, allowing the same number of spells with more flexibility than wizards, the power point system doesn''t give flavor to its magic.'
+    page: 178
+    legacy_core_of: Psion
+    casts: wits
+    uses:
+    - { key: power, label: Power points, count: 8, per: session, growth: { 2: 2, 4: 2, 6: 2 } }
+    bonuses:
+    - { key: cast, label: "Casting a spell (spend a power point on the card)", dice: 0, stats: [ wits ] }
+    - { key: augment, label: "Augmented: +1d (spend a power point on the card)", stats: [ wits ] }
+  - name: Bardsong (Legacy)
+    summary: "Legacy Bard core: 3 bardsongs and 3 melodies a session."
+    text: 'Each session, you can sing 3 bardsongs, rolling Presence. Sing one to pull off a potent feat of emotional influence, like eliciting a vex response in an NPC, buffing a group of allies, or inflicting hindrances on enemies. You can also sing one to interrupt an impact move. A bardsong''s effect flows from its composition. Choose a style, tune, and impact (pg. 56) that matches the effect.
+
+
+      Each session, you can also sing 3 melodies, spur of the moment tunes without specific composition. Spend them to: assist without risk—calm or intensify a vex response—clear a mark. These don''t require a roll. You cannot affect yourself.
+
+
+      GROWTH: At levels 3 and 6, you gain +1 bardsong and +1 melody per session.'
+    note: 'Rationale: Multiple kinds of tracked abilities, and building bardsongs on the fly can slow the game down. This talent is also quite powerful at low levels.'
+    page: 178
+    legacy_core_of: Bard
+    uses:
+    - { key: bardsongs, label: Bardsongs, count: 3, per: session, growth: { 3: 1, 6: 1 } }
+    - { key: melodies, label: Melodies, count: 3, per: session, growth: { 3: 1, 6: 1 } }
+  - name: Flurry
+    summary: "Push yourself to do two physical actions at once with one stat, taking the top two dice."
+    text: You can push yourself to attempt two distinct physical actions at once using one stat, and taking your highest two dice as the results. You can't prompt more than one impact move from this combined action.
+    page: 179
+  - name: Cunning Actions
+    summary: "On a perfect in an intense scene, keep the spotlight; the GM takes suspense instead."
+    text: On a perfect in an intense scene, you can keep the spotlight, even if the GM wants to spend suspense. The GM must take suspense as an impact move on your follow-up. Afterward, move the spotlight to an ally.
+    page: 179
+  - name: Trap Sense
+    summary: "You always notice traps near you; avoid or disable one to take spark."
+    text: You always notice traps near you. When you avoid or disable one, take spark.
+    page: 179
+  - name: Anchorshot
+    summary: "A harpoon rig that tethers big monsters: a 4d Tethered pool on the target."
+    text: 'You have a hook, harpoon, and rope contraption that anchors large monsters to the ground. With it, you have potency to hinder the movement of anything elephant-sized or larger. When hit, the target becomes 4d Tethered. It anchors to the ground so you can leave it.'
+    page: 179
+    makes:
+    - { key: tethered, label: Tethered, pool: 4, kind: timer, at_once: 3, lasts: session, named: true }
+  - name: Double-Barreled Blunderbuss
+    summary: "A firearm with six kinds of crafted ammo, one shot of each a session."
+    text: 'You have a firearm that fires specialized, crafted ammo. You get one shot of each per session. When you shoot, choose the ammo: blast core—drill shot—inferno shot—scatter shot—shrapnel burst—tangler shot. Each shot has a secondary effect related to the type. You can fire two ammo types at the same time for a potent shot.'
+    page: 179
+    uses:
+    - { key: ammo, label: Ammo, names: [ blast core, drill shot, inferno shot, scatter shot, shrapnel burst, tangler shot ], verb: burn }
+  - name: Mechanical Mount
+    summary: "A small mechanical vehicle with three features, each good for a potent feat once a session."
+    text: 'You have a small mechanical vehicle, like a steamwork spider or smoke-belching cart. It has three features: all-terrain—armored—burrowing—grappling hook—submergible—turbo boost. You can activate each perk once per session to pull off a potent feat of piloting. It also has one drawback: conspicuous—horrifying—slow—unreliable.'
+    page: 179
+    choices:
+    - { key: features, label: Features, pick: 3, from: [ all-terrain, armored, burrowing, grappling hook, submergible, turbo boost ] }
+    - { key: drawback, label: Drawback, pick: 1, from: [ conspicuous, horrifying, slow, unreliable ] }
+    uses:
+    - { key: features, label: Features, count: 3, per: session, named_by: features }
+  - name: Steamhammer
+    summary: "A steam-infused warhammer with a 6d power pool for potent pulverizing force."
+    text: You have a large steam-infused warhammer. Each session, you have a 6d Steamhammer power pool. You can roll the pool to pull off potent feats of pulverizing force. You can also not expend its steam to use it as a normal warhammer.
+    page: 179
+    uses:
+    - { key: steamhammer, label: Steamhammer, pool: 6, pool_kind: power, per: session }
+  - name: Swiftwing
+    summary: "Gliding wings: a 3d (or 4d) pool aloft, rolled as bonus dice on physical rolls."
+    text: 'You have highly maneuverable wings that allow you to glide (not fly). You gain a 3d resource pool while aloft, or 4d if you have extreme height or speed. You must roll the pool as bonus dice with any physical roll made while aloft, including defenses. At 0d, you coast back to the ground.'
+    page: 179
+    makes:
+    - { key: aloft, label: Aloft, pool: 3, kind: resource, lasts: scene, bonus_dice: true }
+    follow_ups:
+    - { key: aloft, kind: bonus, label: "Roll Aloft: a physical roll while gliding", pool: aloft }
+  - name: Mind Seed
+    summary: "Planted thoughts take effect exactly when you choose; once a session, an interrupt."
+    text: When you plant thoughts or alter memories in someone's head, you can always choose to have them take effect exactly when you want them to. You can decide this at any time later. Once per session, you can use this for an interrupt.
+    page: 179
+    uses:
+    - { key: interrupt, label: Interrupt, count: 1, per: session }
+  - name: Disturbed Mind
+    summary: "Spend 2 power points for potency on a Wits or Presence defense; interrupt their next move."
+    text: 'You can spend 2 power points to gain potency on any Wits or Presence defense roll. Regardless of the roll, if the attacker is sentient, you can interrupt their next impact move.'
+    note: Formerly Tumultuous Mind on Psion. Its power points are the legacy Awakened Mind's.
+    page: 179

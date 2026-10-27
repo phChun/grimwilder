@@ -17,7 +17,7 @@ module Grimwild
       @data ||= load_data
     end
 
-    %w[ stats paths backgrounds traits desires magic_schools arcana_functions weapon_styles bond_intensities bond_natures arcs ].each do |key|
+    %w[ stats paths backgrounds traits desires magic_schools arcana_functions weapon_styles bond_intensities bond_natures arcs martial_concepts martial_moves martial_weapons thieves_guild ].each do |key|
       define_method(key) { data.fetch(key) }
     end
 

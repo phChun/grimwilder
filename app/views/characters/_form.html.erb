@@ -20,6 +20,11 @@
       <%= form.label :path, "Path", class: "field__label" %>
       <%= form.select :path, Grimwild.paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
       <p class="field__hint">Your path gives its core talent. Add another talent from any path below.</p>
+      <% legacy = Talent.all.select(&:legacy_core_of) %>
+      <label class="check">
+        <%= form.check_box :legacy_core %>
+        Use the legacy core talent, where the path has one (<%= legacy.map { "#{_1.legacy_core_of}: #{_1.name.delete_suffix(" (Legacy)")}" }.to_sentence %>; pg. 178). Ask your GM first.
+      </label>
     </div>
     <%# Once made, the edit page's "At the table" section seats or moves the character. %>
     <% unless character.persisted? %>

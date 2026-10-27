@@ -2601,3 +2601,4 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .talent-state__dice { display: inline-flex; gap: 4px; }
 .talent-state__on { color: var(--grim); }
 .stat-progression { position: relative; margin-top: var(--space-2); }
+.crucible__credit, .talent-card__crucible { margin: 0; font-size: 0.85rem; color: var(--muted); }

@@ -429,3 +429,173 @@
     - [worshipers, adoration, fear, fame, revenge, knowledge]
     - [promises, purity, progress, curios, truth, experiences]
     - [influence, life, territory, perfection, order, entropy]
+- key: herbalism
+  name: Herbalism crucible
+  group: magic
+  page: 85
+  credit: Herbalism crucible by Juniper Bloom, used with permission.
+  blurb: Herb names for a witch's Herbalism, two before each session.
+  how: Roll once on each table and put the two halves together for an herb's name. The name is the potion's touchstone.
+  tables:
+  - name: First half
+    rows:
+    - [choke, star, sun, dream, mist, zap]
+    - [sticky, stone, moon, feather, soot, blast]
+    - [wool, dust, devil, wild, freeze, blood]
+    - [smoke, snake, honey, mirror, sting, ink]
+    - [shriek, mimic, goat, worm, steel, skunk]
+    - [giggle, needle, night, swell, faerie, dragon]
+  - name: Second half
+    rows:
+    - [cap, lily, thistle, pod, stem, petal]
+    - [wort, reed, bell, bud, shoot, bean]
+    - [rose, flower, leaf, tongue, bark, tuber]
+    - [bush, root, wood, berry, funnel, vine]
+    - [shroom, spine, grass, lace, moss, seed]
+    - [sprout, shade, thorn, bane, branch, weed]
+- key: hovel
+  name: Homely hovel
+  group: magic
+  page: 85
+  blurb: A witch's blessed homestead, for Homely Hovel.
+  how: Roll once on each list and put them together, like a whimsical glade.
+  tables:
+  - name: Kind
+    columns: [Kind]
+    rows: [[charming], [mysterious], [rickety], [unsettling], [vibrant], [whimsical]]
+  - name: Place
+    columns: [Place]
+    # The book prints "manner"; it's a manor.
+    rows: [[castle], [cottage], [glade], [manor], [shack], [temple]]
+- key: vassal
+  name: Build-a-vassal
+  group: characters
+  page: 78
+  blurb: The basic form of a summoner's vassal.
+  how: "Roll once on each table: it's a ___ ___-like creature that I send ___ing toward my enemies."
+  tables:
+  - name: Build
+    columns: [Build, Build]
+    rows: [[squat, tall], [gangly, angular], [robust, bulky], [lithe, rounded], [sleek, hunched], [imposing, gaunt]]
+  - name: Creature
+    columns: [Creature, Creature]
+    rows: [[frog, chicken], [bull, snake], [turtle, insect], [squid, jellyfish], [cat, ape], [spider, blob]]
+  - name: Movement
+    columns: [Movement, Movement]
+    rows: [[prowl, glide], [slither, dash], [leap, skitter], [crawl, lumber], [bound, charge], [gallop, float]]
+- key: legend
+  name: The Legend of…
+  group: characters
+  page: 81
+  blurb: What people have taken to calling a swashbuckler.
+  how: Roll once on each table and smash them together, like the Crimson Fox.
+  tables:
+  - name: First
+    columns: [Playful, Witty, Mysterious]
+    rows: [[smiling, gallant, steel], [red, artful, crimson], [infallible, sly, gray], [dashing, silver, silent], [fantastic, azure, midnight], [wondrous, gilded, masked]]
+  - name: Second
+    columns: [Abstract, Animal, Trade]
+    rows: [[phantom, robin, baron], [marvel, hawk, wanderer], [one, butterfly, knight], [justice, fox, rake], [enigma, phoenix, thief], [mirage, viper, avenger]]
+- key: entanglements
+  name: Past entanglements
+  group: characters
+  page: 80
+  blurb: People important in a swashbuckler's tales.
+  how: Roll once on each side and smash them together, like a bitter rival. Choose 2, and 1 more vital to the story you don't know yet.
+  tables:
+  - name: Who they are to you
+    columns: [How, How]
+    rows: [[spurned, lifelong], [obsessed, bitter], [vengeful, adoring], [treacherous, innocent], [jealous, ambitious], [mysterious, secret]]
+  - name: Who
+    columns: [Who, Who]
+    rows: [[patron, partner], [investigator, rival], [paramour, fan], [mentor, friend], [faction, muse], [relative, protégé]]
+- key: spring
+  name: Spring months
+  group: time
+  page: 140
+  blurb: A fantastic name for a month of spring.
+  how: Roll once on each list for a month's name, like Green Bloom. Add three details for it, like atmospherics, weather or flora.
+  tables:
+  - { name: First, columns: [Spring], rows: [[green], [petal], [moss], [eager], [fresh], [well]] }
+  - { name: Second, columns: [Spring], rows: [[bloom], [wind], [wave], [dawn], [shine], [hope]] }
+- key: summer
+  name: Summer months
+  group: time
+  page: 140
+  blurb: A fantastic name for a month of summer.
+  how: Roll once on each list for a month's name, like Ash Storm. Add three details for it, like atmospherics, weather or flora.
+  tables:
+  - { name: First, columns: [Summer], rows: [[ash], [flood], [sear], [lazy], [gold], [buzz]] }
+  - { name: Second, columns: [Summer], rows: [[storm], [haze], [flare], [glow], [breeze], [surge]] }
+- key: fall
+  name: Fall months
+  group: time
+  page: 140
+  blurb: A fantastic name for a month of fall.
+  how: Roll once on each list for a month's name, like Husk Mist. Add three details for it, like atmospherics, weather or flora.
+  tables:
+  - { name: First, columns: [Fall], rows: [[husk], [wilt], [amber], [rust], [bitter], [turn]] }
+  - { name: Second, columns: [Fall], rows: [[mist], [moon], [dew], [chill], [flow], [smoke]] }
+- key: winter
+  name: Winter months
+  group: time
+  page: 140
+  blurb: A fantastic name for a month of winter.
+  how: Roll once on each list for a month's name, like Storm Tide. Add three details for it, like atmospherics, weather or flora.
+  tables:
+  - { name: First, columns: [Winter], rows: [[storm], [bleak], [quiet], [howl], [frost], [drift]] }
+  - { name: Second, columns: [Winter], rows: [[tide], [gale], [sheen], [hush], [freeze], [morn]] }
+- key: eldritch_mutations
+  name: Eldritch mutations
+  group: gm
+  page: 147
+  blurb: What's grown on a chuul, or anything the magic has twisted.
+  how: Roll once on each list and put them together, like glowing eyestalks.
+  tables:
+  - { name: Quality, columns: [Quality], rows: [[acidic], [spiked], [reflective], [extendable], [glowing], [magic-sensing]] }
+  - { name: Part, columns: [Part], rows: [[shell], [eyestalks], [wings], [antennae], [tail], [claws]] }
+- key: martial_arts
+  name: Martial arts style
+  group: characters
+  page: 66
+  blurb: A monk's fighting style, its stances and its weapons.
+  how: "It's based on the concept of ___ (choose 1 or 2), it features stances and moves like ___ (choose 3), and it often makes use of weapons like ___ (choose 2)."
+  tables:
+  - name: Concept
+    columns: [Primal, Elemental, Powerful, Idealistic, Philosophical, Stylistic]
+    rows:
+    - [tiger, fire, thunderstorm, harmony, foundation, ferocity]
+    - [crane, water, avalanche, destruction, flourishing, deception]
+    - [snake, air, tsunami, tranquility, refinement, grace]
+    - [wolf, earth, whirlwind, justice, adaption, brutality]
+    - [mantis, lightning, earthquake, chaos, endurance, precision]
+    - [raven, heart, volcano, freedom, transformation, patience]
+  - name: Stances and moves
+    rows:
+    - [open palm, elbow strike, circular step, high kick, crane stance, mantis grab]
+    - [spinning kick, aerial leaps, knee strike, tiger claw, side kick, close punch]
+    - [low stance, breath control, joint lock, heavy strike, swift parry, leaping elbow]
+    - [finger jabs, redirecting grab, pressure point, dual strikes, rooted stance, snap kick]
+    - [iron forearm, chop strike, whipping attack, jumps & rolls, soft redirect, wide sweep]
+    - [flowing step, iron grip, steady gaze, palm heel, backfist strike, crescent kick]
+  - name: Weapons
+    columns: [Blunt, Flexible, Edged, Reach, Thrown, Specialized]
+    rows:
+    - [bo staff, chain whip, sai, monk spade, shuriken, tiger claws]
+    - [three-part staff, rope dart, kama, spear, throwing spikes, spiked boots]
+    - [half-staff, sickle & chain, butterfly sword, naginata, chakram, war fan]
+    - [nunchaku, weight & chain, hook sword, longhandle blade, boomerang, iron knuckles]
+    - [short sticks, whip blade, straight sword, trident, darts, crescent knives]
+    - [batons, scarf, curved sword, scythe, throwing axes, backfist rings]
+- key: criminal_history
+  name: Criminal history
+  group: characters
+  page: 74
+  blurb: A rogue's past crimes, and the reputation that follows them.
+  how: "Set a crime's severity and nature, your reputation from it, and your reaction: I did what I had to do, I was set up, it was a misunderstanding, I'll do it again…"
+  tables:
+  - { name: Severity, columns: [Severity], rows: [[petty], [low-level], [moderate], [serious], [severe], [legendary]] }
+  - name: Nature
+    columns: [Nature, Nature, Nature]
+    rows: [[theft, vandalism, treason], [fraud, gambling, robbery], [spying, bribery, assassination], [smuggling, extortion, heist], [banditry, arms dealing, impersonation], [kidnapping, arson, necromancy]]
+  - { name: Reputation, columns: [Reputation], rows: [[barely remembered], [small bounty], [known name], [hunted], [infamous], [most wanted]] }
