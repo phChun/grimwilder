@@ -1,0 +1,56 @@
+<% content_for :title, "Scene prep · #{Current.campaign.name}" %>
+
+<%# The GM's prepared scenes (ScenePlan): the ones still to play, then a few that have been. Starting a scene offers the ones to play. %>
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_table_path(Current.campaign) %></p>
+  <h1>Scene prep</h1>
+  <p class="page-header__lede">Write scenes ahead of play. When you start a scene, pick one to fill in its title, notes and opening story roll.</p>
+</header>
+
+<div class="fluid">
+  <div class="fluid__main stack">
+    <section class="card stack" aria-labelledby="plans-title">
+      <h2 id="plans-title" class="card__title">To play</h2>
+      <% if @plans.any? %>
+        <ol class="scene-plans">
+          <% @plans.each do |plan| %>
+            <li id="<%= dom_id(plan) %>" class="scene-plans__item">
+              <div class="scene-plans__main">
+                <strong class="scene-plans__title"><%= plan.title %></strong>
+                <% if plan.opening? %><span class="field__hint">Opens with a <%= plan.opening_odds %>d story roll<%= ": #{plan.opening_question}" if plan.opening_question %></span><% end %>
+                <% if plan.notes %><p class="scene-plans__notes"><%= plan.notes %></p><% end %>
+              </div>
+              <div class="scene-plans__actions">
+                <% if Current.campaign.current_session && !Current.campaign.current_scene %>
+                  <%= link_to "Start it", new_campaign_scene_path(Current.campaign, plan: plan.id), class: "button button--small button--primary" %>
+                <% end %>
+                <%= link_to "Edit", edit_campaign_scene_plan_path(Current.campaign, plan), class: "button button--small" %>
+                <%= button_to "Remove", campaign_scene_plan_path(Current.campaign, plan), method: :delete, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_confirm: "Remove #{plan.title}?" } } %>
+              </div>
+            </li>
+          <% end %>
+        </ol>
+      <% else %>
+        <p class="field__hint">Nothing prepared yet.</p>
+      <% end %>
+    </section>
+
+    <% if @played.any? %>
+      <section class="card stack" aria-labelledby="played-title">
+        <h2 id="played-title" class="card__title">Played</h2>
+        <ul class="scene-plans scene-plans--played">
+          <% @played.each do |plan| %>
+            <li class="scene-plans__item"><span><%= plan.title %></span> <span class="field__hint"><%= plan.scene.heading %></span></li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  </div>
+
+  <aside class="fluid__rail">
+    <section class="card stack" aria-labelledby="new-plan-title">
+      <h2 id="new-plan-title" class="card__title">Prepare a scene</h2>
+      <%= render "campaigns/scene_plans/form", plan: @plan %>
+    </section>
+  </aside>
+</div>

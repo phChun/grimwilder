@@ -13,6 +13,7 @@ class Campaign < ApplicationRecord
   has_many :messages, dependent: :delete_all
   has_many :play_sessions, dependent: :destroy
   has_many :scenes
+  has_many :scene_plans, dependent: :delete_all
   has_many :pools, dependent: :destroy
   has_many :characters, dependent: :nullify
   # Up-for-grabs characters stay with the GM who held them, no longer offered.

@@ -46,7 +46,8 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select ".tally--suspense button[aria-label=?]", "Gain 1 suspense", text: "+"
     assert_select "aside.gm-view__side > .table-rail + section#kept_crucibles.side-card[data-turbo-permanent][hidden]", 1, "under the chat, as on the campaign page"
     assert_select ".scene-bar__actions > *:nth-child(2)", "Cut to new scene"
-    assert_select ".scene-bar__actions > *:nth-child(3)", "End session"
+    assert_select ".scene-bar__actions > *:nth-child(3)", "Scene prep"
+    assert_select ".scene-bar__actions > *:nth-child(4)", "End session"
 
     assert_select ".party-card a[href=?]", character_path(characters(:tibbs)), characters(:tibbs).name
     assert_select ".party-card__harm", "Bloodied · Agility marked · 4d poisoned"
@@ -155,5 +156,39 @@ class TablesTest < ActionDispatch::IntegrationTest
 
     post character_coins_path(tibbs)
     assert_equal 6, tibbs.talent_pools.find_by!(use_key: "rule/coins").size
+  end
+
+  test "the GM prepares scenes, then starts one from the prep, filled in" do
+    sign_in_as identities(:gwen)
+    get campaign_scene_plans_path(@campaign)
+    assert_response :success
+
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", opening_odds: "3", opening_question: "Is the bridge guarded?" } }
+    plan = @campaign.scene_plans.sole
+    assert_redirected_to campaign_scene_plans_path(@campaign)
+
+    PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
+    get new_campaign_scene_path(@campaign)
+    assert_select ".scene-prep-picks a[href=?]", new_campaign_scene_path(@campaign, plan: plan.id), "The bridge at Mirefall"
+
+    get new_campaign_scene_path(@campaign, plan: plan.id)
+    assert_select "input#scene_title[value=?]", "The bridge at Mirefall"
+    assert_select "textarea#scene_notes", "Toll-keepers want a bribe."
+    assert_select "details.scene-form__opening[open]"
+    assert_select "input#scene_open_with_story[checked]"
+    assert_select "input#story_question[value=?]", "Is the bridge guarded?"
+    assert_select "input[name=odds][value='3'][checked]"
+
+    post campaign_scenes_path(@campaign), params: { scene_plan_id: plan.id, title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", open_with_story: "1", question: "Is the bridge guarded?", odds: "3" }
+    scene = @campaign.reload.current_scene
+    assert_equal [ "The bridge at Mirefall", "Toll-keepers want a bribe.", scene ], [ scene.title, scene.notes, plan.reload.scene ]
+    assert_equal [ 3, "Is the bridge guarded?" ], [ scene.opening_roll.stat_dice, scene.opening_roll.question ]
+    assert_empty @campaign.scene_plans.unplayed, "a plan once played leaves the list"
+  end
+
+  test "only the GM preps scenes" do
+    sign_in_as identities(:pip)
+    get campaign_scene_plans_path(@campaign)
+    assert_response :forbidden
   end
 end

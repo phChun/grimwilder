@@ -1,13 +1,14 @@
-<%# locals: (my_characters:, spark: nil) %>
-<%# spark: false leaves out the spark field, for a roll call (the player picks their spark when they roll). %>
+<%# locals: (my_characters:, spark: nil, odds: nil) %>
+<%# spark: false leaves out the spark field, for a roll call (the player picks their spark when they roll). odds: the dice to start on (a prepared scene's). %>
 <% spark = true if spark.nil? %>
+<% odds ||= 2 %>
 <fieldset class="roll-setup__group">
   <legend class="field__label">Odds</legend>
   <div class="segmented segmented--auto">
-    <% Roll::ODDS.each do |dice, odds| %>
+    <% Roll::ODDS.each do |dice, odds_name| %>
       <label class="segmented__option">
-        <%= radio_button_tag :odds, dice, dice == 2 %>
-        <span class="segmented__text"><%= dice %>d <small><%= odds.delete_suffix(" odds") %></small></span>
+        <%= radio_button_tag :odds, dice, dice == odds %>
+        <span class="segmented__text"><%= dice %>d <small><%= odds_name.delete_suffix(" odds") %></small></span>
       </label>
     <% end %>
   </div>

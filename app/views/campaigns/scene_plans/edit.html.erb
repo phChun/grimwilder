@@ -1,0 +1,8 @@
+<% content_for :title, "Edit #{@plan.title} · #{Current.campaign.name}" %>
+
+<header class="page-header">
+  <p class="eyebrow"><%= link_to "Scene prep", campaign_scene_plans_path(Current.campaign) %></p>
+  <h1><%= @plan.title %></h1>
+</header>
+
+<%= render "campaigns/scene_plans/form", plan: @plan, framed: true %>

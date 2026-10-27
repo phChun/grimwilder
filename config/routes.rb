@@ -95,6 +95,7 @@ Rails.application.routes.draw do
       end
       resource :suspense, only: :update
 
+      resources :scene_plans, only: %i[ index create edit update destroy ]
       resources :scenes, only: %i[ new create update ] do
         resource :ending, only: %i[ new create ], module: :scenes
       end

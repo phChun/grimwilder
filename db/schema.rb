@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_27_223517) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_234940) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -289,6 +289,20 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_223517) do
     t.index ["scene_id"], name: "index_rolls_on_scene_id"
   end
 
+  create_table "scene_plans", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.string "title", null: false
+    t.text "notes"
+    t.string "opening_question"
+    t.integer "opening_odds"
+    t.integer "position", default: 0, null: false
+    t.integer "scene_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_scene_plans_on_campaign_id"
+    t.index ["scene_id"], name: "index_scene_plans_on_scene_id"
+  end
+
   create_table "scenes", force: :cascade do |t|
     t.integer "play_session_id", null: false
     t.integer "campaign_id", null: false
@@ -344,6 +358,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_223517) do
   add_foreign_key "rolls", "play_sessions", on_delete: :nullify
   add_foreign_key "rolls", "pools", on_delete: :nullify
   add_foreign_key "rolls", "scenes", on_delete: :nullify
+  add_foreign_key "scene_plans", "campaigns"
+  add_foreign_key "scene_plans", "scenes", on_delete: :nullify
   add_foreign_key "scenes", "campaigns"
   add_foreign_key "scenes", "play_sessions", on_delete: :cascade
   add_foreign_key "scenes", "rolls", column: "closing_roll_id", on_delete: :nullify
