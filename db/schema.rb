@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_27_175740) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_223517) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -27,6 +27,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_175740) do
     t.boolean "lock_ready", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "additions", default: [], null: false
     t.index ["character_id"], name: "index_arcana_on_character_id"
   end
 

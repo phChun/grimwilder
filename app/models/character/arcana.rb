@@ -19,7 +19,7 @@ module Character::Arcana
   end
 
   # Creates and renames arcana power pools, and refills them when `refill`
-  # (each session) or when one is new or changes size; pools for arcana that
+  # (each session, unless it has a unique reset) or when one is new or changes size; pools for arcana that
   # have none, or are used up, go away. Only while seated.
   def refresh_arcana_pools!(refill: false)
     return unless campaign
@@ -30,7 +30,7 @@ module Character::Arcana
     with_pools.each do |arcanum|
       pool, size = Pool.find_or_initialize_by(arcanum: arcanum), arcanum.pool_size
       pool.assign_attributes(campaign: campaign, character: self, name: "#{name}: #{arcanum.name}", kind: "power", refresh: "session", hidden: false)
-      if refill || pool.new_record? || pool.starting_size != size
+      if (refill && !arcanum.unique_reset?) || pool.new_record? || pool.starting_size != size
         pool.assign_attributes(starting_size: size, size: size, phases: [], phase: 0,
           last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil)
       end

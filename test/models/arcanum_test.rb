@@ -114,4 +114,18 @@ class ArcanumTest < ActiveSupport::TestCase
     assert Talent.find("magnum-opus").arcana.sole.opus
     assert_equal "1 major expendable arcana", Talent.find("trophies").arcana.sole.to_s
   end
+
+  test "optional additions: only the book's, and a unique reset keeps its pool through a session" do
+    ring = @tibbs.arcana.create!(name: "Ring of Gusts", function: "traverse", tier: "major", power_pool: true, additions: [ "unique_reset", "curse", "nonsense" ])
+    assert_equal %w[ unique_reset curse ], ring.additions
+    pool = ring.reload.pool
+    pool.update!(size: 1)
+
+    @tibbs.start_session!
+    assert_equal 1, pool.reload.size, "it waits for its own reset"
+
+    ring.update!(additions: [])
+    @tibbs.start_session!
+    assert_equal 4, pool.reload.size
+  end
 end

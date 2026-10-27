@@ -68,6 +68,17 @@
     <%= form.label :description, "Description", class: "field__label" %>
     <%= form.text_area :description, rows: 3, maxlength: Arcanum::LIMITS["description"], placeholder: "How the magic shows itself and what it does in the fiction.", class: "field__input" %>
   </div>
+  <fieldset class="fieldset">
+    <legend class="field__label">Optional additions <small>more likely on greater arcana (pg. 42)</small></legend>
+    <input type="hidden" name="arcanum[additions][]" value="">
+    <% Arcanum::ADDITIONS.each do |key, (addition, means)| %>
+      <label class="check">
+        <%= check_box_tag "arcanum[additions][]", key, arcanum.additions.include?(key), id: "arcanum_addition_#{key}" %>
+        <span><strong><%= addition %></strong>: <%= means %></span>
+      </label>
+    <% end %>
+  </fieldset>
+
   <div class="field">
     <%= form.label :limitations, "Limitations", class: "field__label" %>
     <%= form.text_area :limitations, rows: 2, maxlength: Arcanum::LIMITS["limitations"], placeholder: "Optional: a cost, or situations it doesn't work in.", class: "field__input" %>

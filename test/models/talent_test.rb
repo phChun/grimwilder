@@ -123,6 +123,14 @@ class TalentChoiceTest < ActiveSupport::TestCase
     end
   end
 
+  test "a bard's song: a style, a tune and an impact, from grouped lists" do
+    song = Talent.find("inspiration").choice(:song)
+    assert_equal %w[ Style Tune Impact ], song.option_groups.keys
+    assert_equal [ 3, 1 ], [ song.pick, song.min_each ]
+    assert song.optional?
+    assert_equal "Tune", song.group_of("requiem")
+  end
+
   test "lists, groups and growth read as the book has them" do
     skills = Talent.find("expertise").choice(:skills)
     assert_equal [ "Above board", "Below table" ], skills.option_groups.keys

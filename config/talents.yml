@@ -149,6 +149,7 @@
     choices:
     - { key: method, label: Inspiration method, noun: method, pick: 2, optional: true, open: true, from_list: inspiration_methods }
     - { key: method-learning, label: "And learning", noun: method, pick: 1, optional: true, open: true, from_list: inspiration_methods }
+    - { key: song, label: A song you know, noun: word, pick: 3, min_each: 1, optional: true, from_list: song_composition }
   talents:
   - name: Dynamic Entrance
     summary: "Appear in any scene where and when you like, with a 3d story roll for the entrance."
