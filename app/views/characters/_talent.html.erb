@@ -9,229 +9,237 @@
 <% pushes = editable && character.in_play? && talent.pushes? %>
 <% casts = editable && character.in_play? ? talent.casts : nil %>
 <article id="talent-<%= talent.key %>" class="<%= class_names("talent-card", "talent-card--core": talent.core?, "talent-card--eldritch": eldritch, "talent-card--skinned": talent.skinned?) %>">
-  <div class="talent-card__head">
-    <h3 class="talent-card__name"><%= talent.name %></h3>
-    <% if tends || removable %>
-      <details id="talent-<%= talent.key %>-menu" class="talent-card__more-menu" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
-        <summary class="button button--ghost talent-card__toggle" aria-label="More for <%= talent.name %>"><%= icon(:more, size: 18) %></summary>
-        <div class="talent-card__menu" data-menu-target="panel">
-          <%= render "shared/popover_head", title: talent.name %>
-          <% if tends && talent.choices.any? %>
-            <%= link_to "Choose #{(talent.choices.reject(&:optional?).presence || talent.choices).map(&:nouns).uniq.to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
-          <% end %>
-          <% if tends %>
-            <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
-            <p class="field__hint">Rename it and describe it your way, like a wizard's Bulwark as a magical shield (pg. 53). The rules stay the book's. Leave a field blank to use the book's.</p>
-            <%= form_with url: character_talent_skin_path(character, talent.key), method: :patch, scope: :skin, class: "talent-skin__form stack" do |form| %>
-              <div class="field">
-                <%= form.label :name, "Name", class: "field__label", for: "skin-#{talent.key}-name" %>
-                <%= form.text_field :name, id: "skin-#{talent.key}-name", value: talent.skin["name"], placeholder: talent.book.name, maxlength: Character::TalentSkins::LIMITS["name"], autocomplete: "off", class: "field__input" %>
-              </div>
-              <div class="field">
-                <%= form.label :summary, "One-line summary", class: "field__label", for: "skin-#{talent.key}-summary" %>
-                <%= form.text_field :summary, id: "skin-#{talent.key}-summary", value: talent.skin["summary"], placeholder: talent.book.summary, maxlength: Character::TalentSkins::LIMITS["summary"], autocomplete: "off", class: "field__input" %>
-              </div>
-              <div class="field">
-                <%= form.label :text, "Description", class: "field__label", for: "skin-#{talent.key}-text" %>
-                <%= form.text_area :text, id: "skin-#{talent.key}-text", value: talent.skin["text"], rows: 4, maxlength: Character::TalentSkins::LIMITS["text"], placeholder: "How it looks and feels for this character.", class: "field__input" %>
-              </div>
-              <%= form.submit "Save re-skin", class: "button button--small button--primary" %>
+  <%# Folded to its name and summary; the rest opens under it. details-memory keeps it open through a refresh, and talent_fold_controller.js opens it when the page jumps to it. %>
+  <details id="talent-<%= talent.key %>-fold" class="talent-card__fold">
+    <summary class="talent-card__head">
+      <span class="talent-card__titles">
+        <h3 class="talent-card__name"><%= talent.name %></h3>
+        <span class="talent-card__summary"><%= talent.summary %></span>
+      </span>
+      <%= icon(:chevron, size: 18) %>
+    </summary>
+    <div class="talent-card__body">
+      <p class="talent-card__source">
+        <% if talent.core? %>Core talent · <%= talent.group.name %><% else %><%= "Eldritch · " if eldritch %><%= talent.group.path? ? talent.group.name : "Background" %><% end %> · pg. <%= talent.page %>
+      </p>
+      <%= render "talents/kinds", talent: talent %>
+      <% if talent.renamed? %><p class="talent-card__aka">Re-skinned <%= talent.book.name %></p><% end %>
+      <%# A talent Preview 6 limited to another path ("[Bard Only]") stays on a sheet that already had it; say so, quietly. %>
+      <% if talent.only_paths.any? && talent.only_paths.exclude?(character.path) %><p class="talent-card__aka talent-card__only">Now <%= talent.only_paths.to_sentence %> only (Preview 6); kept on this sheet.</p><% end %>
+      <% if talent.crucible && (crucible = Crucible.find(talent.crucible)) %>
+        <p class="talent-card__crucible"><%= link_to "Roll on #{crucible.name.downcase.delete_suffix(" crucible")}", crucible_path(crucible) %></p>
+      <% end %>
+      <% if talent.core? && talent.growth %><p class="talent-card__growth"><span class="talent-card__label">Grows</span> <%= talent.growth %></p><% end %>
+      <% if talent.choices.any? %>
+        <%# The picks it asks for (Character::TalentChoices), as chips; the owner and GM get a link to the rest. %>
+        <div class="talent-card__choices">
+          <% character.choices_for(talent).each do |choice, picks| %>
+            <% left, extra = character.choices_left(choice), character.extra_choices(choice) %>
+            <%# Picks that name a use's boxes (Hidden Magic's words) show there instead, as the boxes to burn. %>
+            <% if picks.any? && talent.uses.none? { _1.named_by == choice.key } %>
+              <p class="talent-card__label"><%= choice.heading %></p>
+              <ul class="talent-card__picks" aria-label="<%= choice.heading %>">
+                <% picks.each do |pick| %><li class="talent-card__pick"><%= talent_pick_label(choice, pick) %></li><% end %>
+              </ul>
             <% end %>
-            <% if talent.skinned? %>
-              <%= button_to "Back to the book's", character_talent_skin_path(character, talent.key), method: :delete, class: "button button--ghost button--small" %>
+            <% if tends && left.positive? %>
+              <%= link_to "#{choice.optional? ? "Optional: choose" : "Choose"} #{picks.any? ? "#{left} more" : left} #{choice.nouns(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
             <% end %>
-          <% end %>
-          <% if removable %>
-            <%= button_to "Remove talent", character_talent_path(character, talent.key, eldritch: (1 if eldritch)), method: :delete, class: "button button--ghost button--small button--danger-text", "aria-label": "Remove #{talent.name}", form: { data: { turbo_confirm: "Remove #{talent.name}?" } } %>
+            <% if tends && extra.positive? %>
+              <p class="talent-over">Level <%= character.level %> has room for <%= character.choice_slots(choice) %> <%= choice.nouns(character.choice_slots(choice)) %>. <%= link_to "Drop #{extra == 1 ? "one" : extra}", edit_character_talent_choices_path(character, talent.key), data: { turbo_frame: "modal" } %>.</p>
+            <% end %>
           <% end %>
         </div>
-      </details>
-    <% end %>
-  </div>
-  <p class="talent-card__source">
-    <% if talent.core? %>Core talent · <%= talent.group.name %><% else %><%= "Eldritch · " if eldritch %><%= talent.group.path? ? talent.group.name : "Background" %><% end %> · pg. <%= talent.page %>
-  </p>
-  <%= render "talents/kinds", talent: talent %>
-  <% if talent.renamed? %><p class="talent-card__aka">Re-skinned <%= talent.book.name %></p><% end %>
-  <%# A talent Preview 6 limited to another path ("[Bard Only]") stays on a sheet that already had it; say so, quietly. %>
-  <% if talent.only_paths.any? && talent.only_paths.exclude?(character.path) %><p class="talent-card__aka talent-card__only">Now <%= talent.only_paths.to_sentence %> only (Preview 6); kept on this sheet.</p><% end %>
-  <p class="talent-card__summary"><%= talent.summary %></p>
-  <% if talent.crucible && (crucible = Crucible.find(talent.crucible)) %>
-    <p class="talent-card__crucible"><%= link_to "Roll on #{crucible.name.downcase.delete_suffix(" crucible")}", crucible_path(crucible) %></p>
-  <% end %>
-  <% if talent.core? && talent.growth %><p class="talent-card__growth"><span class="talent-card__label">Grows</span> <%= talent.growth %></p><% end %>
-  <% if talent.choices.any? %>
-    <%# The picks it asks for (Character::TalentChoices), as chips; the owner and GM get a link to the rest. %>
-    <div class="talent-card__choices">
-      <% character.choices_for(talent).each do |choice, picks| %>
-        <% left, extra = character.choices_left(choice), character.extra_choices(choice) %>
-        <%# Picks that name a use's boxes (Hidden Magic's words) show there instead, as the boxes to burn. %>
-        <% if picks.any? && talent.uses.none? { _1.named_by == choice.key } %>
-          <p class="talent-card__label"><%= choice.heading %></p>
-          <ul class="talent-card__picks" aria-label="<%= choice.heading %>">
-            <% picks.each do |pick| %><li class="talent-card__pick"><%= talent_pick_label(choice, pick) %></li><% end %>
-          </ul>
-        <% end %>
-        <% if tends && left.positive? %>
-          <%= link_to "#{choice.optional? ? "Optional: choose" : "Choose"} #{picks.any? ? "#{left} more" : left} #{choice.nouns(left)}", edit_character_talent_choices_path(character, talent.key), class: "talent-card__pick-more", data: { turbo_frame: "modal" } %>
-        <% end %>
-        <% if tends && extra.positive? %>
-          <p class="talent-over">Level <%= character.level %> has room for <%= character.choice_slots(choice) %> <%= choice.nouns(character.choice_slots(choice)) %>. <%= link_to "Drop #{extra == 1 ? "one" : extra}", edit_character_talent_choices_path(character, talent.key), data: { turbo_frame: "modal" } %>.</p>
-        <% end %>
       <% end %>
-    </div>
-  <% end %>
-  <% if eldritch && talent.one_time_only? %><p class="talent-card__aka">Its "One time only" feature doesn't work as an Eldritch Talent.</p><% end %>
+      <% if eldritch && talent.one_time_only? %><p class="talent-card__aka">Its "One time only" feature doesn't work as an Eldritch Talent.</p><% end %>
 
-  <% if counters.any? || pool_uses.any? || thread.positive? || talent.makes.any? || talent.state %>
-    <div class="talent-card__uses">
-      <%= render "characters/talent_states/#{talent.state}", character: character, talent: talent, editable: editable if talent.state %>
-      <% counters.each do |use| %>
-        <% names = use.named? ? character.use_box_names(use).compact : [] %>
-        <% if names.any? %>
-          <%# Boxes named by the talent's picks: burn a word of power by name. %>
-          <% burned = character.burned_names(use) %>
-          <div class="use-tracker use-tracker--named">
-            <span class="use-tracker__name"><%= use.label %></span>
-            <span class="use-words" role="group" aria-label="<%= use.label %>: <%= use_words_left(use, names.size, burned.size) %>">
-              <% names.each do |name| %>
-                <% spent = burned.include?(name) %>
+      <% if counters.any? || pool_uses.any? || thread.positive? || talent.makes.any? || talent.state %>
+        <div class="talent-card__uses">
+          <%= render "characters/talent_states/#{talent.state}", character: character, talent: talent, editable: editable if talent.state %>
+          <% counters.each do |use| %>
+            <% names = use.named? ? character.use_box_names(use).compact : [] %>
+            <% if names.any? %>
+              <%# Boxes named by the talent's picks: burn a word of power by name. %>
+              <% burned = character.burned_names(use) %>
+              <div class="use-tracker use-tracker--named">
+                <span class="use-tracker__name"><%= use.label %></span>
+                <span class="use-words" role="group" aria-label="<%= use.label %>: <%= use_words_left(use, names.size, burned.size) %>">
+                  <% names.each do |name| %>
+                    <% spent = burned.include?(name) %>
+                    <% if tends %>
+                      <%= button_to title_case(name), character_talent_uses_path(character), method: :patch, params: { use: use.id, name: name }, class: class_names("use-word", "use-word--#{use.verb}", "use-word--burned": spent), "aria-pressed": spent.to_s, title: use_word_title(use, title_case(name), spent), form: { class: "use-box__form" } %>
+                    <% else %>
+                      <span class="<%= class_names("use-word", "use-word--#{use.verb}", "use-word--burned": spent) %>"><%= title_case(name) %></span>
+                    <% end %>
+                  <% end %>
+                </span>
+                <span class="use-tracker__resets"><%= use_words_left(use, names.size, burned.size) %> · <%= use.resets %></span>
+              </div>
+              <% next %>
+            <% end %>
+            <% if use.tally? %>
+              <%# A count with no most (Mischief Maker's overloads), up and down. %>
+              <% spent = character.uses_spent(use) %>
+              <div class="use-tracker use-tracker--tally">
+                <span class="use-tracker__name"><%= use.label %></span>
                 <% if tends %>
-                  <%= button_to title_case(name), character_talent_uses_path(character), method: :patch, params: { use: use.id, name: name }, class: class_names("use-word", "use-word--#{use.verb}", "use-word--burned": spent), "aria-pressed": spent.to_s, title: use_word_title(use, title_case(name), spent), form: { class: "use-box__form" } %>
-                <% else %>
-                  <span class="<%= class_names("use-word", "use-word--#{use.verb}", "use-word--burned": spent) %>"><%= title_case(name) %></span>
+                  <%= button_to "−", character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: spent - 1 }, class: "button button--small use-tally__step", disabled: spent.zero?, "aria-label": "One fewer #{use.label.downcase}", form: { class: "use-box__form" } %>
                 <% end %>
-              <% end %>
-            </span>
-            <span class="use-tracker__resets"><%= use_words_left(use, names.size, burned.size) %> · <%= use.resets %></span>
-          </div>
-          <% next %>
-        <% end %>
-        <% if use.tally? %>
-          <%# A count with no most (Mischief Maker's overloads), up and down. %>
-          <% spent = character.uses_spent(use) %>
-          <div class="use-tracker use-tracker--tally">
-            <span class="use-tracker__name"><%= use.label %></span>
-            <% if tends %>
-              <%= button_to "−", character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: spent - 1 }, class: "button button--small use-tally__step", disabled: spent.zero?, "aria-label": "One fewer #{use.label.downcase}", form: { class: "use-box__form" } %>
-            <% end %>
-            <strong class="use-tally__count" aria-label="<%= spent %> <%= use.label.downcase %> this session"><%= spent %></strong>
-            <% if tends %>
-              <%= button_to "+", character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: spent + 1 }, class: "button button--small use-tally__step", "aria-label": "One more #{use.label.downcase}", form: { class: "use-box__form" } %>
-            <% end %>
-            <span class="use-tracker__resets">this session · <%= use.resets %></span>
-          </div>
-          <% next %>
-        <% end %>
-        <% total, spent = character.use_count(use), character.uses_spent(use) %>
-        <div class="use-tracker">
-          <span class="use-tracker__name"><%= use.label %></span>
-          <span class="use-boxes" role="group" aria-label="<%= use.label %>: <%= total - spent %> of <%= total %> left">
-            <% track = use.track? ? use.track_at(character.level) : [] %>
-            <% total.times do |index| %>
-              <% used = index < spent %>
-              <% if tends %>
-                <%= button_to character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: used ? index : index + 1 }, class: class_names("use-box", "use-box--spent": used, "use-box--track": track.any?), "aria-pressed": used.to_s, form: { class: "use-box__form" } do %>
-                  <span class="visually-hidden"><%= used ? "Unspend" : "Spend" %> <%= use.label.downcase %> <%= index + 1 %></span>
-                  <% if track.any? %><span class="use-box__thorns" aria-hidden="true">+<%= track[index] %>t</span><% end %>
+                <strong class="use-tally__count" aria-label="<%= spent %> <%= use.label.downcase %> this session"><%= spent %></strong>
+                <% if tends %>
+                  <%= button_to "+", character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: spent + 1 }, class: "button button--small use-tally__step", "aria-label": "One more #{use.label.downcase}", form: { class: "use-box__form" } %>
                 <% end %>
-              <% else %>
-                <span class="<%= class_names("use-box", "use-box--spent": used, "use-box--track": track.any?) %>"><% if track.any? %><span class="use-box__thorns">+<%= track[index] %>t</span><% end %></span>
-              <% end %>
+                <span class="use-tracker__resets">this session · <%= use.resets %></span>
+              </div>
+              <% next %>
             <% end %>
-          </span>
-          <span class="use-tracker__resets"><% if use.track? %>+<%= character.track_thorns(use) %>t now<%= ", no more potent spells" if spent >= total %><% else %><%= total - spent %> left<% end %> · <%= use.resets %></span>
+            <% total, spent = character.use_count(use), character.uses_spent(use) %>
+            <div class="use-tracker">
+              <span class="use-tracker__name"><%= use.label %></span>
+              <span class="use-boxes" role="group" aria-label="<%= use.label %>: <%= total - spent %> of <%= total %> left">
+                <% track = use.track? ? use.track_at(character.level) : [] %>
+                <% total.times do |index| %>
+                  <% used = index < spent %>
+                  <% if tends %>
+                    <%= button_to character_talent_uses_path(character), method: :patch, params: { use: use.id, spent: used ? index : index + 1 }, class: class_names("use-box", "use-box--spent": used, "use-box--track": track.any?), "aria-pressed": used.to_s, form: { class: "use-box__form" } do %>
+                      <span class="visually-hidden"><%= used ? "Unspend" : "Spend" %> <%= use.label.downcase %> <%= index + 1 %></span>
+                      <% if track.any? %><span class="use-box__thorns" aria-hidden="true">+<%= track[index] %>t</span><% end %>
+                    <% end %>
+                  <% else %>
+                    <span class="<%= class_names("use-box", "use-box--spent": used, "use-box--track": track.any?) %>"><% if track.any? %><span class="use-box__thorns">+<%= track[index] %>t</span><% end %></span>
+                  <% end %>
+                <% end %>
+              </span>
+              <span class="use-tracker__resets"><% if use.track? %>+<%= character.track_thorns(use) %>t now<%= ", no more potent spells" if spent >= total %><% else %><%= total - spent %> left<% end %> · <%= use.resets %></span>
+            </div>
+          <% end %>
+
+          <% pool_uses.each do |use| %>
+            <% if (pool = pools.find { |candidate| candidate.use_key == use.id }) %>
+              <div class="pool-rows pool-rows--sheet">
+                <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
+              </div>
+            <% else %>
+              <% size = use.pool_at(character.level) %>
+              <div class="talent-card__pool-preview">
+                <span class="use-tracker__name"><%= use.label %></span>
+                <%= render "shared/pool_track", pool: Pool.new(starting_size: size, size: size) %>
+                <span class="use-tracker__resets"><%= size %>d <%= use.pool_kind %> pool · ready at the first session, <%= use.resets %></span>
+              </div>
+            <% end %>
+          <% end %>
+
+          <%# Pools the talent makes when used (Talent::MadePool): those made so far, then a form to make another. %>
+          <% talent.makes.each do |made| %>
+            <% made_pools = pools.select { |candidate| candidate.use_key == made.id } %>
+            <% if made_pools.any? %>
+              <div class="pool-rows pool-rows--sheet">
+                <% made_pools.each do |pool| %>
+                  <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
+                <% end %>
+              </div>
+            <% end %>
+            <% if editable && character.can_make_pool?(made) %>
+              <%= form_with url: character_talent_made_pools_path(character, talent.key), class: "talent-card__make" do %>
+                <input type="hidden" name="made" value="<%= made.key %>">
+                <% if made.named %>
+                  <label class="visually-hidden" for="make-<%= made.id.parameterize %>">What is it?</label>
+                  <input id="make-<%= made.id.parameterize %>" name="name" class="field__input" maxlength="40" autocomplete="off" placeholder="What is it? (optional)">
+                <% end %>
+                <button type="submit" class="button button--small">Make <%= made.label.downcase %> <small><%= made.pool %>d <%= made.kind %><%= ", ticks #{made.use.tr("-", " ")}" if made.use %></small></button>
+              <% end %>
+            <% elsif made_pools.empty? %>
+              <p class="talent-card__chip"><%= made.label %>: a <%= made.pool %>d <%= made.kind %> pool when used, for the <%= made.lasts %></p>
+            <% end %>
+          <% end %>
+
+          <% if thread.positive? %>
+            <p class="talent-card__chip">+<%= thread %> thread each session</p>
+          <% end %>
         </div>
       <% end %>
 
-      <% pool_uses.each do |use| %>
-        <% if (pool = pools.find { |candidate| candidate.use_key == use.id }) %>
-          <div class="pool-rows pool-rows--sheet">
-            <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
-          </div>
-        <% else %>
-          <% size = use.pool_at(character.level) %>
-          <div class="talent-card__pool-preview">
-            <span class="use-tracker__name"><%= use.label %></span>
-            <%= render "shared/pool_track", pool: Pool.new(starting_size: size, size: size) %>
-            <span class="use-tracker__resets"><%= size %>d <%= use.pool_kind %> pool · ready at the first session, <%= use.resets %></span>
-          </div>
-        <% end %>
-      <% end %>
-
-      <%# Pools the talent makes when used (Talent::MadePool): those made so far, then a form to make another. %>
-      <% talent.makes.each do |made| %>
-        <% made_pools = pools.select { |candidate| candidate.use_key == made.id } %>
-        <% if made_pools.any? %>
-          <div class="pool-rows pool-rows--sheet">
-            <% made_pools.each do |pool| %>
-              <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
+      <% if rolls.any? || pushes || casts %>
+        <div class="talent-card__actions">
+          <% if casts == "rite" %>
+            <p class="talent-card__chip">Cast: roll a rite pool as an action from its ⋯; drop 1d first for a potent spell.</p>
+          <% elsif casts %>
+            <%= link_to character_path(character, cast: talent.key, anchor: "stats"), class: "button button--small talent-card__roll" do %>
+              <%= icon(:die, size: 16) %> <span>Cast</span> <small><%= casts.capitalize %></small>
             <% end %>
-          </div>
-        <% end %>
-        <% if editable && character.can_make_pool?(made) %>
-          <%= form_with url: character_talent_made_pools_path(character, talent.key), class: "talent-card__make" do %>
-            <input type="hidden" name="made" value="<%= made.key %>">
-            <% if made.named %>
-              <label class="visually-hidden" for="make-<%= made.id.parameterize %>">What is it?</label>
-              <input id="make-<%= made.id.parameterize %>" name="name" class="field__input" maxlength="40" autocomplete="off" placeholder="What is it? (optional)">
-            <% end %>
-            <button type="submit" class="button button--small">Make <%= made.label.downcase %> <small><%= made.pool %>d <%= made.kind %><%= ", ticks #{made.use.tr("-", " ")}" if made.use %></small></button>
           <% end %>
-        <% elsif made_pools.empty? %>
-          <p class="talent-card__chip"><%= made.label %>: a <%= made.pool %>d <%= made.kind %> pool when used, for the <%= made.lasts %></p>
-        <% end %>
-      <% end %>
-
-      <% if thread.positive? %>
-        <p class="talent-card__chip">+<%= thread %> thread each session</p>
-      <% end %>
-    </div>
-  <% end %>
-
-  <% if rolls.any? || pushes || casts %>
-    <div class="talent-card__actions">
-      <% if casts == "rite" %>
-        <p class="talent-card__chip">Cast: roll a rite pool as an action from its ⋯; drop 1d first for a potent spell.</p>
-      <% elsif casts %>
-        <%= link_to character_path(character, cast: talent.key, anchor: "stats"), class: "button button--small talent-card__roll" do %>
-          <%= icon(:die, size: 16) %> <span>Cast</span> <small><%= casts.capitalize %></small>
-        <% end %>
-      <% end %>
-      <% rolls.each do |roll| %>
-        <%= button_to character_talent_roll_path(character, talent.key), params: { index: roll.index }, class: "button button--small talent-card__roll", form: { class: "talent-card__action" } do %>
-          <%= icon(:die, size: 16) %> <span><%= roll.label %></span> <small><%= roll.dice_label %><%= " · spends #{roll.cost}" if roll.cost %></small>
-        <% end %>
-      <% end %>
-      <% if pushes %>
-        <details id="talent-<%= talent.key %>-push" class="talent-card__push" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
-          <summary class="button button--small talent-card__push-toggle">Push yourself <small>mark a stat</small></summary>
-          <div class="talent-card__menu talent-card__menu--push" data-menu-target="panel">
-            <%= render "shared/popover_head", title: "Push yourself" %>
-            <p class="field__hint">Once you've used it, mark a stat of your choice (pg. 54). A marked stat takes harm instead.</p>
-            <% Grimwild::STATS.each do |stat| %>
-              <% outcome = character.mark_would_be(stat) %>
-              <%= button_to character_talent_push_path(character, talent.key), params: { stat: stat }, class: class_names("button button--small talent-card__push-stat", "talent-card__push-stat--harm": outcome != "mark") do %>
-                <span><%= stat.capitalize %></span> <small><%= outcome == "mark" ? "mark" : "→ #{outcome}" %></small>
-              <% end %>
+          <% rolls.each do |roll| %>
+            <%= button_to character_talent_roll_path(character, talent.key), params: { index: roll.index }, class: "button button--small talent-card__roll", form: { class: "talent-card__action" } do %>
+              <%= icon(:die, size: 16) %> <span><%= roll.label %></span> <small><%= roll.dice_label %><%= " · spends #{roll.cost}" if roll.cost %></small>
             <% end %>
-          </div>
-        </details>
+          <% end %>
+          <% if pushes %>
+            <details id="talent-<%= talent.key %>-push" class="talent-card__push" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
+              <summary class="button button--small talent-card__push-toggle">Push yourself <small>mark a stat</small></summary>
+              <div class="talent-card__menu talent-card__menu--push" data-menu-target="panel">
+                <%= render "shared/popover_head", title: "Push yourself" %>
+                <p class="field__hint">Once you've used it, mark a stat of your choice (pg. 54). A marked stat takes harm instead.</p>
+                <% Grimwild::STATS.each do |stat| %>
+                  <% outcome = character.mark_would_be(stat) %>
+                  <%= button_to character_talent_push_path(character, talent.key), params: { stat: stat }, class: class_names("button button--small talent-card__push-stat", "talent-card__push-stat--harm": outcome != "mark") do %>
+                    <span><%= stat.capitalize %></span> <small><%= outcome == "mark" ? "mark" : "→ #{outcome}" %></small>
+                  <% end %>
+                <% end %>
+              </div>
+            </details>
+          <% end %>
+        </div>
       <% end %>
+
+      <% if talent.core? && character.path == "Paladin" && (character.oathbroken? || editable) %>
+        <%= render "characters/oath", character: character, editable: editable %>
+      <% end %>
+
+      <details id="talent-<%= talent.key %>-more" class="fold talent-card__more">
+        <summary class="fold__summary">From the book<% if talent.skinned? %> · and your re-skin<% end %></summary>
+        <% if talent.custom_paragraphs.any? %>
+          <% talent.custom_paragraphs.each do |paragraph| %><p class="talent-card__text talent-card__text--own"><%= paragraph %></p><% end %>
+          <p class="talent-card__label">From the book<% if talent.renamed? %> (<%= talent.book.name %>)<% end %></p>
+        <% end %>
+        <% talent.paragraphs.each do |paragraph| %><p class="talent-card__text"><%= paragraph %></p><% end %>
+        <% if talent.note.present? %><p class="talent-card__note"><%= talent.note %></p><% end %>
+      </details>
     </div>
-  <% end %>
-
-  <% if talent.core? && character.path == "Paladin" && (character.oathbroken? || editable) %>
-    <%= render "characters/oath", character: character, editable: editable %>
-  <% end %>
-
-  <details id="talent-<%= talent.key %>-more" class="fold talent-card__more">
-    <summary class="fold__summary">From the book<% if talent.skinned? %> · and your re-skin<% end %></summary>
-    <% if talent.custom_paragraphs.any? %>
-      <% talent.custom_paragraphs.each do |paragraph| %><p class="talent-card__text talent-card__text--own"><%= paragraph %></p><% end %>
-      <p class="talent-card__label">From the book<% if talent.renamed? %> (<%= talent.book.name %>)<% end %></p>
-    <% end %>
-    <% talent.paragraphs.each do |paragraph| %><p class="talent-card__text"><%= paragraph %></p><% end %>
-    <% if talent.note.present? %><p class="talent-card__note"><%= talent.note %></p><% end %>
   </details>
+  <% if tends || removable %>
+    <details id="talent-<%= talent.key %>-menu" class="talent-card__more-menu" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
+      <summary class="button button--ghost talent-card__toggle" aria-label="More for <%= talent.name %>"><%= icon(:more, size: 18) %></summary>
+      <div class="talent-card__menu" data-menu-target="panel">
+        <%= render "shared/popover_head", title: talent.name %>
+        <% if tends && talent.choices.any? %>
+          <%= link_to "Choose #{(talent.choices.reject(&:optional?).presence || talent.choices).map(&:nouns).uniq.to_sentence}…", edit_character_talent_choices_path(character, talent.key), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
+        <% end %>
+        <% if tends %>
+          <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
+          <p class="field__hint">Rename it and describe it your way, like a wizard's Bulwark as a magical shield (pg. 53). The rules stay the book's. Leave a field blank to use the book's.</p>
+          <%= form_with url: character_talent_skin_path(character, talent.key), method: :patch, scope: :skin, class: "talent-skin__form stack" do |form| %>
+            <div class="field">
+              <%= form.label :name, "Name", class: "field__label", for: "skin-#{talent.key}-name" %>
+              <%= form.text_field :name, id: "skin-#{talent.key}-name", value: talent.skin["name"], placeholder: talent.book.name, maxlength: Character::TalentSkins::LIMITS["name"], autocomplete: "off", class: "field__input" %>
+            </div>
+            <div class="field">
+              <%= form.label :summary, "One-line summary", class: "field__label", for: "skin-#{talent.key}-summary" %>
+              <%= form.text_field :summary, id: "skin-#{talent.key}-summary", value: talent.skin["summary"], placeholder: talent.book.summary, maxlength: Character::TalentSkins::LIMITS["summary"], autocomplete: "off", class: "field__input" %>
+            </div>
+            <div class="field">
+              <%= form.label :text, "Description", class: "field__label", for: "skin-#{talent.key}-text" %>
+              <%= form.text_area :text, id: "skin-#{talent.key}-text", value: talent.skin["text"], rows: 4, maxlength: Character::TalentSkins::LIMITS["text"], placeholder: "How it looks and feels for this character.", class: "field__input" %>
+            </div>
+            <%= form.submit "Save re-skin", class: "button button--small button--primary" %>
+          <% end %>
+          <% if talent.skinned? %>
+            <%= button_to "Back to the book's", character_talent_skin_path(character, talent.key), method: :delete, class: "button button--ghost button--small" %>
+          <% end %>
+        <% end %>
+        <% if removable %>
+          <%= button_to "Remove talent", character_talent_path(character, talent.key, eldritch: (1 if eldritch)), method: :delete, class: "button button--ghost button--small button--danger-text", "aria-label": "Remove #{talent.name}", form: { data: { turbo_confirm: "Remove #{talent.name}?" } } %>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
 </article>
