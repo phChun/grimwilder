@@ -29,7 +29,7 @@ class TalentBonusTest < ActiveSupport::TestCase
   end
 
   test "a ticked bonus adds its die and is named on the roll" do
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel stealth lying ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm stealth deception ])
     talent, bonus = @tibbs.talent_bonuses_for("agility").sole
     assert_equal [ "Expertise", "expertise/skill" ], [ talent.name, bonus.id ]
 

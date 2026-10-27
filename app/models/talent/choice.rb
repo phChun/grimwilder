@@ -1,5 +1,5 @@
 # Something a talent asks the player to pick (config/talents.yml `choices:`):
-# Expertise's 3 skills, Weapon Mastery's fighting style, Sorcery's paths and
+# Expertise's 3 skills, Weapon Mastery's fighting style, Sorcery's sources and
 # techniques. Picks are stored on the character (Character::TalentChoices).
 #
 # - `pick`: how many at level 1; `growth` adds more at those levels ({ 3 => 1, 6 => 1 }).
@@ -21,8 +21,10 @@
 #   Everything Arcana): the sheet offers it without asking for it.
 # - `school: true` for spell theorems: each pick carries a school of magic,
 #   stored as "wild fire (evocation)".
+# - `hints`: the book's one line on what an option means ("charm: Persuade
+#   with personality."), shown in the picker.
 class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :from, :groups, :min_each, :open, :same_as, :touchstone, :growth,
-  :from_list, :from_picks, :crucible, :table, :school, :plural, :optional)
+  :from_list, :from_picks, :crucible, :table, :school, :plural, :optional, :hints)
   SCHOOLED = /\A(?<name>.+?) \((?<school>[a-z]+)\)\z/i
 
   # "wild fire (evocation)" => ["wild fire", "evocation"]; a name alone has no school.
@@ -42,7 +44,8 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
       pick: attributes.fetch(:pick), from: Array(attributes[:from]), groups: attributes[:groups] || {}, min_each: attributes[:min_each].to_i,
       open: attributes[:open] == true, same_as: attributes[:same_as], touchstone: attributes[:touchstone] == true,
       growth: (attributes[:growth] || {}).transform_keys(&:to_i), from_list: attributes[:from_list], from_picks: Array(attributes[:from_picks]),
-      crucible: attributes[:crucible], table: attributes[:table], school: attributes[:school] == true, plural: attributes[:plural], optional: attributes[:optional] == true)
+      crucible: attributes[:crucible], table: attributes[:table], school: attributes[:school] == true, plural: attributes[:plural], optional: attributes[:optional] == true,
+      hints: attributes[:hints] || {})
   end
 
   # Unique across talents: "expertise/skills".
@@ -124,6 +127,11 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
 
   def options
     option_groups.values.flatten
+  end
+
+  # What an option means, from the list's own hints (Natural Moxie uses Expertise's).
+  def hint_for(option)
+    source&.hints&.dig(option)
   end
 
   def grouped?

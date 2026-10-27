@@ -137,7 +137,7 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
     assert_no_changes -> { @tibbs.reload.conditions } do
       post character_conditions_path(@tibbs), params: { condition: "poisoned" }
     end
-    @tibbs.update!(level: 2, talent_keys: %w[ according-to-plan lurker ])
+    @tibbs.update!(level: 2, talent_keys: %w[ mastermind lurker ])
     assert_no_changes -> { @tibbs.reload.marked_wits } do
       post character_talent_push_path(@tibbs, "lurker"), params: { stat: "wits" }
     end

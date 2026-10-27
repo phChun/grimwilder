@@ -760,7 +760,7 @@
   core:
     name: Expertise
     summary: "+1d with 3 chosen skills, and a 4d Competence pool each session for bonus dice."
-    text: 'Choose three skills below as your skill set. Take +1d when using a chosen skill. Each session, you have a 4d Competence pool to represent your focus under pressure. You can roll it as bonus dice after any of the chosen skills. Above board: duel—evade—investigate—persuade—track—traverse. Below table: ambush—forgery & disguise—lying—sabotage—sleight of hand—stealth.
+    text: 'Choose three skills below as your skill set. Take +1d when using a chosen skill. Each session, you have a 4d Competence pool to represent your focus under pressure. You can roll it as bonus dice after any of the chosen skills. Above board: blend in—charm—investigate—negotiate—network—parkour. Below table: ambush—deception—dismantle—provoke—sleight of hand—stealth.
 
 
       GROWTH: At levels 3 and 6, gain +1d Competence per session and +1 skill.'
@@ -776,24 +776,26 @@
       pick: 3
       growth: { 3: 1, 6: 1 }
       groups:
-        Above board: [duel, evade, investigate, persuade, track, traverse]
-        Below table: [ambush, "forgery & disguise", lying, sabotage, sleight of hand, stealth]
+        Above board: [blend in, charm, investigate, negotiate, network, parkour]
+        Below table: [ambush, deception, dismantle, provoke, sleight of hand, stealth]
+      hints:
+        blend in: Keep a low profile.
+        charm: Persuade with personality.
+        investigate: Study, observe, connect dots.
+        negotiate: Bargain and settle terms.
+        network: Use contacts and resources.
+        parkour: Run, climb, leap efficiently.
+        ambush: Plan and attack unseen.
+        deception: Lie, disguise, and act.
+        dismantle: Sabotage, pick locks, disable.
+        provoke: Manipulate, incite emotions.
+        sleight of hand: Pickpocket, filch, steal.
+        stealth: Hide, move unseen.
     - { key: guild, label: Thieves guild, noun: guild trait, pick: 2, optional: true, from_list: thieves_guild }
     - { key: guild-isnt, label: But the guild isn't, noun: guild trait, pick: 1, optional: true, from_list: thieves_guild }
     uses:
     - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
   talents:
-  - name: According to Plan
-    summary: "+1 thread a session; spend it to flash back to how you planned for this."
-    text: You gain 1 thread per session and can spend thread to flashback, establishing how you planned for the current situation. Make a montage roll, taking +1d if it fell within your expertise. The GM must take suspense in place of an impact move.
-    note: 'This can cover any kinds of planning. Consider your other talents and abilities as well, for example: if you have spellcasting, perhaps you prepared by using magic ahead of time.'
-    page: 76
-    bonuses:
-    - { key: expertise, label: "A flashback within your expertise", only: [ montage ] }
-    rolls:
-    - { kind: montage, label: "Flashback: the plan", thread: 1 }
-    uses:
-    - { key: thread, thread: 1 }
   - name: Eldritch Affinity
     summary: "Sorcery-style spellcasting with Presence and 3 sources or techniques, never potent."
     text: 'You have spellcasting, as the Sorcery talent. You roll Presence to cast and choose 3 from sources and techniques. You can’t cast potent spells, nor do you risk a magical twist. [Prohibited: Sorcerer]'
@@ -814,6 +816,15 @@
     summary: "Perfect sneaks reveal secrets or openings; push yourself to freeze and avoid detection."
     text: 'On a perfect sneaking past or secretly observing sentient creatures, they: let a secret slip—give you a golden opportunity. If caught sneaking, you can push yourself to stay completely still and avoid detection, but must leave the area immediately after.'
     page: 76
+  - name: Mastermind
+    summary: "+1 thread a session; spend it on a 3d flashback to the contact, decoy or stash you set up."
+    text: 'You gain 1 thread per session and can spend thread to flashback to employing subterfuge or clever preparation to: make a contact—plant a decoy—prepare reinforcements—set up an interrupt—swipe or stash a useful item. Make a 3d montage roll. The GM must take suspense in place of an impact move.'
+    note: 'This can cover many kinds of preparation. Consider your other talents and abilities as well, for example: if you have spellcasting, perhaps you prepared by using magic ahead of time.'
+    page: 76
+    rolls:
+    - { kind: montage, label: "Flashback: the preparation", thread: 1, bonus: 1 }
+    uses:
+    - { key: thread, thread: 1 }
   - name: Opportunist
     summary: "+1d following up when someone nearby defends; push to add a critical bonus to an ally."
     text: When someone nearby rolls defense, you take +1d on an immediate follow-up. On a critical by a nearby ally, you can push yourself to add a critical bonus.

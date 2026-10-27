@@ -13,7 +13,7 @@ tibbs:
   traits: [curious, rash]
   not_trait: quiet
   features: [shock of brown hair, cane]
-  talent_keys: [according-to-plan]
+  talent_keys: [mastermind]
 
 loner:
   identity: stranger

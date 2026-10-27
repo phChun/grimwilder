@@ -44,7 +44,7 @@ class TalentsTest < ActionDispatch::IntegrationTest
     assert_select "section.talent-group:first-of-type h2", text: "The Rogue"
     assert_select "select#talent-path option[selected][value=rogue]", 1, "opens on the character's own path"
     assert_select "section.talent-group:not([hidden])", 1
-    assert_select "#talent-according-to-plan .tag", text: "Taken"
+    assert_select "#talent-mastermind .tag", text: "Taken"
     assert_select "#talent-lucky .talent__take", text: /No room at level 1/
     assert_select "#talent-lucky .talent__take form", 0
 
@@ -65,7 +65,7 @@ class TalentsTest < ActionDispatch::IntegrationTest
 
   test "a sheet with more talents than its level asks for one to go" do
     tibbs = characters(:tibbs)
-    tibbs.update_columns(talent_keys: %w[according-to-plan lucky])
+    tibbs.update_columns(talent_keys: %w[mastermind lucky])
     sign_in_as identities(:pip)
 
     get character_path(tibbs)

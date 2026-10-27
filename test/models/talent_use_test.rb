@@ -47,7 +47,7 @@ class TalentUseTest < ActiveSupport::TestCase
   end
 
   test "the talents that grant thread per session" do
-    assert_equal %w[ according-to-plan bardic-lore reader scout-ahead ], Talent.all.select { _1.uses.any?(&:thread?) }.map(&:key).sort
+    assert_equal %w[ bardic-lore mastermind reader scout-ahead ], Talent.all.select { _1.uses.any?(&:thread?) }.map(&:key).sort
   end
 
   test "the talent pools that drop 1d before rolling" do

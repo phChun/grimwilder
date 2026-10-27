@@ -12,10 +12,10 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
   end
 
   test "picks from a closed list take the book's spelling" do
-    @tibbs.choose_for_talent!("expertise", "skills" => [ "Stealth", " forgery  &  disguise ", "" ])
+    @tibbs.choose_for_talent!("expertise", "skills" => [ "Stealth", " sleight  of  hand ", "" ])
 
-    assert_equal({ "expertise" => { "skills" => [ "stealth", "forgery & disguise" ] } }, @tibbs.reload.talent_choices)
-    assert_equal [ "stealth", "forgery & disguise" ], @tibbs.picks_for(@skills)
+    assert_equal({ "expertise" => { "skills" => [ "stealth", "sleight of hand" ] } }, @tibbs.reload.talent_choices)
+    assert_equal [ "stealth", "sleight of hand" ], @tibbs.picks_for(@skills)
     assert_equal 1, @tibbs.choices_left(@skills)
     assert_equal [ [ "expertise", "skills", 1 ] ], @tibbs.choices_to_make.map { |talent, choice, left| [ talent.key, choice.key, left ] }
   end
@@ -30,8 +30,8 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
   end
 
   test "no more than the slots, and no pick twice" do
-    assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel evade lying stealth ]) }
-    error = assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel Duel ]) }
+    assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm parkour deception stealth ]) }
+    error = assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm Charm ]) }
     assert_match(/same skill twice/, error.message)
   end
 
@@ -48,7 +48,7 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
 
   test "dropping a level leaves the picks, warns, and other saves still work" do
     @tibbs.update!(level: 3, talent_keys: %w[ lucky wisps flight ])
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel evade lying stealth ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm parkour deception stealth ])
 
     @tibbs.update!(level: 1, talent_keys: [ "wisps" ])
     assert_equal 1, @tibbs.extra_choices(@skills)
@@ -58,12 +58,12 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
     @tibbs.choose_for_talent!("wisps", "traits" => [ "petty" ])
     assert_equal [ "petty" ], @tibbs.reload.talent_choices.dig("wisps", "traits")
 
-    assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel evade lying sabotage ]) }
-    @tibbs.reload.choose_for_talent!("expertise", "skills" => %w[ duel evade lying ])
+    assert_raises(ActiveRecord::RecordInvalid) { @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm parkour deception sabotage ]) }
+    @tibbs.reload.choose_for_talent!("expertise", "skills" => %w[ charm parkour deception ])
   end
 
   test "clearing every pick removes the talent's entry" do
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm ])
     @tibbs.choose_for_talent!("expertise", "skills" => [ "" ])
     assert_empty @tibbs.reload.talent_choices
   end
