@@ -64,11 +64,24 @@ class CrucibleTest < ActiveSupport::TestCase
 
   test "the monster pages' d6 tables and the vassal's aspects, checked against the book (pg. 79, 146–172)" do
     monsters = Crucible.all.select { _1.group == "monsters" }
-    assert_equal 54, monsters.size
-    assert monsters.all? { _1.tables.sole.width == 1 }
+    assert_equal 59, monsters.size, "54 d6 lists and 5 word grids"
+    assert_equal 54, monsters.count { _1.tables.one? && _1.tables.sole.width == 1 }
     assert_equal "It's lonely, the last of its kind.", Crucible.find("monster_cyclopean_curses").tables.sole.cell(6, 1)
     assert_equal "Lies, broke a promise made in desperation.", Crucible.find("monster_curse_origins").tables.sole.cell(2, 1)
     assert_equal [ "dragon: Eldritch Growth", "tentacles: Fearsome" ], Crucible.find("vassal_aspects").tables.sole.then { [ _1.cell(1, 1), _1.cell(6, 2) ] }
     assert_equal "vassal_aspects", Talent.find("vassal").choice("aspects").crucible
+  end
+
+  test "every cell is text, not a word YAML reads as true, false or a number" do
+    YAML.load_file(Rails.root.join("config/crucibles.yml")).each do |crucible|
+      crucible["tables"].each { |table| table["rows"].flatten.each { assert_kind_of String, _1, crucible["key"] } }
+    end
+  end
+
+  test "the monster pages' word grids roll several lists together (pg. 159–170)" do
+    assert_equal [ "charred stone bastion", "sulfuric cave system" ], Crucible.find("monster_seat_of_power").tables.then { [ _1.first.cell(1, 1), _1.last.cell(6, 1) ] }
+    assert_equal [ 3, "mist" ], Crucible.find("monster_types_of_mephit").tables.sole.then { [ _1.width, _1.cell(6, 3) ] }
+    assert_equal "It grows taller, then vanishes.", Crucible.find("monster_riddle").tables.first.cell(2, 1)
+    assert_equal %w[ relic promise obsession ], Crucible.find("monster_unfinished_business").tables.map { _1.cell(6, 1) }
   end
 end
