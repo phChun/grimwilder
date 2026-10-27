@@ -10,6 +10,7 @@
 # - `assist`: assist after the roll, with 1d of your own (Got Your Back).
 # - `critical_effect`: nothing changes on the dice; the log notes that it adds
 #   a critical effect (Weapon Mastery's mastery, pg. 10).
+# - `omen`: swap any d6 for one of your omens, which then erases (Augury).
 #
 # `use` ticks one of the talent's uses and `pool` rolls one of its talent
 # pools. `who`: `self` (your own rolls), `allies` (others' at your table) or
@@ -20,7 +21,7 @@
 # the roller), `grim_die` (a bonus die shows 1–3: you), `perfect` (you), or
 # `perfect_both` (you and the roller).
 class Talent::FollowUp < Data.define(:talent_key, :key, :kind, :label, :use, :pool, :who, :rolls, :results, :after, :spark)
-  KINDS = %w[ bonus reroll raise assist critical_effect ].freeze
+  KINDS = %w[ bonus reroll raise assist critical_effect omen ].freeze
   WHO = %w[ self allies anyone ].freeze
   ROLLS = %w[ action defense story ].freeze
   SPARK = %w[ six grim_die perfect perfect_both ].freeze
@@ -48,7 +49,7 @@ class Talent::FollowUp < Data.define(:talent_key, :key, :kind, :label, :use, :po
   # Whether a character can do it to the same roll again: inspiration can be
   # spent twice on one roll, but Luck rolls once.
   def repeatable?
-    kind == "raise"
+    kind.in?(%w[ raise omen ])
   end
 
   def for_roller?(own)

@@ -12,7 +12,7 @@ class Campaigns::Rolls::FollowUpsController < ApplicationController
   end
 
   def create
-    @roll.follow_up!(characters.find(params.expect(:character_id)), params.expect(:follow_up), by: Current.identity, die: params[:die])
+    @roll.follow_up!(characters.find(params.expect(:character_id)), params.expect(:follow_up), by: Current.identity, die: params[:die], omen: params[:omen])
     redirect_back_or_to table_path_for_viewer, status: :see_other
   rescue ArgumentError => error
     redirect_back_or_to table_path_for_viewer, alert: error.message, status: :see_other

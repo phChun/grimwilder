@@ -1,0 +1,18 @@
+<%# locals: (character:, talent:, editable:) %>
+<%# Herbalism's two herb names, made before each session: the touchstones for its potions. %>
+<div class="talent-state">
+  <span class="use-tracker__name">Herbs</span>
+  <% if character.herbs.any? %>
+    <ul class="talent-card__picks" aria-label="Herbs"><% character.herbs.each do |herb| %><li class="talent-card__pick"><%= title_case(herb) %></li><% end %></ul>
+  <% end %>
+  <% if editable %>
+    <%= form_with url: character_talent_state_path(character, talent.key), method: :patch, class: "talent-card__make" do %>
+      <input type="hidden" name="change" value="herbs">
+      <% Character::TalentState::HERB_COUNT.times do |index| %>
+        <label class="visually-hidden" for="herb-<%= index %>">Herb <%= index + 1 %></label>
+        <input id="herb-<%= index %>" name="herbs[]" class="field__input" maxlength="40" autocomplete="off" value="<%= character.herbs[index] %>" placeholder="Herb <%= index + 1 %>">
+      <% end %>
+      <button type="submit" class="button button--small"><%= character.herbs.any? ? "Rename" : "Name this session's herbs" %></button>
+    <% end %>
+  <% end %>
+</div>

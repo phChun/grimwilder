@@ -137,6 +137,10 @@
             <% end %>
           <% end %>
         </div>
+        <%# Flesh Wounds (pg. 58): when they'd be bloodied, a scene-long condition instead. %>
+        <% if tends && !@character.bloodied? && @character.flesh_wounds? && !@character.flesh_wound? %>
+          <%= button_to "Take a Flesh Wound instead", character_conditions_path(@character), params: { condition: Character::Damage::FLESH_WOUND, lasts: "scene" }, class: "button button--small harm__flesh-wound", title: "+1t on every roll until the scene ends; on a disaster, take the harm as normal" %>
+        <% end %>
         <%# Desperate isn't death: more harm drops them, and a story roll says how bad (pg. 27). If that's the end, the owner gets a quiet way there. %>
         <% if editable && @character.desperate? && @character.in_play? && !@character.up_for_grabs? %>
           <div class="harm__end">

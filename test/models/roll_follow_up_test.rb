@@ -20,7 +20,7 @@ class RollFollowUpTest < ActiveSupport::TestCase
         assert (follow_up.results - Grimwild::Dice::RESULTS).empty?, follow_up.id
         assert_includes Talent::FollowUp::SPARK, follow_up.spark, follow_up.id if follow_up.spark
         assert_includes talent.uses.select(&:counter?).map(&:id), follow_up.use_id, follow_up.id if follow_up.use
-        assert_includes talent.uses.select(&:pool?).map(&:id), follow_up.pool_id, follow_up.id if follow_up.pool
+        assert_includes talent.uses.select(&:pool?).map(&:id) + talent.makes.map(&:id), follow_up.pool_id, follow_up.id if follow_up.pool
         assert_includes talent.bonuses.map(&:id), follow_up.after, follow_up.id if follow_up.after
       end
     end

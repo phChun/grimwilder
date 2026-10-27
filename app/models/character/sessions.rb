@@ -1,7 +1,8 @@
 # What a session or scene boundary does to a character who's there for it
 # (pg. 31): a session resets thread (2, plus any from talents), gives spark
-# (not before session 1), and resets talent uses and pools; a scene ending
-# resets the per-scene ones.
+# (not before session 1), resets talent uses and pools, and rolls Augury's
+# omens (Character::TalentState); a scene ending resets the per-scene ones
+# and ends a frenzy.
 module Character::Sessions
   extend ActiveSupport::Concern
 
@@ -19,6 +20,7 @@ module Character::Sessions
     self.thread = session_thread
     settle_spark(take: !first)
     reset_talent_uses(per: :session)
+    reset_talent_state
     save!
     reset_opus_rolls
     refresh_talent_pools!(per: :session)
@@ -26,6 +28,7 @@ module Character::Sessions
 
   def end_scene!
     reset_talent_uses(per: :scene)
+    end_frenzy
     save!
     refresh_talent_pools!(per: :scene)
   end

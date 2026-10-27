@@ -24,13 +24,7 @@ module Character::Damage
   # +1t for a mark on the stat, +1t for bloodied (Brawn, Agility) or rattled
   # (Wits, Presence), and +1t on every roll while desperate.
   def damage_thorns(stat)
-    stat = stat.to_s
-    thorns = 0
-    thorns += 1 if marked?(stat)
-    thorns += 1 if bloodied? && Grimwild::PHYSICAL_STATS.include?(stat)
-    thorns += 1 if rattled? && Grimwild::MENTAL_STATS.include?(stat)
-    thorns += 1 if desperate?
-    thorns
+    damage_reasons(stat).size
   end
 
   def damage_reasons(stat)
@@ -39,8 +33,23 @@ module Character::Damage
       ("marked" if marked?(stat)),
       ("bloodied" if bloodied? && Grimwild::PHYSICAL_STATS.include?(stat)),
       ("rattled" if rattled? && Grimwild::MENTAL_STATS.include?(stat)),
-      ("desperate" if desperate?)
+      ("desperate" if desperate?),
+      ("flesh wound" if flesh_wound?)
     ].compact
+  end
+
+  # Flesh Wounds (pg. 58): instead of bloodied, a condition that adds +1t to
+  # every roll and clears when the scene ends.
+  FLESH_WOUND = "Flesh Wound"
+  HARMS = %w[ bloodied rattled desperate ].freeze
+  MARK_AND_HARMS = [ "marked", *HARMS ].freeze
+
+  def flesh_wounds?
+    [ *talent_entries, *eldritch_talent_entries ].any? { _1.key == "flesh-wounds" }
+  end
+
+  def flesh_wound?
+    conditions.any? { _1["name"].casecmp?(FLESH_WOUND) }
   end
 
   # Conditions are { "name", "lasts" }: lasts "scene" for short-term ones that
@@ -81,9 +90,12 @@ module Character::Damage
   end
 
   # A significant rest (pg. 30) clears all marks and harm. Doesn't save.
+  # Also clears what a rest heals on a talent's companion (a vassal's or
+  # animal companion's damage boxes).
   def rest(by: nil)
     self.changed_by = by if by
     assign_attributes(Grimwild::STATS.to_h { [ "marked_#{_1}", false ] }.merge(bloodied: false, rattled: false, desperate: false))
+    reset_talent_uses(per: :rest)
   end
 
   def rest!(by: nil)

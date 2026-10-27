@@ -41,10 +41,12 @@ module Character::Rolling
     talent_rolled = talent_bonuses_rolled(stat_name, mode, bonuses)
     helping = assists.map { |ally| [ ally, ally.assist_bonuses_rolled(mode, assist_bonuses.to_h.transform_keys(&:to_s)[ally.id.to_s]) ] }
 
-    ignored = { "damage" => damage_thorns(stat_name), "situational" => thorns }
-    reasons = talent_rolled.any? { _2.ignore == "damage" } ? [] : damage_reasons(stat_name)
+    reasons = damage_reasons(stat_name)
+    ignored = { "damage" => (reasons & Character::Damage::MARK_AND_HARMS).size, "situational" => thorns }
+    reasons -= Character::Damage::MARK_AND_HARMS if talent_rolled.any? { _2.ignore == "damage" } # Frenzy: not a Flesh Wound
     thorns = 0 if talent_rolled.any? { _2.ignore == "situational" }
     reasons, thorns, removed = remove_thorns_with_panache(panache, reasons, thorns)
+    reasons += talent_rolled.flat_map { Array.new(bonus_thorns(_2), "instability") }
     talent_dice = talent_rolled.sum(&:last)
 
     own = Grimwild::Dice.roll(stat(stat_name) + spend_spark + help + talent_dice, reasons.size + thorns, random: random)

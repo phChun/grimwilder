@@ -146,7 +146,7 @@ module RollsHelper
     dice << "#{roll.help_dice}d extra" if roll.help_dice.positive?
     dice << roll_assists_line(roll) if roll.assists.any?
 
-    thorns = roll.damage_reasons.dup
+    thorns = roll.damage_reasons.tally.map { |reason, count| count > 1 ? "#{count} #{reason}" : reason }
     thorns << "#{roll.situational_thorns} situational" if roll.situational_thorns.positive?
 
     left_out = roll.talent_bonuses.select { _1["ignored"].positive? }.map do |bonus|
@@ -178,6 +178,7 @@ module RollsHelper
     when "bonus" then "Roll #{actor.talent_pools.find_by(use_key: follow_up.pool_id)&.size}d"
     when "reroll" then "Re-roll"
     when "assist" then "Assist with 1d"
+    when "omen" then "Swap"
     else "Spend 1"
     end
   end
@@ -198,6 +199,7 @@ module RollsHelper
     when "raise" then "#{whose} raised a #{entry["from"]} to #{entry["to"]}"
     when "assist" then "#{entry["by"]} assisted after the roll with #{entry["talent"]} (#{entry["die"]})"
     when "critical_effect" then "#{whose} adds a critical effect"
+    when "omen" then "#{entry["by"]} swapped a #{entry["from"]} for an omen of #{entry["to"]} (#{entry["talent"]})"
     end
     Array(entry["spark"]).any? ? "#{line}, and #{entry["spark"].to_sentence} #{entry["spark"].one? ? "takes" : "take"} spark" : line
   end
@@ -269,6 +271,7 @@ module RollsHelper
   def pool_roll_summary(roll)
     left =
       if roll.next_phase then "0d: #{roll.phase} is done. #{roll.next_phase} begins."
+      elsif roll.refilled? then "0d: #{roll.pool&.outcome || "it happens."} Then it refills to #{roll.pool&.starting_size}d."
       elsif roll.remaining.zero? then "0d: #{roll.pool&.outcome || "it happens."}"
       else "#{roll.remaining}d left."
       end
@@ -283,6 +286,7 @@ module RollsHelper
 
     case roll.pool_action
     when "pushed" then "Pushed: 1d dropped, take a mark. #{left}"
+    when "smite" then "#{roll.character&.name || "Someone"} smites: 1d dropped. #{left}"
     when "rolled_after_drop" then "Dropped 1d, then rolled #{roll.dice.size}d: #{roll.dropped}d dropped in all. #{left}"
     else "Rolled #{roll.dice.size}d: #{roll.dropped.zero? ? "nothing dropped" : "#{roll.dropped}d dropped"}. #{left}"
     end
