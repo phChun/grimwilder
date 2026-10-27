@@ -9,6 +9,14 @@
 class Arcanum < ApplicationRecord
   TIERS = %w[ trivial minor major mythic ].freeze
   POOL_SIZES = { "minor" => 2, "major" => 4, "mythic" => 6 }.freeze
+  # Optional additions (pg. 42), more likely on greater arcana: key => [name, what it means].
+  ADDITIONS = {
+    "heavy_cost" => [ "Heavy cost", "Its magic has an upfront cost: pushing yourself, harm, vex or a temporary condition." ],
+    "unique_reset" => [ "Unique reset", "Its power pool doesn't reset each session; an act, event, resource, spark or thread restores it." ],
+    "ritual" => [ "Ritual ability", "Given time, or with an 8d timer pool, it can produce a ritual-level effect." ],
+    "curse" => [ "Curse", "A secret drawback: costly to use, or twisting the user toward its own desires." ],
+    "sentient" => [ "Sentient", "It can communicate, and has its own thoughts, goals and wises." ]
+  }.freeze
   TOUCHSTONE_LIMIT = 6
   LIMITS = { "description" => 2000, "limitations" => 1000 }.freeze
 
@@ -35,6 +43,14 @@ class Arcanum < ApplicationRecord
   after_save :refresh_pool, if: -> { saved_change_to_power_pool? || saved_change_to_tier? || saved_change_to_name? || saved_change_to_used_at? }
 
   scope :ordered, -> { order(:used_at, :created_at, :id) }
+
+  def additions=(value)
+    super(Array(value).map(&:to_s) & ADDITIONS.keys)
+  end
+
+  def unique_reset?
+    additions.include?("unique_reset")
+  end
 
   def touchstones=(value)
     super(Array(value.is_a?(Hash) ? value.values : value).map { _1.to_s.squish.first(Character::WORD_LIMIT) }.compact_blank.uniq(&:downcase).first(TOUCHSTONE_LIMIT))

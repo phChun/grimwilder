@@ -25,6 +25,11 @@
 
   <% if arcanum.description %><p class="talent-card__summary"><%= arcanum.description %></p><% end %>
   <% if arcanum.limitations %><p class="talent-card__growth"><span class="talent-card__label">Limits</span> <%= arcanum.limitations %></p><% end %>
+  <%# A curse is a secret drawback: only the owner and the GM see it. %>
+  <% shown = arcanum.additions.reject { _1 == "curse" && !tends } %>
+  <% if shown.any? %>
+    <ul class="talent-card__picks" aria-label="Additions"><% shown.each do |key| %><li class="talent-card__pick" title="<%= Arcanum::ADDITIONS[key].last %>"><%= Arcanum::ADDITIONS[key].first %></li><% end %></ul>
+  <% end %>
 
   <% if arcanum.opus? && !arcanum.opus_complete? %>
     <%# Magnum Opus: roll this session's touchstones, then lock one in for good. %>

@@ -107,3 +107,8 @@ scars: [crookedly broken nose, "wild, ripped hair", torn earlobe or ear tips, we
 creeds: [all's fair in love and war, wield the sword of justice, accept every challenge, coin is meant to be spent, infamous is still famous, gentleman even in dire times, honor is only for the dead, a good story beats any reward, never kill the helpless, death before dishonor, the best plan is no plan at all, only a fair fight measures skill]
 # Witch afflictions (pg. 85): 1, or your own.
 afflictions: [plagued by your own shadow, empty eye sockets, skeletal body wasting away, "special diet, such as only raw meat", haunted by ancestral ghosts, putrid smell that follows everywhere]
+# Bard song composition (pg. 57): a style, a tune and an impact make a song.
+song_composition:
+  Style: [chaotic, dire, fiery, gentle, haunting, playful, nostalgic, rousing, vicious, whimsical]
+  Tune: [anthem, aria, ballad, chant, ditty, hymn, ode, requiem, rhapsody, serenade]
+  Impact: [affection, awe, calm, despair, fear, fury, hope, joy, mockery, wonder]

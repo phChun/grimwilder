@@ -9,7 +9,8 @@
 #   and the player can type their own.
 # - `same_as: "expertise.skills"` takes another talent's list (Natural Moxie).
 # - `touchstone: true` when the picks are the talent's magic touchstones (pg. 36).
-# - `from_list: magic_schools` takes a list from config/grimwild.yml.
+# - `from_list: magic_schools` takes a list from config/grimwild.yml (a hash
+#   of lists is groups: the Bard's song composition).
 # - `from_picks: [spellcraft.theorems, …]` picks from what the character
 #   picked for those talents (Bailiwick, Mastered Theorem); a character with
 #   none of those talents types their own (Character::TalentChoices#choice_open?).
@@ -120,9 +121,16 @@ class Talent::Choice < Data.define(:talent_key, :key, :label, :noun, :pick, :fro
   end
 
   # { "Above board" => [...], "Below table" => [...] }, or { nil => [...] } for a plain list.
+  # A `from_list` that's a hash of lists is groups too (the Bard's song
+  # composition); a hash of descriptions gives its keys (magic schools).
   def option_groups
     list = source
-    list.groups.presence || { nil => list.from_list ? Grimwild.public_send(list.from_list).then { _1.is_a?(Hash) ? _1.keys : _1 } : list.from }
+    return list.groups if list.groups.present?
+
+    value = list.from_list ? Grimwild.public_send(list.from_list) : list.from
+    if value.is_a?(Hash) && value.values.all?(Array) then value
+    else { nil => value.is_a?(Hash) ? value.keys : value }
+    end
   end
 
   def options

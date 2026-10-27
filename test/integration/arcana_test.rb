@@ -151,4 +151,15 @@ class ArcanaTest < ActionDispatch::IntegrationTest
     post campaign_pool_roll_path(@campaign, ring.pool), params: { return_to: "character" }
     assert_redirected_to character_path(@tibbs, anchor: "arcanum-#{ring.id}")
   end
+
+  test "the form offers the optional additions, and the card shows them" do
+    sign_in_as identities(:pip)
+    get new_character_arcanum_path(@tibbs)
+    assert_select "input[type=checkbox][name='arcanum[additions][]'][value=unique_reset]"
+
+    post character_arcana_path(@tibbs), params: { arcanum: { name: "Whispering Skull", function: "reveal", tier: "major", additions: [ "", "sentient", "curse" ] } }
+    get character_path(@tibbs)
+    assert_select ".arcanum-card .talent-card__pick", text: "Sentient"
+    assert_select ".arcanum-card .talent-card__pick", text: "Curse"
+  end
 end
