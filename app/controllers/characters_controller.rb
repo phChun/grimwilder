@@ -73,7 +73,7 @@ class CharactersController < ApplicationController
         :name, :path, :legacy_core, :level_zero, :campaign_id, :status, :farewell, :up_for_grabs, :level, :xp,
         :brawn, :agility, :wits, :presence, :spark, :thread,
         :marked_brawn, :marked_agility, :marked_wits, :marked_presence, :bloodied, :rattled, :desperate,
-        :not_trait, :not_desire, :weapons, :talents, :notes,
+        :not_trait, :not_desire, :weapons, :armor, :talents, :notes,
         traits: [], desires: [], features: [], weapon_styles: [], arcs: [],
         backgrounds: [ :name, wises: [] ], bonds: [ :to, :bond, :character_id ]
       ).tap { |permitted| permitted[:campaign_id] = nil if permitted.key?(:campaign_id) && permitted[:campaign_id].blank? }

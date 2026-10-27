@@ -14,8 +14,9 @@ module Character::Advancement
     validates :xp, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   end
 
+  # Focused growth (an optional rule) slashes a box for each one filled.
   def xp_to_next_level
-    level + 1
+    (level + 1) * (campaign&.optional_rule?(:focused_growth) ? 2 : 1)
   end
 
   # The stats a character starts with: 1 in each plus 4 points, or 3 at level 0.

@@ -101,6 +101,7 @@ module Character::Damage
   def rest!(by: nil)
     rest(by: by)
     save!
+    refresh_talent_pools!(per: :rest)
   end
 
   # The last change someone other than the owner made: "GM cleared Bloodied".

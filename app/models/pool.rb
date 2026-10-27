@@ -137,6 +137,8 @@ class Pool < ApplicationRecord
 
   # The Talent::Use (or Talent::MadePool) a talent pool comes from.
   def talent_use
+    return character&.rule_uses&.find { _1.id == use_key } if use_key.to_s.start_with?("rule/")
+
     talent = Talent.find_by_key(use_key.to_s.split("/").first)
     talent && (made_by_talent? ? talent.makes : talent.uses).find { _1.id == use_key }
   end
