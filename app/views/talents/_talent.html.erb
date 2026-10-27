@@ -26,24 +26,23 @@
     <% end %>
   </details>
   <% if character && !talent.core? %>
+    <%# On the picker (characters/talents/new): an Add toggle tied to the Taken panel's form, so several can be picked and saved at once (talent_picker_controller.js). %>
     <div class="talent__take">
-      <% if character.has_talent?(talent) %>
+      <% chosen = eldritch ? character.has_eldritch_talent?(talent) : character.has_talent?(talent) %>
+      <% unavailable = eldritch ? !character.eldritch_choosable?(talent) : talent.prohibited_for?(character.path) %>
+      <% if eldritch && character.has_talent?(talent) %>
         <span class="tag">Taken</span>
-      <% elsif character.has_eldritch_talent?(talent) %>
+      <% elsif !eldritch && character.has_eldritch_talent?(talent) %>
         <span class="tag">Eldritch</span>
-      <% elsif talent.prohibited_for?(character.path) %>
+      <% elsif !chosen && unavailable %>
         <span class="field__hint">Not available to a <%= character.path %>.</span>
-      <% elsif eldritch %>
-        <% if character.eldritch_talents_full? %>
-          <span class="field__hint">No Eldritch Talent slot free at level <%= character.level %>.</span>
-        <% else %>
-          <%= button_to "Take as Eldritch", character_talents_path(character), params: { talent: talent.key, eldritch: 1 }, class: "button button--small button--primary", "aria-label": "Take #{talent.name} as an Eldritch Talent" %>
-          <% if talent.one_time_only? %><p class="field__hint">Its "One time only" feature won't work as an Eldritch Talent.</p><% end %>
-        <% end %>
-      <% elsif character.talents_full? %>
-        <span class="field__hint">No room at level <%= character.level %>.</span>
       <% else %>
-        <%= button_to "Take #{talent.name}", character_talents_path(character), params: { talent: talent.key }, class: "button button--small button--primary" %>
+        <label class="talent-toggle">
+          <%= check_box_tag "talents[]", talent.key, chosen, id: "pick-#{talent.key}", form: "talent-list", class: "talent-toggle__box", data: { talent_picker_target: "box", action: "talent-picker#update", name: talent.name } %>
+          <span class="button button--small talent-toggle__add">Add<span class="visually-hidden"> <%= talent.name %></span></span>
+          <span class="button button--small button--primary talent-toggle__added"><%= icon(:check, size: 16) %> Added<span class="visually-hidden"> <%= talent.name %></span></span>
+        </label>
+        <% if eldritch && talent.one_time_only? %><p class="field__hint">Its "One time only" feature won't work as an Eldritch Talent.</p><% end %>
       <% end %>
     </div>
   <% end %>

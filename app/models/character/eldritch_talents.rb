@@ -57,6 +57,15 @@ module Character::EldritchTalents
     talent
   end
 
+  # The picker's Save for Eldritch Talents; see Character::Talents#set_talents!.
+  def set_eldritch_talents!(keys)
+    keys = Array(keys).map(&:to_s).compact_blank.uniq
+    removed = eldritch_talent_keys - keys
+    added = keys - eldritch_talent_keys
+    update!(eldritch_talent_keys: (eldritch_talent_keys - removed) + added, talent_skins: talent_skins.except(*removed), talent_choices: talent_choices.except(*removed))
+    [ added.filter_map { Talent.find_by_key(_1) }, removed.filter_map { Talent.find_by_key(_1) } ]
+  end
+
   def remove_eldritch_talent!(key)
     update!(eldritch_talent_keys: eldritch_talent_keys - [ key.to_s ], talent_skins: talent_skins.except(key.to_s), talent_choices: talent_choices.except(key.to_s))
   end

@@ -16,9 +16,9 @@
       <% if @character.talents_to_choose.positive? %>
         At level <%= @character.level %>, choose <%= @character.talents_to_choose %> more.
       <% elsif @character.extra_talents.positive? %>
-        That's <%= @character.extra_talents %> more than level <%= @character.level %> allows: remove <%= @character.extra_talents == 1 ? "one" : @character.extra_talents %> from the sheet.
+        That's <%= @character.extra_talents %> more than level <%= @character.level %> allows: remove <%= @character.extra_talents == 1 ? "one" : @character.extra_talents %> from the list.
       <% else %>
-        That's the full set for level <%= @character.level %>; you gain another each level. To swap one, remove it from the sheet first.
+        That's the full set for level <%= @character.level %>; you gain another each level. To swap one, remove it from the list on the right and add another.
       <% end %>
       <%= @character.path %> talents come first, but any path's are open.
       <% if @character.eldritch_talents? %>
@@ -31,4 +31,40 @@
   <% end %>
 </header>
 
-<%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch, selected: params[:path] || Talent.groups.find { |group| group.name == @character.path && group.talents.any? { !_1.core? } }&.key %>
+<%# The catalog on the left, what's taken on the right (a drawer behind a button on a phone). Ticking Add on a card puts it in the list; Save sets the whole list at once (Characters::TalentListsController). %>
+<% keys = @eldritch ? @character.eldritch_talent_keys : @character.talent_keys %>
+<% limit = @eldritch ? @character.eldritch_talent_slots : @character.expected_talent_count %>
+<div class="talent-picker" data-controller="talent-picker" data-talent-picker-limit-value="<%= limit %>">
+  <div class="talent-picker__catalog">
+    <%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch, selected: params[:path] || Talent.groups.find { |group| group.name == @character.path && group.talents.any? { !_1.core? } }&.key %>
+  </div>
+
+  <aside id="talent-picker-panel" class="talent-picker__panel" aria-labelledby="taken-title">
+    <%= form_with url: character_talent_list_path(@character), method: :patch, id: "talent-list", class: "panel stack talent-picker__form" do %>
+      <% if @eldritch %><input type="hidden" name="eldritch" value="1"><% end %>
+      <input type="hidden" name="talents[]" value="">
+      <div class="talent-picker__head">
+        <h2 id="taken-title" class="panel__title"><%= @eldritch ? "Eldritch Talents" : "Taken" %></h2>
+        <span class="talent-picker__count" data-talent-picker-target="count" aria-live="polite"><%= keys.size %> of <%= limit %></span>
+        <button type="button" class="close-button talent-picker__close" data-action="talent-picker#toggle" aria-label="Close the list"><%= icon(:close, size: 18) %></button>
+      </div>
+      <% if !@eldritch && @character.core_talent %><p class="field__hint">Plus <%= @character.core_talent %>, from the path.</p><% end %>
+      <template data-talent-picker-target="removeIcon"><%= icon(:close, size: 16) %></template>
+      <ul class="talent-picker__list" data-talent-picker-target="list">
+        <% keys.each do |key| %>
+          <% talent = Talent.find_by_key(key) %>
+          <% if talent %>
+            <li class="talent-picker__item" data-key="<%= key %>"><span><%= talent.name %></span></li>
+          <% end %>
+        <% end %>
+      </ul>
+      <p class="field__hint" data-talent-picker-target="empty"<% if keys.any? %> hidden<% end %>>Nothing yet: tap Add on a talent.</p>
+      <p class="form-error" data-talent-picker-target="over" hidden></p>
+      <button type="submit" class="button button--primary" data-talent-picker-target="save">Save talents</button>
+    <% end %>
+  </aside>
+
+  <button type="button" class="button button--primary talent-picker__fab" data-action="talent-picker#toggle" aria-controls="talent-picker-panel" aria-expanded="false" data-talent-picker-target="fab">
+    <%= icon(:list, size: 18) %> <span data-talent-picker-target="fabCount"><%= keys.size %> of <%= limit %></span><span class="visually-hidden"> talents taken</span>
+  </button>
+</div>

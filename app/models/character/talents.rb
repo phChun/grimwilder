@@ -56,6 +56,17 @@ module Character::Talents
     talent
   end
 
+  # Sets the whole list at once (the picker's Save): new keys are added in
+  # the order given, missing ones removed with their skins and picks.
+  # Returns [added, removed] talents.
+  def set_talents!(keys)
+    keys = Array(keys).map(&:to_s).compact_blank.uniq
+    removed = talent_keys - keys
+    added = keys - talent_keys
+    update!(talent_keys: (talent_keys - removed) + added, talent_skins: talent_skins.except(*removed), talent_choices: talent_choices.except(*removed))
+    [ added.filter_map { Talent.find_by_key(_1) }, removed.filter_map { Talent.find_by_key(_1) } ]
+  end
+
   def remove_talent!(key)
     update!(talent_keys: talent_keys - [ key.to_s ], talent_skins: talent_skins.except(key.to_s), talent_choices: talent_choices.except(key.to_s))
   end

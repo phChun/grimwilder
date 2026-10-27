@@ -44,20 +44,27 @@ class TalentsTest < ActionDispatch::IntegrationTest
     assert_select "section.talent-group:first-of-type h2", text: "The Rogue"
     assert_select "select#talent-path option[selected][value=rogue]", 1, "opens on the character's own path"
     assert_select "section.talent-group:not([hidden])", 1
-    assert_select "#talent-mastermind .tag", text: "Taken"
-    assert_select "#talent-lucky .talent__take", text: /No room at level 1/
-    assert_select "#talent-lucky .talent__take form", 0
+    assert_select "#talent-mastermind input[type=checkbox][name='talents[]'][form=talent-list][checked]"
+    assert_select "#talent-lucky input[type=checkbox][name='talents[]']:not([checked])"
+    assert_select "#talent-picker-panel .talent-picker__count", "1 of 1"
+    assert_select "#talent-picker-panel .talent-picker__item", "Mastermind"
 
-    post character_talents_path(tibbs), params: { talent: "lucky" }
+    patch character_talent_list_path(tibbs), params: { talents: [ "", "mastermind", "lucky" ] }
     assert_redirected_to new_character_talent_path(tibbs)
     assert_not_includes tibbs.reload.talent_keys, "lucky", "level 1 has room for one"
 
-    tibbs.update!(level: 2)
-    get new_character_talent_path(tibbs)
-    assert_select "#talent-lucky .talent__take form"
-    post character_talents_path(tibbs), params: { talent: "lucky" }
+    tibbs.update!(level: 3)
+    patch character_talent_list_path(tibbs), params: { talents: [ "", "mastermind", "lucky", "weasel" ] }
     assert_redirected_to character_path(tibbs, anchor: "talents")
-    assert_includes tibbs.reload.talent_keys, "lucky"
+    assert_equal "Gibbletibble \"Tibbs\" took Lucky and Weasel.", flash[:notice]
+    assert_equal %w[ mastermind lucky weasel ], tibbs.reload.talent_keys
+
+    patch character_talent_list_path(tibbs), params: { talents: [ "", "lucky", "weasel", "lurker" ] }
+    assert_equal %w[ lucky weasel lurker ], tibbs.reload.talent_keys, "a swap in one save"
+    assert_match "took Lurker and dropped Mastermind", flash[:notice]
+
+    post character_talents_path(tibbs), params: { talent: "poisoner" }
+    assert_not_includes tibbs.reload.talent_keys, "poisoner", "taking one alone still checks the room"
 
     delete character_talent_path(tibbs, "lucky")
     assert_not_includes tibbs.reload.talent_keys, "lucky"
@@ -84,11 +91,12 @@ class TalentsTest < ActionDispatch::IntegrationTest
 
     get new_character_talent_path(vex, eldritch: 1)
     assert_select "h1", "Choose an Eldritch Talent"
-    assert_select "#talent-lucky button", "Take as Eldritch"
+    assert_select "#talent-lucky input[type=checkbox][name='talents[]']"
     assert_select "#talent-affliction .tag", "Taken"
     assert_select "section.talent-group h2", text: "Background and heritage", count: 0
 
-    post character_talents_path(vex), params: { talent: "lucky", eldritch: 1 }
+    assert_select "#talent-list input[type=hidden][name=eldritch][value='1']"
+    patch character_talent_list_path(vex), params: { talents: [ "", "lucky" ], eldritch: 1 }
     assert_redirected_to character_path(vex, anchor: "talents")
     assert_equal [ "lucky" ], vex.reload.eldritch_talent_keys
     assert_equal [ "affliction" ], vex.talent_keys
@@ -97,7 +105,9 @@ class TalentsTest < ActionDispatch::IntegrationTest
     assert_select ".eldritch #talent-lucky .talent-card__source", /Eldritch/
     assert_select ".eldritch .talent-slot", 0
     get new_character_talent_path(vex, eldritch: 1)
-    assert_select "#talent-bulwark .talent__take", /No Eldritch Talent slot free/
+    assert_select "#talent-picker-panel .talent-picker__count", "1 of 1"
+    patch character_talent_list_path(vex), params: { talents: [ "", "lucky", "bulwark" ], eldritch: 1 }
+    assert_equal [ "lucky" ], vex.reload.eldritch_talent_keys, "no second slot at level 1"
 
     delete character_talent_path(vex, "lucky", eldritch: 1)
     assert_empty vex.reload.eldritch_talent_keys

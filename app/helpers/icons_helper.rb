@@ -9,7 +9,8 @@ module IconsHelper
     send: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
     more: '<circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/>',
     close: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>',
-    check: '<path d="M5 12.5l4.5 4.5L19 7"/>'
+    check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+    list: '<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4.5 6h.01"/><path d="M4.5 12h.01"/><path d="M4.5 18h.01"/>'
   }.freeze
 
   # Decorative by default; pass label: for an icon that stands alone.
