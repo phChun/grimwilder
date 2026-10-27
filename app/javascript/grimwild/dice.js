@@ -1,4 +1,4 @@
-// Grimwild dice rules (Community Edition 5.2, pg. 10–18).
+// Grimwild dice rules (Community Edition Preview 6, pg. 10–18).
 //
 // Action/defense rolls: roll d6s equal to the stat (plus spark, assists,
 // talents) and any thorns (d8s). The highest d6 sets the result. Each thorn
