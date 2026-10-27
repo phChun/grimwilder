@@ -1,0 +1,15 @@
+<%# locals: (character:, editable:) %>
+<%# Oathbreaker (P6 pg. 69, Character::Oath), on a Paladin's core talent card: Oathsworn while sworn, Talented while oathbroken. The owner marks the break and the one redemption. %>
+<div class="talent-state oath">
+  <% if character.oathbroken? %>
+    <span class="use-tracker__name">Oathbreaker</span>
+    <span class="use-tracker__resets">Talented replaces Oathsworn</span>
+    <% if editable && character.can_redeem_oath? %>
+      <%= button_to "Redeemed: Oathsworn returns", character_oath_path(character), method: :delete, class: "button button--small", form: { class: "talent-card__action", data: { turbo_confirm: "A ritual or mythic deed redeems #{character.short_name}: Oathsworn returns, and they keep one talent from their time oathbroken. Redemption is possible only once." } } %>
+    <% elsif character.oath_redeemed? %>
+      <span class="use-tracker__resets">already redeemed once</span>
+    <% end %>
+  <% elsif editable && character.can_break_oath? %>
+    <%= button_to "Two tenets broken: Oathbreaker", character_oath_path(character), class: "button button--small button--ghost", form: { class: "talent-card__action", data: { turbo_confirm: "#{character.short_name} loses Oathsworn and gains the Adventurer's Talented in its place, with its extra talents. Continue?" } } %>
+  <% end %>
+</div>

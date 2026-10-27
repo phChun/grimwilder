@@ -21,6 +21,12 @@
       <%= form.select :path, Grimwild.paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
       <p class="field__hint">Your path gives its core talent. Add another talent from any path below.</p>
       <% legacy = Talent.all.select(&:legacy_core_of) %>
+      <% unless character.persisted? %>
+        <label class="check">
+          <%= form.check_box :level_zero %>
+          Start at level 0: no core talent yet, and 3 stat points instead of 4 (optional rule, pg. 177). Ask your GM first.
+        </label>
+      <% end %>
       <label class="check">
         <%= form.check_box :legacy_core %>
         Use the legacy core talent, where the path has one (<%= legacy.map { "#{_1.legacy_core_of}: #{_1.name.delete_suffix(" (Legacy)")}" }.to_sentence %>; pg. 179). Ask your GM first.
@@ -51,14 +57,14 @@
       <% end %>
       <div class="field field--inline">
         <%= form.label :level, class: "field__label" %>
-        <%= form.number_field :level, min: 1, max: Grimwild::MAX_LEVEL, class: "field__input field__input--short" %>
+        <%= form.number_field :level, min: (character.level_zero? ? 0 : 1), max: Grimwild::MAX_LEVEL, class: "field__input field__input--short" %>
       </div>
     <% end %>
   </section>
 
   <section class="panel stack" aria-labelledby="form-stats">
     <h2 id="form-stats" class="panel__title">Stats</h2>
-    <p class="field__hint">Start with 1 in each, then add 4 points, up to 3 in any one stat.</p>
+    <p class="field__hint">Start with 1 in each, then add 4 points (3 at level 0), up to 3 in any one stat.</p>
     <div class="stat-inputs">
       <% Grimwild.stats.each do |stat, description| %>
         <div class="field">
@@ -125,6 +131,8 @@
       <%= form.label :weapons, "Weapons", class: "field__label" %>
       <%= form.text_field :weapons, maxlength: Character::WORD_LIMIT, autocomplete: "off", placeholder: "short sword and buckler", class: "field__input" %>
     </div>
+    <%# Weapon styles are an optional rule (P6 pg. 177): asked for at a table that uses it, or once filled in. %>
+    <% if weapon_styles_offered?(character) %>
     <fieldset class="fieldset">
       <legend class="field__label">Two weapon styles</legend>
       <div class="two-up">
@@ -133,6 +141,7 @@
         <% end %>
       </div>
     </fieldset>
+    <% end %>
   </section>
 
   <section class="panel stack" aria-labelledby="form-story">

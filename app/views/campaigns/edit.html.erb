@@ -46,6 +46,17 @@
           <%= form.label :setting, "Setting", class: "field__label" %>
           <%= form.text_field :setting, maxlength: 80, autocomplete: "off", placeholder: "The Bramble Marches", class: "field__input" %>
         </div>
+        <fieldset class="fieldset">
+          <legend class="field__label">Optional rules</legend>
+          <input type="hidden" name="campaign[optional_rules][]" value="">
+          <% Campaign::OptionalRules::RULES.each do |rule, rule_label| %>
+            <label class="check">
+              <%= check_box_tag "campaign[optional_rules][]", rule, campaign.optional_rule?(rule), id: "rule-#{rule}" %>
+              <%= rule_label %>
+            </label>
+          <% end %>
+          <p class="field__hint">Players opt into stat progression, legacy core talents and starting at level 0 on their own sheets, with your say-so.</p>
+        </fieldset>
         <%= form.submit "Save", class: "button button--primary" %>
       <% end %>
     </section>

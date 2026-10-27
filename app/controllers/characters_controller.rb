@@ -35,7 +35,7 @@ class CharactersController < ApplicationController
 
   def update
     @character.changed_by = Current.identity
-    if @character.update(character_params)
+    if @character.update(character_params.except(:level_zero)) # only a new character starts at level 0
       redirect_to @character
     else
       load_play if params[:quick]
@@ -70,7 +70,7 @@ class CharactersController < ApplicationController
 
     def character_params
       params.require(:character).permit(
-        :name, :path, :legacy_core, :campaign_id, :status, :farewell, :up_for_grabs, :level, :xp,
+        :name, :path, :legacy_core, :level_zero, :campaign_id, :status, :farewell, :up_for_grabs, :level, :xp,
         :brawn, :agility, :wits, :presence, :spark, :thread,
         :marked_brawn, :marked_agility, :marked_wits, :marked_presence, :bloodied, :rattled, :desperate,
         :not_trait, :not_desire, :weapons, :talents, :notes,

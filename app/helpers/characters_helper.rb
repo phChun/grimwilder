@@ -8,6 +8,16 @@ module CharactersHelper
   end
   alias_method :can_change_damage?, :can_spend_talent_uses?
 
+  # Weapon styles are an optional rule (Campaign::OptionalRules): the form asks
+  # for them when the character's table uses it (a new one: any of the owner's
+  # tables), or when they're already filled in.
+  def weapon_styles_offered?(character)
+    return true if character.weapon_styles.any?
+    return character.campaign.optional_rule?(:weapon_styles) if character.campaign
+
+    !character.persisted? && Current.identity.campaigns.active.any? { _1.optional_rule?(:weapon_styles) }
+  end
+
   # A talent pick as the sheet shows it: "Wild Fire · Evocation" for a theorem.
   def talent_pick_label(choice, pick)
     name, school = choice.schooled? ? Talent::Choice.split_school(pick) : [ pick, nil ]
