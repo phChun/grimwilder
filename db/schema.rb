@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_26_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_120000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -263,6 +263,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_26_120000) do
     t.string "next_phase"
     t.integer "play_session_id"
     t.integer "scene_id"
+    t.json "talent_bonuses", default: [], null: false
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"
@@ -314,7 +315,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_26_120000) do
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
-  add_foreign_key "pools", "arcana", column: "arcanum_id", on_delete: :cascade
+  add_foreign_key "pools", "arcana", on_delete: :cascade
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade
   add_foreign_key "pools", "identities", column: "last_rolled_by_id"

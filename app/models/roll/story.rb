@@ -9,8 +9,9 @@ module Roll::Story
 
   class_methods do
     # rolled: { dice:, thorns: } the player already rolled at a roll call, with
-    # their spark already spent (RollCall); otherwise the server rolls here.
-    def story!(campaign:, by:, question: nil, odds: 2, thorns: 0, character: nil, spend_spark: 0, rolled: nil, random: Random)
+    # their spark already spent and any talent dice in (RollCall); otherwise
+    # the server rolls here. talent_bonuses: what those talents added.
+    def story!(campaign:, by:, question: nil, odds: 2, thorns: 0, character: nil, spend_spark: 0, talent_bonuses: [], rolled: nil, random: Random)
       raise ArgumentError, "Pick 1d, 2d or 3d for the odds." unless ODDS.key?(odds)
       raise ArgumentError, "Thorns go from 0 to #{Character::Rolling::MAX_EXTRA}." unless thorns.in?(0..Character::Rolling::MAX_EXTRA)
       raise ArgumentError, "Only a character can spend spark." if character.nil? && spend_spark != 0
@@ -26,7 +27,7 @@ module Roll::Story
           campaign: campaign, identity: by, character: character, kind: "story",
           name: character&.name || by.display_name, question: question.to_s.squish.first(200).presence,
           dice: result.dice, thorns: result.thorns, outcome: result.result, critical: result.critical,
-          stat_dice: odds, spark_spent: spend_spark, spark_gained: gained
+          stat_dice: odds, spark_spent: spend_spark, spark_gained: gained, talent_bonuses: talent_bonuses
         )
       end
     end

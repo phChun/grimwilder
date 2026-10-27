@@ -130,7 +130,8 @@ class RollCall < ApplicationRecord
   end
 
   # One seat rolls. Spark is the player's to spend, and assists roll 1d alone.
-  def roll!(character, by:, spark: 0, random: Random)
+  # bonuses: the talent bonuses the player ticks (Talent::Bonus#id).
+  def roll!(character, by:, spark: 0, bonuses: [], random: Random)
     with_lock do
       seat = seats.find { _1["character_id"] == character.id }
       raise ArgumentError, "That roll is over." unless open?
@@ -138,7 +139,7 @@ class RollCall < ApplicationRecord
       raise ArgumentError, "#{character.name} already rolled." if seat["dice"]
       raise ArgumentError, "Only #{character.name}'s player or the GM can roll for them." unless may_roll?(seat, by)
 
-      roll_seat(seat, character, by: by, spark: spark.to_i, random: random)
+      roll_seat(seat, character, by: by, spark: spark.to_i, bonuses: bonuses, random: random)
       finish! if waiting.empty?
     end
   end
@@ -149,7 +150,7 @@ class RollCall < ApplicationRecord
       raise ArgumentError, "That roll is over." unless open?
       raise ArgumentError, "Only the GM can roll for everyone." unless gm?(by)
 
-      waiting.each { |seat| roll_seat(seat, character_for(seat), by: by, spark: 0, random: random) }
+      waiting.each { |seat| roll_seat(seat, character_for(seat), by: by, spark: 0, bonuses: [], random: random) }
       finish!
     end
   end
@@ -171,18 +172,22 @@ class RollCall < ApplicationRecord
       identity&.membership_in(campaign)&.gm? || false
     end
 
-    def roll_seat(seat, character, by:, spark:, random:)
+    # Talents that always apply count when the GM rolls for someone too;
+    # ticking one, like spending spark, is the player's call.
+    def roll_seat(seat, character, by:, spark:, bonuses:, random:)
       raise ArgumentError, "#{character.name} is no longer at the table." unless character
       raise ArgumentError, "Only #{character.name}'s player can spend their spark." if spark.positive? && !character.owned_by?(by)
+      raise ArgumentError, "Only #{character.name}'s player can tick their talents." if Array(bonuses).compact_blank.any? && !character.owned_by?(by)
       raise ArgumentError, "An assist rolls 1d, without spark." if spark.positive? && assist?(seat)
       character.check_spark_spend!(spark)
+      talents = assist?(seat) ? [] : character.call_bonuses_rolled(kind, bonuses)
 
       character.settle_spark(spent: spark)
       character.save!
       rolled = seat.merge(
-        "dice" => Array.new(base_dice(seat) + spark) { random.rand(1..6) },
+        "dice" => Array.new(base_dice(seat) + spark + talents.sum(&:last)) { random.rand(1..6) },
         "thorns" => story? ? Array.new(thorns) { random.rand(1..8) } : [],
-        "spark" => spark, "rolled_by" => (by.display_name unless character.owned_by?(by))
+        "spark" => spark, "talent_bonuses" => character.bonus_records(talents), "rolled_by" => (by.display_name unless character.owned_by?(by))
       )
       # Replaced by id, not changed in place: rolling everyone left goes
       # through seats one by one, and each save must keep the ones before it.
@@ -201,10 +206,10 @@ class RollCall < ApplicationRecord
       when "story"
         seat = seats.first
         Roll.story!(campaign: campaign, by: identity, question: question, odds: odds, thorns: thorns, character: character_for(seat),
-          spend_spark: seat["spark"], rolled: { dice: seat["dice"], thorns: seat["thorns"] })
+          spend_spark: seat["spark"], talent_bonuses: Array(seat["talent_bonuses"]), rolled: { dice: seat["dice"], thorns: seat["thorns"] })
       when "montage"
         Roll.montage!(campaign: campaign, by: identity, scene: question,
-          participants: seats.map { { character: character_for(_1), spend_spark: _1["spark"], dice: _1["dice"] } })
+          participants: seats.map { { character: character_for(_1), spend_spark: _1["spark"], dice: _1["dice"], talent_bonuses: Array(_1["talent_bonuses"]) } })
       when "quarrel"
         sides = seats.reject { assist?(_1) }.map do |lead|
           helpers = seats.select { _1["lead_id"] == lead["character_id"] }

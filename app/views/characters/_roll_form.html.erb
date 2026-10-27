@@ -1,5 +1,5 @@
 <%# locals: (character:, stat:, allies:) %>
-<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). %>
+<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. %>
 <% damage = character.damage_thorns(stat) %>
 <% dice = character.stat(stat) %>
 <% prefix = "roll_#{stat}" %>
@@ -23,6 +23,31 @@
         <span class="stat-roll__label" id="<%= prefix %>_spark_label">Spend spark <small>+1d each</small></span>
         <%= render "shared/segmented", name: "spark", legend: "Spend spark", options: (0..character.spark).map { [ _1, _1.zero? ? "None" : "+#{_1}" ] }, checked: 0, id_prefix: "#{prefix}_spark", classes: "segmented--auto" %>
       </div>
+    <% end %>
+
+    <% bonuses = character.talent_bonuses_for(stat) %>
+    <% if bonuses.any? %>
+      <fieldset class="stat-roll__group">
+        <legend class="stat-roll__label">Talents <small>tick what fits; the log names them</small></legend>
+        <ul class="stat-roll__talents">
+          <% bonuses.each do |talent, bonus| %>
+            <% effect = talent_bonus_effect(character, bonus, stat) %>
+            <li>
+              <% if bonus.auto? %>
+                <%= tag.span class: "stat-roll__talent stat-roll__talent--auto", data: { stat_roll_target: "auto", dice: character.bonus_dice(bonus, stat), defense_only: bonus.defense_only? } do %>
+                  <%= icon(:check) %>
+                  <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                <% end %>
+              <% else %>
+                <label class="check stat-roll__talent">
+                  <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), defense_only: bonus.defense_only? } %>
+                  <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                </label>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </fieldset>
     <% end %>
 
     <% if allies.any? %>

@@ -8,7 +8,8 @@ module IconsHelper
     die: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/>',
     send: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
     more: '<circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/>',
-    close: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'
+    close: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7"/>'
   }.freeze
 
   # Decorative by default; pass label: for an icon that stands alone.

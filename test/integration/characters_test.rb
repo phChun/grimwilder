@@ -173,6 +173,24 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_equal [ 1, 4, 3, [ "marked", "bloodied" ] ], [ roll.help_dice, roll.dice.size, roll.thorns.size, roll.damage_reasons ]
   end
 
+  test "talents that fit a stat are ticks in its setup, and the log names them" do
+    @tibbs.update!(talent_keys: [ "lightning-reflexes" ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel stealth ])
+    sign_in_as identities(:pip)
+
+    get character_path(@tibbs)
+    assert_select "#roll_agility_bonus_expertise-skill[value='expertise/skill'][data-dice='1']", 1
+    assert_select ".stat-roll__talent", text: /Using a chosen skill \(Duel, Stealth\)/
+    assert_select ".stat-roll__talent--auto[data-defense-only=true]", text: /Lightning Reflexes/, count: 1
+
+    post character_rolls_path(@tibbs), params: { stat: "agility", mode: "action", dice: 3, total_thorns: 0, bonuses: [ "expertise/skill" ] }
+    roll = @tibbs.rolls.last
+    assert_equal [ 4, "Expertise" ], [ roll.dice.size, roll.talent_bonuses.sole["name"] ]
+
+    get character_path(@tibbs)
+    assert_select ".roll-toast__setup", text: /3d Agility \+ 1d Expertise/
+  end
+
   test "a stat that isn't one never reaches the character" do
     sign_in_as identities(:pip)
 

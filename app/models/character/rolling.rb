@@ -6,6 +6,8 @@
 # - each ally assisting rolls 1d of their own, which counts toward the result
 #   and is shown separately (pg. 13);
 # - damage adds its thorns, and a mark on the stat clears once rolled (pg. 27);
+# - talents add dice when the situation fits, or leave thorns out
+#   (Character::TalentBonuses), and any use they tick is spent;
 # - a disaster gives spark, up to the 2 a character can hold (pg. 10, 15);
 # - so does a critical when none of its effects fit (pg. 10), if the player
 #   takes it right away: only on the character's latest roll.
@@ -19,10 +21,11 @@ module Character::Rolling
     has_many :rolls, dependent: :nullify
   end
 
-  # help: extra dice from talents and outside help (an NPC, the scene).
+  # help: extra dice from outside help (an NPC, the scene) or anything else.
   # assists: other characters seated alongside this one, each rolling 1d.
   # thorns: situational thorns, on top of the ones damage adds.
-  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, random: Random)
+  # bonuses: the talent bonuses ticked (Talent::Bonus#id); automatic ones apply anyway.
+  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], random: Random)
     stat_name = stat_name.to_s
     raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
     raise ArgumentError, "#{campaign.name} is done." if campaign&.done?
@@ -31,9 +34,13 @@ module Character::Rolling
     check_spark_spend!(spend_spark)
     raise ArgumentError, "Extra dice and thorns go from 0 to #{MAX_EXTRA}." unless [ help, thorns ].all? { _1.in?(0..MAX_EXTRA) }
     check_assists!(assists)
+    talent_rolled = talent_bonuses_rolled(stat_name, mode, bonuses)
 
-    reasons = damage_reasons(stat_name)
-    own = Grimwild::Dice.roll(stat(stat_name) + spend_spark + help, reasons.size + thorns, random: random)
+    ignored = { "damage" => damage_thorns(stat_name), "situational" => thorns }
+    reasons = talent_rolled.any? { _2.ignore == "damage" } ? [] : damage_reasons(stat_name)
+    thorns = 0 if talent_rolled.any? { _2.ignore == "situational" }
+    talent_dice = talent_rolled.sum(&:last)
+    own = Grimwild::Dice.roll(stat(stat_name) + spend_spark + help + talent_dice, reasons.size + thorns, random: random)
     assist_dice = assists.map { random.rand(1..6) }
     result = Grimwild::Dice.interpret(own.dice + assist_dice, own.thorns)
 
@@ -41,12 +48,14 @@ module Character::Rolling
       gained = settle_spark(spent: spend_spark, take: result.result == "disaster")
       self.changed_by = by
       self[:"marked_#{stat_name}"] = false
+      talent_rolled.filter_map { bonus_use(_2) }.each { |use| self.talent_uses = talent_uses.merge(use.id => uses_spent(use) + 1) }
       save!
 
       rolls.create!(
         campaign: campaign, identity: by, kind: mode, name: name, stat: stat_name,
         dice: own.dice, thorns: own.thorns, outcome: result.result, critical: result.critical,
         stat_dice: stat(stat_name), help_dice: help, spark_spent: spend_spark, damage_reasons: reasons, spark_gained: gained,
+        talent_bonuses: bonus_records(talent_rolled, ignored: ignored),
         assists: assists.zip(assist_dice).map { |ally, die| { "character_id" => ally.id, "name" => ally.name, "die" => die } }
       )
     end

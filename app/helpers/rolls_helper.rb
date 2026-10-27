@@ -127,18 +127,21 @@ module RollsHelper
     end
   end
 
-  # "3d Agility + 1 spark + 1d extra + Wren assisting, vs 2t (marked, 1 situational)",
+  # "3d Agility + 1d Expertise + 1 spark + 1d extra + Wren assisting, vs 2t (marked, 1 situational)",
   # or for a story roll "2d (even odds) + 1 spark, vs 1t (1 situational)"
   def roll_setup(roll)
     dice = [ roll.story? ? "#{roll.stat_dice}d (#{roll.odds})" : "#{roll.stat_dice}d #{roll.stat.capitalize}" ]
     dice << "#{roll.spark_spent} spark" if roll.spark_spent.positive?
+    roll.talent_bonuses.each { dice << "#{_1["dice"]}d #{_1["name"]}" if _1["dice"].positive? }
     dice << "#{roll.help_dice}d extra" if roll.help_dice.positive?
     dice << "#{roll.assists.pluck("name").to_sentence} assisting" if roll.assists.any?
 
     thorns = roll.damage_reasons.dup
     thorns << "#{roll.situational_thorns} situational" if roll.situational_thorns.positive?
 
-    [ dice.join(" + "), ("vs #{roll.thorns.size}t (#{thorns.join(", ")})" if thorns.any?) ].compact.join(", ")
+    left_out = roll.talent_bonuses.select { _1["ignored"].positive? }.map { "#{_1["name"]} left out #{pluralize(_1["ignored"], "thorn")}" }
+
+    [ dice.join(" + "), ("vs #{roll.thorns.size}t (#{thorns.join(", ")})" if thorns.any?), *left_out ].compact.join(", ")
   end
 
   def roll_summary(roll)
@@ -166,6 +169,13 @@ module RollsHelper
 
   def quarrel_result(roll)
     roll.tie? ? "Tie" : "#{roll.winner} wins"
+  end
+
+  # What a quarrel side or montage character added to their 2d: " + 1 spark + 1d Jack of All Trades".
+  def side_extras(side)
+    extras = [ ("#{side["spark_spent"]} spark" if side["spark_spent"].positive?) ]
+    extras += Array(side["talent_bonuses"]).select { _1["dice"].positive? }.map { "#{_1["dice"]}d #{_1["name"]}" }
+    extras.compact.map { " + #{_1}" }.join
   end
 
   # A quarrel side's or montage character's own dice, then any helpers' assist
