@@ -1879,6 +1879,7 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .party-card__harm--none { color: var(--muted); }
 .party-card__currency,
 .party-card__uses { margin: 0; font-size: 0.9rem; color: var(--text-soft); }
+.party-card__picks { margin: 0; font-size: 0.9rem; color: var(--ember); }
 .party-card__pools { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
 .party-card .button_to { margin: 0; }
 
