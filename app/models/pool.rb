@@ -98,6 +98,21 @@ class Pool < ApplicationRecord
       result: result, spark_dice: spark_dice || [], character: character)
   end
 
+  # A talent pool rolled into someone's roll after it's made (Roll::FollowUps:
+  # Luck's bonus die, Component Pouch's reagents). 1–3s drop as usual, but the
+  # log shows it on that roll, so this adds no entry of its own.
+  def roll_into!(by:, random: Random)
+    raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
+    raise ArgumentError, "#{character.name} is #{character.status}; return them to play to roll." if held_by_gone_character?
+    raise ArgumentError, "#{campaign.name} is done." if campaign.done?
+
+    dice = Array.new(size) { random.rand(1..6) }
+    kept = dice.count { |die| die >= 4 }
+    update!(size: kept, last_dice: dice, last_dropped: size - kept, last_action: "rolled", last_rolled_by: by, last_rolled_at: Time.current,
+      **next_phase_attributes(kept).to_h)
+    dice
+  end
+
   # Who may drop 1d before rolling (pg. 10, 18–19, 96): anyone on a task pool,
   # for a critical's Greater effect; the GM on any shared pool, with suspense;
   # on a talent pool only when the talent says so (a potent rite spell); and

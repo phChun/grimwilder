@@ -7,7 +7,7 @@
 # Names are copied in when rolled, so the log still reads right after a
 # character or pool is renamed or deleted.
 class Roll < ApplicationRecord
-  include Story, Quarrel, Montage
+  include Story, Quarrel, Montage, FollowUps
 
   belongs_to :campaign, optional: true
   belongs_to :identity

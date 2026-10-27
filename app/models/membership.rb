@@ -36,6 +36,13 @@ class Membership < ApplicationRecord
     identity.characters.where(campaign: campaign).played.active.ordered
   end
 
+  # Whose talents they can bring to someone's roll after it's made
+  # (Roll::FollowUps): their own characters here, or for the GM everyone's,
+  # as the GM tends any character at the table.
+  def follow_up_characters
+    gm? ? campaign.characters.played.active.ordered : seated_characters
+  end
+
   # The one their tab and the live banner lead to when there's a choice: the first by name.
   def seated_character
     seated_characters.first

@@ -60,6 +60,9 @@
     <% else %>
       <%= render "shared/roll_result", roll: roll, size: 32 %>
       <p class="feed-item__meta"><%= roll.pool? ? pool_roll_summary(roll) : "#{roll_setup(roll)}." %><% if (note = roll_spark_note(roll)) %> <%= note %><% end %> · <%= roll.identity.display_name %></p>
+      <% if roll.follow_up_open? %>
+        <p class="feed-item__follow-up"><%= link_to "Talents after the roll", new_campaign_roll_follow_up_path(roll.campaign, roll), data: { turbo_frame: "modal" } %></p>
+      <% end %>
     <% end %>
   </li>
 <% end %>

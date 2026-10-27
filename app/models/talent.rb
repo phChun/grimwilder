@@ -3,7 +3,7 @@
 # any talent (pg. 52) except those marked "[Prohibited: Path]".
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses)
+class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses, :follow_ups)
   def self.all
     catalog[:talents]
   end
@@ -61,7 +61,8 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
       rolls: Array(attributes["rolls"]).each_with_index.map { Talent::Roll.from(key, _2, _1) },
       choices: Array(attributes["choices"]).map { Talent::Choice.from(key, _1) },
       arcana: Array(attributes["arcana"]).map { Talent::ArcanaGrant.from(key, _1) },
-      bonuses: Array(attributes["bonuses"]).map { Talent::Bonus.from(key, _1) })
+      bonuses: Array(attributes["bonuses"]).map { Talent::Bonus.from(key, _1) },
+      follow_ups: Array(attributes["follow_ups"]).map { Talent::FollowUp.from(key, _1) })
   end
 
   def self.keyify(name)

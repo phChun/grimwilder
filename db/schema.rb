@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_27_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_120100) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -264,6 +264,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_120000) do
     t.integer "play_session_id"
     t.integer "scene_id"
     t.json "talent_bonuses", default: [], null: false
+    t.json "follow_ups", default: [], null: false
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"
