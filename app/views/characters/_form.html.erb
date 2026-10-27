@@ -22,6 +22,11 @@
       <p class="field__hint">Your path gives its core talent. Add another talent from any path below.</p>
       <% legacy = Talent.all.select(&:legacy_core_of) %>
       <% unless character.persisted? %>
+        <div class="field field--inline">
+          <%= form.label :level, "Level", class: "field__label" %>
+          <%= form.select :level, (1..Grimwild::MAX_LEVEL).to_a, {}, class: "field__input field__input--short" %>
+        </div>
+        <p class="field__hint">Joining a table that's already under way? Start at its level: a talent for each level, and the core talent's growth.</p>
         <label class="check">
           <%= form.check_box :level_zero %>
           Start at level 0: no core talent yet, and 3 stat points instead of 4 (optional rule, pg. 177). Ask your GM first.

@@ -23,8 +23,9 @@ class CharactersController < ApplicationController
     @character = Current.identity.characters.new(character_params)
 
     if @character.save
-      # Next step: their first talent (pg. 47), alongside the path's core talent.
-      redirect_to new_character_talent_path(@character), notice: "#{@character.name} is ready. Now choose a first talent."
+      # Next step: their talents (pg. 47), one per level, alongside the path's core talent.
+      count = @character.talents_to_choose
+      redirect_to new_character_talent_path(@character), notice: "#{@character.name} is ready. Now choose #{count == 1 ? "a first talent" : "#{count} talents"}."
     else
       render :new, status: :unprocessable_entity
     end

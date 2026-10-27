@@ -39,6 +39,18 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", crucible_path("features"), 0, "no trip to another page"
   end
 
+  test "a new character can start at a higher level, with a talent for each" do
+    sign_in_as identities(:pip)
+    get new_character_path
+    assert_select "select[name='character[level]'] option", 7
+
+    post characters_path, params: { character: { name: "Ash", path: "Fighter", level: 3, brawn: 3, agility: 2, wits: 2, presence: 1 } }
+    ash = Character.find_by!(name: "Ash")
+    assert_equal [ 3, 3 ], [ ash.level, ash.talents_to_choose ]
+    assert_redirected_to new_character_talent_path(ash)
+    assert_equal "Ash is ready. Now choose 3 talents.", flash[:notice]
+  end
+
   test "a bad stat spread shows the form again" do
     sign_in_as identities(:gwen)
 
