@@ -89,6 +89,7 @@ class Pool < ApplicationRecord
     before = size
     dice = Array.new(drop_first ? size - 1 : size) { random.rand(1..6) }
     kept = dice.count { |die| die >= 4 }
+    kept += 1 if archivist_keeps_one?(before, dice)
 
     if as_action
       spark_dice = Array.new(spend_spark) { random.rand(1..6) }
@@ -129,6 +130,13 @@ class Pool < ApplicationRecord
     end
   end
 
+  # Archivist (pg. 88): when you roll an arcana's power pool, you drop 1 fewer
+  # die, unless it's the last.
+  def archivist_keeps_one?(before, dice)
+    arcanum_id.present? && character.present? && before > 1 && dice.any? { _1 <= 3 } &&
+      [ *character.talent_entries, *character.eldritch_talent_entries ].any? { _1.key == "archivist" }
+  end
+
   # A power pool rolled as an action in place of a stat (pg. 20). A talent's
   # bonus-dice pool (Luck) just rolls.
   def rolls_as_action?
@@ -137,6 +145,8 @@ class Pool < ApplicationRecord
 
   # The Talent::Use (or Talent::MadePool) a talent pool comes from.
   def talent_use
+    return character&.rule_uses&.find { _1.id == use_key } if use_key.to_s.start_with?("rule/")
+
     talent = Talent.find_by_key(use_key.to_s.split("/").first)
     talent && (made_by_talent? ? talent.makes : talent.uses).find { _1.id == use_key }
   end

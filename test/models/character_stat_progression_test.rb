@@ -27,4 +27,13 @@ class CharacterStatProgressionTest < ActiveSupport::TestCase
     @tibbs.undo_stat_progression!
     assert_equal [ 2, nil, 1 ], [ @tibbs.wits, @tibbs.stat_progression, @tibbs.talents_to_choose ]
   end
+
+  test "an Adventurer can take it back with a full sheet: Talented's extra slots count" do
+    @tibbs.update!(path: "Adventurer", level: 2, talent_keys: %w[ lucky lurker weasel ])
+    @tibbs.progress_stat!("wits", by: @pip)
+    assert_equal [ 3, true ], [ @tibbs.expected_talent_count, @tibbs.talents_full? ]
+
+    @tibbs.undo_stat_progression!
+    assert_equal [ nil, 4, 1 ], [ @tibbs.stat_progression, @tibbs.expected_talent_count, @tibbs.talents_to_choose ]
+  end
 end

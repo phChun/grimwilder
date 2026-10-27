@@ -7,7 +7,7 @@
   <% if roll.sides.any? %>
     <ul class="log-marker__levels">
       <% roll.sides.each do |level_up| %>
-        <li><%= level_up["name"] %> reached level <%= level_up["level"] %>: <%= link_to "choose a talent", new_character_talent_path(level_up["character_id"]) %></li>
+        <li><%= level_up["name"] %> reached level <%= level_up["level"] %>: <%= level_up_link(level_up) %></li>
       <% end %>
     </ul>
   <% end %>

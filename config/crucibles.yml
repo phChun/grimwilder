@@ -598,3 +598,44 @@
     columns: [Nature, Nature, Nature]
     rows: [[theft, vandalism, treason], [fraud, gambling, robbery], [spying, bribery, assassination], [smuggling, extortion, heist], [banditry, arms dealing, impersonation], [kidnapping, arson, necromancy]]
   - { name: Reputation, columns: [Reputation], rows: [[barely remembered], [small bounty], [known name], [hunted], [infamous], [most wanted]] }
+- key: druidic_tells
+  name: Druidic tells
+  group: characters
+  page: 63
+  blurb: Signs of a druid's bond with nature that others notice.
+  how: Roll for a tell or two, animalistic or plant-like, that offers new vantage, outside help or a tangle.
+  tables:
+  - name: Tells
+    rows:
+    - [thorns, blossoming, feathered, bristled, roots, fluffy]
+    - [moss, bark, earthen, hoofed, vibrant, silken]
+    - [vines, glowing, translucent, tangled, crystalline, smoky]
+    - [tusked, velvet, murky, speckled, verdant, willowy]
+    - [shimmering, antlered, ashen, spiny, gnarled, fragrant]
+    - [scaly, longtoothed, dewy, breezy, misty, petals]
+- key: weapon_origin
+  name: Weapon origin
+  group: characters
+  page: 65
+  blurb: A fighter's weapon, and its own small story.
+  how: Roll twice to give your weapon, or each of your weapons, its own small story. You can also choose, or make up your own.
+  tables:
+  - name: Origin
+    columns: [Origin, Origin, Origin]
+    rows:
+    - [etched with words of loss, stolen from a family member, marked by a secret society]
+    - [gift from a childhood mentor, covered in burn marks, with a hidden compartment]
+    - [given to you by your father, carved with friend's initials, inscribed with a quote]
+    # The book prints "give as a peace offering".
+    - [taken from a dead body, with a faded family crest, given as a peace offering]
+    - [marred with blade nicks, taken as spoils of war, belonged to a gambler]
+    - [made from a rare material, scratched from fierce battle, patched many times]
+- key: favorite_traps
+  name: Favorite traps
+  group: characters
+  page: 73
+  blurb: The traps a ranger lays while hunting or scouting.
+  how: Combine an effect, a trigger and the word "trap" (a poisonous bait trap) to make three traps you commonly use. They aren't limits, just options ready when you need one.
+  tables:
+  - { name: Effect, columns: [Effect], rows: [[stunning], [falling], [noisy], [poisonous], [entangling], [injuring]] }
+  - { name: Trigger, columns: [Trigger], rows: [[tripwire], [pressure plate], [snare loop], [bait], [hidden], [proximity]] }

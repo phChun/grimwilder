@@ -22,6 +22,30 @@ module Campaign::Breaks
     end
   end
 
+  # Rest resets (pg. 175): at a rest the group calls a reset, each character
+  # takes spark, resets talents and thread and heals 1 harm, and the GM takes
+  # 2 suspense.
+  def rest_reset!(by:)
+    raise ArgumentError, "#{name} doesn't use the Rest resets rule." unless optional_rule?(:rest_resets)
+
+    transaction do
+      resting = resting_characters.each { _1.rest_reset!(by: by) }
+      increment!(:suspense, 2)
+      post_marker!("Reset", by: by, text: ("Spark, talents, thread and 1 harm for #{resting.map(&:name).to_sentence}." if resting.any?))
+    end
+  end
+
+  # Milestone levels (pg. 177): after a major group arc, the party levels up.
+  def milestone!(by:)
+    raise ArgumentError, "#{name} doesn't use the Milestone levels rule." unless optional_rule?(:milestone_levels)
+
+    transaction do
+      levelled = resting_characters.reject(&:max_level?).each { _1.update!(level: _1.level + 1, xp: 0) }
+      post_marker!("Milestone", by: by, level_ups: levelled)
+      levelled
+    end
+  end
+
   # clear: "character_id:index" for each condition to clear (the form ticks
   # them all; untick permanent ones).
   def downtime!(by:, clear: [], random: Random)
@@ -38,6 +62,7 @@ module Campaign::Breaks
         character.reset_talent_uses(per: :session)
         character.save!
         character.refresh_talent_pools!(per: :session)
+        character.refresh_talent_pools!(per: :rest)
       end
       downtime_pools.each { _1.roll!(by: by, random: random) }
     end

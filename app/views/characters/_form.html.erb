@@ -131,6 +131,13 @@
       <%= form.label :weapons, "Weapons", class: "field__label" %>
       <%= form.text_field :weapons, maxlength: Character::WORD_LIMIT, autocomplete: "off", placeholder: "short sword and buckler", class: "field__input" %>
     </div>
+    <% if character.campaign&.optional_rule?(:armor) || character.armor %>
+      <%# The Armor optional rule (P6 pg. 176): light or heavy armor gives an Armor pool each session. %>
+      <div class="field">
+        <%= form.label :armor, "Armor", class: "field__label" %>
+        <%= form.select :armor, [ [ "None", "" ], [ "Light: 1d Armor pool, Lightly Armored", "light" ], [ "Heavy: 2d Armor pool, Heavily Armored", "heavy" ] ], {}, class: "field__input" %>
+      </div>
+    <% end %>
     <%# Weapon styles are an optional rule (P6 pg. 177): asked for at a table that uses it, or once filled in. %>
     <% if weapon_styles_offered?(character) %>
     <fieldset class="fieldset">

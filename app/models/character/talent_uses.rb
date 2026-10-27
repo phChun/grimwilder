@@ -11,8 +11,9 @@ module Character::TalentUses
 
   TALLY_MAX = 99
 
+  # Rule pools (Character::RulePools) ride along, so they're made and refilled the same way.
   def talent_use_list
-    [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses)
+    [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses) + rule_uses
   end
 
   def use_counters
@@ -46,8 +47,16 @@ module Character::TalentUses
     Array(talent_uses[use.id]).grep(String)
   end
 
+  # How many boxes a count has now: its count at this level, less anything
+  # its `less_by` takes off (1 smite for each tenet in violation).
+  def use_count(use)
+    return if use.tally?
+
+    [ use.count_at(level) - (use.less_by ? public_send(use.less_by) : 0), 0 ].max
+  end
+
   def uses_left(use)
-    use.tally? ? Float::INFINITY : use.count_at(level) - uses_spent(use)
+    use.tally? ? Float::INFINITY : [ use_count(use) - uses_spent(use), 0 ].max
   end
 
   # Awakened Mind's instability: the thorns on the last box ticked.
@@ -59,7 +68,7 @@ module Character::TalentUses
   # Sets how many of a talent's uses are spent this session or scene.
   def spend_use!(use_id, spent:)
     use = use_counters.find { _1.id == use_id } or raise ArgumentError, "#{name} has no talent use #{use_id.inspect}."
-    update!(talent_uses: talent_uses.merge(use.id => spent.to_i.clamp(0, use.count_at(level) || TALLY_MAX)))
+    update!(talent_uses: talent_uses.merge(use.id => spent.to_i.clamp(0, use_count(use) || TALLY_MAX)))
     use
   end
 
@@ -81,17 +90,19 @@ module Character::TalentUses
   end
 
   # Creates, resizes and refills talent pools for this level: all of them for
-  # :session, the per-scene ones for :scene. Pools for talents the character no
-  # longer has go away. A session refills arcana pools too (Character::Arcana).
+  # :session, the per-scene ones for :scene, the per-rest ones for :rest. Pools
+  # for talents the character no longer has go away. A session refills arcana
+  # pools too (Character::Arcana).
   def refresh_talent_pools!(per:)
     return unless campaign
 
-    pool_uses.select { per == :session || _1.per_scene? || _1.per == "never" }.each do |use|
+    pool_uses.select { per == :session || (per == :rest ? _1.per == "rest" : _1.per_scene?) || _1.per == "never" }.each do |use|
       size = use.pool_at(level).clamp(1, Pool::MAX_SIZE)
       pool = talent_pools.find_or_initialize_by(use_key: use.id)
-      # Kept until spent (Pact's Patience): made once, then only renamed and
-      # grown, never refilled by a session.
-      next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: size) if use.per == "never" && pool.persisted?
+      # Kept until spent (Pact's Patience, Supplies): made once, then only
+      # renamed and grown, never refilled by a session. A per-rest pool (Vigor)
+      # is made by a session but refilled only by a rest.
+      next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: size) if pool.persisted? && (use.per == "never" || (use.per == "rest" && per != :rest))
 
       pool.update!(
         campaign: campaign, name: "#{name}: #{use.label}", kind: use.pool_kind, refresh: use.per, hidden: false,

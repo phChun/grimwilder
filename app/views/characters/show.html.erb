@@ -281,6 +281,7 @@
     </section>
 
     <%= render "characters/arcana", character: @character, tends: tends, pools: talent_pools %>
+    <%= render "characters/rule_pools", character: @character, pools: talent_pools %>
 
     <section class="card" aria-labelledby="sheet-who">
       <h2 id="sheet-who" class="card__title">Who <%= short %> is</h2>

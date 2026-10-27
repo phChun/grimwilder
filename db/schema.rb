@@ -100,6 +100,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_172759) do
     t.datetime "oathbroken_at"
     t.datetime "oath_redeemed_at"
     t.boolean "level_zero", default: false, null: false
+    t.string "armor"
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"

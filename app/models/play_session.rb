@@ -59,14 +59,19 @@ class PlaySession < ApplicationRecord
   end
 
   # Closes any open scene first, clearing the scene conditions picked (see
-  # Scene#end!). Returns the characters who reached a new level.
-  def end!(by:, standout: false, notes: nil, clear: [])
+  # Scene#end!). Returns the characters who reached a new level. Under
+  # Milestone levels nobody takes XP; under Focused growth, those in `bonus`
+  # (character ids) take one more for what happened in play.
+  def end!(by:, standout: false, notes: nil, clear: [], bonus: [])
     raise ArgumentError, "#{title} has already ended." unless open?
 
     transaction do
       current_scene&.end!(by: by, clear: clear)
       update!(ended_at: Time.current, standout: standout, notes: notes.to_s.strip.presence)
-      levelled = characters.select { |character| Array.new(standout ? 2 : 1) { character.gain_xp! }.any? }
+      levelled = campaign.optional_rule?(:milestone_levels) ? [] : characters.select do |character|
+        xp = (standout ? 2 : 1) + (campaign.optional_rule?(:focused_growth) && Array(bonus).map(&:to_s).include?(character.id.to_s) ? 1 : 0)
+        Array.new(xp) { character.gain_xp! }.any?
+      end
       post_marker!("#{title} ends", by: by, text: notes, level_ups: levelled)
       levelled
     end

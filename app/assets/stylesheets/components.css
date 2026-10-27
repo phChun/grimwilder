@@ -2181,6 +2181,8 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .pool-glance__hidden { display: flex; align-items: center; gap: var(--space-2); margin: 0; padding-top: var(--space-3); border-top: 1px solid var(--line-soft); font-size: 0.85rem; color: var(--muted); }
 
 .members { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.rules-in-play { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.rule-pools__slots { margin: 0; }
 .members__item { display: flex; align-items: center; gap: 12px; min-height: var(--tap); }
 .members__name { flex: 1; }
 .members__role { font-size: 0.85rem; color: var(--muted); }
@@ -2601,5 +2603,10 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .talent-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .talent-state__dice { display: inline-flex; gap: 4px; }
 .talent-state__on { color: var(--grim); }
+.oath-tenets__list { flex-basis: 100%; display: flex; flex-direction: column; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+.oath-tenets__item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.oath-tenets__tenet--violated { border-color: var(--grim-line); }
+.oath-tenets__tenet--heavy { border-color: var(--grim-line); background: var(--grim-bg); }
+.oath-tenets__tenet--broken { color: var(--dim); text-decoration: line-through; }
 .stat-progression { position: relative; margin-top: var(--space-2); }
 .crucible__credit, .talent-card__crucible { margin: 0; font-size: 0.85rem; color: var(--muted); }

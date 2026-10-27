@@ -99,6 +99,8 @@ Rails.application.routes.draw do
       resources :notes, only: :create
       resources :messages, only: %i[ create destroy ]
       resource :rest, only: :create
+      resource :rest_reset, only: :create
+      resource :milestone, only: :create
       resource :done, only: %i[ create destroy ] # the GM marks the campaign done, or reopens it
       resource :reset, only: :create # the GM clears sessions and the roll log
       resource :downtime, only: %i[ new create ]
