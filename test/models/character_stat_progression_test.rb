@@ -7,17 +7,18 @@ class CharacterStatProgressionTest < ActiveSupport::TestCase
     @pip = identities(:pip)
   end
 
-  test "a free talent slot buys +1 to a stat, which can reach 4, once" do
-    refute @tibbs.can_progress_stat?("agility"), "no free slot at level 1 with a talent chosen"
+  test "a free talent slot buys +1 to a stat, to a max of 3, once" do
+    refute @tibbs.can_progress_stat?("wits"), "no free slot at level 1 with a talent chosen"
     @tibbs.update!(level: 2)
+    refute @tibbs.can_progress_stat?("agility"), "Agility is already 3"
 
-    @tibbs.progress_stat!("agility", by: @pip)
-    assert_equal [ 4, "agility", 1, true ], [ @tibbs.agility, @tibbs.stat_progression, @tibbs.expected_talent_count, @tibbs.talents_full? ]
-    assert_equal "Tibbs gives up a talent for +1 Agility.", campaigns(:bramblewood).rolls.last.question
-    refute @tibbs.can_progress_stat?("wits"), "once"
+    @tibbs.progress_stat!("wits", by: @pip)
+    assert_equal [ 3, "wits", 1, true ], [ @tibbs.wits, @tibbs.stat_progression, @tibbs.expected_talent_count, @tibbs.talents_full? ]
+    assert_equal "Tibbs gives up a talent for +1 Wits.", campaigns(:bramblewood).rolls.last.question
+    refute @tibbs.can_progress_stat?("presence"), "once"
 
     @tibbs.wits = 4
-    refute @tibbs.valid?, "only the progressed stat goes past 3"
+    refute @tibbs.valid?, "no stat goes past 3"
   end
 
   test "taking it back gives the slot back, unless a talent has filled it" do

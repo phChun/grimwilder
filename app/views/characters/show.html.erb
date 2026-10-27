@@ -235,7 +235,7 @@
           <summary class="button button--ghost button--small">Or, optional rule: +1 to a stat instead</summary>
           <div class="talent-card__menu" data-menu-target="panel">
             <%= render "shared/popover_head", title: "+1 to a stat instead" %>
-            <p class="field__hint">Once, a character can give up a talent for +1 to a stat, which can then reach 4 (pg. 175). Ask your GM first: it's an optional rule.</p>
+            <p class="field__hint">Once, a character can give up a talent for +1 to a stat, to a max of 3 (pg. 175). Ask your GM first: it's an optional rule.</p>
             <% Grimwild::STATS.select { @character.can_progress_stat?(_1) }.each do |stat| %>
               <%= button_to "+1 #{stat.capitalize} (#{@character.stat(stat)} → #{@character.stat(stat) + 1})", character_stat_progression_path(@character), params: { stat: stat }, class: "button button--small" %>
             <% end %>
