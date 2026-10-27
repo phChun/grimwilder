@@ -11,8 +11,9 @@ module Character::TalentUses
 
   TALLY_MAX = 99
 
+  # Rule pools (Character::RulePools) ride along, so they're made and refilled the same way.
   def talent_use_list
-    [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses)
+    [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses) + rule_uses
   end
 
   def use_counters
@@ -81,17 +82,19 @@ module Character::TalentUses
   end
 
   # Creates, resizes and refills talent pools for this level: all of them for
-  # :session, the per-scene ones for :scene. Pools for talents the character no
-  # longer has go away. A session refills arcana pools too (Character::Arcana).
+  # :session, the per-scene ones for :scene, the per-rest ones for :rest. Pools
+  # for talents the character no longer has go away. A session refills arcana
+  # pools too (Character::Arcana).
   def refresh_talent_pools!(per:)
     return unless campaign
 
-    pool_uses.select { per == :session || _1.per_scene? || _1.per == "never" }.each do |use|
+    pool_uses.select { per == :session || (per == :rest ? _1.per == "rest" : _1.per_scene?) || _1.per == "never" }.each do |use|
       size = use.pool_at(level).clamp(1, Pool::MAX_SIZE)
       pool = talent_pools.find_or_initialize_by(use_key: use.id)
-      # Kept until spent (Pact's Patience): made once, then only renamed and
-      # grown, never refilled by a session.
-      next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: size) if use.per == "never" && pool.persisted?
+      # Kept until spent (Pact's Patience, Supplies): made once, then only
+      # renamed and grown, never refilled by a session. A per-rest pool (Vigor)
+      # is made by a session but refilled only by a rest.
+      next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: size) if pool.persisted? && (use.per == "never" || (use.per == "rest" && per != :rest))
 
       pool.update!(
         campaign: campaign, name: "#{name}: #{use.label}", kind: use.pool_kind, refresh: use.per, hidden: false,

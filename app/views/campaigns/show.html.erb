@@ -230,6 +230,17 @@
         </details>
       <% end %>
 
+      <% if campaign.rules_in_play.any? %>
+        <section class="card side-card" aria-labelledby="rules-title">
+          <h2 id="rules-title" class="side-card__title">Optional rules</h2>
+          <ul class="rules-in-play">
+            <% campaign.rules_in_play.each do |rule_name, page, does| %>
+              <li><strong><%= rule_name %></strong> <small>pg. <%= page %></small><br><span class="field__hint"><%= does %></span></li>
+            <% end %>
+          </ul>
+        </section>
+      <% end %>
+
       <section class="card side-card" aria-labelledby="members-title">
         <h2 id="members-title" class="side-card__title">At the table</h2>
         <ul class="members">

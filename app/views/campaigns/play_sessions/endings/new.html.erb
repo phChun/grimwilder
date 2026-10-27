@@ -3,14 +3,32 @@
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
   <h1>End <%= @session.title.downcase %></h1>
-  <p class="page-header__lede">Everyone here takes 1 XP (pg. 32): <%= @session.characters.map(&:name).to_sentence.presence || "no one was marked present" %>.</p>
+  <% if Current.campaign.optional_rule?(:milestone_levels) %>
+    <p class="page-header__lede">Milestone levels: no XP after a session. The party levels up after a major group arc, from Respite on the table.</p>
+  <% else %>
+    <p class="page-header__lede">Everyone here takes 1 XP (pg. 32): <%= @session.characters.map(&:name).to_sentence.presence || "no one was marked present" %>.</p>
+  <% end %>
 </header>
 
 <%= form_with url: campaign_play_session_ending_path(Current.campaign, @session), class: "panel stack session-form" do %>
-  <label class="check">
-    <%= check_box_tag :standout, "1", false, id: "session_standout" %>
-    <span><strong>Standout session</strong>: +1 bonus XP for everyone here <small>(about 1 session in 4)</small></span>
-  </label>
+  <% unless Current.campaign.optional_rule?(:milestone_levels) %>
+    <label class="check">
+      <%= check_box_tag :standout, "1", false, id: "session_standout" %>
+      <span><strong>Standout session</strong>: +1 bonus XP for everyone here <small>(about 1 session in 4)</small></span>
+    </label>
+  <% end %>
+  <% if Current.campaign.optional_rule?(:focused_growth) && !Current.campaign.optional_rule?(:milestone_levels) && @session.characters.any? %>
+    <%# Focused growth (pg. 177): a bonus XP for those whose play hit the campaign's focus. %>
+    <fieldset class="fieldset">
+      <legend class="field__label">Focused growth: bonus XP for what happened in play</legend>
+      <% @session.characters.each do |character| %>
+        <label class="check">
+          <%= check_box_tag "bonus[]", character.id, false, id: "bonus_#{character.id}" %>
+          <%= character.name %>
+        </label>
+      <% end %>
+    </fieldset>
+  <% end %>
 
   <% if (scene = @session.current_scene) %>
     <p class="field__hint">This also ends scene <%= scene.number %>: <%= scene.title %>.</p>

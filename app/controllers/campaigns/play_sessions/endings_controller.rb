@@ -9,7 +9,7 @@ class Campaigns::PlaySessions::EndingsController < ApplicationController
   end
 
   def create
-    levelled = @session.end!(by: Current.identity, standout: params[:standout] == "1", notes: params[:notes], clear: Array(params[:clear]))
+    levelled = @session.end!(by: Current.identity, standout: params[:standout] == "1", notes: params[:notes], clear: Array(params[:clear]), bonus: Array(params[:bonus]))
     back_to_table(notice: [ "#{@session.title} ends.", *levelled.map { "#{_1.name} reached level #{_1.level}." } ].join(" "))
   rescue ArgumentError => error
     back_to_table(alert: error.message)
