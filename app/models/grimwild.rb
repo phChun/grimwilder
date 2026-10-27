@@ -1,6 +1,9 @@
 # Reference lists from the book (config/grimwild.yml): paths, backgrounds,
 # traits, desires, schools of magic, arcana functions, weapon styles, bonds and arcs.
 module Grimwild
+  # The edition of the book the rules, talents and crucibles follow.
+  EDITION = "Community Edition Preview 6"
+
   STATS = %w[ brawn agility wits presence ].freeze
   PHYSICAL_STATS = %w[ brawn agility ].freeze
   MENTAL_STATS = %w[ wits presence ].freeze
