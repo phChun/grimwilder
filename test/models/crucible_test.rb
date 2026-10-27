@@ -18,7 +18,7 @@ class CrucibleTest < ActiveSupport::TestCase
     end
   end
 
-  test "the crucibles from pages 78–85 and 140, checked against the book" do
+  test "the crucibles from pages 79–86 and 141, checked against the book" do
     assert_equal [ "choke", "weed" ], Crucible.find("herbalism").tables.then { [ _1.first.cell(1, 1), _1.last.cell(6, 6) ] }
     assert_match "Juniper Bloom", Crucible.find("herbalism").credit
     assert_equal [ "squat", "float" ], Crucible.find("vassal").tables.then { [ _1.first.cell(1, 1), _1.last.cell(6, 2) ] }
@@ -30,7 +30,7 @@ class CrucibleTest < ActiveSupport::TestCase
     Talent.all.select(&:crucible).each { assert Crucible.find(_1.crucible), _1.key }
   end
 
-  test "the GM crucible reads 3 and 1 both ways, as in the book (pg. 93)" do
+  test "the GM crucible reads 3 and 1 both ways, as in the book (pg. 94)" do
     quality = Crucible.find("gm").tables.first
 
     assert_equal "broken", quality.cell(3, 1)
@@ -43,7 +43,7 @@ class CrucibleTest < ActiveSupport::TestCase
     assert_equal %w[Civil Social Historical Natural Mystical Practical], Crucible.find("wises").tables.first.columns
   end
 
-  test "the spell, words of power and patron crucibles, checked against the book (pg. 82, 84, 86)" do
+  test "the spell, words of power and patron crucibles, checked against the book (pg. 83, 85, 87)" do
     spell = Crucible.find("spell")
     assert_equal %w[ Style Essence Form ], spell.tables.map(&:name)
     assert_equal [ "binding", "whispering", "oil", "growth", "beacon", "field" ], spell.tables.flat_map { [ _1.cell(1, 1), _1.cell(6, 6) ] }

@@ -9,7 +9,7 @@
 #   pool to do it).
 # - `assist`: assist after the roll, with 1d of your own (Got Your Back).
 # - `critical_effect`: nothing changes on the dice; the log notes that it adds
-#   a critical effect (Weapon Mastery's mastery, pg. 10).
+#   a critical effect (Weapon Mastery's mastery, pg. 11).
 # - `omen`: swap any d6 for one of your omens, which then erases (Augury).
 #
 # `use` ticks one of the talent's uses and `pool` rolls one of its talent

@@ -25,7 +25,7 @@
           <span class="field__label"><%= choice.label %></span>
           <span class="talent-choice__count" data-talent-choice-target="count" aria-live="polite"><%= picks.size %> of <%= slots %></span>
         </legend>
-        <% hints = [ ("Your magic's touchstones (pg. 35)." if choice.touchstone?), ("At least #{choice.min_each} from each list." if choice.min_each.positive?), ("More at #{choice.growth.keys.map { "level #{_1}" }.to_sentence}." if choice.growth.any?), ("Two words from the spell crucible, and a school (pg. 87)." if choice.school?), ("Pick from the list or write your own." if open && options.any?), ("Roll for ideas below, or write your own." if open && options.empty? && choice.crucible) ].compact %>
+        <% hints = [ ("Your magic's touchstones (pg. 36)." if choice.touchstone?), ("At least #{choice.min_each} from each list." if choice.min_each.positive?), ("More at #{choice.growth.keys.map { "level #{_1}" }.to_sentence}." if choice.growth.any?), ("Two words from the spell crucible, and a school (pg. 88)." if choice.school?), ("Pick from the list or write your own." if open && options.any?), ("Roll for ideas below, or write your own." if open && options.empty? && choice.crucible) ].compact %>
         <% if hints.any? %><p class="field__hint"><%= hints.join(" ") %></p><% end %>
 
         <% if open %>

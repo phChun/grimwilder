@@ -1,4 +1,4 @@
-# A character's arcana (Arcanum; pg. 40–43): the owner and the campaign's GM
+# A character's arcana (Arcanum; pg. 41–44): the owner and the campaign's GM
 # add, change and remove them. The form opens in the sheet's modal
 # (shared/_frame_modal); `tier` and `source` preset it from a talent's
 # reminder ("Archivist: 1 of 2 minor arcana").

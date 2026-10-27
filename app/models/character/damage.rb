@@ -1,9 +1,9 @@
-# Marks, harm and conditions (pg. 27–29), and the thorns they add to rolls.
+# Marks, harm and conditions (pg. 28–30), and the thorns they add to rolls.
 module Character::Damage
   extend ActiveSupport::Concern
 
   HARMS = %w[ bloodied rattled desperate ].freeze
-  # "4d poisoned": a condition that's also a timer pool (pg. 29).
+  # "4d poisoned": a condition that's also a timer pool (pg. 30).
   CONDITION_POOL = /\A(\d+)d\s+(\S.*)\z/i
   # Pools run 1–20 dice (Pool#starting_size), and so do condition pools.
   CONDITION_MAX_DICE = 20
@@ -38,7 +38,7 @@ module Character::Damage
     ].compact
   end
 
-  # Flesh Wounds (pg. 58): instead of bloodied, a condition that adds +1t to
+  # Flesh Wounds (pg. 60): instead of bloodied, a condition that adds +1t to
   # every roll and clears when the scene ends.
   FLESH_WOUND = "Flesh Wound"
   HARMS = %w[ bloodied rattled desperate ].freeze
@@ -53,7 +53,7 @@ module Character::Damage
   end
 
   # Conditions are { "name", "lasts" }: lasts "scene" for short-term ones that
-  # clear after a scene (pg. 29), nil for ordinary ones.
+  # clear after a scene (pg. 30), nil for ordinary ones.
   CONDITION_LASTS = %w[ scene ].freeze
 
   def conditions=(value)
@@ -64,7 +64,7 @@ module Character::Damage
     end)
   end
 
-  # Taking a mark (pg. 27), as when pushing yourself: a stat already marked
+  # Taking a mark (pg. 28), as when pushing yourself: a stat already marked
   # takes its harm instead (bloodied for Brawn and Agility, rattled for Wits
   # and Presence); that harm a second time makes you desperate, and harm while
   # desperate drops you, which the sheet doesn't track. Doesn't save. Returns
@@ -89,7 +89,7 @@ module Character::Damage
     !public_send(harm) ? harm : (desperate? ? "dropped" : "desperate")
   end
 
-  # A significant rest (pg. 30) clears all marks and harm. Doesn't save.
+  # A significant rest (pg. 31) clears all marks and harm. Doesn't save.
   # Also clears what a rest heals on a talent's companion (a vassal's or
   # animal companion's damage boxes).
   def rest(by: nil)
@@ -114,7 +114,7 @@ module Character::Damage
     [ match[1].to_i, match[2] ] if match
   end
 
-  # Rolls a condition's pool the way a pool rolls (pg. 18): every 1–3 drops,
+  # Rolls a condition's pool the way a pool rolls (pg. 19): every 1–3 drops,
   # and at 0d it has run its course (the condition stays until it's cleared).
   # The roll goes in the table's log like any pool roll.
   def roll_condition!(index, by:, random: Random)

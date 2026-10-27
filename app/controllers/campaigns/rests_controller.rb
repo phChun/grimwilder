@@ -1,4 +1,4 @@
-# A rest (pg. 30): marks and harm clear for the characters there. GM only.
+# A rest (pg. 31): marks and harm clear for the characters there. GM only.
 class Campaigns::RestsController < ApplicationController
   include CampaignScoped
 

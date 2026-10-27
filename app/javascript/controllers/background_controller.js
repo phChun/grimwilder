@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Picking a common background (pg. 48) fills its three wises, but only into
+// Picking a common background (pg. 49) fills its three wises, but only into
 // empty boxes, so nothing the player wrote is overwritten.
 export default class extends Controller {
   static targets = ["wise"]

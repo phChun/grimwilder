@@ -48,7 +48,7 @@ class Campaign < ApplicationRecord
     identities.merge(Membership.gm)
   end
 
-  # The party is (pg. 26): two concepts, cleaned and capped.
+  # The party is (pg. 45): two concepts, cleaned and capped.
   def party_is=(value)
     list = value.is_a?(Hash) || value.is_a?(ActionController::Parameters) ? value.to_h.values : Array(value)
     super(list.map { _1.to_s.squish.first(40) }.compact_blank.first(2))

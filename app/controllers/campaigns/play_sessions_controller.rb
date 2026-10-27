@@ -1,4 +1,4 @@
-# Sessions (pg. 31): the history, for everyone at the table; starting one
+# Sessions (pg. 32): the history, for everyone at the table; starting one
 # (who's here, "Previously on…") and editing the recap afterwards, for the GM.
 class Campaigns::PlaySessionsController < ApplicationController
   include CampaignScoped

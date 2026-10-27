@@ -15,14 +15,14 @@
 
   <% if characters.any? %>
     <div class="rolls__panel rolls__panel--montage">
-      <p class="field__hint">Zoom out over a stretch of the story. Everyone taking part rolls 2d, and the best result is the scene's outcome (pg. 16).</p>
+      <p class="field__hint">Zoom out over a stretch of the story. Everyone taking part rolls 2d, and the best result is the scene's outcome (pg. 17).</p>
       <%= render "campaigns/montages/form", characters: characters %>
     </div>
   <% end %>
 
   <% if characters.size >= 2 %>
     <div class="rolls__panel rolls__panel--quarrel">
-      <p class="field__hint">Characters at odds: each side rolls 2d plus spark, allies assist with 1d, and the highest die wins. Everyone in it takes spark (pg. 23).</p>
+      <p class="field__hint">Characters at odds: each side rolls 2d plus spark, allies assist with 1d, and the highest die wins. Everyone in it takes spark (pg. 24).</p>
       <%= render "campaigns/quarrels/form", characters: characters %>
     </div>
   <% end %>

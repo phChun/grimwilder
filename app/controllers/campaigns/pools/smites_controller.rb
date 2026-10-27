@@ -1,4 +1,4 @@
-# Oathsworn's smite (pg. 68): after a task pool is rolled, a player spends
+# Oathsworn's smite (pg. 69): after a task pool is rolled, a player spends
 # their character's smite to drop 1d from it.
 class Campaigns::Pools::SmitesController < ApplicationController
   include PoolScoped

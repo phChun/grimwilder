@@ -1,6 +1,7 @@
 # A talent from the book (config/talents.yml): each path's core talent and its
 # seven path talents, plus background and heritage talents. Any path can take
-# any talent (pg. 52) except those marked "[Prohibited: Path]".
+# any talent (pg. 53) except those marked "[Prohibited: Path]", and one marked
+# "[Bard Only]" belongs to that path alone.
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
 class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses, :follow_ups, :makes, :state, :casts, :crucible, :legacy_core_of)
@@ -20,7 +21,7 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     all.find { |talent| talent.key == key.to_s }
   end
 
-  # legacy: the older core talent in its place (Legacy talents, pg. 178), where there is one.
+  # legacy: the older core talent in its place (Legacy talents, pg. 179), where there is one.
   def self.core_for(path, legacy: false)
     (legacy && legacy_core_for(path)) || all.find { |talent| talent.core? && talent.group.name == path }
   end
@@ -121,7 +122,7 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     bonuses.select { _1.key == "cast" }.map(&:id)
   end
 
-  # "You can push yourself to…": use it, then mark a stat (pg. 21).
+  # "You can push yourself to…": use it, then mark a stat (pg. 54).
   def pushes?
     text.match?(/push yourself/i)
   end
@@ -131,7 +132,7 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     text[/GROWTH:\s*([^\n]+)/, 1]&.strip
   end
 
-  # "One time only…" features, which thematic path talents can't use (pg. 53).
+  # "One time only…" features, which thematic path talents can't use (pg. 54).
   def one_time_only?
     text.match?(/one time only/i)
   end
@@ -140,14 +141,19 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     text.scan(/\[Prohibited: ([^\]]+)\]/).flatten.flat_map { _1.split(/,\s*/) }
   end
 
-  def prohibited_for?(path)
-    prohibited_paths.include?(path)
+  # "[Bard Only]": only that path may choose it.
+  def only_paths
+    text.scan(/\[(\w+) Only\]/).flatten
   end
 
-  # Paragraphs, without the "[Prohibited: …]" marker (shown separately) or,
-  # for a core talent, its GROWTH line (shown on its own).
+  def prohibited_for?(path)
+    prohibited_paths.include?(path) || (only_paths.any? && only_paths.exclude?(path))
+  end
+
+  # Paragraphs, without the "[Prohibited: …]" or "[Bard Only]" marker (shown
+  # separately) or, for a core talent, its GROWTH line (shown on its own).
   def paragraphs
-    text.sub(/\s*\[Prohibited: [^\]]+\]/, "").then { core? ? _1.sub(/GROWTH:[^\n]+/, "") : _1 }.split(/\n{2,}/).map(&:strip).compact_blank
+    text.gsub(/\s*\[(?:Prohibited: [^\]]+|\w+ Only)\]/, "").then { core? ? _1.sub(/GROWTH:[^\n]+/, "") : _1 }.split(/\n{2,}/).map(&:strip).compact_blank
   end
 
   def to_param

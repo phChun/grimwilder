@@ -1,6 +1,6 @@
 # Talents from the catalog (config/talents.yml). The core talent comes from the
-# path; the rest are chosen: one at creation and one per new level (pg. 31, 46),
-# so a character at level N has at most N chosen talents, from any path (pg. 52).
+# path; the rest are chosen: one at creation and one per new level (pg. 32, 47),
+# so a character at level N has at most N chosen talents, from any path (pg. 53).
 # Swapping one means removing it first.
 module Character::Talents
   extend ActiveSupport::Concern
@@ -12,7 +12,7 @@ module Character::Talents
     validate :talents_fit_level, if: -> { will_save_change_to_talent_keys? || will_save_change_to_level? }
   end
 
-  # The path's core talent, or with legacy_core its older version (pg. 178).
+  # The path's core talent, or with legacy_core its older version (pg. 179).
   def core_talent_entry
     Talent.core_for(path, legacy: legacy_core?)
   end
@@ -60,14 +60,18 @@ module Character::Talents
       end
     end
 
+    # A talent already on the sheet stays when the book later limits it to
+    # another path ("[Bard Only]" in Preview 6); only new picks, or a new path,
+    # are checked against it.
     def talents_are_choosable
+      kept = will_save_change_to_path? ? [] : Array(talent_keys_in_database)
       talent_keys.each do |key|
         talent = Talent.find_by_key(key)
         if talent.nil?
           errors.add(:talent_keys, "include an unknown talent (#{key})")
         elsif talent.core?
           errors.add(:talent_keys, "can't include a core talent (#{talent.name}); it comes from a path")
-        elsif talent.prohibited_for?(path)
+        elsif talent.prohibited_for?(path) && kept.exclude?(key)
           errors.add(:talent_keys, "can't include #{talent.name} for a #{path}")
         elsif eldritch_talent_keys.include?(key)
           errors.add(:talent_keys, "can't include #{talent.name}; it's already an Eldritch Talent")

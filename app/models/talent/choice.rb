@@ -8,7 +8,7 @@
 # - `open: true` when the book says "such as": the options are suggestions,
 #   and the player can type their own.
 # - `same_as: "expertise.skills"` takes another talent's list (Natural Moxie).
-# - `touchstone: true` when the picks are the talent's magic touchstones (pg. 35).
+# - `touchstone: true` when the picks are the talent's magic touchstones (pg. 36).
 # - `from_list: magic_schools` takes a list from config/grimwild.yml.
 # - `from_picks: [spellcraft.theorems, …]` picks from what the character
 #   picked for those talents (Bailiwick, Mastered Theorem); a character with

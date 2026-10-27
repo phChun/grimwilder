@@ -1,4 +1,4 @@
-# Starting a scene (pg. 95), maybe opening with a story roll. GM only.
+# Starting a scene (pg. 96), maybe opening with a story roll. GM only.
 class Campaigns::ScenesController < ApplicationController
   include CampaignScoped, StoryRollParams
 

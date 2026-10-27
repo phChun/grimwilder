@@ -1,4 +1,4 @@
-# XP and levels (pg. 31): take 1 XP after each session; you advance when you
+# XP and levels (pg. 32): take 1 XP after each session; you advance when you
 # fill boxes equal to the next level (level 4 → 5 takes 5 XP). Max level 7.
 module Character::Advancement
   extend ActiveSupport::Concern

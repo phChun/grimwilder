@@ -1,4 +1,4 @@
-# Rest and downtime (pg. 30). A rest is a significant stretch of time: it
+# Rest and downtime (pg. 31). A rest is a significant stretch of time: it
 # clears all marks and harm. Downtime goes further: PCs fully heal, including
 # relevant conditions, and reset per-session talents, and every campaign pool
 # is rolled. Both apply to the characters at the current session, or to

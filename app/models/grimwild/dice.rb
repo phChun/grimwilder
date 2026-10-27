@@ -1,4 +1,4 @@
-# Action and defense rolls (pg. 10–15), for rolls the server makes so the
+# Action and defense rolls (pg. 11–16), for rolls the server makes so the
 # table's log can be trusted. Mirrors interpretRoll in
 # app/javascript/grimwild/dice.js; both are tested against the same examples
 # (test/dice_examples.json).

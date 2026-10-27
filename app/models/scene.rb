@@ -1,7 +1,7 @@
-# One stretch of action within a session (pg. 95). It opens in the middle of
+# One stretch of action within a session (pg. 96). It opens in the middle of
 # things, with a story roll if the setup is unclear, and closes with a montage
 # once it has served its purpose. Ending it can clear "clears after scene"
-# conditions (pg. 29) from the characters there.
+# conditions (pg. 30) from the characters there.
 class Scene < ApplicationRecord
   belongs_to :play_session
   belongs_to :campaign

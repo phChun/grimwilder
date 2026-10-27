@@ -1,5 +1,5 @@
 # Re-skinned talents. The book encourages re-skinning a talent to fit the
-# character (pg. 52: a wizard's Bulwark as a magical shield), so the owner or
+# character (pg. 53: a wizard's Bulwark as a magical shield), so the owner or
 # the campaign's GM can give any of the character's talents its own name,
 # summary and text. The mechanics (uses, pools) stay the book's.
 #

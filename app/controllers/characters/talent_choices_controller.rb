@@ -1,5 +1,5 @@
 # Picks a talent asks for (Character::TalentChoices): Expertise's skills,
-# Sorcery's paths and techniques. The owner and the campaign's GM can, like
+# Sorcery's sources and techniques. The owner and the campaign's GM can, like
 # re-skins. The form opens in the sheet's modal (shared/_frame_modal).
 class Characters::TalentChoicesController < ApplicationController
   require_authentication

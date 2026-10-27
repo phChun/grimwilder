@@ -10,7 +10,7 @@
   <% if gm? %>
     <section class="card stack" aria-labelledby="settings-pitch">
       <h2 id="settings-pitch" class="card__title">The pitch</h2>
-      <p class="field__hint">What the campaign page leads with. Settle these at session zero (pg. 26).</p>
+      <p class="field__hint">What the campaign page leads with. Settle these at session zero (pg. 45).</p>
       <datalist id="group-arcs"><% Grimwild.arcs.values.flatten.each do |arc| %><option value="<%= title_case(arc) %>"></option><% end %></datalist>
       <%= form_with model: campaign, class: "stack" do |form| %>
         <% if campaign.errors.any? %>

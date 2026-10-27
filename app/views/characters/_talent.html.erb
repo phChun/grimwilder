@@ -21,7 +21,7 @@
           <% end %>
           <% if tends %>
             <p class="talent-card__menu-title"><%= talent.skinned? ? "Edit re-skin" : "Re-skin this talent" %></p>
-            <p class="field__hint">Rename it and describe it your way, like a wizard's Bulwark as a magical shield (pg. 52). The rules stay the book's. Leave a field blank to use the book's.</p>
+            <p class="field__hint">Rename it and describe it your way, like a wizard's Bulwark as a magical shield (pg. 53). The rules stay the book's. Leave a field blank to use the book's.</p>
             <%= form_with url: character_talent_skin_path(character, talent.key), method: :patch, scope: :skin, class: "talent-skin__form stack" do |form| %>
               <div class="field">
                 <%= form.label :name, "Name", class: "field__label", for: "skin-#{talent.key}-name" %>
@@ -206,7 +206,7 @@
           <summary class="button button--small talent-card__push-toggle">Push yourself <small>mark a stat</small></summary>
           <div class="talent-card__menu talent-card__menu--push" data-menu-target="panel">
             <%= render "shared/popover_head", title: "Push yourself" %>
-            <p class="field__hint">Once you've used it, mark a stat of your choice (pg. 21). A marked stat takes harm instead.</p>
+            <p class="field__hint">Once you've used it, mark a stat of your choice (pg. 54). A marked stat takes harm instead.</p>
             <% Grimwild::STATS.each do |stat| %>
               <% outcome = character.mark_would_be(stat) %>
               <%= button_to character_talent_push_path(character, talent.key), params: { stat: stat }, class: class_names("button button--small talent-card__push-stat", "talent-card__push-stat--harm": outcome != "mark") do %>
