@@ -25,11 +25,14 @@ module Campaign::Breaks
   # Rest resets (pg. 175): at a rest the group calls a reset, each character
   # takes spark, resets talents and thread and heals 1 harm, and the GM takes
   # 2 suspense.
-  def rest_reset!(by:)
+  # clear: "character_id:index" for each condition that fades (the form ticks
+  # none; some conditions fade, the GM picks which).
+  def rest_reset!(by:, clear: [])
     raise ArgumentError, "#{name} doesn't use the Rest resets rule." unless optional_rule?(:rest_resets)
 
+    picks = condition_picks(clear)
     transaction do
-      resting = resting_characters.each { _1.rest_reset!(by: by) }
+      resting = resting_characters.each { _1.rest_reset!(by: by, clear: picks.fetch(_1.id.to_s, [])) }
       increment!(:suspense, 2)
       post_marker!("Reset", by: by, text: ("Spark, talents, thread and 1 harm for #{resting.map(&:name).to_sentence}." if resting.any?))
     end
@@ -49,7 +52,7 @@ module Campaign::Breaks
   # clear: "character_id:index" for each condition to clear (the form ticks
   # them all; untick permanent ones).
   def downtime!(by:, clear: [], random: Random)
-    picks = Array(clear).map { _1.to_s.split(":", 2) }.group_by(&:first).transform_values { |pairs| pairs.map { _2.to_i } }
+    picks = condition_picks(clear)
 
     transaction do
       resting = resting_characters
@@ -67,4 +70,10 @@ module Campaign::Breaks
       downtime_pools.each { _1.roll!(by: by, random: random) }
     end
   end
+
+  private
+    # "character_id:index" strings => { "character_id" => [index, …] }
+    def condition_picks(clear)
+      Array(clear).map { _1.to_s.split(":", 2) }.group_by(&:first).transform_values { |pairs| pairs.map { _2.to_i } }
+    end
 end

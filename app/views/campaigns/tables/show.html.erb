@@ -46,7 +46,7 @@
               <%= button_to "Rest", campaign_rest_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Rest: clear marks and harm for #{@session ? "everyone here" : "everyone seated"}?" } } %>
               <%= link_to "Downtime", new_campaign_downtime_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
               <% if campaign.optional_rule?(:rest_resets) %>
-                <%= button_to "Reset", campaign_rest_reset_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "Reset (Rest resets rule): everyone takes spark, resets talents and thread and heals 1 harm, and you take 2 suspense?" } } %>
+                <%= link_to "Reset", new_campaign_rest_reset_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
               <% end %>
               <% if campaign.optional_rule?(:milestone_levels) %>
                 <%= button_to "Milestone", campaign_milestone_path(campaign), class: "button button--small", form: { data: { turbo_confirm: "A major group arc is done: everyone #{@session ? "here" : "seated"} levels up?" } } %>

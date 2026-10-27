@@ -31,10 +31,11 @@ module Character::Sessions
     refresh_talent_pools!(per: :session) if resets || first
   end
 
-  # Rest resets (pg. 175): take spark, reset every talent and all thread, and
-  # heal 1 harm (the worst first). Saves.
-  def rest_reset!(by:)
+  # Rest resets (pg. 175): take spark, reset every talent and all thread, heal
+  # 1 harm (the worst first), and the conditions at `clear` (indexes) fade. Saves.
+  def rest_reset!(by:, clear: [])
     self.changed_by = by
+    self.conditions = conditions.reject.with_index { |_, index| clear.include?(index) }
     settle_spark(take: true)
     self.thread = session_thread
     %i[ session scene rest ].each { reset_talent_uses(per: _1) }

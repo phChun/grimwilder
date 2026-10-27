@@ -1,0 +1,33 @@
+<% content_for :title, "Reset · #{Current.campaign.name}" %>
+
+<%# The Rest resets optional rule (pg. 175). Its own page, and from the GM table's "Reset" in Respite a modal (shared/_frame_modal), like Downtime. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+    <h1>Reset</h1>
+    <p class="page-header__lede">
+      At a rest, everyone takes spark, resets every talent and all thread, and heals 1 harm, and you take 2 suspense (pg. 175).
+      <%= Current.campaign.current_session ? "It applies to the characters at #{Current.campaign.current_session.title.downcase}." : "Between sessions, it applies to everyone seated." %>
+    </p>
+  </header>
+
+  <%= form_with url: campaign_rest_reset_path(Current.campaign), class: "panel stack session-form", data: { turbo_frame: "_top" } do %>
+    <fieldset class="roll-setup__group">
+      <legend class="field__label">Conditions that fade</legend>
+      <% conditions = @characters.flat_map { |character| character.conditions.each_with_index.map { |condition, index| [ character, index, condition ] } } %>
+      <% if conditions.any? %>
+        <% conditions.each do |character, index, condition| %>
+          <label class="check">
+            <%= check_box_tag "clear[]", "#{character.id}:#{index}", false, id: "reset_clear_#{character.id}_#{index}" %>
+            <span><strong><%= character.name %></strong>: <%= condition["name"] %></span>
+          </label>
+        <% end %>
+        <p class="field__hint">Some conditions fade with a rest; tick those.</p>
+      <% else %>
+        <p class="field__hint">No one has a condition.</p>
+      <% end %>
+    </fieldset>
+
+    <button type="submit" class="button button--primary">Reset</button>
+  <% end %>
+<% end %>

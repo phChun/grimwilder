@@ -1,4 +1,4 @@
-<%# locals: (character:, pools:) %>
+<%# locals: (character:, pools:, tends: nil) %>
 <%# What the table's optional rules give this character (Campaign::OptionalRules, Character::RulePools): its rule pools as pool rows, and Encumbrance's gear slots. Its own card, after the talents. %>
 <% campaign = character.campaign %>
 <% uses = character.rule_uses %>
@@ -15,7 +15,13 @@
         <p class="talent-card__chip"><%= use.label %> · <%= use.pool_at(character.level) %>d <%= use.pool_kind %> pool, ready at the next session</p>
       <% end %>
       <% if use.key == "vigor" %><p class="field__hint">Catch your breath: roll it to clear 1 harm on the Harm card. A rest or downtime refreshes it.</p><% end %>
-      <% if use.key == "coins" %><p class="field__hint">Roll it for larger purchases; drop 1d first for huge expenses. The GM restocks it.</p><% end %>
+      <% if use.key == "coins" %>
+        <p class="field__hint">Roll it for larger purchases; drop 1d first for huge expenses. Carousing by selling off treasure adds 2d, up to 8d.</p>
+        <% if tends && pool && pool.size < Character::RulePools::MAX_COINS && character.in_play? %>
+          <%= button_to "+2d Coins: carousing", character_coins_path(character), class: "button button--small button--ghost", form: { class: "talent-card__action" } %>
+        <% end %>
+      <% end %>
+      <% if use.key == "armor" && character.bulwark_reworked? %><p class="field__hint">Bulwark adds 2d here: rolling it avoids the consequence instead of lessening it.</p><% end %>
     <% end %>
     <% if slots %>
       <p class="rule-pools__slots"><strong>Encumbrance:</strong> room for <%= pluralize(character.gear_slots, "slot") %> of gear (2 + Brawn), beyond main armor and weapons. Small items take half a slot; large or bulky ones two or more.</p>

@@ -69,4 +69,41 @@ class CampaignOptionalRulesTest < ActiveSupport::TestCase
     assert_equal [ "Weapon styles", "Encumbrance" ], @campaign.rules_in_play.map(&:first)
     assert_equal 3, @tibbs.gear_slots
   end
+
+  test "turning a rule on makes its pools at once, and turning it off removes them" do
+    @campaign.update!(optional_rules: %w[ supplies ])
+    assert_equal [ 4 ], @tibbs.talent_pools.where(use_key: "rule/supplies").pluck(:size)
+
+    @campaign.update!(optional_rules: [])
+    assert_empty @tibbs.talent_pools.where("use_key LIKE 'rule/%'")
+  end
+
+  test "Bulwark's rework: +2d to the Armor pool in place of its own, armor or not" do
+    @campaign.update!(optional_rules: %w[ armor ])
+    @tibbs.update!(level: 2, talent_keys: %w[ bulwark lucky ])
+    assert @tibbs.bulwark_reworked?
+    assert_not_includes @tibbs.pool_uses.map(&:id), "bulwark/bulwark"
+    assert_equal [ 2, "Armor (+2d Bulwark)" ], @tibbs.rule_uses.sole.then { [ _1.pool, _1.label ] }
+
+    @tibbs.update!(armor: "light")
+    assert_equal 3, @tibbs.talent_pools.find_by!(use_key: "rule/armor").size, "made at once when armor changes"
+  end
+
+  test "carousing adds 2d to Coins, up to 8d" do
+    @campaign.update!(optional_rules: %w[ wealth ])
+    coins = @tibbs.talent_pools.find_by!(use_key: "rule/coins")
+    2.times { @tibbs.add_coins!(by: @pip) }
+    assert_equal [ 8, 8 ], [ coins.reload.size, coins.starting_size ]
+    assert_raises(ArgumentError) { @tibbs.add_coins!(by: @pip) }
+
+    @tibbs.refresh_talent_pools!(per: :session)
+    assert_equal [ 8, 8 ], [ coins.reload.size, coins.starting_size ], "a session keeps them"
+  end
+
+  test "a Reset lets the conditions the GM picks fade" do
+    @campaign.update!(optional_rules: %w[ rest_resets ])
+    @tibbs.update!(conditions: [ "4d poisoned", "cursed" ])
+    @campaign.rest_reset!(by: @gwen, clear: [ "#{@tibbs.id}:0" ])
+    assert_equal [ "cursed" ], @tibbs.reload.conditions.pluck("name")
+  end
 end
