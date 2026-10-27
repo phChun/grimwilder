@@ -4,14 +4,14 @@ Guidance for AI coding agents (and humans) working in this repo. Read this befor
 
 ## What this is
 
-**Grimwilder** is a *play toolkit* for the tabletop RPG **Grimwild: Community Edition** (CE Preview 5.2).
+**Grimwilder** is a *play toolkit* for the tabletop RPG **Grimwild: Community Edition** (CE Preview 6).
 It is **not** a rules reference/SRD. Each tool should quote only as much rule text as a player needs at the table.
 
 Current state:
 - Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`), passwordless accounts (email code + passkeys) with plans, campaigns with join links, campaign pools, crucibles, character sheets and the talent catalog, and the table log (server-rolled character rolls that spend and award spark, plus pool rolls, live on the campaign page).
 - Next: see *Roadmap*.
 
-Source rulebook: *Grimwild: Community Edition*, Preview 5.2 (`GWCE P5.2 Pages.pdf`, not in the repo). Page numbers below refer to it.
+Source rulebook: *Grimwild: Community Edition*, Preview 6 (not in the repo; the edition is `Grimwild::EDITION`, shown in the footer). Page numbers below were taken from Preview 5.2 (`GWCE P5.2 Pages.pdf`) and haven't all been rechecked against Preview 6.
 
 ## Stack
 
