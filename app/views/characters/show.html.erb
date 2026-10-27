@@ -217,6 +217,21 @@
       <% if editable && @character.talents_to_choose.positive? %>
         <%= link_to "Pick a talent at level #{@character.level}", new_character_talent_path(@character), class: "talent-slot" %>
       <% end %>
+      <%# The optional stat progression (pg. 175): once, a free talent slot for +1 to a stat. %>
+      <% if editable && @character.stat_progressed? %>
+        <p class="field__hint stat-progression">Gave up a talent for +1 <%= @character.stat_progression.capitalize %> (pg. 175). <%= button_to "Take the talent back", character_stat_progression_path(@character), method: :delete, class: "button button--ghost button--small", form: { class: "talent-card__action", data: { turbo_confirm: "Give back the +1 #{@character.stat_progression.capitalize} and take a talent slot instead?" } } %></p>
+      <% elsif editable && @character.talents_to_choose.positive? %>
+        <details class="stat-progression" data-controller="menu" data-action="toggle->menu#place">
+          <summary class="button button--ghost button--small">Or, optional rule: +1 to a stat instead</summary>
+          <div class="talent-card__menu" data-menu-target="panel">
+            <%= render "shared/popover_head", title: "+1 to a stat instead" %>
+            <p class="field__hint">Once, a character can give up a talent for +1 to a stat, which can then reach 4 (pg. 175). Ask your GM first: it's an optional rule.</p>
+            <% Grimwild::STATS.select { @character.can_progress_stat?(_1) }.each do |stat| %>
+              <%= button_to "+1 #{stat.capitalize} (#{@character.stat(stat)} → #{@character.stat(stat) + 1})", character_stat_progression_path(@character), params: { stat: stat }, class: "button button--small" %>
+            <% end %>
+          </div>
+        </details>
+      <% end %>
       <%# A warlock's Eldritch Talents (Pact): their own slots, on top of the one per level. %>
       <% if @character.eldritch_talents? %>
         <div class="eldritch">

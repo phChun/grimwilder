@@ -2,7 +2,7 @@
 # identity's campaigns, where the table can see it. The GM can offer one up for
 # grabs for a player to pick (Character::Claiming).
 class Character < ApplicationRecord
-  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentChoices, Character::TalentUses, Character::TalentBonuses, Character::TalentState, Character::Arcana, Character::Sessions, Character::Claiming, Character::Seating, Character::EldritchTalents, Character::TalentActions, Character::Farewell
+  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentChoices, Character::TalentUses, Character::TalentBonuses, Character::TalentState, Character::StatProgression, Character::Arcana, Character::Sessions, Character::Claiming, Character::Seating, Character::EldritchTalents, Character::TalentActions, Character::Farewell
 
   STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 46)
 
@@ -13,7 +13,8 @@ class Character < ApplicationRecord
 
   validates :name, presence: true, length: { maximum: 80 }
   validates :path, inclusion: { in: ->(_) { Grimwild.paths.keys } }
-  validates(*Grimwild::STATS, numericality: { only_integer: true, in: 1..3 })
+  validates(*Grimwild::STATS, numericality: { only_integer: true, in: 1..3 }, unless: -> { stat_progression.present? })
+  validate :progressed_stats_in_range, if: -> { stat_progression.present? }
   validates :spark, numericality: { only_integer: true, in: 0..Grimwild::MAX_SPARK }
   validates :thread, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: :session_thread }
   validate :starting_stats_add_up, on: :create
@@ -121,6 +122,14 @@ class Character < ApplicationRecord
 
     def words(value)
       list(value).map { _1.to_s.squish.first(WORD_LIMIT) }.compact_blank
+    end
+
+    # With the stat progression (pg. 175), that one stat can reach 4.
+    def progressed_stats_in_range
+      Grimwild::STATS.each do |name|
+        top = name == stat_progression ? Character::StatProgression::MAX_PROGRESSED_STAT : 3
+        errors.add(name, "must be between 1 and #{top}") unless stat(name).is_a?(Integer) && stat(name).between?(1, top)
+      end
     end
 
     def starting_stats_add_up
