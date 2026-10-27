@@ -187,4 +187,15 @@ class PoolTest < ActiveSupport::TestCase
     assert_not luck.rolls_as_action?
     assert_raises(ArgumentError) { luck.roll!(by: identities(:pip), as_action: true) }
   end
+
+  test "a tick pool drops exactly 1d each time and is never rolled" do
+    pool = campaigns(:bramblewood).pools.create!(name: "Torches burn down", kind: "timer", starting_size: 3, size: 3, tick: true)
+    refute pool.rolls_as_action?
+    refute pool.drops_first_for?(gm: true)
+
+    pool.roll!(by: identities(:gwen))
+    roll = pool.rolls.last
+    assert_equal [ 2, "ticked", [] ], [ pool.reload.size, roll.pool_action, roll.dice ]
+    assert_equal "Ticked: 1d dropped. 2d left.", ApplicationController.helpers.pool_roll_summary(roll)
+  end
 end

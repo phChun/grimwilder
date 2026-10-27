@@ -7,7 +7,7 @@ class Campaigns::StoryRollsController < ApplicationController
 
   def create
     if (character = called_character)
-      RollCall.story!(campaign: Current.campaign, by: Current.identity, character: character, **story_roll_options)
+      RollCall.story!(campaign: Current.campaign, by: Current.identity, character: character, assists: assists(character), **story_roll_options)
       back_to_table(anchor: "rolls")
     else
       Roll.story!(campaign: Current.campaign, by: Current.identity, **story_roll_options)
@@ -18,6 +18,11 @@ class Campaigns::StoryRollsController < ApplicationController
   end
 
   private
+    # Anyone else seated at the table can assist (pg. 13); they roll their own 1d.
+    def assists(character)
+      Current.campaign.characters.played.active.where(id: Array(params[:assists]).compact_blank).where.not(id: character.id).to_a
+    end
+
     def called_character
       return if params[:character_id].blank?
 

@@ -171,6 +171,9 @@ class CharactersTest < ActionDispatch::IntegrationTest
     post character_rolls_path(@tibbs), params: { stat: "agility", mode: "action", dice: 4, total_thorns: 3 }
     roll = @tibbs.rolls.last
     assert_equal [ 1, 4, 3, [ "marked", "bloodied" ] ], [ roll.help_dice, roll.dice.size, roll.thorns.size, roll.damage_reasons ]
+
+    post character_rolls_path(@tibbs), params: { stat: "wits", mode: "action", dice: 3, total_thorns: 0, help_from: "the innkeeper" }
+    assert_match "1d from the innkeeper", ApplicationController.helpers.roll_setup(@tibbs.rolls.last)
   end
 
   test "talents that fit a stat are ticks in its setup, and the log names them" do

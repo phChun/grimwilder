@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_27_130100) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_27_150000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -211,6 +211,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_130100) do
     t.integer "arcanum_id"
     t.integer "refills_used", default: 0, null: false
     t.boolean "made_by_talent", default: false, null: false
+    t.boolean "tick", default: false, null: false
     t.index ["arcanum_id"], name: "index_pools_on_arcanum_id", unique: true
     t.index ["campaign_id"], name: "index_pools_on_campaign_id"
     t.index ["character_id", "use_key"], name: "index_pools_on_character_id_and_use_key", unique: true, where: "made_by_talent = 0"
@@ -271,6 +272,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_27_130100) do
     t.json "follow_ups", default: [], null: false
     t.json "boosts", default: [], null: false
     t.boolean "refilled", default: false, null: false
+    t.string "help_from"
     t.index ["campaign_id", "created_at"], name: "index_rolls_on_campaign_id_and_created_at"
     t.index ["campaign_id"], name: "index_rolls_on_campaign_id"
     t.index ["character_id"], name: "index_rolls_on_character_id"

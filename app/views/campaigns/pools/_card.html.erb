@@ -40,6 +40,8 @@
       <span class="pool-card__note">Not rolled yet</span>
     <% elsif pool.last_action == "pushed" %>
       <span class="pool-card__note">Pushed: 1d dropped, take a mark</span>
+    <% elsif pool.last_action == "ticked" %>
+      <span class="pool-card__note">Ticked: 1d dropped</span>
     <% elsif scene && !pool.depleted? && pool.last_rolled_at < scene.started_at %>
       <span class="pool-card__note">Not rolled this scene</span>
     <% end %>
@@ -84,7 +86,7 @@
     <% end %>
 
     <% if pool.rollable? %>
-      <%= button_to "Roll #{pool.size}d", campaign_pool_roll_path(pool.campaign, pool), class: class_names("button", "button--primary": !pool.hidden?, "button--suspense": pool.hidden?), "aria-label": "Roll #{pool.name}, #{pool.size}d" %>
+      <%= button_to (pool.tick? ? "Tick −1d" : "Roll #{pool.size}d"), campaign_pool_roll_path(pool.campaign, pool), class: class_names("button", "button--primary": !pool.hidden?, "button--suspense": pool.hidden?), "aria-label": pool.tick? ? "Tick 1d off #{pool.name}" : "Roll #{pool.name}, #{pool.size}d" %>
     <% elsif restock %>
       <%= button_to "Restock to #{pool.starting_size}d", campaign_pool_reset_path(pool.campaign, pool), class: "button", "aria-label": "Restock #{pool.name} to #{pool.starting_size}d" %>
     <% elsif pool.resettable? %>

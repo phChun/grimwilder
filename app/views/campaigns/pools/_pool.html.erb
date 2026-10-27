@@ -9,7 +9,7 @@
   <div class="pool-row__main">
     <p class="pool-row__title">
       <span class="pool-row__name"><%= pool.name %></span>
-      <span class="pool-row__kind" title="<%= pool.description %>"><%= pool.kind %><%= ", linked" if pool.linked? %></span>
+      <span class="pool-row__kind" title="<%= pool.description %>"><%= pool.kind %><%= ", linked" if pool.linked? %><%= ", tick" if pool.tick? %></span>
       <% if pool.hidden? %><span class="tag">GM only</span><% end %>
       <% if pool.pushable? %><span class="badge badge--push">Nothing dropped: push?</span><% end %>
       <% if pool.depleted? %><span class="pool-row__outcome"><%= pool.outcome %></span><% end %>
@@ -28,6 +28,8 @@
         Not rolled yet
       <% elsif pool.last_action == "pushed" %>
         Pushed by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped, take a mark
+      <% elsif pool.last_action == "ticked" %>
+        Ticked by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped
       <% elsif pool.last_action == "smite" %>
         Smitten by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped
       <% else %>
@@ -45,7 +47,7 @@
 
   <div class="pool-row__primary">
     <% if pool.rollable? %>
-      <%= button_to "Roll", campaign_pool_roll_path(pool.campaign, pool), params: back, class: "button button--primary button--small", "aria-label": "Roll #{pool.name}" %>
+      <%= button_to (pool.tick? ? "Tick" : "Roll"), campaign_pool_roll_path(pool.campaign, pool), params: back, class: "button button--primary button--small", "aria-label": "#{pool.tick? ? "Tick 1d off" : "Roll"} #{pool.name}" %>
     <% elsif gm && pool.resettable? %>
       <%= button_to pool_reset_label(pool), campaign_pool_reset_path(pool.campaign, pool), class: "button button--small" %>
     <% end %>

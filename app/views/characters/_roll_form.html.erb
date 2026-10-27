@@ -16,6 +16,10 @@
       <%= render "shared/stepper", text: "Dice", name: "dice", id: "#{prefix}_dice", value: dice, min: dice, max: dice + Character::Rolling::MAX_EXTRA %>
       <%= render "shared/stepper", text: "Thorns", name: "total_thorns", id: "#{prefix}_thorns", value: damage, min: damage, max: damage + Character::Rolling::MAX_EXTRA %>
     </div>
+    <div class="field stat-roll__help">
+      <label class="stat-roll__label" for="<%= prefix %>_help_from">Extra dice from <small>optional: an NPC, the scene</small></label>
+      <input type="text" id="<%= prefix %>_help_from" name="help_from" maxlength="60" autocomplete="off" class="field__input" placeholder="The innkeeper">
+    </div>
     <% if (note = damage_thorns_note(character, stat)) %>
       <p class="stat-roll__note"><%= note %></p>
     <% end %>
