@@ -1651,14 +1651,20 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .talent-card--eldritch { border-color: var(--suspense-line); }
 .talent-card--skinned { box-shadow: inset 3px 0 0 var(--spark); }
 .talent-card__head { display: flex; align-items: flex-start; gap: var(--space-2); }
-.talent-card__fold > summary { list-style: none; cursor: pointer; padding-right: calc(var(--tap) + var(--space-1)); }
+/* The ⋯ menu sits just left of the chevron, which takes the far right. */
+.talent-card__fold > summary { list-style: none; cursor: pointer; }
 .talent-card__fold > summary::-webkit-details-marker { display: none; }
-.talent-card__fold > summary > .icon--chevron { flex: none; margin-top: 4px; color: var(--dim); transition: transform 0.15s; }
-.talent-card__fold[open] > summary > .icon--chevron { transform: rotate(180deg); }
+/* Descendant selectors: Herb's dev debug mode wraps the icon in a span. */
+.talent-card__fold > summary .icon--chevron { flex: none; margin-top: 4px; color: var(--dim); transition: transform 0.2s ease; }
+.talent-card__fold[open] > summary .icon--chevron { transform: rotate(180deg); }
 .talent-card__fold > summary:hover .talent-card__name { color: var(--ember); }
-.talent-card__titles { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.talent-card__titles { display: flex; flex: 1; flex-direction: column; min-width: 0; padding-right: 3.5rem; }
+.talent-card__session { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; margin-top: var(--space-1); padding: 1px 8px; border: 1px dashed var(--line-strong); border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--dim); }
+.talent-card__between { flex-basis: 100%; margin: 0; }
 .talent-card__body { display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-2); }
-.talent-card > .talent-card__more-menu { position: absolute; top: 6px; right: 6px; }
+/* Clear of the chevron (18px plus a gap from the card's edge) and inside the card. */
+.talent-card > .talent-card__more-menu { position: absolute; top: 4px; right: 44px; margin: 0; }
+.talent-card--core > .talent-card__more-menu { top: 8px; right: 48px; }
 .talent-card__name { flex: 1; margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; line-height: 1.25; }
 .talent-card--core .talent-card__name { font-size: 1.5rem; }
 .talent-card__source { margin: 0; font-size: 12px; color: var(--dim); }

@@ -104,4 +104,17 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     get character_path(@tibbs)
     assert_select "#talent-folk-hero .talent-card__only", 0
   end
+
+  test "outside a session, a talent you roll says it's for a session, and still rolls" do
+    @tibbs.update!(level: 2, talent_keys: %w[ mastermind lurker ])
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+    assert_select "#talent-mastermind .talent-card__session", /Roll it in a session/
+    assert_select "#talent-mastermind .talent-card__between"
+    assert_select "#talent-lurker .talent-card__session", 0, "nothing to roll"
+
+    PlaySession.start!(campaigns(:bramblewood), characters: [ @tibbs ], by: identities(:gwen))
+    get character_path(@tibbs)
+    assert_select ".talent-card__session", 0
+  end
 end
