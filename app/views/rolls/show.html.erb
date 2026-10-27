@@ -1,5 +1,5 @@
 <%# herb:slots client %>
-<%# herb:state (stat: 2, thorns: 0, mode: "action", outcome: "", critical: false) %>
+<%# herb:state (stat: 2, thorns: 0, mode: "action", outcome: "", critical: false, assists: 0, panache: 0, reckless: false, teamwork: false, spell: false, twist: false) %>
 <% content_for :title, "Action roll" %>
 
 <div class="roller" data-controller="roller">
@@ -46,6 +46,41 @@
         <p class="counter__hint">Typical play is 0–2. Odds drop sharply at 3+.</p>
       </div>
 
+      <%# Talent dice rules, as the sheet applies them on the server (grimwild/dice talentRoll). %>
+      <details class="fold roller__talents">
+        <summary class="fold__summary"><span class="fold__title">Talents</span></summary>
+        <div class="counter">
+          <span class="counter__label" id="assists-label">Assists <small>d6</small></span>
+          <div class="counter__control" role="group" aria-labelledby="assists-label">
+            <button type="button" class="counter__step" data-herb-decrement="assists" disabled="<%= assists <= 0 %>" aria-label="One fewer assist">&minus;</button>
+            <output class="counter__value counter__value--d6" aria-live="polite"><%= assists %></output>
+            <button type="button" class="counter__step" data-herb-increment="assists" disabled="<%= assists >= 4 %>" aria-label="One more assist">+</button>
+          </div>
+          <p class="counter__hint">Each ally helping rolls 1d of their own, shown apart.</p>
+        </div>
+        <label class="check">
+          <input type="checkbox" checked="<%= teamwork %>" data-herb-toggle="teamwork">
+          <span><strong>Teamwork</strong>: the assists' 5s count as 6s.</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" checked="<%= reckless %>" data-herb-toggle="reckless">
+          <span><strong>Reckless</strong>: your 5s count as 6s, but 4s as 1s (Into the Fray, There Is No Try, Audacity, Maelstrom).</span>
+        </label>
+        <div class="counter">
+          <span class="counter__label" id="panache-label">Panache</span>
+          <div class="counter__control" role="group" aria-labelledby="panache-label">
+            <button type="button" class="counter__step" data-herb-decrement="panache" disabled="<%= panache <= 0 %>" aria-label="One less panache">&minus;</button>
+            <output class="counter__value" aria-live="polite"><%= panache %></output>
+            <button type="button" class="counter__step" data-herb-increment="panache" disabled="<%= panache >= 4 %>" aria-label="One more panache">+</button>
+          </div>
+          <p class="counter__hint">Removes that many thorns. Remove them all and they roll as Panache dice: each 7 or 8 raises the result a step.</p>
+        </div>
+        <label class="check">
+          <input type="checkbox" checked="<%= spell %>" data-herb-toggle="spell">
+          <span><strong>Casting a spell</strong>: two or more 1s, thorns included, cause a magical twist.</span>
+        </label>
+      </details>
+
       <div class="roller__actions">
         <button type="button" class="button button--primary button--wide" data-action="roller#roll">Roll</button>
         <button type="button" class="button button--quiet" data-action="roller#clear">Clear</button>
@@ -54,6 +89,9 @@
 
     <section class="panel roller__result" aria-label="Result">
       <div class="tray" data-roller-target="tray" aria-live="polite"></div>
+      <% if twist %>
+        <p class="result__twist">Magical twist: two or more 1s, thorns included.</p>
+      <% end %>
 
       <% case outcome %>
       <% when "perfect" %>

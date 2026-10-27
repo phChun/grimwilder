@@ -74,6 +74,23 @@ export function actionRoll(statDice, thornCount, random = Math.random) {
   return { dice, thorns, ...interpretRoll(dice, thorns) }
 }
 
+// An action roll with the talent dice rules, as the sheet makes them on the
+// server (Character#roll!, Roll#counted_dice): assists roll 1d each; Panache
+// removes that many thorns, and if it removes them all they roll as Panache
+// dice instead; reckless counts your own dice's 5s as 6s and 4s as 1s;
+// Teamwork counts the assists' 5s as 6s; a spell checks your own dice (as
+// counted) and the thorns for a twist.
+export function talentRoll({ dice: statDice, thorns: thornCount = 0, assists = 0, panache = 0, reckless = false, teamwork = false, spell = false }, random = Math.random) {
+  const dice = rollDice(statDice, 6, random)
+  const assistDice = rollDice(assists, 6, random)
+  const removed = Math.min(panache, thornCount)
+  const thorns = rollDice(thornCount - removed, 8, random)
+  const boosts = removed > 0 && removed === thornCount ? rollDice(removed, 8, random) : []
+  const own = countAs(dice, reckless ? "reckless" : null)
+  const counted = [...own, ...countAs(assistDice, teamwork ? "teamwork" : null)]
+  return { dice, assistDice, thorns, boosts, removed, counted, twist: spell && isTwist(own, thorns), ...interpretRoll(counted, thorns, { boosts }) }
+}
+
 export function rollPool(size, random = Math.random) {
   const dice = rollDice(size, 6, random)
   const remaining = dice.filter((d) => d >= 4).length
