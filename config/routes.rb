@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       resource :stat_progression, only: %i[ create destroy ]
       resource :stat_point, only: :create
       resource :oath, only: %i[ create destroy ]
+      resource :coins, only: :create
     end
   end
 
@@ -99,7 +100,7 @@ Rails.application.routes.draw do
       resources :notes, only: :create
       resources :messages, only: %i[ create destroy ]
       resource :rest, only: :create
-      resource :rest_reset, only: :create
+      resource :rest_reset, only: %i[ new create ]
       resource :milestone, only: :create
       resource :done, only: %i[ create destroy ] # the GM marks the campaign done, or reopens it
       resource :reset, only: :create # the GM clears sessions and the roll log

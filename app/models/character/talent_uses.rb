@@ -13,7 +13,9 @@ module Character::TalentUses
 
   # Rule pools (Character::RulePools) ride along, so they're made and refilled the same way.
   def talent_use_list
-    [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses) + rule_uses
+    uses = [ core_talent_entry, *chosen_talents, *eldritch_talents ].compact.flat_map(&:uses)
+    uses = uses.reject { _1.talent_key == Character::RulePools::BULWARK } if bulwark_reworked?
+    uses + rule_uses
   end
 
   def use_counters
@@ -102,7 +104,7 @@ module Character::TalentUses
       # Kept until spent (Pact's Patience, Supplies): made once, then only
       # renamed and grown, never refilled by a session. A per-rest pool (Vigor)
       # is made by a session but refilled only by a rest.
-      next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: size) if pool.persisted? && (use.per == "never" || (use.per == "rest" && per != :rest))
+      next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: [ size, pool.size ].max) if pool.persisted? && (use.per == "never" || (use.per == "rest" && per != :rest))
 
       pool.update!(
         campaign: campaign, name: "#{name}: #{use.label}", kind: use.pool_kind, refresh: use.per, hidden: false,

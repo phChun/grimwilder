@@ -17,6 +17,11 @@
 module Campaign::OptionalRules
   extend ActiveSupport::Concern
 
+  included do
+    # Turning a rule on or off makes or removes its pools for the party right away.
+    after_update_commit -> { characters.played.each(&:refresh_rule_pools!) }, if: :saved_change_to_optional_rules?
+  end
+
   # rule => [name, page, what it does]
   RULES = {
     "weapon_styles" => [ "Weapon styles", 177, "Each PC's weapons have two styles that shape the fiction." ],

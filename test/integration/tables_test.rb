@@ -132,4 +132,28 @@ class TablesTest < ActionDispatch::IntegrationTest
     get campaign_table_path(@campaign)
     assert_select ".party-card__picks", text: /Expertise/, count: 0
   end
+
+  test "under Rest resets, the Reset form lets the GM pick conditions that fade" do
+    @campaign.update!(optional_rules: %w[ rest_resets ])
+    characters(:tibbs).update!(conditions: [ "cursed" ])
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
+    assert_select "a[href=?]", new_campaign_rest_reset_path(@campaign), text: "Reset"
+
+    get new_campaign_rest_reset_path(@campaign)
+    assert_select "input[type=checkbox][name='clear[]']:not([checked])"
+    post campaign_rest_reset_path(@campaign), params: { clear: [ "#{characters(:tibbs).id}:0" ] }
+    assert_empty characters(:tibbs).reload.conditions
+  end
+
+  test "Wealth: the owner adds 2d of Coins from the sheet" do
+    @campaign.update!(optional_rules: %w[ wealth ])
+    tibbs = characters(:tibbs)
+    sign_in_as identities(:pip)
+    get character_path(tibbs)
+    assert_select ".rule-pools form[action=?] button", character_coins_path(tibbs), text: "+2d Coins: carousing"
+
+    post character_coins_path(tibbs)
+    assert_equal 6, tibbs.talent_pools.find_by!(use_key: "rule/coins").size
+  end
 end
