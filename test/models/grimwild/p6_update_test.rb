@@ -48,3 +48,30 @@ class Grimwild::P6UpdateTest < ActiveSupport::TestCase
     assert_equal %w[mastermind], @tibbs.reload.talent_keys
   end
 end
+
+class Grimwild::P6UpdateMechanicsTest < ActiveSupport::TestCase
+  setup do
+    @tibbs = characters(:tibbs)
+  end
+
+  test "Competence and Quarry pools go, Magus's style moves to the notes, and the log says so" do
+    @tibbs.update_columns(talents: "Owes the guild", talent_uses: { "expertise/competence" => 1 },
+      talent_choices: { "magus" => { "style" => [ "flaming" ] } })
+    @tibbs.campaign.pools.create!(name: "Tibbs: Competence", kind: "power", starting_size: 4, size: 2, character: @tibbs, use_key: "expertise/competence")
+
+    assert_difference -> { Pool.count } => -1, -> { Roll.where(kind: "note").count } => 1 do
+      Grimwild::P6Update.update_mechanics!(@tibbs)
+    end
+
+    @tibbs.reload
+    assert_empty @tibbs.talent_uses
+    assert_empty @tibbs.talent_choices
+    assert_equal "Owes the guild\n\nMagus: your weapon's magical style was flaming.", @tibbs.talents
+    assert_match "Competence is now 2 points a session", Roll.where(kind: "note").last.question
+    assert_match "its old style, flaming, is in the talent notes", Roll.where(kind: "note").last.question
+
+    assert_no_difference -> { Roll.count } do
+      Grimwild::P6Update.update_mechanics!(@tibbs)
+    end
+  end
+end

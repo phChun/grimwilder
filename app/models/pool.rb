@@ -130,7 +130,7 @@ class Pool < ApplicationRecord
   end
 
   # A power pool rolled as an action in place of a stat (pg. 20). A talent's
-  # bonus-dice pool (Luck, Quarry, Competence) just rolls.
+  # bonus-dice pool (Luck) just rolls.
   def rolls_as_action?
     power? && !tick? && !talent_use&.bonus_dice
   end

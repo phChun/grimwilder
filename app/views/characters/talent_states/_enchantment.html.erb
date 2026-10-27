@@ -1,0 +1,22 @@
+<%# locals: (character:, talent:, editable:) %>
+<%# Magus's enchantment: once a session, a trait for the weapon (ticking the use), kept until it's ended for a potent effect. %>
+<% use = character.use_counters.find { _1.id == "#{talent.key}/enchant" } %>
+<div class="talent-state">
+  <span class="use-tracker__name">Enchantment</span>
+  <% if character.enchantment %>
+    <strong class="talent-state__on"><%= title_case(character.enchantment) %></strong>
+    <% if editable && character.in_play? %>
+      <%= button_to "End it: potent effect", character_talent_state_path(character, talent.key), method: :patch, params: { change: "disenchant" }, class: "button button--small", form: { class: "talent-card__action" } %>
+    <% end %>
+  <% elsif editable && character.in_play? && use && character.uses_left(use).positive? %>
+    <%= form_with url: character_talent_state_path(character, talent.key), method: :patch, class: "talent-card__make" do %>
+      <input type="hidden" name="change" value="enchant">
+      <label class="visually-hidden" for="enchant-trait">The weapon's trait</label>
+      <input id="enchant-trait" name="trait" class="field__input" maxlength="40" autocomplete="off" list="enchant-traits" placeholder="<%= type_or_select %>" required>
+      <datalist id="enchant-traits"><% Character::TalentState::ENCHANTMENTS.each do |trait| %><option value="<%= title_case(trait) %>"></option><% end %></datalist>
+      <button type="submit" class="button button--small">Enchant</button>
+    <% end %>
+  <% else %>
+    <span class="use-tracker__resets">not enchanted</span>
+  <% end %>
+</div>

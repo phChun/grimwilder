@@ -55,7 +55,12 @@ module Roll::FollowUps
         if (use = actor.use_counters.find { _1.id == follow_up.use_id })
           actor.talent_uses = actor.talent_uses.merge(use.id => actor.uses_spent(use) + 1)
         end
-        entry["pool_dice"] = follow_up_pool(actor, follow_up).roll_into!(by: by, random: random) if follow_up.pool
+        if follow_up.pool
+          entry["pool_dice"] = follow_up_pool(actor, follow_up).roll_into!(by: by, random: random)
+        elsif follow_up.dice
+          entry["pool_dice"] = Array.new(follow_up.dice) { random.rand(1..6) }
+        end
+        entry["critical_effect"] = true if follow_up.six == "critical_effect" && entry["pool_dice"]&.include?(6)
 
         apply_follow_up(follow_up, entry, actor, die: die, omen: omen, random: random)
         result = interpretation
@@ -85,6 +90,7 @@ module Roll::FollowUps
         (follow_up.repeatable? || follow_ups.none? { _1["id"] == follow_up.id && _1["character_id"] == actor.id }) &&
         (!follow_up.use || actor.use_counters.find { _1.id == follow_up.use_id }&.then { actor.uses_left(_1).positive? }) &&
         (!follow_up.pool || follow_up_pool(actor, follow_up)&.size.to_i.positive?) &&
+        (!follow_up.needs || actor.public_send(follow_up.needs).any?) &&
         case follow_up.kind
         when "reroll" then follow_ups.empty? # "a roll you just made"
         when "raise" then all_dice.any? { _1 < 6 }

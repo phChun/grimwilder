@@ -22,25 +22,37 @@ class RollFollowUpTest < ActiveSupport::TestCase
         assert_includes talent.uses.select(&:counter?).map(&:id), follow_up.use_id, follow_up.id if follow_up.use
         assert_includes talent.uses.select(&:pool?).map(&:id) + talent.makes.map(&:id), follow_up.pool_id, follow_up.id if follow_up.pool
         assert_includes talent.bonuses.map(&:id), follow_up.after, follow_up.id if follow_up.after
+        assert follow_up.pool || follow_up.dice&.positive?, "#{follow_up.id}: a bonus rolls a pool or its own dice" if follow_up.kind == "bonus"
+        assert_includes Talent::FollowUp::NEEDS, follow_up.needs, follow_up.id if follow_up.needs
+        assert_equal "critical_effect", follow_up.six, follow_up.id if follow_up.six
       end
     end
   end
 
-  test "Competence: bonus dice after a chosen skill, rolled from its pool" do
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm ])
-    @tibbs.refresh_talent_pools!(per: :session)
-    plain = @tibbs.roll!("wits", by: @pip, random: FixedDice.new([ 2, 3 ]))
-    assert_empty plain.follow_ups_for([ @tibbs ]), "only after a roll that took the skill"
+  test "the quarry die: once a quarry is chosen, anyone's action roll can take it; a 6 adds a critical effect" do
+    @bram.update!(path: "Ranger", talent_keys: [])
+    roll = @tibbs.roll!("agility", by: @pip, random: FixedDice.new([ 2, 3, 1 ]))
+    assert_empty roll.follow_ups_for([ @bram ]), "no quarry chosen yet"
 
-    roll = @tibbs.roll!("wits", by: @pip, bonuses: [ "expertise/skill" ], random: FixedDice.new([ 2, 3, 1 ]))
-    assert_equal [ "expertise/competence" ], roll.follow_ups_for([ @tibbs ]).map { _3.id }
+    @bram.designate_quarry!("The Grey Wolf", by: @gwen)
+    assert_equal [ "quarry/quarry" ], roll.follow_ups_for([ @bram ]).map { _3.id }
+    assert_equal "Roll 1d", ApplicationController.helpers.follow_up_button(@bram, Talent.find("quarry").follow_ups.sole)
 
-    roll.follow_up!(@tibbs, "expertise/competence", by: @pip, random: FixedDice.new([ 6, 1, 5, 2 ]))
+    roll.follow_up!(@bram, "quarry/quarry", by: @gwen, random: FixedDice.new([ 6 ]))
     roll.reload
-    assert_equal [ [ 2, 3, 1, 6, 1, 5, 2 ], "perfect" ], [ roll.dice, roll.outcome ]
-    assert_equal 2, @tibbs.talent_pools.sole.size, "the 1–3s drop from the pool"
-    assert_match "then Gibbletibble \"Tibbs\"'s Expertise +4d (6, 1, 5, 2)", ApplicationController.helpers.roll_setup(roll)
-    assert_empty roll.follow_ups_for([ @tibbs ]), "once per roll"
+    assert_equal [ [ 2, 3, 1, 6 ], "perfect" ], [ roll.dice, roll.outcome ]
+    assert_equal [ 1, 2 ], [ @tibbs.reload.spark, @bram.reload.spark ], "a 6 no longer gives spark"
+    assert_match "Bram's Quarry +1d (6): a 6, so add a critical effect", ApplicationController.helpers.roll_setup(roll)
+    assert_empty roll.follow_ups_for([ @bram ]), "once per roll"
+
+    defense = @tibbs.roll!("agility", by: @pip, mode: "defense", random: FixedDice.new([ 2, 2, 2 ]))
+    assert_empty defense.follow_ups_for([ @bram ]), "action rolls only"
+  end
+
+  test "Competence is 2 points a session, +1 at levels 3 and 6" do
+    use = Talent.find("expertise").uses.sole
+    assert use.counter?
+    assert_equal [ 2, 3, 4 ], [ 1, 3, 6 ].map { use.count_at(_1) }
   end
 
   test "Blessed re-rolls without thorns, once a session, and a perfect takes spark" do

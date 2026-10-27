@@ -194,13 +194,13 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
     assert_select "#talent-hidden-magic .use-tracker__resets", "1 left · resets each session"
   end
 
-  test "Infusion's known touchstones are offered, not asked for" do
+  test "Infusion asks for its known touchstones and 3 major arcana (P6: no longer optional)" do
     kit = identities(:pip).characters.create!(name: "Kit", path: "Artificer", brawn: 1, agility: 2, wits: 3, presence: 2)
-    assert_empty kit.choices_to_make
+    assert_equal [ [ "infusion", "touchstones", 6 ] ], kit.choices_to_make.map { |talent, choice, left| [ talent.key, choice.key, left ] }
 
     sign_in_as identities(:pip)
     get character_path(kit)
-    assert_select "#talent-infusion a.talent-card__pick-more", "Optional: choose 6 touchstones"
-    assert_select ".arcana-grants__item", /Infusion: 0 of 2 major arcana \(optional\)/
+    assert_select "#talent-infusion a.talent-card__pick-more", "Choose 6 touchstones"
+    assert_select ".arcana-grants__item", /Infusion: 0 of 3 major arcana/
   end
 end
