@@ -2646,3 +2646,18 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .oath-tenets__tenet--broken { color: var(--dim); text-decoration: line-through; }
 .stat-progression { position: relative; margin-top: var(--space-2); }
 .crucible__credit, .talent-card__crucible { margin: 0; font-size: 0.85rem; color: var(--muted); }
+
+/* Scene prep (ScenePlan): the list to play, and the picks above a new scene's form. */
+.scene-plans { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.scene-plans__item { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-2) var(--space-3); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.scene-plans--played .scene-plans__item { padding: var(--space-2) var(--space-3); opacity: 0.75; }
+.scene-plans__main { display: flex; flex: 1 1 16rem; flex-direction: column; gap: 2px; min-width: 0; }
+.scene-plans__title { font-family: var(--font-display); font-size: 1.1rem; }
+.scene-plans__notes { margin: var(--space-1) 0 0; color: var(--text-soft); white-space: pre-line; }
+.scene-plans__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.scene-plans__actions .button_to { margin: 0; }
+.scene-prep-picks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.scene-prep-picks .field__label { flex-basis: 100%; }
+/* A fieldset won't shrink below its content unless told; the odds wrap in a narrow rail. */
+.scene-plan-form__opening { display: grid; gap: var(--space-2); min-width: 0; }
+.segmented--auto.scene-plan-form__odds { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr)); }

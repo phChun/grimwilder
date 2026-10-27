@@ -34,6 +34,7 @@
           <% elsif @session %>
             <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--ghost" %>
           <% end %>
+          <%= link_to campaign_scene_plans_path(campaign), class: "button button--ghost" do %>Scene prep<% if (prepared = campaign.scene_plans.unplayed.count).positive? %> <small>(<%= prepared %>)</small><% end %><% end %>
           <% if @session %>
             <%= link_to "End session", new_campaign_play_session_ending_path(campaign, @session), class: "button button--ghost" %>
           <% else %>

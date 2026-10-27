@@ -19,13 +19,15 @@ class Scene < ApplicationRecord
   scope :open, -> { where(ended_at: nil) }
 
   # opening: story roll arguments (Roll.story!) to open with, or nil.
-  def self.start!(session, title:, by:, opening: nil)
+  # plan: the ScenePlan it was started from, which then belongs to it.
+  def self.start!(session, title:, by:, opening: nil, notes: nil, plan: nil)
     raise ArgumentError, "#{session.title} has ended." unless session.open?
     raise ArgumentError, "#{session.current_scene.heading} is still going." if session.current_scene
 
     transaction do
       scene = session.scenes.create!(campaign: session.campaign, number: session.scenes.maximum(:number).to_i + 1,
-        title: title, started_at: Time.current)
+        title: title, notes: notes.to_s.strip.presence, started_at: Time.current)
+      plan&.update!(scene: scene)
       session.post_marker!(scene.heading, by: by, scene: scene)
       scene.update!(opening_roll: Roll.story!(campaign: session.campaign, by: by, **opening)) if opening
       scene

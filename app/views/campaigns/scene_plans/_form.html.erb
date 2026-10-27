@@ -1,0 +1,31 @@
+<%# locals: (plan:, framed: nil) %>
+<%# A prepared scene: a title, notes for the GM, and maybe an opening story roll, preloaded when a scene starts from it. framed: its own panel (the edit page); in the prep page's card it isn't. %>
+<%= form_with model: [ Current.campaign, plan ], class: class_names("stack scene-plan-form", "panel": framed) do |form| %>
+  <% if plan.errors.any? %><p class="form-error"><%= plan.errors.full_messages.to_sentence %></p><% end %>
+  <div class="field">
+    <%= form.label :title, "Title", class: "field__label" %>
+    <%= form.text_field :title, required: true, maxlength: 120, autocomplete: "off", placeholder: "The bridge at Mirefall", class: "field__input" %>
+  </div>
+  <div class="field">
+    <%= form.label :notes, "Notes", class: "field__label" %>
+    <%= form.text_area :notes, rows: 4, maxlength: 2000, placeholder: "Who's there, what they want, what could go wrong…", class: "field__input" %>
+  </div>
+  <fieldset class="fieldset scene-plan-form__opening">
+    <legend class="field__label">Open with a story roll <small>(optional)</small></legend>
+    <div class="segmented segmented--auto scene-plan-form__odds">
+      <label class="segmented__option">
+        <%= form.radio_button :opening_odds, "", checked: plan.opening_odds.nil? %>
+        <span class="segmented__text">None</span>
+      </label>
+      <% Roll::ODDS.each do |dice, odds_name| %>
+        <label class="segmented__option">
+          <%= form.radio_button :opening_odds, dice %>
+          <span class="segmented__text"><%= dice %>d <small><%= odds_name.delete_suffix(" odds") %></small></span>
+        </label>
+      <% end %>
+    </div>
+    <%= form.label :opening_question, "Question", class: "visually-hidden" %>
+    <%= form.text_field :opening_question, maxlength: 200, autocomplete: "off", placeholder: "Are the guards awake?", class: "field__input" %>
+  </fieldset>
+  <%= form.submit plan.new_record? ? "Add to prep" : "Save", class: "button button--primary" %>
+<% end %>
