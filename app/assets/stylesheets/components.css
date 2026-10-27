@@ -1642,23 +1642,23 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .talents__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-3); }
 .talents__head .card__title { margin: 0; }
 
-/* The core talent on its own, then the rest as cards that wrap. With room for
-   columns, they're all as tall as the tallest, with "From the book" at the
-   foot. One with its book text open takes the whole row, and then rows size
-   to their own cards so the rest don't grow with it. */
-.talent-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
-@container sheet (min-width: 40rem) {
-  .talent-list { grid-auto-rows: 1fr; }
-  .talent-list:has(.talent-card__more[open]) { grid-auto-rows: auto; align-items: start; }
-}
+/* The core talent on its own, then the rest, one under another across the
+   card. Each folds to its name and summary; opening one shows the rest. */
+.talent-list { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-3); }
 .talent-card--core { margin-bottom: var(--space-3); }
 .talent-card { position: relative; display: flex; flex-direction: column; gap: var(--space-1); padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
-.talent-card--core,
-.talent-card:has(> .talent-card__more[open]) { grid-column: 1 / -1; }
 .talent-card--core { padding: 18px 20px; border-color: color-mix(in srgb, var(--ember) 45%, var(--line)); background: linear-gradient(135deg, var(--ember-soft), var(--surface-2) 60%); }
 .talent-card--eldritch { border-color: var(--suspense-line); }
 .talent-card--skinned { box-shadow: inset 3px 0 0 var(--spark); }
 .talent-card__head { display: flex; align-items: flex-start; gap: var(--space-2); }
+.talent-card__fold > summary { list-style: none; cursor: pointer; padding-right: calc(var(--tap) + var(--space-1)); }
+.talent-card__fold > summary::-webkit-details-marker { display: none; }
+.talent-card__fold > summary > .icon--chevron { flex: none; margin-top: 4px; color: var(--dim); transition: transform 0.15s; }
+.talent-card__fold[open] > summary > .icon--chevron { transform: rotate(180deg); }
+.talent-card__fold > summary:hover .talent-card__name { color: var(--ember); }
+.talent-card__titles { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.talent-card__body { display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-2); }
+.talent-card > .talent-card__more-menu { position: absolute; top: 6px; right: 6px; }
 .talent-card__name { flex: 1; margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; line-height: 1.25; }
 .talent-card--core .talent-card__name { font-size: 1.5rem; }
 .talent-card__source { margin: 0; font-size: 12px; color: var(--dim); }
