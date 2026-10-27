@@ -5,7 +5,7 @@
 #   with `drop_first: true` when the talent's text drops 1d before rolling it
 #   (a potent spell from a rite, a wild talent on Wild Shape), and with
 #   `bonus_dice: true` when a power pool is rolled as extra dice for another
-#   roll (Luck, Quarry, Competence), never as an action in place of a stat;
+#   roll (Luck), never as an action in place of a stat;
 # - extra thread per session (`thread`), from Bardic Lore, Reader and the like.
 #
 # A count can be `named_by` one of the talent's choices: each box is one of
@@ -19,7 +19,8 @@
 # `per`: when it resets: each `session` or `scene`, at a `rest` (rest and
 # downtime), or `never` (charges kept until spent; a one-time potion).
 # A pool can also `refill` at 0d: `always` (Pact's Patience) or that many
-# times before it resets (the Vassal's once).
+# times before it resets; `push` refills it only when you push yourself (the
+# Vassal).
 #
 # `growth` adds to the count or pool at those levels: { 2 => 1, 4 => 1, 6 => 1 }.
 class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, :pool_kind, :thread, :growth, :drop_first, :bonus_dice, :named_by,
@@ -71,9 +72,13 @@ class Talent::Use < Data.define(:talent_key, :key, :label, :per, :count, :pool, 
   end
 
   # Pools that refill at 0d: how many times before the use resets (nil: no
-  # refill; Float::INFINITY for always).
+  # refill; Float::INFINITY for always). `push` refills only when you push
+  # yourself for the talent (the Vassal), never at 0d.
   def refills
-    refill == "always" ? Float::INFINITY : refill
+    case refill
+    when "always" then Float::INFINITY
+    when Integer then refill
+    end
   end
 
   def per_scene?

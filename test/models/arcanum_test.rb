@@ -109,8 +109,8 @@ class ArcanumTest < ActiveSupport::TestCase
     grants = @tibbs.arcana_grants.map { |grant, held| [ grant.to_s(@tibbs.level), held ] }
     assert_equal [ [ "2 minor arcana", 1 ], [ "1 major arcana", 0 ] ], grants
 
-    assert_equal "3 major arcana", Talent.find("infusion").arcana.sole.to_s(2)
-    assert Talent.find("infusion").arcana.sole.optional
+    assert_equal "4 major arcana", Talent.find("infusion").arcana.sole.to_s(2)
+    assert_not Talent.find("infusion").arcana.sole.optional
     assert Talent.find("magnum-opus").arcana.sole.opus
     assert_equal "1 major expendable arcana", Talent.find("trophies").arcana.sole.to_s
   end

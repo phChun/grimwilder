@@ -30,7 +30,7 @@ class TalentUseTest < ActiveSupport::TestCase
       end
       assert use.counter? && use.track.all?(Integer), use.id if use.track?
       assert use.pool?, "#{use.id}: only a pool refills" if use.refill
-      assert use.refill == "always" || use.refill.to_i.positive?, use.id if use.refill
+      assert use.refill.in?(%w[ always push ]) || use.refill.to_i.positive?, use.id if use.refill
     end
     assert_equal uses.map(&:id).uniq, uses.map(&:id)
   end

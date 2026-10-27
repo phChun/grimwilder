@@ -32,17 +32,18 @@
   tagline: You shape the world with your creations, blending ingenuity, craftsmanship, and magic to forge and enchant wonders.
   core:
     name: Infusion
-    summary: "Your path talents are magitech gizmos you built, and can rebuild or teach others to use."
-    text: 'You can reflavor any of your path talents to actually be the effects of magical gizmos you’ve created. Toss in some magitech buzzwords that almost make sense, and use them to sound like you know what you’re talking about—perfect for baffling the less inventive. You can teach others to use them, though doing so always carries risk. If any of these gizmos is ever lost, you can recreate them with some effort during any downtime.
-
-
-      Everything Arcana (optional): You harness the power of creativity. You know 6 touchstones from the arcana crucibles (and all functions), and have created 2 major arcana using them. Anyone can use them with the most relevant stat (as arcana), though it always carries risk for those other than you. Given time, you can: rebuild them using any other touchstones you know—pull off a potent feat of mechanical ingenuity. You can push yourself to do it on the spot.
+    summary: "You know 6 touchstones and built 3 major arcana anyone can use; rebuild them given time."
+    text: 'You harness the power of creativity. You know 6 touchstones from the arcana crucibles (and all functions), and have created 3 major arcana using them. Anyone can use them with the most relevant stat (as arcana), though it always carries risk for those other than you. Given time, you can: disassemble and rebuild them using any touchstones you know—pull off a potent feat of mechanical ingenuity. You can push yourself to do it on the spot.
 
 
       Engineer: Take +1d at creating, repairing, or destroying mechanisms and arcana. You can also deconstruct arcana to learn their touchstones, destroying them in the process.
 
 
+      Everything Arcana (optional): You can reflavor any of your path talents to actually be the effects of magical gizmos you’ve created. Toss in some magitech buzzwords that almost make sense, and use them to sound like you know what you’re talking about—perfect for baffling the less inventive. You can teach others to use them, though doing so always carries risk. If any of these gizmos is ever lost, you can recreate them with some effort during any downtime.
+
+
       GROWTH: At levels 2, 4, and 6, you can create +1 major arcana, and learn 2 touchstones.'
+    note: Arcana doesn’t regain uses when rebuilt, but those that expand vantage can still do so.
     page: 55
     bonuses:
     - { key: engineer, label: "Engineer: making, fixing or breaking a mechanism or arcana" }
@@ -53,10 +54,9 @@
       pick: 6
       growth: { 2: 2, 4: 2, 6: 2 }
       open: true
-      optional: true
       crucible: arcana
     arcana:
-    - { tier: major, count: 2, growth: { 2: 1, 4: 1, 6: 1 }, optional: true }
+    - { tier: major, count: 3, growth: { 2: 1, 4: 1, 6: 1 } }
   talents:
   - name: Animate Objects
     summary: "Given time, bring objects to life as a 2d power pool that follows one-word commands."
@@ -632,8 +632,8 @@
   talents:
   - name: Echo
     summary: "Once a session, create a 3d duplicate of yourself to assist you or swap places."
-    text: 'Once per session, you can create a duplicate as a 3d power pool. It is a second version of you, acting as you with shared knowledge, ability, and resources. You can drop 1d of its pool to have it: assist you—trade places with you.'
-    note: This isn’t an interrupt, if you’re targeted by an impact move, it’s too late to switch.
+    text: 'Once per session, you can create a duplicate as a 3d power pool. It is a second version of you, acting as you with shared knowledge, ability, and resources. You can roll 1d of its pool to have it: assist you—trade places with you.'
+    note: This isn’t an interrupt, if you’re targeted by an impact move, it’s too late to switch. Harm isn’t shared. If they’re targeted, roll the pool (power pools, pg. 20).
     page: 72
     makes:
     - { key: echo, label: Echo, pool: 3, use: echo, lasts: session }
@@ -652,12 +652,12 @@
     uses:
     - { key: foresight, label: Foresight, count: 1, per: session }
   - name: Psychic Warrior
-    summary: "Forge willpower weapons used with Wits; +1d to follow up when you take vex or instability."
-    text: 'You’re able to turn your psychic volatility against others. You can freely create weapons made from pure willpower, using them with Wits. You take +1d to follow up with them when you: take vex—increase your instability.'
+    summary: "Forge willpower weapons used with Wits; +1d to follow up after vex, rattled or instability."
+    text: 'You’re able to turn your psychic volatility against others. You can freely create weapons made from pure willpower, using them with Wits. You take +1d to follow up with them when you: take vex or rattled—increase your instability.'
     note: This talent can be poached by any spellcaster. Flavor the weapons with your magical trappings.
     page: 72
     bonuses:
-    - { key: follow-up, label: "Following up with a psychic weapon after taking vex or instability" }
+    - { key: follow-up, label: "Following up with a psychic weapon after taking vex, rattled or instability" }
   - name: Shift Form
     summary: "A 2d Shifter resource pool each session to alter your features and form."
     text: Each session, you have a 2d Shifter resource pool. You can roll the pool to alter your features and appearance, though you keep the same basic shape.
@@ -685,20 +685,19 @@
   tagline: You stalk relentlessly, moving unseen through the terrain, tracking your prey with deadly precision and striking them when they're weakest.
   core:
     name: Quarry
-    summary: "Twice a session, mark a quarry: a 2d pool of bonus dice for anyone hunting or fighting it."
-    text: 'Twice per session, you can designate a target as your Quarry—the focus of your hunt. Until the end of the session, you have a 2d Quarry pool rolled as bonus dice to research or locate them, and when anyone attacks or defends against them. When a Quarry die rolls a ''6'', that PC takes spark. Prowler: You take +1d when using stealth, traversal, and traps in familiar terrain.
+    summary: "Once a session, choose a quarry: anyone researching, locating or attacking it adds your quarry die."
+    text: 'Once per session, you can choose a foe as your Quarry—the focus of your hunt. You have a Quarry die, a special d6. When you or an ally attempts to research, locate, or attack your quarry, add your quarry die to the roll. If a quarry die rolls a ‘6’, you can add a critical effect. Survivalist: You take +1d when scouting, wrangling animals, placing traps, and on defense rolls against environmental hazards.
 
 
-      GROWTH: At levels 3 and 6, gain +1d to your Quarry pool.'
+      GROWTH: At levels 3 and 6, choose +1 Quarry per session.'
     page: 73
     state: quarries
     follow_ups:
-    - { key: quarry, kind: bonus, label: "Roll Quarry: it's against your quarry", pool: quarry, who: anyone, rolls: [ action, defense, story ], spark: six }
+    - { key: quarry, kind: bonus, label: "Add your quarry die: it's against your quarry", dice: 1, who: anyone, rolls: [ action ], six: critical_effect, needs: quarries }
     bonuses:
-    - { key: prowler, label: "Prowler: stealth, traversal or traps in familiar terrain" }
+    - { key: survivalist, label: "Survivalist: scouting, wrangling animals, placing traps, or defending against environmental hazards" }
     uses:
-    - { key: designations, label: Quarry designations, count: 2, per: session }
-    - { key: quarry, label: Quarry, pool: 2, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
+    - { key: designations, label: Quarry designations, count: 1, per: session, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Animal Companion
     summary: "A loyal animal with 3 tricks (rolled at 3d), 2 flaws and a bond with each PC."
@@ -728,7 +727,7 @@
     page: 74
   - name: Scout Ahead
     summary: "+1 thread a session; spend it to flash back to scouting ahead, with a 3d montage roll."
-    text: 'You gain 1 thread per session and can spend thread to flashback to scouting ahead and: sabotage something—set a trap—survey the area (ask 2 questions)—take out a danger—set up an interrupt. Make a 3d montage roll. The GM always takes suspense in place of an impact move.'
+    text: 'You gain 1 thread per session and can spend thread to flashback to scouting ahead and: find an escape route—sabotage something—set a trap—survey the area (ask 2 questions)—take out a danger. Make a 3d montage roll. The GM always takes suspense in place of an impact move.'
     page: 74
     rolls:
     - { kind: montage, label: "Flashback: scouting ahead", thread: 1, bonus: 1 }
@@ -759,15 +758,13 @@
   tagline: You live and operate in the margins, striking unseen and disappearing before anyone knows you were there.
   core:
     name: Expertise
-    summary: "+1d with 3 chosen skills, and a 4d Competence pool each session for bonus dice."
-    text: 'Choose three skills below as your skill set. Take +1d when using a chosen skill. Each session, you have a 4d Competence pool to represent your focus under pressure. You can roll it as bonus dice after any of the chosen skills. Above board: blend in—charm—investigate—negotiate—network—parkour. Below table: ambush—deception—dismantle—provoke—sleight of hand—stealth.
+    summary: "+1d with 3 chosen skills, and 2 Competence a session to spend on potent feats with them."
+    text: 'Choose three skills below as your skill set. Take +1d when using a chosen skill. Each session, you have 2 Competence to represent your focus under pressure. You can spend 1 to pull off a potent feat within your skill set. Above board: blend in—charm—investigate—negotiate—network—parkour. Below table: ambush—deception—dismantle—provoke—sleight of hand—stealth.
 
 
-      GROWTH: At levels 3 and 6, gain +1d Competence per session and +1 skill.'
+      GROWTH: At levels 3 and 6, gain +1 Competence per session and +1 skill.'
     page: 75
     crucible: criminal_history
-    follow_ups:
-    - { key: competence, kind: bonus, label: "Roll Competence as bonus dice", pool: competence, after: expertise/skill }
     bonuses:
     - { key: skill, label: "Using a chosen skill", choice: skills }
     choices:
@@ -794,7 +791,7 @@
     - { key: guild, label: Thieves guild, noun: guild trait, pick: 2, optional: true, from_list: thieves_guild }
     - { key: guild-isnt, label: But the guild isn't, noun: guild trait, pick: 1, optional: true, from_list: thieves_guild }
     uses:
-    - { key: competence, label: Competence, pool: 4, pool_kind: power, per: session, bonus_dice: true, growth: { 3: 1, 6: 1 } }
+    - { key: competence, label: Competence, count: 2, per: session, growth: { 3: 1, 6: 1 } }
   talents:
   - name: Eldritch Affinity
     summary: "Sorcery-style spellcasting with Presence and 3 sources or techniques, never potent."
@@ -930,11 +927,11 @@
     uses:
     - { key: wisps, label: Wisps, count: 2, per: session }
   - name: Wrath
-    summary: "When an ally is hurt or dropped, +1d and potency on your next spell if you lash out."
-    text: When a nearby ally takes harm or is dropped, you take +1d and potency on your next spell, if you immediately lash out.
+    summary: "When an ally is hurt or dropped, +1d and potency on your next action if you lash out."
+    text: When a nearby ally takes harm or is dropped, you take +1d and potency on your next action, if you immediately lash out.
     page: 78
     bonuses:
-    - { key: wrath, label: "Lashing out with a spell after a nearby ally took harm or dropped" }
+    - { key: wrath, label: "Lashing out after a nearby ally took harm or dropped" }
 - key: summoner
   name: Summoner
   kind: path
@@ -943,24 +940,27 @@
   tagline: You can create creatures from the essence of other planes to protect yourself and bring ruin to your enemies.
   core:
     name: Vassal
-    summary: "Call and direct a creature from another plane: a 4d power pool with 1 aspect."
-    text: 'VASSAL Core Talent You have a connection with a creature from another plane, and are able to call upon and direct it with a 4d power pool. The pool returns to its max once at 0d, or when you push yourself. It has 1 aspect, a strange trait defining it such as: big enough to ride—telepathic—a thematic path talent. It can take 1 mark and 1 harm, with any more breaking the anchors holding it here. Make a 2d story roll to see the fallout before it disappears. You can resummon it every scene.
+    summary: "Call and direct a creature from another plane: a 4d power pool with 2 aspects."
+    text: 'You have a connection with a creature from another plane, and are able to call upon and direct it with a 4d power pool, representing your connection. You can push yourself to return the pool to its max. It has 2 aspects, strange traits defining it such as: big enough to ride—telepathic—a thematic path talent. It can take 1 mark and 1 harm, with any more breaking the anchors holding it here. Make a 2d story roll to see the fallout before it disappears. You can resummon it every scene, and take +1d when performing summoning rituals.
 
 
-      GROWTH: At levels 3 and 6, you gain +1 aspect.'
+      GROWTH: At levels 3 and 6, you gain +1 aspect, and +1d to the power pool.'
+    note: 'Your spark and thread are shared. Fallout: there are often consequences to the magic anchoring your vassal to this plane breaking. Consider your summon, and what form that could take beforehand. Demons may require immediate payment for their service, vassals from elemental planes could bring forth raging fire or a tidal wave, while bestial creatures could go berserk. On a perfect, you avoid the trouble.'
     page: 79
     crucible: vassal
     choices:
     - key: aspects
       label: Aspects
-      pick: 1
+      pick: 2
       growth: { 3: 1, 6: 1 }
       open: true
       from: [big enough to ride, telepathic, a thematic path talent]
+    bonuses:
+    - { key: rituals, label: "Performing a summoning ritual" }
     rolls:
     - { kind: story, odds: 2, label: The anchors break }
     uses:
-    - { key: vassal, label: Vassal, pool: 4, pool_kind: power, per: scene, refill: 1 }
+    - { key: vassal, label: Vassal, pool: 4, pool_kind: power, per: scene, refill: push, growth: { 3: 1, 6: 1 } }
     - { key: damage, label: Vassal damage, names: [ Mark, Harm ], verb: mark, per: scene }
   talents:
   - name: Binding Word
@@ -1000,7 +1000,7 @@
     page: 80
   - name: Monster Menagerie
     summary: "Bonds with 3 creatures, each with its own aspects; choose which answers your summons."
-    text: You have a bond with 3 different creatures, all with their own aspects. When you summon a vassal, you can choose which answers the call. [Summoner Only]
+    text: You have a bond with 3 different creatures, all with their own aspects, though you still summon one at a time. When you summon a vassal, you can choose which answers the call. [Summoner Only]
     page: 80
     choices:
     - { key: creatures, label: Creatures, noun: creature, pick: 3, open: true }
@@ -1151,17 +1151,12 @@
     text: 'When given time, you can stare into someone’s eyes and learn: the price of their loyalty—their biggest fear—their greatest desire—their next move—what they’re hiding—whom they serve. This gaze only works on someone once. You can push yourself to do this on the spot.'
     page: 84
   - name: Magus
-    summary: "Your weapon is a touchstone with a magical style; push for a secondary effect on a perfect."
-    text: 'You weave blade and magic together. You can use your weapon as a touchstone, and add a magical weapon style, such as: flaming—returning—seeking. On a perfect with this weapon, you can push yourself to add a secondary effect based on the magical style. Given time, you can change the style.'
+    summary: "Once a session, enchant your weapon with a trait; end the enchantment for a potent effect."
+    text: 'You weave blade and magic together. Once per session, you can enchant your weapon, giving it a trait such as: flaming—pulverizing—seeking. While using it, you can end the enchantment to produce a potent effect with it. You can add your weapon as a touchstone on spells.'
     page: 84
-    choices:
-    - key: style
-      label: Magical weapon style
-      noun: style
-      pick: 1
-      open: true
-      touchstone: true
-      from: [flaming, returning, seeking]
+    state: enchantment
+    uses:
+    - { key: enchant, label: Enchant weapon, count: 1, per: session }
   - name: Otherworldly Form
     summary: "Turn into a floating, dispersed form with three abilities you choose."
     text: 'You can turn into a floating, dispersed form, flavored after your patron’s trappings. Choose three things you can do in this form: appear barely visible—fly high in the sky—interact with objects—move swiftly—slip through small gaps—speak.'
@@ -1268,11 +1263,11 @@
     uses:
     - { key: soothsayer, label: Tag a spirit, count: 1, per: session }
   - name: Wonder Magnet
-    summary: "Your spells can surge wildly, with a 3d story roll for the result; spark on a perfect."
-    text: You can cause wild surges when spellcasting, as the magical twist in Sorcery. When it triggers, make a 3d story roll for the results. On a perfect, take spark. When strange things happen, they happen to you.
+    summary: "Any action can surge wildly, with a 3d story roll for the result; spark on a perfect."
+    text: You can cause wild surges on any action, as the magical twist in Sorcery. When it triggers, make a 3d story roll for the results. On a perfect, take spark. When strange things happen, they happen to you.
     page: 86
     bonuses:
-    - { key: cast, label: "Casting a spell: two or more 1s, thorns included, cause a wild surge", dice: 0, cast: true }
+    - { key: cast, label: "Any action: two or more 1s, thorns included, cause a wild surge", dice: 0, cast: true }
     rolls:
     - { kind: story, odds: 3, label: The wild surge }
   - name: Herbalism

@@ -1,7 +1,9 @@
-# Moves saved characters from Preview 5.2 to Preview 6 (docs/design/p6-update,
-# Phase 2): According to Plan became Mastermind, and Expertise's skill list
-# was rewritten. Run once by a migration; running it again changes nothing.
-# Roll history keeps the old names: each roll stored its talents' names.
+# Moves saved characters from Preview 5.2 to Preview 6 (docs/design/p6-update).
+# Phase 2 (`run!`): According to Plan became Mastermind, and Expertise's skill
+# list was rewritten. Phase 3 (`run_mechanics!`): Competence and the Quarry
+# pool are no longer pools, and Magus enchants instead of picking a style.
+# Each is run once by a migration; running one again changes nothing. Roll
+# history keeps the old names: each roll stored its talents' names.
 module Grimwild::P6Update
   TALENT_KEYS = { "according-to-plan" => "mastermind" }.freeze
   OLD_NAMES = { "according-to-plan" => "According to Plan" }.freeze
@@ -16,10 +18,45 @@ module Grimwild::P6Update
   # Choices that pick from Expertise's skills (Natural Moxie's are the same list).
   SKILL_CHOICES = { "expertise" => "skills", "natural-moxie" => "skills" }.freeze
 
+  # Talent pools Preview 6 turned into something else, with the log's word on it.
+  GONE_POOLS = {
+    "expertise/competence" => "Competence is now 2 points a session to spend on potent feats",
+    "quarry/quarry" => "Quarry is now a quarry die anyone adds against the quarry"
+  }.freeze
+
   module_function
 
   def run!
     Character.find_each { update!(_1) }
+  end
+
+  def run_mechanics!
+    Character.find_each { update_mechanics!(_1) }
+  end
+
+  def update_mechanics!(character)
+    notes = []
+    changes = {}
+
+    gone = GONE_POOLS.keys & (character.talent_uses.keys + Pool.where(character_id: character.id, made_by_talent: false).pluck(:use_key))
+    if gone.any?
+      changes["talent_uses"] = character.talent_uses.except(*gone)
+      notes += gone.map { "#{GONE_POOLS[_1]} (Preview 6)." }
+    end
+
+    if (style = character.talent_choices.dig("magus", "style")&.first)
+      changes["talent_choices"] = character.talent_choices.except("magus")
+      changes["talents"] = [ character.talents.presence, "Magus: your weapon's magical style was #{style}." ].compact.join("\n\n")
+      notes << "Magus now enchants the weapon once a session (Preview 6); its old style, #{style}, is in the talent notes."
+    end
+
+    return if changes.empty?
+
+    Character.transaction do
+      character.update_columns(changes)
+      Pool.where(character_id: character.id, made_by_talent: false, use_key: gone).destroy_all
+      Roll.note!(campaign: character.campaign, by: character.identity, character: character, text: notes.join(" ")) if character.campaign
+    end
   end
 
   def update!(character)

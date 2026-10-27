@@ -175,7 +175,7 @@ module RollsHelper
 
   def follow_up_button(actor, follow_up)
     case follow_up.kind
-    when "bonus" then "Roll #{actor.talent_pools.find_by(use_key: follow_up.pool_id)&.size}d"
+    when "bonus" then "Roll #{follow_up.dice || actor.talent_pools.find_by(use_key: follow_up.pool_id)&.size}d"
     when "reroll" then "Re-roll"
     when "assist" then "Assist with 1d"
     when "omen" then "Swap"
@@ -194,7 +194,7 @@ module RollsHelper
   def follow_up_line(entry)
     whose = "#{entry["by"]}'s #{entry["talent"]}"
     line = case entry["kind"]
-    when "bonus" then "#{whose} +#{entry["pool_dice"].size}d (#{entry["pool_dice"].join(", ")})"
+    when "bonus" then "#{whose} +#{entry["pool_dice"].size}d (#{entry["pool_dice"].join(", ")})#{": a 6, so add a critical effect" if entry["critical_effect"]}"
     when "reroll" then "#{whose} re-rolled it without thorns (it was #{entry["was"].join(", ")})"
     when "raise" then "#{whose} raised a #{entry["from"]} to #{entry["to"]}"
     when "assist" then "#{entry["by"]} assisted after the roll with #{entry["talent"]} (#{entry["die"]})"

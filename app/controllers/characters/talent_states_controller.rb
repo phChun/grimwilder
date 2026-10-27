@@ -1,6 +1,6 @@
 # What a talent keeps between rolls (Character::TalentState), from its card:
 # Herbalism's herb names, Quarry's designations, entering and leaving a
-# frenzy. The owner changes it.
+# frenzy, Magus's enchantment. The owner changes it.
 class Characters::TalentStatesController < ApplicationController
   include CharacterScoped
 
@@ -12,6 +12,8 @@ class Characters::TalentStatesController < ApplicationController
     when "quarry" then @character.designate_quarry!(params[:name], by: Current.identity)
     when "frenzy" then @character.enter_frenzy!(by: Current.identity, free: params[:free] == "1")
     when "calm" then @character.leave_frenzy!(by: Current.identity)
+    when "enchant" then @character.enchant_weapon!(params[:trait], by: Current.identity)
+    when "disenchant" then @character.end_enchantment!(by: Current.identity)
     else raise ArgumentError, "That's not something #{@character.short_name}'s talents keep track of."
     end
     @character.campaign&.broadcast_table_refresh

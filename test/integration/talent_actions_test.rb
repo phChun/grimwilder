@@ -17,7 +17,7 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     assert_select "#talents > .talent-card--core#talent-expertise" do
       assert_select ".talent-card__source", /Core talent · Rogue/
       assert_select ".talent-card__growth", /At levels 3 and 6/
-      assert_select ".talent-kind--pool", "Pool"
+      assert_select ".talent-kind--uses", "Uses" # Competence: 2 points a session
     end
     assert_select "#talent-mastermind" do
       assert_select ".talent-kind--roll", "Roll"
@@ -49,5 +49,21 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     assert_select ".talent-card__push", 0
     post character_talent_roll_path(@tibbs, "mastermind"), params: { index: 0 }
     assert_response :not_found
+  end
+
+  test "Magus: enchant the weapon from its card, then end it for a potent effect" do
+    @tibbs.update!(path: "Warlock", talent_keys: %w[ magus lurker ])
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+    assert_select "#talent-magus datalist#enchant-traits option[value=Pulverizing]"
+
+    patch character_talent_state_path(@tibbs, "magus"), params: { change: "enchant", trait: "Seeking" }
+    assert_redirected_to character_path(@tibbs, anchor: "talent-magus")
+    follow_redirect!
+    assert_select "#talent-magus .talent-state__on", "Seeking"
+
+    patch character_talent_state_path(@tibbs, "magus"), params: { change: "disenchant" }
+    follow_redirect!
+    assert_select "#talent-magus .use-tracker__resets", "not enchanted"
   end
 end

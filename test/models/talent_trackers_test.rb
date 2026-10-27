@@ -58,7 +58,7 @@ class TalentTrackersTest < ActiveSupport::TestCase
     assert_equal 0, @tibbs.track_thorns(use("instability"))
   end
 
-  test "Pact's Patience never refills with a session, and comes back at 0d; the Vassal's once" do
+  test "Pact's Patience never refills with a session, and comes back at 0d; the Vassal only when you push" do
     @tibbs.update!(path: "Warlock", talent_keys: [])
     @tibbs.refresh_talent_pools!(per: :session)
     patience = @tibbs.talent_pools.sole
@@ -73,8 +73,9 @@ class TalentTrackersTest < ActiveSupport::TestCase
     @tibbs.update!(path: "Summoner")
     @tibbs.refresh_talent_pools!(per: :session)
     vassal = @tibbs.talent_pools.find_by!(use_key: "vassal/vassal")
-    2.times { vassal.update!(size: 1) && vassal.roll!(by: @pip, random: FixedDice.new([ 1 ])) }
-    assert_equal [ 0, 1 ], [ vassal.reload.size, vassal.refills_used ], "once, then it stays at 0d"
+    vassal.update!(size: 1)
+    vassal.roll!(by: @pip, random: FixedDice.new([ 1 ]))
+    assert_equal [ 0, 0 ], [ vassal.reload.size, vassal.refills_used ], "it stays at 0d"
     @tibbs.push!("brawn", talent_key: "vassal", by: @pip)
     assert_equal 4, vassal.reload.size, "pushing yourself brings it back"
   end
@@ -128,12 +129,30 @@ class TalentTrackersTest < ActiveSupport::TestCase
     assert_equal %w[ moonwort gallowsbane ], @tibbs.herbs
 
     @tibbs.designate_quarry!("The Grey Wolf", by: @pip)
-    @tibbs.designate_quarry!("Mother Ash", by: @pip)
-    assert_equal [ "The Grey Wolf", "Mother Ash" ], @tibbs.quarries
-    assert_raises(ArgumentError) { @tibbs.designate_quarry!("A third", by: @pip) }
+    assert_equal [ "The Grey Wolf" ], @tibbs.quarries
+    assert_raises(ArgumentError) { @tibbs.designate_quarry!("Mother Ash", by: @pip) } # one a session until level 3
 
     @tibbs.start_session!
     assert_empty @tibbs.herbs + @tibbs.quarries
+  end
+
+  test "Magus enchants the weapon once a session, and ends it for a potent effect" do
+    @tibbs.update!(path: "Warlock", level: 2, talent_keys: [ "magus", "lucky" ])
+    @tibbs.enchant_weapon!(" Flaming ", by: @pip)
+    assert_equal "flaming", @tibbs.enchantment
+    assert_equal "#{@tibbs.short_name} enchants their weapon: flaming.", @campaign.rolls.note.last.question
+
+    @tibbs.end_enchantment!(by: @pip)
+    assert_nil @tibbs.enchantment
+    assert_match "ends the flaming enchantment for a potent effect", @campaign.rolls.note.last.question
+    assert_raises(ArgumentError) { @tibbs.enchant_weapon!("seeking", by: @pip) } # once a session
+  end
+
+  test "the Vassal: 2 aspects to start, and its pool grows at levels 3 and 6" do
+    vassal = Talent.find("vassal")
+    assert_equal [ 2, 3, 4 ], [ 1, 3, 6 ].map { vassal.choice("aspects").slots_at(_1) }
+    pool = vassal.uses.find { _1.key == "vassal" }
+    assert_equal [ 4, 5, 6 ], [ 1, 3, 6 ].map { pool.pool_at(_1) }
   end
 
   test "smite drops 1d from a task pool just rolled, 1-for-1" do
