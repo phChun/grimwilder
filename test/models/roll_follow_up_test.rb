@@ -27,7 +27,7 @@ class RollFollowUpTest < ActiveSupport::TestCase
   end
 
   test "Competence: bonus dice after a chosen skill, rolled from its pool" do
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm ])
     @tibbs.refresh_talent_pools!(per: :session)
     plain = @tibbs.roll!("wits", by: @pip, random: FixedDice.new([ 2, 3 ]))
     assert_empty plain.follow_ups_for([ @tibbs ]), "only after a roll that took the skill"

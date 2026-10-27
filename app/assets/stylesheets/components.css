@@ -2540,6 +2540,7 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .talent-choice__group-name { flex-basis: 100%; margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
 .talent-choice__option { min-height: var(--tap); flex: 0 1 12rem; }
 .talent-choice__option:has(input:disabled) { opacity: 0.5; cursor: default; }
+.talent-choice__hint { display: block; font-size: 13px; color: var(--dim); }
 .talent-choice__boxes { display: flex; flex-direction: column; gap: var(--space-2); }
 .talent-choice__box { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .talent-choice__box > .field__input { flex: 1 1 12rem; min-width: 0; }

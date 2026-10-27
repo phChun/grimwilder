@@ -50,7 +50,7 @@ class TablesTest < ActionDispatch::IntegrationTest
 
     assert_select ".party-card a[href=?]", character_path(characters(:tibbs)), characters(:tibbs).name
     assert_select ".party-card__harm", "Bloodied · Agility marked · 4d poisoned"
-    assert_select ".party-card__currency", "Spark 1 · Thread 3" # According to Plan: 3 thread a session
+    assert_select ".party-card__currency", "Spark 1 · Thread 3" # Mastermind: 3 thread a session
     assert_select ".party-card--empty .party-card__name", "Stranger"
     assert_select ".party-card--empty .party-card__meta", "Making a character"
   end

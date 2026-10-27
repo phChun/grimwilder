@@ -11,7 +11,7 @@ class CharacterTalentUsesTest < ActiveSupport::TestCase
     assert_equal [ "weapon-mastery/mastery" ], @ash.use_counters.map(&:id)
     assert_equal [ "bulwark/bulwark" ], @ash.pool_uses.map(&:id)
     assert_equal 0, @ash.talent_thread
-    assert_equal 1, characters(:tibbs).talent_thread, "According to Plan"
+    assert_equal 1, characters(:tibbs).talent_thread, "Mastermind"
   end
 
   test "spending ticks uses, within what the level allows" do

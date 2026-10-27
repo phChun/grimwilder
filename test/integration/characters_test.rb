@@ -178,12 +178,12 @@ class CharactersTest < ActionDispatch::IntegrationTest
 
   test "talents that fit a stat are ticks in its setup, and the log names them" do
     @tibbs.update!(talent_keys: [ "lightning-reflexes" ])
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel stealth ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm stealth ])
     sign_in_as identities(:pip)
 
     get character_path(@tibbs)
     assert_select "#roll_agility_bonus_expertise-skill[value='expertise/skill'][data-dice='1']", 1
-    assert_select ".stat-roll__talent", text: /Using a chosen skill \(Duel, Stealth\)/
+    assert_select ".stat-roll__talent", text: /Using a chosen skill \(Charm, Stealth\)/
     assert_select ".stat-roll__talent--auto[data-defense-only=true]", text: /Lightning Reflexes/, count: 1
 
     post character_rolls_path(@tibbs), params: { stat: "agility", mode: "action", dice: 3, total_thorns: 0, bonuses: [ "expertise/skill" ] }

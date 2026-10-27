@@ -5,7 +5,7 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
   setup do
     @campaign = campaigns(:bramblewood)
     @tibbs = characters(:tibbs)
-    @tibbs.update!(level: 2, talent_keys: %w[ according-to-plan lurker ])
+    @tibbs.update!(level: 2, talent_keys: %w[ mastermind lurker ])
   end
 
   test "the core talent leads, every card says what it is, and the owner gets its actions" do
@@ -19,9 +19,9 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
       assert_select ".talent-card__growth", /At levels 3 and 6/
       assert_select ".talent-kind--pool", "Pool"
     end
-    assert_select "#talent-according-to-plan" do
+    assert_select "#talent-mastermind" do
       assert_select ".talent-kind--roll", "Roll"
-      assert_select "form[action=?] button.talent-card__roll", character_talent_roll_path(@tibbs, "according-to-plan"), /Flashback: the plan\s+2d montage · spends 1 thread/
+      assert_select "form[action=?] button.talent-card__roll", character_talent_roll_path(@tibbs, "mastermind"), /Flashback: the preparation\s+3d montage · spends 1 thread/
       assert_select ".talent-card__menu button", text: "Remove talent"
     end
     assert_select "#talent-lurker .talent-card__push" do
@@ -30,8 +30,8 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     end
     assert_select "#talent-expertise .talent-card__menu button", text: "Remove talent", count: 0
 
-    post character_talent_roll_path(@tibbs, "according-to-plan"), params: { index: 0 }
-    assert_redirected_to character_path(@tibbs, anchor: "talent-according-to-plan")
+    post character_talent_roll_path(@tibbs, "mastermind"), params: { index: 0 }
+    assert_redirected_to character_path(@tibbs, anchor: "talent-mastermind")
     assert @campaign.roll_calls.open.sole.montage?
 
     post character_talent_push_path(@tibbs, "lurker"), params: { stat: "wits" }
@@ -44,10 +44,10 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get character_path(@tibbs)
 
-    assert_select "#talent-according-to-plan .talent-kind--roll"
+    assert_select "#talent-mastermind .talent-kind--roll"
     assert_select ".talent-card__roll", 0
     assert_select ".talent-card__push", 0
-    post character_talent_roll_path(@tibbs, "according-to-plan"), params: { index: 0 }
+    post character_talent_roll_path(@tibbs, "mastermind"), params: { index: 0 }
     assert_response :not_found
   end
 end

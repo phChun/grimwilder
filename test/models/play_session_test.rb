@@ -6,7 +6,7 @@ class PlaySessionTest < ActiveSupport::TestCase
     @tibbs, @bram = characters(:tibbs), characters(:bram)
   end
 
-  test "session 1 resets thread (2, +1 from According to Plan), but gives no spark or suspense" do
+  test "session 1 resets thread (2, +1 from Mastermind), but gives no spark or suspense" do
     @tibbs.update!(thread: 0)
 
     session = PlaySession.start!(@campaign, characters: [ @tibbs ], recap: "ignored on session 1", by: identities(:gwen))
@@ -22,7 +22,7 @@ class PlaySessionTest < ActiveSupport::TestCase
 
     session = PlaySession.start!(@campaign, characters: [ @tibbs, @bram ], recap: "The bridge burned.", by: identities(:gwen))
     assert_equal [ 2, "The bridge burned." ], [ session.number, session.recap ]
-    assert_equal [ 3, 2 ], [ @tibbs.reload.thread, @tibbs.spark ], "According to Plan: +1 thread"
+    assert_equal [ 3, 2 ], [ @tibbs.reload.thread, @tibbs.spark ], "Mastermind: +1 thread"
     assert_equal 2, @bram.reload.spark, "already at the cap"
     assert_equal 1, @campaign.reload.suspense
   end

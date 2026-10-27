@@ -222,7 +222,7 @@ class CharacterTalentsTest < ActiveSupport::TestCase
 
   test "core talent comes from the path, chosen talents from the catalog" do
     assert_equal "Expertise", @tibbs.core_talent_entry.name
-    assert_equal [ "According to Plan" ], @tibbs.chosen_talents.map(&:name)
+    assert_equal [ "Mastermind" ], @tibbs.chosen_talents.map(&:name)
     assert_equal 0, @tibbs.talents_to_choose
 
     @tibbs.update!(level: 2)
@@ -233,16 +233,16 @@ class CharacterTalentsTest < ActiveSupport::TestCase
     @tibbs.update!(level: 2)
     @tibbs.add_talent!("lucky")
     @tibbs.add_talent!("lucky")
-    assert_equal %w[according-to-plan lucky], @tibbs.reload.talent_keys
+    assert_equal %w[mastermind lucky], @tibbs.reload.talent_keys
 
     @tibbs.remove_talent!("lucky")
-    assert_equal %w[according-to-plan], @tibbs.reload.talent_keys
+    assert_equal %w[mastermind], @tibbs.reload.talent_keys
   end
 
   test "one chosen talent per level, from any path" do
     assert @tibbs.talents_full?
     assert_raises(ActiveRecord::RecordInvalid) { @tibbs.add_talent!("lucky") }
-    assert_equal %w[according-to-plan], @tibbs.reload.talent_keys
+    assert_equal %w[mastermind], @tibbs.reload.talent_keys
 
     @tibbs.update!(level: 2)
     @tibbs.add_talent!("bulwark")
@@ -254,7 +254,7 @@ class CharacterTalentsTest < ActiveSupport::TestCase
   end
 
   test "a sheet already over the limit still saves other changes, and says so" do
-    @tibbs.update_columns(talent_keys: %w[according-to-plan lucky])
+    @tibbs.update_columns(talent_keys: %w[mastermind lucky])
     assert_equal 1, @tibbs.extra_talents
     @tibbs.update!(spark: 2)
 

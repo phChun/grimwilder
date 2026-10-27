@@ -101,6 +101,7 @@ class TalentChoiceTest < ActiveSupport::TestCase
         assert_includes tables, choice.table, choice.id if choice.table
       end
       assert choice.open?, "#{choice.id}: a school goes with a theorem the player names" if choice.school?
+      assert_empty choice.hints.keys - choice.options, "#{choice.id} has hints for options it doesn't list"
     end
 
     Talent.all.each do |talent|

@@ -16,6 +16,7 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name='picks[skills][]']", 12
     assert_select "input[type=checkbox][value=stealth][checked]"
     assert_select ".talent-choice__count", "1 of 3"
+    assert_select ".talent-choice__option", text: /Charm\s*Persuade with personality\./
   end
 
   test "an open list is a type-or-pick box per slot" do
@@ -29,10 +30,10 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
 
   test "the owner saves picks and goes back to the talent" do
     sign_in_as identities(:pip)
-    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: [ "", "Duel", "stealth" ] } }
+    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: [ "", "Charm", "stealth" ] } }
 
     assert_redirected_to character_path(@tibbs, anchor: "talent-expertise")
-    assert_equal %w[ duel stealth ], @tibbs.reload.talent_choices.dig("expertise", "skills")
+    assert_equal %w[ charm stealth ], @tibbs.reload.talent_choices.dig("expertise", "skills")
 
     patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: [ "" ] } }
     assert_empty @tibbs.reload.talent_choices, "unticking every box clears them"
@@ -40,7 +41,7 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
 
   test "a bad pick shows the form again with what went wrong" do
     sign_in_as identities(:pip)
-    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: %w[ duel evade lying stealth ] } }
+    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: %w[ charm parkour deception stealth ] } }
 
     assert_response :unprocessable_entity
     assert_select ".form-error", /room for 3 skills/
@@ -49,8 +50,8 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
 
   test "the GM can pick for a player's character; other players can't; strangers get a 404" do
     sign_in_as identities(:gwen)
-    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: %w[ track ] } }
-    assert_equal %w[ track ], @tibbs.reload.talent_choices.dig("expertise", "skills")
+    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: %w[ network ] } }
+    assert_equal %w[ network ], @tibbs.reload.talent_choices.dig("expertise", "skills")
 
     sign_out
     sign_in_as identities(:pip)
@@ -59,7 +60,7 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
 
     sign_out
     sign_in_as identities(:stranger)
-    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: %w[ duel ] } }
+    patch character_talent_choices_path(@tibbs, "expertise"), params: { picks: { skills: %w[ charm ] } }
     assert_response :not_found
   end
 
@@ -97,7 +98,7 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
 
   test "over the cap after a level drop, the card says so" do
     @tibbs.update!(level: 3, talent_keys: %w[ lucky wisps flight ])
-    @tibbs.choose_for_talent!("expertise", "skills" => %w[ duel evade lying stealth ])
+    @tibbs.choose_for_talent!("expertise", "skills" => %w[ charm parkour deception stealth ])
     @tibbs.update!(level: 1, talent_keys: %w[ lucky ])
 
     sign_in_as identities(:pip)

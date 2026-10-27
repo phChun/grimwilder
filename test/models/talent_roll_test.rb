@@ -22,7 +22,7 @@ class TalentRollTest < ActiveSupport::TestCase
     end
     assert_equal "3d story roll", Talent.find("pact").rolls.sole.dice_label
     assert_equal "3d montage", Talent.find("scout-ahead").rolls.sole.dice_label
-    assert_equal "1 thread", Talent.find("according-to-plan").rolls.sole.cost
+    assert_equal "1 thread", Talent.find("mastermind").rolls.sole.cost
   end
 
   test "badges say what a talent does, and a core talent's growth stands on its own" do
@@ -36,24 +36,24 @@ class TalentRollTest < ActiveSupport::TestCase
   end
 
   test "a talent's roll is a roll call for the character, after spending what it asks" do
-    @tibbs.update!(talent_keys: [ "according-to-plan" ], thread: 2)
+    @tibbs.update!(talent_keys: [ "mastermind" ], thread: 2)
 
     assert_difference -> { @campaign.roll_calls.count }, 1 do
-      @tibbs.call_talent_roll!("according-to-plan", 0, by: identities(:pip))
+      @tibbs.call_talent_roll!("mastermind", 0, by: identities(:pip))
     end
     call = @campaign.roll_calls.last
     assert call.montage?
-    assert_equal "According to Plan: Flashback: the plan", call.question
+    assert_equal "Mastermind: Flashback: the preparation", call.question
     assert_equal 1, @tibbs.reload.thread
 
-    error = assert_raises(ArgumentError) { @tibbs.call_talent_roll!("according-to-plan", 0, by: identities(:pip)) }
+    error = assert_raises(ArgumentError) { @tibbs.call_talent_roll!("mastermind", 0, by: identities(:pip)) }
     assert_match "waiting", error.message
     assert_equal 1, @tibbs.reload.thread, "the thread comes back when the call can't be made"
   end
 
   test "a story roll at the talent's odds, ticking its use; a montage's extra dice" do
     pip = identities(:pip)
-    @tibbs.update!(level: 2, talent_keys: %w[ according-to-plan weasel ])
+    @tibbs.update!(level: 2, talent_keys: %w[ mastermind weasel ])
     @tibbs.call_talent_roll!("weasel", 0, by: pip)
     call = @campaign.roll_calls.last
     assert call.story?

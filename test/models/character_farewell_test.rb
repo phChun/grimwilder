@@ -32,7 +32,7 @@ class CharacterFarewellTest < ActiveSupport::TestCase
     assert_not pool.reload.rollable?
     assert_raises(ArgumentError) { pool.roll!(by: @gwen) }
 
-    @tibbs.update!(level: 2, talent_keys: %w[ according-to-plan lurker ])
+    @tibbs.update!(level: 2, talent_keys: %w[ mastermind lurker ])
     @tibbs.end_story!("fallen", by: @pip)
     assert_raises(ArgumentError, match: /fallen/) { @tibbs.push!("wits", talent_key: "lurker", by: @pip) }
   end

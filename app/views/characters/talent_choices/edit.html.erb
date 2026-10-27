@@ -61,7 +61,7 @@
               <% group_options.each do |option| %>
                 <label class="check talent-choice__option">
                   <%= check_box_tag field, option, picks.include?(option), id: "choice-#{choice.key}-#{option.parameterize}", data: { talent_choice_target: "input", action: "talent-choice#update" } %>
-                  <span><%= talent_pick_label(choice, option) %></span>
+                  <span><%= talent_pick_label(choice, option) %><% if (hint = choice.hint_for(option)) %><small class="talent-choice__hint"><%= hint %></small><% end %></span>
                 </label>
               <% end %>
             </div>
