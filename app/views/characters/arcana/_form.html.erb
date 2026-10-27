@@ -1,5 +1,5 @@
 <%# locals: (character:, arcanum:) %>
-<%# The arcana form (pg. 42's steps): name, function, tier, touchstones (rolled on the arcana crucibles, pg. 43, through choice_fill_controller.js), and what it does. A Magnum Opus gets its touchstones by rolling on the sheet, so its form leaves them out. %>
+<%# The arcana form (pg. 43's steps): name, function, tier, touchstones (rolled on the arcana crucibles, pg. 44, through choice_fill_controller.js), and what it does. A Magnum Opus gets its touchstones by rolling on the sheet, so its form leaves them out. %>
 <%= form_with model: [ character, arcanum ], class: "panel stack arcanum-form", data: { turbo_frame: "_top", controller: "choice-fill", action: "crucible:pick->choice-fill#fill" } do |form| %>
   <% if arcanum.errors.any? %>
     <p class="form-error"><%= arcanum.errors.full_messages.to_sentence %></p>
@@ -26,7 +26,7 @@
 
   <fieldset class="arcanum-form__group">
     <legend class="field__label">Tier</legend>
-    <p class="field__hint">Minor: set dressing vantage, a 2d power pool, a once-a-session effect. Major: expanded vantage, a 4d pool, a once-a-session potent effect. Mythic: greatly expanded vantage and ritual magic. Expendable arcana work one tier higher; trivial is only for them (pg. 40).</p>
+    <p class="field__hint">Minor: set dressing vantage, a 2d power pool, a once-a-session effect. Major: expanded vantage, a 4d pool, a once-a-session potent effect. Mythic: greatly expanded vantage and ritual magic. Expendable arcana work one tier higher; trivial is only for them (pg. 41).</p>
     <div class="arcanum-form__options arcanum-form__options--row">
       <% Arcanum::TIERS.each do |tier| %>
         <label class="check">

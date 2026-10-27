@@ -1,6 +1,6 @@
 require "test_helper"
 
-# Pact (pg. 82): a warlock's Eldritch Talents, on top of the one per level.
+# Pact (pg. 83): a warlock's Eldritch Talents, on top of the one per level.
 class CharacterEldritchTalentsTest < ActiveSupport::TestCase
   setup do
     @vex = identities(:pip).characters.create!(name: "Vex", path: "Warlock", brawn: 1, agility: 2, wits: 2, presence: 3, talent_keys: [ "affliction" ])

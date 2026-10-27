@@ -274,6 +274,18 @@ class CharacterTalentsTest < ActiveSupport::TestCase
     assert_not @tibbs.valid?
   end
 
+  test "a talent the book later gave to one path stays on the sheet, but isn't a new pick" do
+    @tibbs.update_columns(talent_keys: %w[folk-hero])
+    @tibbs.update!(spark: 2)
+
+    @tibbs.talent_keys = %w[mind-blast]
+    assert_not @tibbs.valid?
+
+    @tibbs.talent_keys = %w[folk-hero]
+    @tibbs.path = "Fighter"
+    assert_not @tibbs.valid?
+  end
+
   test "bonds are cut to a sensible length" do
     character = characters(:tibbs)
     character.bonds = [ { "to" => "M" * 100, "bond" => "B" * 100 } ]

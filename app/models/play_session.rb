@@ -1,4 +1,4 @@
-# One sitting of a campaign (pg. 31). Called PlaySession because Session is
+# One sitting of a campaign (pg. 32). Called PlaySession because Session is
 # the sign-in session; the UI just says "Session".
 #
 # Starting one is the pre-session: each character present resets thread and

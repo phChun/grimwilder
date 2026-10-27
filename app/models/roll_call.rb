@@ -1,6 +1,6 @@
 # A story roll, montage or quarrel that waits for its players to roll their
 # own dice. Whoever calls it picks who's in it; each player then picks their
-# spark and rolls (spark is spent right then, before the roll, pg. 12), and
+# spark and rolls (spark is spent right then, before the roll, pg. 13), and
 # the GM can roll for anyone still waiting (with no spark: only a character's
 # own player spends it). Once every seat has rolled, the call becomes the
 # usual Roll in the log, built from the dice already rolled.
@@ -27,7 +27,7 @@ class RollCall < ApplicationRecord
   after_commit :broadcast_to_table
 
   class << self
-    # assists: others at the table who help (pg. 13): each rolls 1d of their
+    # assists: others at the table who help (pg. 15): each rolls 1d of their
     # own, which counts toward the result, and shares the risk.
     def story!(campaign:, by:, character:, question: nil, odds: 2, thorns: 0, assists: [])
       raise ArgumentError, "Pick 1d, 2d or 3d for the odds." unless Roll::ODDS.key?(odds)

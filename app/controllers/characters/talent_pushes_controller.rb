@@ -1,4 +1,4 @@
-# Push yourself (pg. 21) from a talent's card: the owner marks a stat after
+# Push yourself (pg. 54) from a talent's card: the owner marks a stat after
 # using the talent; a stat already marked takes harm instead.
 class Characters::TalentPushesController < ApplicationController
   include CharacterScoped

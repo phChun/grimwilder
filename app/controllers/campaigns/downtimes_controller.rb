@@ -1,4 +1,4 @@
-# Downtime (pg. 30): everyone heals, including the conditions the GM leaves
+# Downtime (pg. 31): everyone heals, including the conditions the GM leaves
 # ticked, per-session talents reset, and campaign pools roll. GM only.
 class Campaigns::DowntimesController < ApplicationController
   include CampaignScoped

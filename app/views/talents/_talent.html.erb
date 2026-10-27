@@ -5,6 +5,7 @@
     <span class="talent__meta">
       <% if talent.core? %><span class="tag">Core</span> <% end %>
       <% talent.prohibited_paths.each do |path| %><span class="tag" title="Not available to the <%= path %> path">Not for <%= path %></span> <% end %>
+      <% talent.only_paths.each do |path| %><span class="tag" title="Only the <%= path %> path can take it"><%= path %> only</span> <% end %>
       pg. <%= talent.page %>
     </span>
   </header>

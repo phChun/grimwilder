@@ -1,4 +1,4 @@
-# Montage rolls (pg. 16): zoom out over a stretch of the story. Everyone taking
+# Montage rolls (pg. 17): zoom out over a stretch of the story. Everyone taking
 # part makes a 2d action roll (spark allowed), and the highest result is the
 # outcome for the whole scene. Zoom back in on unlikely or interesting results.
 module Roll::Montage
@@ -40,7 +40,7 @@ module Roll::Montage
     end
 
     private
-      # Teamwork (pg. 89): in a group montage, your 6 counts toward a critical,
+      # Teamwork (pg. 90): in a group montage, your 6 counts toward a critical,
       # so it and anyone else's 6 make one.
       def teamwork_critical?(rolled)
         sixes = rolled.select { _1[:result].dice.include?(6) }

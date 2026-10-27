@@ -1,4 +1,4 @@
-# A character's arcana (Arcanum; pg. 40–43). Anyone can hold them, found or
+# A character's arcana (Arcanum; pg. 41–44). Anyone can hold them, found or
 # bought in play; some talents grant them (`arcana:` in config/talents.yml:
 # Archivist's 2 minor and 1 major), and the sheet reminds the player of those.
 #

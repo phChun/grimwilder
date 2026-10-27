@@ -1,4 +1,4 @@
-# Linked pools (pg. 19): two or more phases that unlock one at a time, written
+# Linked pools (pg. 20): two or more phases that unlock one at a time, written
 # like the book: "8d Magic Shielding + 2d Wizard". Only the current phase rolls
 # and drops; when it reaches 0d the next begins at full size, and the pool's
 # event happens when the last one does.

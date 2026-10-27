@@ -1,8 +1,8 @@
-# A warlock's Eldritch Talents (Pact, pg. 82): path talents gifted by the
+# A warlock's Eldritch Talents (Pact, pg. 83): path talents gifted by the
 # patron, 1 at the start and +1 at levels 3 and 6, changeable given time to
 # commune. They're extra: they don't count against the one chosen talent per
 # level (Character::Talents), so they live in their own list with their own
-# cap. As "thematic path talents" (pg. 53) they can't use "One time only…"
+# cap. As "thematic path talents" (pg. 54) they can't use "One time only…"
 # features, which the sheet points out.
 module Character::EldritchTalents
   extend ActiveSupport::Concern
@@ -62,12 +62,14 @@ module Character::EldritchTalents
   end
 
   private
+    # Ones already held stay, as with chosen talents (Character::Talents).
     def eldritch_talents_are_choosable
+      kept = will_save_change_to_path? ? [] : Array(eldritch_talent_keys_in_database)
       eldritch_talent_keys.each do |key|
         talent = Talent.find_by_key(key)
         if talent.nil?
           errors.add(:eldritch_talent_keys, "include an unknown talent (#{key})")
-        elsif !eldritch_choosable?(talent)
+        elsif kept.exclude?(key) && !eldritch_choosable?(talent)
           errors.add(:base, "#{talent.name} can't be an Eldritch Talent for #{name}")
         end
       end

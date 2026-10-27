@@ -1,5 +1,5 @@
 # What a session or scene boundary does to a character who's there for it
-# (pg. 31): a session resets thread (2, plus any from talents), gives spark
+# (pg. 32): a session resets thread (2, plus any from talents), gives spark
 # (not before session 1), resets talent uses and pools, and rolls Augury's
 # omens (Character::TalentState); a scene ending resets the per-scene ones
 # and ends a frenzy.

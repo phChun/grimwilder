@@ -1,4 +1,4 @@
-# Spark from a changed bond (pg. 12, 22): when a character changes their bond
+# Spark from a changed bond (pg. 13, 23): when a character changes their bond
 # toward another PC at the table, that PC takes spark, up to the 2 they can
 # hold. Setting a bond for the first time isn't a change.
 module Character::BondSpark

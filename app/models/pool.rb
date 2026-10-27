@@ -1,4 +1,4 @@
-# A diminishing pool (Grimwild CE pg. 18–19): a set of d6s tracking progress
+# A diminishing pool (Grimwild CE pg. 19–20): a set of d6s tracking progress
 # toward an event. Rolling drops every die showing 1–3; at 0d the event
 # happens. Mirrors rollPool in app/javascript/grimwild/dice.js.
 class Pool < ApplicationRecord
@@ -75,7 +75,7 @@ class Pool < ApplicationRecord
 
   # drop_first: Greater effect, potency and some talents drop 1d before rolling.
   #
-  # as_action: a risky use of a power pool (pg. 19) rolls it as an action roll
+  # as_action: a risky use of a power pool (pg. 20) rolls it as an action roll
   # in place of a stat. The highest die is the result, then 1–3s drop as usual.
   # Spark dice, spent by a character, count toward the result but never drop
   # or join the pool. A use that isn't risky just rolls: it works, and dice drop.
@@ -114,10 +114,10 @@ class Pool < ApplicationRecord
     dice
   end
 
-  # Who may drop 1d before rolling (pg. 10, 18–19, 96): anyone on a task pool,
+  # Who may drop 1d before rolling (pg. 11, 19–20, 97): anyone on a task pool,
   # for a critical's Greater effect; the GM on any shared pool, with suspense;
   # on a talent pool only when the talent says so (a potent rite spell); and
-  # on a mythic arcana's, for a potent effect (pg. 41).
+  # on a mythic arcana's, for a potent effect (pg. 42).
   def drops_first_for?(gm:)
     if tick? then false
     elsif arcanum
@@ -129,7 +129,7 @@ class Pool < ApplicationRecord
     end
   end
 
-  # A power pool rolled as an action in place of a stat (pg. 19). A talent's
+  # A power pool rolled as an action in place of a stat (pg. 20). A talent's
   # bonus-dice pool (Luck, Quarry, Competence) just rolls.
   def rolls_as_action?
     power? && !tick? && !talent_use&.bonus_dice
@@ -152,7 +152,7 @@ class Pool < ApplicationRecord
     record!(size: size - 1, dice: last_dice, dropped: 1, action: "pushed", by: by)
   end
 
-  # A tick pool (optional rule, pg. 177) is never rolled: each time it's
+  # A tick pool (optional rule, pg. 178) is never rolled: each time it's
   # triggered, exactly 1d drops.
   def tick!(by:)
     raise ArgumentError, "#{name} is at 0d" if depleted?
@@ -161,7 +161,7 @@ class Pool < ApplicationRecord
     record!(size: size - 1, dice: [], dropped: 1, action: "ticked", by: by)
   end
 
-  # Oathsworn's smite (pg. 68): after a task pool is rolled, spend smite 1-for-1
+  # Oathsworn's smite (pg. 69): after a task pool is rolled, spend smite 1-for-1
   # to drop its dice.
   SMITE = "oathsworn/smite"
 

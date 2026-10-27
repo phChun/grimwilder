@@ -1,6 +1,6 @@
-# Quarrels (pg. 23): when PCs are at odds, each side rolls 2d (spark allowed,
+# Quarrels (pg. 24): when PCs are at odds, each side rolls 2d (spark allowed,
 # talents not) and the highest die wins (5 beats 4). Allies can assist, each
-# rolling 1d of their own (pg. 13); others can join at 2d as another side. On a
+# rolling 1d of their own (pg. 15); others can join at 2d as another side. On a
 # tie, compromise or keep quarreling. Everyone who took part takes spark.
 module Roll::Quarrel
   extend ActiveSupport::Concern

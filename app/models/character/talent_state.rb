@@ -63,7 +63,7 @@ module Character::TalentState
     Roll.note!(campaign: campaign, by: by, character: self, text: "#{short_name} marks #{name} as their quarry.") if campaign
   end
 
-  # Frenzy (pg. 58): once per session by choice, ticking its use, or free when
+  # Frenzy (pg. 59): once per session by choice, ticking its use, or free when
   # bloodied or taking vex.
   def enter_frenzy!(by:, free: false)
     talent = talent_with_state(:frenzy) or raise ArgumentError, "#{short_name} doesn't have Frenzy."

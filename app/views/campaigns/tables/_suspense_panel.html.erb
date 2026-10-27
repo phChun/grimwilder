@@ -1,5 +1,5 @@
 <%# locals: (campaign:) %>
-<%# The GM's suspense (pg. 96), first in the scene bar's actions. Everyone at the table sees the count; only the GM changes it. Spending prompts an impact move, so the − button says so. %>
+<%# The GM's suspense (pg. 97), first in the scene bar's actions. Everyone at the table sees the count; only the GM changes it. Spending prompts an impact move, so the − button says so. %>
 <%= render "shared/tally", kind: "suspense", noun: "suspense", left: true, group_label: "Suspense, players can see it", value: campaign.suspense,
   down: { url: campaign_suspense_path(campaign), method: :patch, params: { by: -1 }, disabled: campaign.suspense.zero?, label: "Spend 1 suspense (prompts an impact move)" },
   up: { url: campaign_suspense_path(campaign), method: :patch, params: { by: 1 }, label: "Gain 1 suspense" } %>

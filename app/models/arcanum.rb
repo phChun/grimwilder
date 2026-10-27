@@ -1,4 +1,4 @@
-# An arcana (pg. 40–43): a relic a character holds. Its name, function and
+# An arcana (pg. 41–44): a relic a character holds. Its name, function and
 # touchstones decide what it can do; its tier how much (minor, major, mythic,
 # or trivial for an expendable one). It may have a power pool, kept in the
 # character's campaign like a talent pool and refilled each session
@@ -12,7 +12,7 @@ class Arcanum < ApplicationRecord
   TOUCHSTONE_LIMIT = 6
   LIMITS = { "description" => 2000, "limitations" => 1000 }.freeze
 
-  # Magnum Opus (pg. 55): a mythic arcana still being made. Before each
+  # Magnum Opus (pg. 56): a mythic arcana still being made. Before each
   # session, roll touchstones for the ones not yet locked in (3 in all), then
   # lock in 1 of them, never rolling for it again.
   OPUS = "magnum-opus"
@@ -40,7 +40,7 @@ class Arcanum < ApplicationRecord
     super(Array(value.is_a?(Hash) ? value.values : value).map { _1.to_s.squish.first(Character::WORD_LIMIT) }.compact_blank.uniq(&:downcase).first(TOUCHSTONE_LIMIT))
   end
 
-  # The function first: it's a touchstone too (pg. 42).
+  # The function first: it's a touchstone too (pg. 43).
   def all_touchstones
     [ function, *touchstones ]
   end
@@ -80,7 +80,7 @@ class Arcanum < ApplicationRecord
     touchstones.size >= OPUS_TOUCHSTONES
   end
 
-  # Rolls this session's touchstones from the arcana crucibles (pg. 43): one
+  # Rolls this session's touchstones from the arcana crucibles (pg. 44): one
   # for each not yet locked in, never one it already has.
   def roll_opus_touchstones!(random: Random)
     raise ArgumentError, "#{name} isn't a Magnum Opus." unless opus?

@@ -23,7 +23,7 @@
       <% legacy = Talent.all.select(&:legacy_core_of) %>
       <label class="check">
         <%= form.check_box :legacy_core %>
-        Use the legacy core talent, where the path has one (<%= legacy.map { "#{_1.legacy_core_of}: #{_1.name.delete_suffix(" (Legacy)")}" }.to_sentence %>; pg. 178). Ask your GM first.
+        Use the legacy core talent, where the path has one (<%= legacy.map { "#{_1.legacy_core_of}: #{_1.name.delete_suffix(" (Legacy)")}" }.to_sentence %>; pg. 179). Ask your GM first.
       </label>
     </div>
     <%# Once made, the edit page's "At the table" section seats or moves the character. %>
@@ -145,7 +145,7 @@
     </fieldset>
     <fieldset class="fieldset">
       <legend class="field__label">Bonds: how you see each other PC, and any NPCs</legend>
-      <%# One bond toward each other character at the table (pg. 22, 46); bonds to anyone else, or for a character not at a table, are written in by name. %>
+      <%# One bond toward each other character at the table (pg. 23, 47); bonds to anyone else, or for a character not at a table, are written in by name. %>
       <% party = character.bond_party.to_a %>
       <% others = (character.campaign ? character.bonds_beyond(party) : character.bonds) + [ {} ] %>
       <% party.each_with_index do |other, i| %>

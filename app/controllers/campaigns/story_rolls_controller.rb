@@ -18,7 +18,7 @@ class Campaigns::StoryRollsController < ApplicationController
   end
 
   private
-    # Anyone else seated at the table can assist (pg. 13); they roll their own 1d.
+    # Anyone else seated at the table can assist (pg. 15); they roll their own 1d.
     def assists(character)
       Current.campaign.characters.played.active.where(id: Array(params[:assists]).compact_blank).where.not(id: character.id).to_a
     end

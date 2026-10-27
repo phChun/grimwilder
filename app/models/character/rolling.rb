@@ -1,15 +1,15 @@
-# Action and defense rolls from the sheet (pg. 10–15). The server rolls, so
+# Action and defense rolls from the sheet (pg. 11–16). The server rolls, so
 # the table's log can be trusted, and everything a roll changes on the sheet
 # happens with it:
 #
-# - each spark spent before the roll adds 1d (pg. 12);
+# - each spark spent before the roll adds 1d (pg. 13);
 # - each ally assisting rolls 1d of their own, which counts toward the result
-#   and is shown separately (pg. 13);
-# - damage adds its thorns, and a mark on the stat clears once rolled (pg. 27);
+#   and is shown separately (pg. 15);
+# - damage adds its thorns, and a mark on the stat clears once rolled (pg. 28);
 # - talents add dice when the situation fits, or leave thorns out
 #   (Character::TalentBonuses), and any use they tick is spent;
-# - a disaster gives spark, up to the 2 a character can hold (pg. 10, 15);
-# - so does a critical when none of its effects fit (pg. 10), if the player
+# - a disaster gives spark, up to the 2 a character can hold (pg. 12–13);
+# - so does a critical when none of its effects fit (pg. 11), if the player
 #   takes it right away: only on the character's latest roll.
 module Character::Rolling
   extend ActiveSupport::Concern
@@ -90,7 +90,7 @@ module Character::Rolling
   end
 
   # Spark spent before a roll (+1d each), then spark taken after it (from a
-  # disaster, a quarrel...), up to the 2 a character can hold (pg. 12). Doesn't
+  # disaster, a quarrel...), up to the 2 a character can hold (pg. 13). Doesn't
   # save. Returns whether spark was taken.
   def settle_spark(spent: 0, take: false)
     self.spark -= spent

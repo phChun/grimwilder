@@ -1,5 +1,5 @@
 # Picks a talent asks for (Talent::Choice): Expertise's skills, Weapon
-# Mastery's style, Sorcery's paths and techniques. Any of the character's
+# Mastery's style, Sorcery's sources and techniques. Any of the character's
 # talents can have them: the core, chosen ones and Eldritch Talents.
 #
 # talent_choices: { "expertise" => { "skills" => ["stealth", "lying", "duel"] } }.

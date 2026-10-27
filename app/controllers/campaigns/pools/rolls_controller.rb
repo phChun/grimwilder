@@ -1,5 +1,5 @@
 # Roll a pool: drop every die showing 1–3. A power pool can instead be rolled
-# as an action roll (pg. 19), with thorns, and spark from one of your own
+# as an action roll (pg. 20), with thorns, and spark from one of your own
 # seated characters.
 class Campaigns::Pools::RollsController < ApplicationController
   include PoolScoped

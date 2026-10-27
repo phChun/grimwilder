@@ -24,6 +24,12 @@ class TalentTest < ActiveSupport::TestCase
     assert Talent.groups.find { |group| group.key == "backgrounds" }.talents.any?
   end
 
+  test "the YAML loads safely, and every page is in the book" do
+    assert Psych.safe_load_file(Rails.root.join("config/talents.yml"))
+    Talent.all.each { |talent| assert_includes 1..200, talent.page, talent.key }
+    Talent.groups.each { |group| assert_includes 1..200, group.page, group.key }
+  end
+
   test "keys are unique and every talent has text" do
     assert_equal Talent.all.size, Talent.all.map(&:key).uniq.size
     Talent.all.each { |talent| assert talent.text.present?, "#{talent.key} has no text" }
@@ -44,6 +50,16 @@ class TalentTest < ActiveSupport::TestCase
     assert_not_includes Talent.choosable_for("Sorcerer"), affinity
     assert_includes Talent.choosable_for("Rogue"), affinity
     assert_not affinity.paragraphs.join.include?("Prohibited")
+  end
+
+  test "a talent only one path may take" do
+    folk_hero = Talent.find("folk-hero")
+
+    assert_equal [ "Bard" ], folk_hero.only_paths
+    assert_includes Talent.choosable_for("Bard"), folk_hero
+    assert_not_includes Talent.choosable_for("Rogue"), folk_hero
+    assert_not folk_hero.paragraphs.join.include?("Only]")
+    assert_equal %w[ folk-hero mind-blast monster-menagerie ], Talent.all.select { _1.only_paths.any? }.map(&:key).sort
   end
 
   test "core talents aren't choosable" do
@@ -119,9 +135,9 @@ class TalentChoiceTest < ActiveSupport::TestCase
     sorcery = Talent.find("sorcery").choice(:paths)
     assert_equal 1, sorcery.min_each
     assert_equal "Touchstones", sorcery.heading
-    assert_equal "path or technique", sorcery.noun
-    assert_equal "paths or techniques", sorcery.nouns
-    assert_equal "4 paths or techniques", sorcery.to_s
+    assert_equal "source or technique", sorcery.noun
+    assert_equal "sources or techniques", sorcery.nouns
+    assert_equal "4 sources or techniques", sorcery.to_s
     assert_equal sorcery.options, Talent.find("eldritch-affinity").choice(:paths).options
 
     assert_includes Talent.find("weapon-mastery").choice(:style).options, "one-handed"

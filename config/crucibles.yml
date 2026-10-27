@@ -7,7 +7,7 @@
 - key: gm
   name: GM crucible
   group: gm
-  page: 93
+  page: 94
   blurb: The seed of an idea when the story needs one.
   how: 'Roll once on each table. Each roll reads two ways (3 and 1 is 31 or 13): pick the most evocative pair, smash it together, and interpret.'
   tables:
@@ -30,7 +30,7 @@
 - key: settlements
   name: Settlements
   group: places
-  page: 138
+  page: 139
   blurb: Villages, camps, ports and strongholds.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -53,7 +53,7 @@
 - key: sites
   name: Sites
   group: places
-  page: 138
+  page: 139
   blurb: Ruins, shrines, tombs and lairs to explore.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -64,7 +64,7 @@
     - [sacred, mystic, weird, moonlit, foggy, collapsed]
     - [haunted, sunken, buried, ruined, sulfurous, smoldering]
     - [crumbling, shattered, burned, underground, blessed, windblown]
-    - [hidden, overgrown, desolate, echoing, forgotten, shaded]
+    - [hidden, overgrown, desolate, echoing, repurposed, shaded]
   - name: Site
     rows:
     - [altar, circle, well, chamber, labyrinth, archway]
@@ -76,7 +76,7 @@
 - key: dangers
   name: Dangers
   group: places
-  page: 138
+  page: 139
   blurb: What waits out in the wilds.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -99,7 +99,7 @@
 - key: curiosities
   name: Curiosities
   group: places
-  page: 139
+  page: 140
   blurb: Strange sights that hint at more to explore.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -122,7 +122,7 @@
 - key: barriers
   name: Barriers
   group: places
-  page: 139
+  page: 140
   blurb: Terrain that makes getting around harder.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -145,7 +145,7 @@
 - key: factions
   name: Factions
   group: places
-  page: 139
+  page: 140
   blurb: Groups with goals of their own.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -168,7 +168,7 @@
 - key: buildings
   name: Buildings
   group: places
-  page: 135
+  page: 136
   blurb: Notable buildings for a settlement map.
   how: Roll on each table, smash the results together, and interpret.
   tables:
@@ -191,7 +191,7 @@
 - key: heritage
   name: Heritage
   group: characters
-  page: 49
+  page: 50
   blurb: Ancestry, culture and homeland.
   how: Roll on each table, choose two or three results, and combine them, e.g. Orcs of the Verdant Boglands.
   tables:
@@ -222,7 +222,7 @@
 - key: wises
   name: Expanded wises
   group: characters
-  page: 49
+  page: 50
   blurb: Areas of knowledge for backgrounds and heritages.
   how: 'Roll for a wise: one die picks the column (its area), the other the row.'
   tables:
@@ -238,7 +238,7 @@
 - key: features
   name: Distinctive features
   group: characters
-  page: 51
+  page: 52
   blurb: Clothing, voice, eyes, personality and build.
   how: Roll on the tables you want and pick the two or three features others notice first.
   tables:
@@ -285,7 +285,7 @@
 - key: arcana
   name: Arcana touchstones
   group: magic
-  page: 43
+  page: 44
   blurb: Touchstones for magic items and spells.
   how: Pick one or two themes and roll for two touchstones, then assign a function.
   tables:
@@ -332,7 +332,7 @@
 - key: wild_surge
   name: Wild surge
   group: magic
-  page: 76
+  page: 77
   blurb: When raw magic spirals out of control.
   how: Roll once on each table, smash the results together, and interpret.
   tables:
@@ -355,9 +355,9 @@
 - key: spell
   name: Spell crucible
   group: magic
-  page: 86
+  page: 87
   blurb: Spell theorems for a wizard's spellbook.
-  how: 'Roll on each table, then take two of the three (style + essence, style + form or essence + form) as the theorem, and add a school (pg. 87).'
+  how: 'Roll on each table, then take two of the three (style + essence, style + form or essence + form) as the theorem, and add a school (pg. 88).'
   tables:
   - name: Style
     rows:
@@ -386,7 +386,7 @@
 - key: words_of_power
   name: Words of power
   group: magic
-  page: 84
+  page: 85
   blurb: The language of the universe, for a witch's Hidden Magic.
   how: Roll on either table for a word of power, or come up with your own to fit your witch.
   tables:
@@ -409,7 +409,7 @@
 - key: patron
   name: Patron crucible
   group: magic
-  page: 82
+  page: 83
   blurb: A warlock's otherworldly patron.
   how: Roll 2 on each table, smash them together and interpret. Then give the patron a name, trappings, a way of communicating and a following.
   tables:
@@ -432,7 +432,7 @@
 - key: herbalism
   name: Herbalism crucible
   group: magic
-  page: 85
+  page: 86
   credit: Herbalism crucible by Juniper Bloom, used with permission.
   blurb: Herb names for a witch's Herbalism, two before each session.
   how: Roll once on each table and put the two halves together for an herb's name. The name is the potion's touchstone.
@@ -456,7 +456,7 @@
 - key: hovel
   name: Homely hovel
   group: magic
-  page: 85
+  page: 86
   blurb: A witch's blessed homestead, for Homely Hovel.
   how: Roll once on each list and put them together, like a whimsical glade.
   tables:
@@ -465,12 +465,11 @@
     rows: [[charming], [mysterious], [rickety], [unsettling], [vibrant], [whimsical]]
   - name: Place
     columns: [Place]
-    # The book prints "manner"; it's a manor.
     rows: [[castle], [cottage], [glade], [manor], [shack], [temple]]
 - key: vassal
   name: Build-a-vassal
   group: characters
-  page: 78
+  page: 79
   blurb: The basic form of a summoner's vassal.
   how: "Roll once on each table: it's a ___ ___-like creature that I send ___ing toward my enemies."
   tables:
@@ -486,7 +485,7 @@
 - key: legend
   name: The Legend of…
   group: characters
-  page: 81
+  page: 82
   blurb: What people have taken to calling a swashbuckler.
   how: Roll once on each table and smash them together, like the Crimson Fox.
   tables:
@@ -499,7 +498,7 @@
 - key: entanglements
   name: Past entanglements
   group: characters
-  page: 80
+  page: 81
   blurb: People important in a swashbuckler's tales.
   how: Roll once on each side and smash them together, like a bitter rival. Choose 2, and 1 more vital to the story you don't know yet.
   tables:
@@ -512,7 +511,7 @@
 - key: spring
   name: Spring months
   group: time
-  page: 140
+  page: 141
   blurb: A fantastic name for a month of spring.
   how: Roll once on each list for a month's name, like Green Bloom. Add three details for it, like atmospherics, weather or flora.
   tables:
@@ -521,7 +520,7 @@
 - key: summer
   name: Summer months
   group: time
-  page: 140
+  page: 141
   blurb: A fantastic name for a month of summer.
   how: Roll once on each list for a month's name, like Ash Storm. Add three details for it, like atmospherics, weather or flora.
   tables:
@@ -530,7 +529,7 @@
 - key: fall
   name: Fall months
   group: time
-  page: 140
+  page: 141
   blurb: A fantastic name for a month of fall.
   how: Roll once on each list for a month's name, like Husk Mist. Add three details for it, like atmospherics, weather or flora.
   tables:
@@ -539,7 +538,7 @@
 - key: winter
   name: Winter months
   group: time
-  page: 140
+  page: 141
   blurb: A fantastic name for a month of winter.
   how: Roll once on each list for a month's name, like Storm Tide. Add three details for it, like atmospherics, weather or flora.
   tables:
@@ -548,7 +547,7 @@
 - key: eldritch_mutations
   name: Eldritch mutations
   group: gm
-  page: 147
+  page: 148
   blurb: What's grown on a chuul, or anything the magic has twisted.
   how: Roll once on each list and put them together, like glowing eyestalks.
   tables:
@@ -557,7 +556,7 @@
 - key: martial_arts
   name: Martial arts style
   group: characters
-  page: 66
+  page: 67
   blurb: A monk's fighting style, its stances and its weapons.
   how: "It's based on the concept of ___ (choose 1 or 2), it features stances and moves like ___ (choose 3), and it often makes use of weapons like ___ (choose 2)."
   tables:
@@ -590,7 +589,7 @@
 - key: criminal_history
   name: Criminal history
   group: characters
-  page: 74
+  page: 75
   blurb: A rogue's past crimes, and the reputation that follows them.
   how: "Set a crime's severity and nature, your reputation from it, and your reaction: I did what I had to do, I was set up, it was a misunderstanding, I'll do it again…"
   tables:

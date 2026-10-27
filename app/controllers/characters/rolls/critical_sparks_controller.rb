@@ -1,4 +1,4 @@
-# A critical where none of the effects fit gives spark instead (pg. 10). The
+# A critical where none of the effects fit gives spark instead (pg. 11). The
 # button sits on the sheet's "Last roll" card.
 class Characters::Rolls::CriticalSparksController < ApplicationController
   include CharacterScoped

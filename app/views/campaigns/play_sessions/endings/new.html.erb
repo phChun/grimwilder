@@ -3,7 +3,7 @@
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
   <h1>End <%= @session.title.downcase %></h1>
-  <p class="page-header__lede">Everyone here takes 1 XP (pg. 31): <%= @session.characters.map(&:name).to_sentence.presence || "no one was marked present" %>.</p>
+  <p class="page-header__lede">Everyone here takes 1 XP (pg. 32): <%= @session.characters.map(&:name).to_sentence.presence || "no one was marked present" %>.</p>
 </header>
 
 <%= form_with url: campaign_play_session_ending_path(Current.campaign, @session), class: "panel stack session-form" do %>

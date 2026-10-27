@@ -1,7 +1,7 @@
-# Story rolls (pg. 16): luck, or how true a doubtful detail is, read from good
+# Story rolls (pg. 17): luck, or how true a doubtful detail is, read from good
 # (perfect) to bad (disaster). Usually 2d; 1d for bad odds, 3d for good, and
 # thorns are rare but allowed. Made for a character, it can take spark like any
-# roll, and a disaster gives spark (pg. 12).
+# roll, and a disaster gives spark (pg. 13).
 module Roll::Story
   extend ActiveSupport::Concern
 

@@ -1,6 +1,6 @@
 require "test_helper"
 
-# Arcana (pg. 40–43) and their power pools (Character::Arcana).
+# Arcana (pg. 41–44) and their power pools (Character::Arcana).
 class ArcanumTest < ActiveSupport::TestCase
   setup do
     @tibbs = characters(:tibbs) # seated at the Bramblewood

@@ -1,6 +1,6 @@
 require "test_helper"
 
-# Legacy talents (pg. 178–179): older versions a GM may allow.
+# Legacy talents (pg. 179–180): older versions a GM may allow.
 class LegacyTalentTest < ActiveSupport::TestCase
   test "legacy path talents can be chosen; legacy cores replace the path's core instead" do
     legacy = Talent.groups.find { _1.key == "legacy" }

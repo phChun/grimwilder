@@ -1,4 +1,4 @@
-# Magnum Opus (pg. 55): before each session, roll touchstones for the opus
+# Magnum Opus (pg. 56): before each session, roll touchstones for the opus
 # (create), then lock one of them in for good (update, `touchstone`).
 class Characters::MagnumOpusesController < ApplicationController
   include TendedCharacter

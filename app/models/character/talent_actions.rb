@@ -61,7 +61,7 @@ module Character::TalentActions
     self.changed_by = by
     took = take_mark(stat)
     save!
-    # The Vassal's pool returns to its max when you push yourself (pg. 78).
+    # The Vassal's pool returns to its max when you push yourself (pg. 79).
     refilled = talent_pools.where(use_key: talent.uses.select(&:refill).map(&:id)).each(&:reset!).map(&:name)
     text = "#{short_name} pushes for #{talent.name} and #{took}#{"; #{refilled.to_sentence} refills" if refilled.any?}."
     Roll.note!(campaign: campaign, by: by, character: self, text: text) if campaign

@@ -4,7 +4,7 @@
 class Character < ApplicationRecord
   include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentChoices, Character::TalentUses, Character::TalentBonuses, Character::TalentState, Character::StatProgression, Character::BondSpark, Character::Arcana, Character::Sessions, Character::Claiming, Character::Seating, Character::EldritchTalents, Character::TalentActions, Character::Farewell
 
-  STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 46)
+  STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 47)
 
   belongs_to :identity
   belongs_to :campaign, optional: true
@@ -58,7 +58,7 @@ class Character < ApplicationRecord
     super(words(value).first(2))
   end
 
-  # One bond toward each other PC (pg. 22, 46), as many as there are. A bond
+  # One bond toward each other PC (pg. 23, 47), as many as there are. A bond
   # to someone at the table keeps their character_id (a row left blank is
   # dropped); a bond to anyone else is a name. One per character or name.
   # Who a bond is toward (an NPC's name) and the bond itself are each cut to this.

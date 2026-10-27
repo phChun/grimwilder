@@ -8,7 +8,7 @@ stats:
   wits: Smarts, trickery and reading situations.
   presence: Influence, willpower and reading people.
 
-# Path name => core talent (pg. 54–87)
+# Path name => core talent (pg. 55–88)
 paths:
   Artificer: Infusion
   Bard: Inspiration
@@ -28,7 +28,7 @@ paths:
   Witch: Hidden Magic
   Wizard: Spellcraft
 
-# Common backgrounds and their wises (pg. 48)
+# Common backgrounds and their wises (pg. 49)
 backgrounds:
   Charlatan: [social graces, spotting marks, timely misdirects]
   Clergy: [allegories, signs of sin, faiths of the world]
@@ -49,11 +49,11 @@ backgrounds:
   Trader: [cultural tastes, people's desires, rare goods]
   Warrior: [battle plans, improvised weapons, war stories]
 
-# Choose 2 you are and 1 you aren't (pg. 46)
+# Choose 2 you are and 1 you aren't (pg. 47)
 traits: [brave, caring, confident, curious, gentle, honest, honorable, persistent, protective, quiet, rash, stubborn]
 desires: [belonging, glory, harmony, honor, justice, knowledge, love, power, renown, thrills, wealth, wisdom]
 
-# Schools of magic, for spell theorems (pg. 86)
+# Schools of magic, for spell theorems (pg. 87)
 magic_schools:
   abjuration: Protects, blocks, dispels, or banishes.
   conjuration: Summons creatures, objects, and portals.
@@ -64,7 +64,7 @@ magic_schools:
   necromancy: Manipulates life, death, and the undead.
   transmutation: Transforms matter and alters physical properties.
 
-# Arcana functions: the general effect, and a touchstone (pg. 42)
+# Arcana functions: the general effect, and a touchstone (pg. 43)
 arcana_functions:
   attack: Lash out to deal direct harm or destruction.
   enhance: Temporarily boost senses, ability, or bestow something new.
@@ -77,23 +77,23 @@ arcana_functions:
   transform: Change the nature or form of the subject.
   traverse: Move across space, through barriers, or in a new way.
 
-# Example weapon styles (pg. 20)
+# Example weapon styles (pg. 177)
 weapon_styles: [precise, quick, bashing, quiet, sweeping, piercing, vicious, entangling, sapping, disarming, heavy, balanced, dazing, nimble, concealable, ornate, brutal, long]
 
-# Bonds: an intensity + a nature (pg. 22)
+# Bonds: an intensity + a nature (pg. 23)
 bond_intensities: [deep, complex, growing, lowkey, playful, tense]
-bond_natures: [affection, camaraderie, curiosity, doubts, respect, rivalry, ambivalence, annoyance, apprehension, awe, cynicism, devotion, envy, fascination, fear, indifference, kinship, loyalty, obligation, obsession, pity, resentment, reverence, scorn, solidarity, spite, trust]
+bond_natures: [affection, camaraderie, curiosity, doubts, respect, rivalry, ambivalence, annoyance, apprehension, awe, cynicism, devotion, envy, fascination, fear, indifference, kinship, loyalty, obligation, obsession, pity, resentment, reverence, scorn, spite, trust]
 
-# Story arcs (pg. 26)
+# Story arcs (pg. 27)
 arcs:
   ambitions: [build a reputation, explore the world, finish the mission, make things right, satisfy desires, uncover the truth, spread the word, expand power]
   struggles: [come unraveled, doubt convictions, feed my vices, flirt with betrayal, keep a secret, survive the storm, ignore the problem, burn at both ends]
   growth: [embrace change, escape my past, find belonging, just enjoy life, prove myself, settle debts, make something new, take charge]
 
 # Optional path builders, as optional talent choices on the core talent.
-# Monk martial arts style (pg. 66), the martial_arts crucible's three tables.
+# Monk martial arts style (pg. 67), the martial_arts crucible's three tables.
 martial_concepts: [tiger, crane, snake, wolf, mantis, raven, fire, water, air, earth, lightning, heart, thunderstorm, avalanche, tsunami, whirlwind, earthquake, volcano, harmony, destruction, tranquility, justice, chaos, freedom, foundation, flourishing, refinement, adaption, endurance, transformation, ferocity, deception, grace, brutality, precision, patience]
 martial_moves: [open palm, spinning kick, low stance, finger jabs, iron forearm, flowing step, elbow strike, aerial leaps, breath control, redirecting grab, chop strike, iron grip, circular step, knee strike, joint lock, pressure point, whipping attack, steady gaze, high kick, tiger claw, heavy strike, dual strikes, jumps & rolls, palm heel, crane stance, side kick, swift parry, rooted stance, soft redirect, backfist strike, mantis grab, close punch, leaping elbow, snap kick, wide sweep, crescent kick]
 martial_weapons: [bo staff, three-part staff, half-staff, nunchaku, short sticks, batons, chain whip, rope dart, sickle & chain, weight & chain, whip blade, scarf, sai, kama, butterfly sword, hook sword, straight sword, curved sword, monk spade, spear, naginata, longhandle blade, trident, scythe, shuriken, throwing spikes, chakram, boomerang, darts, throwing axes, tiger claws, spiked boots, war fan, iron knuckles, crescent knives, backfist rings]
-# Rogue thieves guild (pg. 74): 2 that describe it, 1 that really doesn't.
+# Rogue thieves guild (pg. 75): 2 that describe it, 1 that really doesn't.
 thieves_guild: [like family, elite training, cultish, turf-obsessed, heroes, mercenaries, mystics, outsiders, influential, just business, in the open, follows code]
