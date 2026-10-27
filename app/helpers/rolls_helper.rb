@@ -157,6 +157,17 @@ module RollsHelper
     roll.follow_ups.any? ? "#{setup}; then #{roll.follow_ups.map { follow_up_line(_1) }.join("; ")}" : setup
   end
 
+  # What a level-up asks for, in a session's end marker: a new talent, or at
+  # level 1 (only from level 0, an optional rule) the core talent and the last
+  # stat point, which the sheet asks for. No Current: markers render in broadcasts.
+  def level_up_link(level_up)
+    if level_up["level"] == 1
+      link_to "add the last stat point", character_path(level_up["character_id"], anchor: "stats")
+    else
+      link_to "choose a talent", new_character_talent_path(level_up["character_id"])
+    end
+  end
+
   # Whether the viewer's characters can do anything to this roll now: the
   # roll toast then links to the follow-ups.
   def roll_follow_ups_offered?(roll)

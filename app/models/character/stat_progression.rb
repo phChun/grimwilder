@@ -29,7 +29,8 @@ module Character::StatProgression
 
   def undo_stat_progression!
     raise ArgumentError, "#{short_name} hasn't given up a talent for a stat." unless stat_progressed?
-    raise ArgumentError, "Remove a talent first: #{short_name} is at the most for level #{level}." if talent_keys.size > level
+    # Taking it back frees one slot; the sheet must still fit (Talented's extras count).
+    raise ArgumentError, "Remove a talent first: #{short_name} is at the most for level #{level}." if talent_keys.size > expected_talent_count + 1
     raise ArgumentError, "#{stat_progression.capitalize} would drop below 1." if stat(stat_progression) <= 1
 
     update!(stat_progression => self.stat(stat_progression) - 1, stat_progression: nil)
