@@ -1466,3 +1466,59 @@
     - ["pixie: Arcane Training", "warrior spirit: Guardian"]
     - ["air elemental: Windcaller", "treant: Primal Growth"]
     - ["oozeling: Shift Form", "tentacles: Fearsome"]
+# The monster pages' word grids (several lists to roll together).
+- key: monster_seat_of_power
+  name: Seat of Power
+  group: monsters
+  page: 159
+  blurb: From the monsters on pg. 159.
+  how: Roll once on each list, a seat and where it stands.
+  tables:
+  - { name: Seat, columns: [Seat], rows: [[charred stone bastion], [grand obsidian spire], [ash-choked estate], [steamy sulfur baths], [basalt cathedral], [clanging forgeworks]] }
+  - { name: Where, columns: [Where], rows: [[island in a lava river], [sheer volcanic cliffside], [billowing caldera rim], [center of a vast plain], [beneath magma-falls], [sulfuric cave system]] }
+- key: monster_types_of_mephit
+  name: Types of Mephit
+  group: monsters
+  page: 164
+  blurb: From the monsters on pg. 164.
+  how: Roll for the kind of mephit.
+  tables:
+  - name: Types of Mephit
+    columns: [Mephit, Mephit, Mephit]
+    rows: [[magma, steam, mud], [lightning, ooze, ore], [plant, ash, water], [ice, dust, smoke], [earth, wood, wind], [salt, fire, mist]]
+- key: monster_forbidden_knowledge
+  name: Forbidden Knowledge
+  group: monsters
+  page: 165
+  blurb: From the monsters on pg. 165.
+  how: Roll once on each list and interpret, like true rites of necromancy.
+  tables:
+  - { name: Kind, columns: [Kind], rows: [[secret], [twisted], ["false"], ["true"], [blasphemous], [shattered]] }
+  - { name: Form, columns: [Form], rows: [[scrolls of], [visions of], [rites of], [pacts of], [elixirs of], [ciphers of]] }
+  - { name: Subject, columns: [Subject], rows: [[immortality], [soulbinding], [necromancy], [teleportation], [polymorphing], [godhood]] }
+- key: monster_riddle
+  name: Riddle
+  group: monsters
+  page: 169
+  blurb: From the sphinx on pg. 169.
+  how: Roll on each list, choose 1 or 2, and pose it as a riddle. If an answer is relatively close, accept it.
+  tables:
+  - name: First
+    columns: [First]
+    rows: [[It flows but has no shape.], ["It grows taller, then vanishes."], [It travels far but takes no steps.], [It burns but leaves no ashes.], [It counts the moments but has no hands.], [It falls but makes no sound.]]
+  - name: Second
+    columns: [Second]
+    rows: [[It's cold but not frozen.], [It's bright but not hot.], [It hums when the world is still.], [It's full but never complete.], [It's fleeting but always returns.], [It's hidden in plain sight.]]
+  - name: Third
+    columns: [Third]
+    rows: [[It grows when light dims.], [It follows you on sunny days.], [It stares back from still waters.], [It's buried but not dead.], [It's a silent companion.], [It's a path without end.]]
+- key: monster_unfinished_business
+  name: Unfinished Business
+  group: monsters
+  page: 170
+  blurb: From the monsters on pg. 170.
+  how: Roll once on each list and interpret, like a hidden heirloom's betrayal.
+  tables:
+  - { name: Thing, columns: [Thing], rows: [[heirloom], [estate], [portrait], [key], [diary], [relic]] }
+  - { name: Word, columns: [Word], rows: [[confession], [vow], [denial], [hidden], [whisper], [promise]] }
+  - { name: Wrong, columns: [Wrong], rows: [[vendetta], [guilt], [betrayal], [murder], [burden], [obsession]] }
