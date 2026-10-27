@@ -799,9 +799,10 @@ form.button_to, .button_to { margin: 0; }
 .talent-toggle { display: inline-flex; cursor: pointer; }
 .talent-toggle__box { position: absolute; opacity: 0; pointer-events: none; }
 .talent-toggle__added { display: none; gap: var(--space-1); }
-.talent-toggle__box:checked ~ .talent-toggle__add { display: none; }
-.talent-toggle__box:checked ~ .talent-toggle__added { display: inline-flex; }
-.talent-toggle__box:focus-visible ~ .button { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* :has(), not a sibling selector: Herb's dev debug mode wraps the checkbox in a span. */
+.talent-toggle:has(.talent-toggle__box:checked) .talent-toggle__add { display: none; }
+.talent-toggle:has(.talent-toggle__box:checked) .talent-toggle__added { display: inline-flex; }
+.talent-toggle:has(.talent-toggle__box:focus-visible) .button { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* The talent picker: the catalog, and what's taken beside it (a drawer on a phone). */
 .talent-picker { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: var(--space-5); align-items: start; }
