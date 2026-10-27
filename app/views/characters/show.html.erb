@@ -206,15 +206,16 @@
         <% end %>
       </div>
       <% talent_pools = @character.talent_pools.includes(:campaign).to_a %>
+      <% live = @character.campaign&.current_session.present? %>
       <%# The core talent on its own, then the rest in a grid of matching heights. %>
       <% core, chosen = @character.talent_entries.partition(&:core?) %>
       <% core.each do |talent| %>
-        <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools %>
+        <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools, live: live %>
       <% end %>
       <% if chosen.any? %>
         <div class="talent-list">
           <% chosen.each do |talent| %>
-            <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools %>
+            <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools, live: live %>
           <% end %>
         </div>
       <% end %>
@@ -255,7 +256,7 @@
           <% if @character.eldritch_talent_keys.any? %>
             <div class="talent-list">
               <% @character.eldritch_talent_entries.each do |talent| %>
-                <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools, eldritch: true %>
+                <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools, eldritch: true, live: live %>
               <% end %>
             </div>
           <% end %>

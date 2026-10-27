@@ -1,4 +1,4 @@
-<%# locals: (talent:, character:, editable: nil, tends: nil, pools: nil, eldritch: nil) %>
+<%# locals: (talent:, character:, editable: nil, tends: nil, pools: nil, eldritch: nil, live: nil) %>
 <%# One talent on the sheet. Its name and kind badges, a one-line summary, a core talent's growth, then what it gives (tick boxes, talent pools, thread) and what you can do with it (its rolls, Push yourself). The book's text folds away; re-skin and Remove live in the ⋯ menu. %>
 <% pools ||= [] %>
 <% counters = talent.uses.select(&:counter?) %>
@@ -8,6 +8,8 @@
 <% rolls = editable && character.campaign && !character.up_for_grabs? && character.in_play? ? talent.rolls : [] %>
 <% pushes = editable && character.in_play? && talent.pushes? %>
 <% casts = editable && character.in_play? ? talent.casts : nil %>
+<%# Seated with no session on: rolling still works and logs between sessions, but it's meant for play. %>
+<% between = (rolls.any? || casts) && character.campaign && !live %>
 <article id="talent-<%= talent.key %>" class="<%= class_names("talent-card", "talent-card--core": talent.core?, "talent-card--eldritch": eldritch, "talent-card--skinned": talent.skinned?) %>">
   <%# Folded to its name and summary; the rest opens under it. details-memory keeps it open through a refresh, and talent_fold_controller.js opens it when the page jumps to it. %>
   <details id="talent-<%= talent.key %>-fold" class="talent-card__fold">
@@ -15,6 +17,7 @@
       <span class="talent-card__titles">
         <h3 class="talent-card__name"><%= talent.name %></h3>
         <span class="talent-card__summary"><%= talent.summary %></span>
+        <% if between %><span class="talent-card__session"><%= icon(:die, size: 14) %> Roll it in a session</span><% end %>
       </span>
       <%= icon(:chevron, size: 18) %>
     </summary>
@@ -161,6 +164,7 @@
 
       <% if rolls.any? || pushes || casts %>
         <div class="talent-card__actions">
+          <% if between %><p class="field__hint talent-card__between">No session on: rolling still works, and the log puts it between sessions.</p><% end %>
           <% if casts == "rite" %>
             <p class="talent-card__chip">Cast: roll a rite pool as an action from its ⋯; drop 1d first for a potent spell.</p>
           <% elsif casts %>
