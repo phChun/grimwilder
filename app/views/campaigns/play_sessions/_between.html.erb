@@ -1,8 +1,9 @@
 <%# locals: (rolls:, after:, before:, open: nil) %>
-<%# The log between two sessions (rests, downtime, rolls, notes made outside one), in its place in the history, oldest first, folded like the sessions. after/before: the sessions either side; nil at the ends. %>
+<%# The log between two sessions (rests, downtime, rolls, notes made outside one), in its place in the history, oldest first, folded like the sessions. after/before: the sessions either side; nil at the ends, and both nil before the first session. %>
 <% title = if after && before then "Between Sessions #{after.number} and #{before.number}"
            elsif before then "Before #{before.title}"
-           else "Since #{after.title}"
+           elsif after then "Since #{after.title}"
+           else "Before Session 1"
            end %>
 <% key = before ? "between-before-#{before.number}" : "between-since" %>
 <li class="panel session-card session-card--between">
