@@ -8,8 +8,9 @@ stats:
   wits: Smarts, trickery and reading situations.
   presence: Influence, willpower and reading people.
 
-# Path name => core talent (pg. 55–88)
+# Path name => core talent (pg. 55–88; the Adventurer's is on its character sheet, pg. 46)
 paths:
+  Adventurer: Talented
   Artificer: Infusion
   Bard: Inspiration
   Berserker: Frenzy

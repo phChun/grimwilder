@@ -11,13 +11,13 @@ class TalentTest < ActiveSupport::TestCase
     assert_equal %w[ Pact Affliction Blood\ Rituals Knowing\ Gaze ], Talent.groups.find { _1.key == "warlock" }.talents.first(4).map(&:name)
   end
 
-  test "17 paths, each with a core talent and 7 path talents, plus background talents" do
+  test "18 paths, each with a core talent and 7 path talents (the Adventurer has none), plus background talents" do
     paths = Talent.groups.select(&:path?)
     assert_equal Grimwild.paths.keys.sort, paths.map(&:name).sort
 
     paths.each do |group|
       assert_equal 1, group.talents.count(&:core?), "#{group.name} core"
-      assert_equal 7, group.talents.reject(&:core?).size, "#{group.name} path talents"
+      assert_equal group.name == "Adventurer" ? 0 : 7, group.talents.reject(&:core?).size, "#{group.name} path talents"
       assert_equal Grimwild.core_talent(group.name), Talent.core_for(group.name).name
     end
 

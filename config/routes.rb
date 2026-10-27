@@ -38,6 +38,8 @@ Rails.application.routes.draw do
       resource :seat, only: :update
       resource :story_end, only: %i[ create destroy ]
       resource :stat_progression, only: %i[ create destroy ]
+      resource :stat_point, only: :create
+      resource :oath, only: %i[ create destroy ]
     end
   end
 

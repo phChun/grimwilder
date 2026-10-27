@@ -103,6 +103,16 @@
       </div>
     <% end %>
 
+    <% if editable && @character.stat_point_due? %>
+      <%# Level 0 (optional rule, pg. 177): reaching level 1 brings the core talent and the last stat point. %>
+      <div class="claim-bar stat-point">
+        <p class="claim-bar__text">Level 1: <%= short %> gains <%= @character.core_talent || "their core talent" %> and their last stat point.</p>
+        <% Grimwild::STATS.select { @character.stat(_1) < 3 }.each do |stat| %>
+          <%= button_to "+1 #{stat.capitalize}", character_stat_point_path(@character), params: { stat: stat }, class: "button button--small" %>
+        <% end %>
+      </div>
+    <% end %>
+
     <div class="sheet__top">
       <section id="stats" class="stat-grid" aria-label="Stats">
         <% Grimwild.stats.each do |stat, description| %>

@@ -24,6 +24,23 @@
 # (Talent::MadePool).
 # "follow_ups" change a roll after it's made (Talent::FollowUp): bonus dice
 # from a talent pool, a re-roll, +1 to a die, a late assist, or a noted effect.
+- key: adventurer
+  name: Adventurer
+  kind: path
+  page: 46
+  aka: null
+  tagline: You forge your own path forward, unbeholden to any standard but your own.
+  core:
+    name: Talented
+    summary: "No path's core talent: 2 extra talents from any path instead, and more as you grow."
+    text: 'You forge your own path forward, unbeholden to any standard but your own. You gain two non-core talents from any path (in addition to the one you start with).
+
+
+      GROWTH: At levels 3 and 6, gain +1 extra talent.'
+    note: 'The Adventurer is not a full path; it trades a core talent for 2 extra path talents, and more with growth—great for those not following a specific path or abandoning their original (such as oathbreaker paladins).'
+    page: 46
+    extra_talents: { pick: 2, growth: { 3: 1, 6: 1 } }
+  talents: []
 - key: artificer
   name: Artificer
   kind: path
@@ -1498,6 +1515,7 @@
     summary: "Push yourself to do two physical actions at once with one stat, taking the top two dice."
     text: You can push yourself to attempt two distinct physical actions at once using one stat, and taking your highest two dice as the results. You can't prompt more than one impact move from this combined action.
     page: 180
+    retired: true
   - name: Cunning Actions
     summary: "On a perfect in an intense scene, keep the spotlight; the GM takes suspense instead."
     text: On a perfect in an intense scene, you can keep the spotlight, even if the GM wants to spend suspense. The GM must take suspense as an impact move on your follow-up. Afterward, move the spotlight to an ally.
@@ -1527,6 +1545,12 @@
     - { key: drawback, label: Drawback, pick: 1, from: [ conspicuous, horrifying, slow, unreliable ] }
     uses:
     - { key: features, label: Features, count: 3, per: session, named_by: features }
+  - name: Prepared Spell
+    summary: "Legacy Wizard: +1 thread a session; spend it to flash back to a spell cast with a trigger."
+    text: You gain 1 thread per session and can spend thread to flashback to casting a spell with specific triggers. Roll for the spell’s effectiveness now. The GM always take suspense in place of an impact move.
+    page: 180
+    uses:
+    - { key: thread, thread: 1 }
   - name: Steamhammer
     summary: "A steam-infused warhammer with a 6d power pool for potent pulverizing force."
     text: You have a large steam-infused warhammer. Each session, you have a 6d Steamhammer power pool. You can roll the pool to pull off potent feats of pulverizing force. You can also not expend its steam to use it as a normal warhammer.

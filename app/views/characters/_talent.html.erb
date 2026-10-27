@@ -219,6 +219,10 @@
     </div>
   <% end %>
 
+  <% if talent.core? && character.path == "Paladin" && (character.oathbroken? || editable) %>
+    <%= render "characters/oath", character: character, editable: editable %>
+  <% end %>
+
   <details id="talent-<%= talent.key %>-more" class="fold talent-card__more">
     <summary class="fold__summary">From the book<% if talent.skinned? %> · and your re-skin<% end %></summary>
     <% if talent.custom_paragraphs.any? %>

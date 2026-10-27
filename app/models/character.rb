@@ -2,7 +2,7 @@
 # identity's campaigns, where the table can see it. The GM can offer one up for
 # grabs for a player to pick (Character::Claiming).
 class Character < ApplicationRecord
-  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentChoices, Character::TalentUses, Character::TalentBonuses, Character::TalentState, Character::StatProgression, Character::BondSpark, Character::Arcana, Character::Sessions, Character::Claiming, Character::Seating, Character::EldritchTalents, Character::TalentActions, Character::Farewell
+  include Character::Damage, Character::Rolling, Character::Advancement, Character::Talents, Character::TalentSkins, Character::TalentChoices, Character::TalentUses, Character::TalentBonuses, Character::TalentState, Character::StatProgression, Character::BondSpark, Character::Arcana, Character::Sessions, Character::Claiming, Character::Seating, Character::EldritchTalents, Character::TalentActions, Character::Farewell, Character::Oath
 
   STARTING_STAT_TOTAL = 8 # 1 in each stat + 4 points (pg. 47)
 
@@ -92,7 +92,7 @@ class Character < ApplicationRecord
   end
 
   def core_talent
-    Grimwild.core_talent(path)
+    core_talent_entry&.name
   end
 
   # What the table calls them: a quoted nickname (Gibbletibble "Tibbs"), or the first name.
@@ -134,8 +134,8 @@ class Character < ApplicationRecord
 
     def starting_stats_add_up
       total = Grimwild::STATS.sum { |name| stat(name).to_i }
-      unless total == STARTING_STAT_TOTAL
-        errors.add(:base, "Stats should add up to #{STARTING_STAT_TOTAL} (1 in each, plus 4 points); they add up to #{total}")
+      unless total == starting_stat_total
+        errors.add(:base, "Stats should add up to #{starting_stat_total} (1 in each, plus #{starting_stat_total - 4} points#{" at level 0" if level.to_i.zero?}); they add up to #{total}")
       end
     end
 

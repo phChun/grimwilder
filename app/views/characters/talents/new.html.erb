@@ -12,7 +12,7 @@
   <% else %>
     <h1>Choose a talent</h1>
     <p class="page-header__lede">
-      <%= @character.name %> has <%= pluralize(@character.talent_keys.size, "talent") %> besides <%= @character.core_talent %>.
+      <%= @character.name %> has <%= pluralize(@character.talent_keys.size, "talent") %> <%= @character.core_talent ? "besides #{@character.core_talent}" : "and no core talent until level 1" %>.
       <% if @character.talents_to_choose.positive? %>
         At level <%= @character.level %>, choose <%= @character.talents_to_choose %> more.
       <% elsif @character.extra_talents.positive? %>
@@ -31,4 +31,4 @@
   <% end %>
 </header>
 
-<%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch, selected: params[:path] || Talent.groups.find { _1.name == @character.path }&.key %>
+<%= render "talents/catalog", groups: @groups, character: @character, eldritch: @eldritch, selected: params[:path] || Talent.groups.find { |group| group.name == @character.path && group.talents.any? { !_1.core? } }&.key %>
