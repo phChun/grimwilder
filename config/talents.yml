@@ -146,6 +146,9 @@
     - { key: inspiration, kind: raise, label: "Spend inspiration: +1 to their die", use: inspiration, who: allies }
     uses:
     - { key: inspiration, label: Inspiration, count: 3, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
+    choices:
+    - { key: method, label: Inspiration method, noun: method, pick: 2, optional: true, open: true, from_list: inspiration_methods }
+    - { key: method-learning, label: "And learning", noun: method, pick: 1, optional: true, open: true, from_list: inspiration_methods }
   talents:
   - name: Dynamic Entrance
     summary: "Appear in any scene where and when you like, with a 3d story roll for the entrance."
@@ -214,6 +217,10 @@
     - { key: frenzy, label: "In a frenzy: +1d per mark, and harm and marks add no thorns", per_mark: true, ignore: damage, auto: true, during: frenzy }
     uses:
     - { key: frenzy, label: Frenzy, count: 1, per: session, growth: { 3: 1, 6: 1 } }
+    choices:
+    - { key: source, label: Frenzy source, noun: source, pick: 2, optional: true, open: true, from_list: frenzy_sources }
+    - { key: source-disdain, label: "Disdain for", noun: source, pick: 1, optional: true, open: true, from_list: frenzy_sources }
+    - { key: scars, label: Scars, pick: 3, optional: true, open: true, from_list: scars }
   talents:
   - name: Fearsome
     summary: "NPCs fear you, and thread sets how; push yourself for potent feats of intimidation."
@@ -325,6 +332,7 @@
 
       GROWTH: At levels 3 and 6, gain +1d to your Wild Shape pool.'
     page: 63
+    crucible: druidic_tells
     uses:
     - { key: wild-shape, label: Wild Shape, pool: 2, pool_kind: resource, per: scene, drop_first: true, growth: { 3: 1, 6: 1 } }
   talents:
@@ -394,6 +402,7 @@
 
       GROWTH: At levels 3 and 6, gain +1 mastery per scene.'
     page: 65
+    crucible: weapon_origin
     follow_ups:
     - { key: mastery, kind: critical_effect, label: "Spend mastery to add a critical effect", use: mastery, after: weapon-mastery/style, results: [ perfect, messy ] }
     bonuses:
@@ -545,12 +554,14 @@
 
       GROWTH: At levels 2, 4, and 6, gain +1 smite per session.'
     page: 69
+    state: oath
     choices:
     - { key: tenets, label: Tenets, noun: tenet, pick: 3, open: true }
     bonuses:
     - { key: tenets, label: "+1d for each thorn from harm", harm: true, auto: true }
     uses:
-    - { key: smite, label: Smite, count: 3, per: session, growth: { 2: 1, 4: 1, 6: 1 } }
+    - { key: smite, label: Smite, count: 3, per: session, growth: { 2: 1, 4: 1, 6: 1 }, less_by: tenets_in_violation }
+    - { key: affirmation, label: Affirmation, count: 1, per: session }
   talents:
   - name: Aegis
     summary: "+1d defending yourself from physical harm, with extra effects on a perfect."
@@ -708,6 +719,7 @@
 
       GROWTH: At levels 3 and 6, choose +1 Quarry per session.'
     page: 73
+    crucible: favorite_traps
     state: quarries
     follow_ups:
     - { key: quarry, kind: bonus, label: "Add your quarry die: it's against your quarry", dice: 1, who: anyone, rolls: [ action ], six: critical_effect, needs: quarries }
@@ -1019,6 +1031,7 @@
     summary: "Bonds with 3 creatures, each with its own aspects; choose which answers your summons."
     text: You have a bond with 3 different creatures, all with their own aspects, though you still summon one at a time. When you summon a vassal, you can choose which answers the call. [Summoner Only]
     page: 80
+    state: menagerie
     choices:
     - { key: creatures, label: Creatures, noun: creature, pick: 3, open: true }
 - key: swashbuckler
@@ -1042,6 +1055,8 @@
     uses:
     - { key: panache, label: Panache, count: 2, per: scene, growth: { 2: 1, 4: 1, 6: 1 } }
     - { key: quick-wit, label: Quick Wit, count: 1, per: session }
+    choices:
+    - { key: creed, label: Creed, pick: 2, optional: true, open: true, from_list: creeds }
   talents:
   - name: Audacity
     summary: "Reckless acts: 5s count as 6s and 4s as 1s, and onlookers are struck by what you did."
@@ -1232,6 +1247,7 @@
       growth: { 2: 2, 4: 2, 6: 2 }
       open: true
       crucible: words_of_power
+    - { key: affliction, label: Affliction, pick: 1, optional: true, open: true, from_list: afflictions }
     uses:
     - { key: words, label: Words of power, count: 6, per: session, growth: { 2: 2, 4: 2, 6: 2 }, named_by: words }
   talents:

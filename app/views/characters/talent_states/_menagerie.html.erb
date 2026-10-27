@@ -1,0 +1,14 @@
+<%# locals: (character:, talent:, editable:) %>
+<%# Monster Menagerie: which bonded creature answers the summons (one at a time). %>
+<% creatures = character.picks_for(talent.choice("creatures")) %>
+<% if creatures.any? %>
+  <div class="talent-state">
+    <span class="use-tracker__name">Answering</span>
+    <% if character.answering_creature %><strong class="talent-state__on"><%= character.answering_creature %></strong><% end %>
+    <% if editable && character.in_play? %>
+      <% creatures.reject { _1 == character.answering_creature }.each do |creature| %>
+        <%= button_to creature, character_talent_state_path(character, talent.key), method: :patch, params: { change: "answer", creature: creature }, class: "button button--small button--ghost", form: { class: "talent-card__action" } %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

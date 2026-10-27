@@ -1,0 +1,41 @@
+<%# locals: (character:, talent:, editable:) %>
+<%# Oathsworn's tenets (P6 pg. 69, Character::TalentState): each violation slashes, then fills, then breaks a tenet; each in violation costs 1 smite, and a second broken one makes an Oathbreaker. Affirmation gives spark to another character, once a session. %>
+<% tenets = character.picks_for(talent.choice("tenets")) %>
+<% violations = character.tenet_violations %>
+<% if tenets.any? %>
+  <div class="talent-state oath-tenets">
+    <span class="use-tracker__name">Tenets</span>
+    <ul class="oath-tenets__list">
+      <% tenets.each do |tenet| %>
+        <% status = violations[tenet] %>
+        <li class="oath-tenets__item">
+          <span class="<%= class_names("talent-card__pick", "oath-tenets__tenet--#{status}": status) %>"><%= title_case(tenet) %></span>
+          <% if status %><small class="use-tracker__resets"><%= { "violated" => "in violation", "heavy" => "heavy violation", "broken" => "broken" }[status] %></small><% end %>
+          <% if editable && character.in_play? %>
+            <% unless status == "broken" %>
+              <%= button_to "Violated", character_talent_state_path(character, talent.key), method: :patch, params: { change: "violate", tenet: tenet }, class: "button button--small button--ghost", form: { class: "talent-card__action" } %>
+            <% end %>
+            <% if status && status != "broken" %>
+              <%= button_to "Atoned", character_talent_state_path(character, talent.key), method: :patch, params: { change: "atone", tenet: tenet }, class: "button button--small button--ghost", form: { class: "talent-card__action" } %>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <% if character.tenets_in_violation.positive? %>
+      <p class="field__hint"><%= pluralize(character.tenets_in_violation, "tenet") %> in violation: <%= character.tenets_in_violation %> less smite.</p>
+    <% end %>
+  </div>
+<% end %>
+<% use = character.use_counters.find { _1.id == "#{talent.key}/affirmation" } %>
+<% allies = character.campaign ? character.campaign.characters.played.active.where.not(id: character.id).order(:name) : [] %>
+<% if editable && character.in_play? && use && character.uses_left(use).positive? && allies.any? %>
+  <%= form_with url: character_talent_state_path(character, talent.key), method: :patch, class: "talent-card__make" do %>
+    <input type="hidden" name="change" value="affirm">
+    <label class="visually-hidden" for="affirm-ally">Who joined a scene involving your tenets?</label>
+    <select id="affirm-ally" name="ally_id" class="field__input">
+      <% allies.each do |ally| %><option value="<%= ally.id %>"><%= ally.name %></option><% end %>
+    </select>
+    <button type="submit" class="button button--small">Affirmation: give spark</button>
+  <% end %>
+<% end %>

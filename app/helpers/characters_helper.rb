@@ -60,7 +60,7 @@ module CharactersHelper
     use = character.bonus_use(bonus)
     thorns = character.bonus_thorns(bonus)
     [ ("+#{dice}d" if dice.positive?), ("+#{thorns}t" if thorns.positive?), ("defense only" if bonus.defense_only?),
-      ("#{character.uses_left(use)} of #{use.count_at(character.level)} left" if use) ].compact.join(" · ")
+      ("#{character.uses_left(use)} of #{character.use_count(use)} left" if use) ].compact.join(" · ")
   end
 
   # "Roll 3d + 1t"; stat_roll_controller.js keeps it current as the steppers change.

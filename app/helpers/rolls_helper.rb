@@ -167,7 +167,7 @@ module RollsHelper
   # "2 of 3 left", "Luck 1d", for a follow-up's use or pool.
   def follow_up_cost(actor, follow_up)
     if (use = actor.use_counters.find { _1.id == follow_up.use_id })
-      "#{actor.uses_left(use)} of #{use.count_at(actor.level)} #{use.label.downcase} left"
+      "#{actor.uses_left(use)} of #{actor.use_count(use)} #{use.label.downcase} left"
     elsif (pool = actor.talent_pools.find_by(use_key: follow_up.pool_id))
       "#{pool.name.split(": ").last} #{pool.size}d"
     end
