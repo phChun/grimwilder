@@ -2,7 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 
 // The table's rail. Its lines render once for everyone (they arrive over
 // broadcasts), so the per-viewer part happens here: your own lines sit on the
-// right.
+// right, and the lines of the private conversation picked in Show are marked
+// (by its two sides, data-from and data-to: a player's identity id or "gm"),
+// since CSS can't match a line to the choice. Whispers you haven't read
+// (newer than when you last had their conversation open, kept per browser in
+// localStorage) add "· 2 new" to the conversation in Show and light a pill
+// beside it.
 //
 // It also keeps your place. Reading the latest, new lines scroll into view;
 // scrolled up into history, you stay put and a "3 new" pill offers the way
@@ -14,11 +19,15 @@ import { Controller } from "@hotwired/stimulus"
 const NEAR_LATEST = 48 // px from the newest line that still counts as reading it
 
 export default class extends Controller {
-  static targets = ["scroller", "newPill", "newCount", "list", "older"]
-  static values = { viewer: String, before: String, more: Boolean, olderUrl: String }
+  static targets = ["scroller", "newPill", "newCount", "list", "older", "filter", "unread"]
+  static values = { viewer: String, side: String, before: String, more: Boolean, olderUrl: String }
 
   connect() {
-    this.element.querySelectorAll(".chat-line").forEach((line) => this.mark(line))
+    this.chosen = this.hasFilterTarget ? this.filterTarget.value : "all"
+    // Coming back to a hidden tab with a conversation open reads it.
+    this.onVisible = () => this.renderUnread()
+    document.addEventListener("visibilitychange", this.onVisible)
+    this.markAll()
     this.seen = new Set([...this.element.querySelectorAll(".feed-item[id]")].map((item) => item.id))
     this.unread = 0
     this.scrolled()
@@ -34,7 +43,10 @@ export default class extends Controller {
           arrived.push(node)
         }
       }))
-      if (arrived.length) this.arrived(arrived)
+      if (arrived.length) {
+        this.arrived(arrived)
+        this.renderUnread()
+      }
     })
     this.observer.observe(this.element, { childList: true, subtree: true })
 
@@ -48,6 +60,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    document.removeEventListener("visibilitychange", this.onVisible)
     this.observer?.disconnect()
     this.olderObserver?.disconnect()
   }
@@ -101,6 +114,85 @@ export default class extends Controller {
 
   mark(line) {
     line.classList.toggle("chat-line--mine", line.dataset.identity === this.viewerValue)
+    const { from, to } = line.dataset
+    const inThread = !!this.thread && ((from === this.sideValue && to === this.thread) || (from === this.thread && to === this.sideValue))
+    line.classList.toggle("feed-item--in-thread", inThread)
+  }
+
+  markAll() {
+    this.thread = this.chosen?.startsWith("private-") ? this.chosen.slice("private-".length) : null
+    this.element.querySelectorAll(".chat-line").forEach((line) => this.mark(line))
+    this.renderUnread()
+  }
+
+  // Unread whispers by conversation. One showing on a visible page (its
+  // conversation picked in Show) is read.
+  renderUnread() {
+    if (!this.hasFilterTarget) return
+    const read = this.readState()
+    const counts = {}
+    let changed = false
+
+    this.element.querySelectorAll(".chat-line[data-from][data-to]").forEach((line) => {
+      const { from, to } = line.dataset
+      if (!from || !to || from === this.sideValue) return
+      const at = Date.parse(line.querySelector("time")?.getAttribute("datetime")) || 0
+      if (at <= (read.threads[from] || read.since)) return
+      if (!document.hidden && line.getClientRects().length > 0) {
+        read.threads[from] = at
+        changed = true
+      } else {
+        counts[from] = (counts[from] || 0) + 1
+      }
+    })
+    if (changed) this.saveReadState(read)
+
+    let total = 0
+    this.firstUnread = null
+    this.filterTarget.querySelectorAll("option[data-label]").forEach((option) => {
+      const n = counts[option.value.slice("private-".length)] || 0
+      total += n
+      if (n && !this.firstUnread) this.firstUnread = option.value
+      option.textContent = n ? `${option.dataset.label} · ${n} new` : option.dataset.label
+    })
+
+    if (this.hasUnreadTarget) {
+      this.unreadTarget.hidden = total === 0
+      this.unreadTarget.textContent = `${total} private`
+      this.unreadTarget.setAttribute("aria-label", `${total} unread private ${total === 1 ? "message" : "messages"}: open the conversation`)
+    }
+  }
+
+  openUnread() {
+    if (!this.firstUnread) return
+    this.filterTarget.value = this.firstUnread
+    this.filter()
+  }
+
+  // { since, threads: { other side => newest read time } }, in ms. The first visit
+  // counts what's already there as read.
+  readState() {
+    const key = `whispers-read:${this.olderUrlValue}:${this.viewerValue}`
+    try {
+      const saved = JSON.parse(localStorage.getItem(key))
+      if (saved?.threads) return saved
+    } catch {}
+    const fresh = { since: Date.now(), threads: {} }
+    this.saveReadState(fresh)
+    return fresh
+  }
+
+  saveReadState(state) {
+    try { localStorage.setItem(`whispers-read:${this.olderUrlValue}:${this.viewerValue}`, JSON.stringify(state)) } catch {}
+  }
+
+  // Show changed. Picking a private conversation also points Speak as at it.
+  filter() {
+    this.chosen = this.filterTarget.value
+    this.markAll()
+    const voice = this.thread && this.element.querySelector(`select[name=speak_as] option[data-thread="${this.thread}"]`)
+    if (voice) voice.selected = true
+    this.toLatest()
   }
 
   // The scroller is column-reverse: scrollTop is 0 at the newest line and goes
@@ -145,8 +237,11 @@ export default class extends Controller {
     this.render()
   }
 
-  // Also after a morph, which re-renders the pill hidden.
+  // Also after a morph, which re-renders the pill hidden, Show at Everything
+  // and the lines unmarked.
   render() {
+    if (this.hasFilterTarget && this.chosen && this.filterTarget.value !== this.chosen) this.filterTarget.value = this.chosen
+    this.markAll()
     this.renderOlder()
     if (!this.hasNewPillTarget) return
     this.newPillTarget.hidden = this.unread === 0

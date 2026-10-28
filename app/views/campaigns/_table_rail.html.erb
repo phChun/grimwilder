@@ -8,7 +8,7 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.done?, "table-rail--open": !campaign.done?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
+<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.done?, "table-rail--open": !campaign.done?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-side-value="<%= gm ? "gm" : membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>
@@ -24,10 +24,12 @@
   </div>
 
   <div class="feed">
-    <%# What the feed shows; CSS hides the rest (components.css, "Filters"), lines that arrive live included. %>
+    <%# What the feed shows; CSS hides the rest (components.css, "Filters"), lines that arrive live included. A private conversation is picked by the other side: feed_controller.js marks its lines and points Speak as at them. %>
     <div class="feed__filter">
       <label class="feed__filter-label" for="<%= prefix %>_filter">Show</label>
-      <%= select_tag "#{prefix}_filter", options_for_select([ %w[ Everything all ], %w[ Story story ], [ "Table talk", "talk" ], %w[ Private private ], %w[ Dice dice ] ], "all"), id: "#{prefix}_filter", class: "field__input feed__filter-select" %>
+      <%= select_tag "#{prefix}_filter", options_for_select(feed_filters(campaign, membership), "all"), id: "#{prefix}_filter", class: "field__input feed__filter-select", data: { feed_target: "filter", action: "feed#filter" } %>
+      <%# Unread private messages (feed_controller.js); it opens the first conversation with any. %>
+      <button type="button" class="feed__unread" hidden data-feed-target="unread" data-action="feed#openUnread"></button>
     </div>
 
     <div class="feed__scroller" data-feed-target="scroller" data-action="scroll->feed#scrolled">

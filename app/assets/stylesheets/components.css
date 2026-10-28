@@ -2314,6 +2314,11 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .feed__filter { display: flex; align-items: center; gap: var(--space-2); }
 .feed__filter-label { flex: none; font-size: 0.85rem; color: var(--muted); }
 .feed__filter-select { flex: 1; min-width: 0; }
+/* Unread private messages: a purple pill beside Show. */
+.feed__unread { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); padding: 0 12px; border: 1px dashed var(--suspense-line); border-radius: 999px; background: none; color: var(--suspense-text); font: 600 13px/1 var(--font-ui); white-space: nowrap; cursor: pointer; }
+.feed__unread::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--suspense); }
+.feed__unread[hidden] { display: none; }
+.feed__unread:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* Newest at the bottom: a column-reverse scroller stays pinned to the newest line as lines arrive. */
 .feed__scroller { display: flex; flex-direction: column-reverse; max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; }
@@ -2351,10 +2356,11 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 @keyframes feed-new-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @media (prefers-reduced-motion: reduce) { .feed__new { animation: none; } }
 
-/* Filters: Story is the fiction (narration, NPCs, in character, scene dividers and game events), Table talk is out of character, Private is whispers, Dice is rolls and pool changes. */
+/* Filters: Story is the fiction (narration, NPCs, in character, scene dividers and game events), Table talk is out of character, Dice is rolls and pool changes, and a private conversation is your whispers with one person (marked .feed-item--in-thread by feed_controller.js). Everything leaves whispers out, for everyone: they're read a conversation at a time. */
+.table-rail:has(.feed__filter option[value=all]:checked) .feed__items > .feed-item--private,
+.table-rail:has(.feed__filter option[value^="private-"]:checked) .feed__items > :not(.feed-item--in-thread),
 .table-rail:has(.feed__filter option[value=story]:checked) .feed__items > :not(.feed-item--story):not(.feed-item--event),
 .table-rail:has(.feed__filter option[value=talk]:checked) .feed__items > :not(.feed-item--talk),
-.table-rail:has(.feed__filter option[value=private]:checked) .feed__items > :not(.feed-item--private),
 .table-rail:has(.feed__filter option[value=dice]:checked) .feed__items > :not(.feed-item--dice) { display: none; }
 
 .feed-item { min-width: 0; }
@@ -2406,7 +2412,9 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__delete { display: inline-flex; align-items: center; justify-content: center; width: var(--tap); height: var(--tap); border: 0; border-radius: var(--radius-sm); background: none; color: var(--dim); opacity: 0.35; cursor: pointer; }
 .chat-line:hover .chat-line__delete, .chat-line__delete:focus-visible { opacity: 1; }
 .chat-line__delete:hover { color: var(--grim); }
-.chat-line--mine { align-items: flex-end; }
+/* Incoming lines sit and read from the left; your own (feed_controller.js marks them) from the right. Narration spans the rail either way. */
+.chat-line--mine { align-items: flex-end; text-align: right; }
+.chat-line--mine .chat-line__head, .chat-line--mine .chat-line__label { justify-content: flex-end; }
 .chat-line__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); margin: 0; font-size: 13px; }
 .chat-line__who { color: var(--text-soft); }
 .chat-line__who--character { color: var(--link); }
@@ -2418,14 +2426,17 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__body--voice em { font-style: normal; }
 
 .chat-line__bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px 12px 12px 4px; background: var(--surface-2); }
-.chat-line--mine .chat-line__bubble { border-radius: 12px 12px 4px 12px; }
+.chat-line--mine .chat-line__bubble { border-radius: 12px 12px 4px 12px; background: var(--mine-bg); box-shadow: inset 0 0 0 1px var(--mine-line); }
 .chat-line__bubble--character { background: var(--ember-soft); }
 .chat-line__bubble--npc { background: var(--suspense-bg); box-shadow: inset 0 0 0 1px var(--suspense-line); }
 
 .chat-line__card { align-self: stretch; display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; }
 .chat-line__card--narration { background: var(--surface-2); }
 .chat-line__card--narration .chat-line__body { font-size: 18px; }
-.chat-line__card--whisper { border: 1px dashed var(--suspense-line); }
+.chat-line__card--whisper { align-self: auto; max-width: 85%; border: 1px dashed var(--suspense-line); }
+.chat-line--mine .chat-line__card--whisper { background: var(--mine-bg); }
+.chat-line__label { flex-wrap: wrap; }
+.chat-line .feed-item__time { white-space: nowrap; }
 .chat-line__label { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ember); }
 .chat-line__card--whisper .chat-line__label { color: var(--suspense-text); letter-spacing: 0.02em; text-transform: none; font-size: 12px; }
 

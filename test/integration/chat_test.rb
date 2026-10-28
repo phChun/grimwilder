@@ -68,7 +68,7 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select "#table_feed > li:nth-child(1).chat-line--narration .chat-line__label", /GM · Cut to/
     assert_select "#table_feed > li:nth-child(2)##{dom_id(roll)}.feed-item--dice"
     assert_select "#table_feed > li:nth-child(3).feed-item--talk .chat-line__body", "oof"
-    assert_equal [ "Everything", "Story", "Table talk", "Private", "Dice" ], css_select(".feed__filter option").map(&:text)
+    assert_equal [ "Everything", "Story", "Table talk", "Dice", "Private with the GM" ], css_select(".feed__filter option").map(&:text)
     assert_select ".composer select[name=speak_as] option", 3
     assert_select ".composer select[name=speak_as] option[value=?][selected]", "character:#{characters(:tibbs).id}"
     assert_select ".composer select[name=speak_as] option[value=whisper]", "Privately to the GM"
@@ -79,7 +79,9 @@ class ChatTest < ActionDispatch::IntegrationTest
     get campaign_table_path(@campaign)
     assert_select ".composer select[name=speak_as] option", 4
     assert_select ".composer select[name=speak_as] option[value=table_talk][selected]", 1, "between sessions the GM starts on table talk"
-    assert_select ".composer select[name=speak_as] option[value=?]", "whisper:#{characters(:tibbs).id}", "Privately to Tibbs"
+    assert_select ".composer select[name=speak_as] option[value=?][data-thread=?]", "whisper:#{characters(:tibbs).id}", identities(:pip).id.to_s, "Privately to Tibbs"
+    assert_select ".table-rail .feed__filter option[value=?]", "private-#{identities(:pip).id}", "Private: Tibbs"
+    assert_select ".feed__filter option[value=private]", 0, "no one place shows everyone's whispers"
     assert_select ".composer select[name=speak_as] option[value=narration]", "Narrate"
     assert_select ".composer select[name=speak_as] option[value=npc]", "As NPC"
     assert_select ".composer input[name=speaker_name]"
@@ -97,7 +99,7 @@ class ChatTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".chat-line--whisper .chat-line__label", /Gwen to Tibbs · private/
+    assert_select ".chat-line--whisper[data-from=gm][data-to=?] .chat-line__label", identities(:pip).id.to_s, /Gwen to Tibbs · private/
 
     sign_out
     sign_in_as identities(:stranger)

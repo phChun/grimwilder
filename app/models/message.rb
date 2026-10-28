@@ -7,11 +7,13 @@
 # - in_character: a player as their active character seated here (the GM may
 #   speak as any of them).
 # - table_talk: anyone, as themselves.
-# - whisper: private. A player's goes to the GM; the GM's goes to one player,
-#   picked by their character (to_character: sets recipient and copies the
-#   character's name into recipient_name). Only the sender, the recipient and
-#   the GM ever see it: it's never broadcast to the table, and visible_to
-#   filters it from every other player-facing query, the way hidden pools are.
+# - whisper: private, between two people. A player's goes to the GM (no
+#   recipient) or to another player; the GM's to a player. A player is picked
+#   by their character (to_character: sets recipient and copies the
+#   character's name into recipient_name). Only those two ever see it (the
+#   GM's side is every GM; the GM doesn't see players' whispers to each
+#   other): it's never broadcast to the table, and visible_to filters it from
+#   everyone else's queries, the way hidden pools are.
 #
 # The speaker's name is copied in, so the chat still reads right after a
 # rename or delete.
@@ -47,8 +49,10 @@ class Message < ApplicationRecord
   after_destroy_commit :broadcast_removal
 
   scope :visible_to, ->(membership) {
-    if membership&.gm? then all
-    elsif membership.nil? then where.not(kind: "whisper")
+    if membership.nil? then where.not(kind: "whisper")
+    elsif membership.gm?
+      gms = membership.campaign.memberships.gm.select(:identity_id)
+      where.not(kind: "whisper").or(where(kind: "whisper", recipient_id: nil)).or(where(kind: "whisper", identity_id: gms))
     else where.not(kind: "whisper").or(where(kind: "whisper", identity_id: membership.identity_id)).or(where(kind: "whisper", recipient_id: membership.identity_id))
     end
   }
@@ -66,6 +70,16 @@ class Message < ApplicationRecord
 
   def story?
     !whisper? && !table_talk?
+  end
+
+  # A whisper's two sides, for feed_controller.js to find a conversation's
+  # lines: a player by their identity id, the GM as "gm".
+  def from_side
+    sent_by_gm? ? "gm" : identity_id.to_s if whisper?
+  end
+
+  def to_side
+    recipient_id&.to_s || "gm" if whisper?
   end
 
   def to_character=(character)
@@ -107,13 +121,17 @@ class Message < ApplicationRecord
       end
     end
 
-    # A player whispers to the GM only; the GM, to a player at this table by
-    # their active character.
+    def sent_by_gm?
+      identity&.membership_in(campaign)&.gm?
+    end
+
+    # A player whispers to the GM (no recipient) or another player; the GM,
+    # to a player. Players are picked by their active character here.
     def whispers_to_someone_allowed(membership)
-      if !membership.gm?
-        errors.add(:recipient, "must be the GM") if recipient
-      elsif recipient.nil? || recipient.membership_in(campaign)&.player? != true
-        errors.add(:recipient, "must be a player at this table")
+      return if recipient.nil? && !membership.gm?
+
+      if recipient.nil? || recipient == identity || recipient.membership_in(campaign)&.player? != true
+        errors.add(:recipient, "must be another player at this table")
       elsif to_character && (to_character.campaign_id != campaign_id || !to_character.active?)
         errors.add(:recipient, "must be an active character at this table")
       end
@@ -131,6 +149,6 @@ class Message < ApplicationRecord
       return [ [ campaign, :chat ] ] unless whisper?
 
       players = [ identity, recipient ].compact.filter_map { _1.membership_in(campaign) }.reject(&:gm?)
-      [ [ campaign, :gm ], *players.map { [ _1, :chat ] } ]
+      [ ([ campaign, :gm ] if recipient.nil? || sent_by_gm?), *players.map { [ _1, :chat ] } ].compact
     end
 end

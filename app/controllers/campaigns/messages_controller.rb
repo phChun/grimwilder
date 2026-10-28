@@ -1,6 +1,6 @@
 # Table chat; the GM can delete any line, and anyone their own. The composer's speak-as picker sends speak_as: "narration",
 # "npc" (with speaker_name), "table_talk", "whisper" (a player's, to the GM),
-# "whisper:<character id>" (the GM's, to that character's player), or "character:<id>". The
+# "whisper:<character id>" (to that character's player), or "character:<id>". The
 # model decides who may speak which way. The new line reaches everyone who
 # should see it, the sender included, over the chat streams, so a Turbo
 # submit gets nothing back but the form being cleared.

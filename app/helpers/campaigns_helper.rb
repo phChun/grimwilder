@@ -97,16 +97,36 @@ module CampaignsHelper
   end
 
   # The composer's speak-as choices, as [label, value]: a player's characters,
-  # table talk and a whisper to the GM; the GM's narration, an NPC, table talk
-  # and a whisper to each player's active character here.
+  # table talk and whispers to the GM and each other player; the GM's
+  # narration, an NPC, table talk and a whisper to each player. A whisper's
+  # data-thread is the other side, as feed_filters names it.
   def speak_as_voices(campaign, membership, speakers)
+    whispers = whisper_characters(campaign, membership).map { [ "Privately to #{_1.short_name}", "whisper:#{_1.id}", { data: { thread: _1.identity_id } } ] }
     if membership.gm?
-      players = campaign.memberships.player.pluck(:identity_id)
-      whispers = campaign.characters.played.active.where(identity_id: players).order(:name).map { [ "Privately to #{_1.short_name}", "whisper:#{_1.id}" ] }
       [ %w[ Narrate narration ], [ "As NPC", "npc" ], [ "Table talk", "table_talk" ], *whispers ]
     else
-      speakers.map { [ "As #{_1.short_name}", "character:#{_1.id}" ] } + [ [ "Table talk", "table_talk" ], [ "Privately to the GM", "whisper" ] ]
+      speakers.map { [ "As #{_1.short_name}", "character:#{_1.id}" ] } + [ [ "Table talk", "table_talk" ], [ "Privately to the GM", "whisper", { data: { thread: "gm" } } ], *whispers ]
     end
+  end
+
+  # The rail's Show choices. Private conversations are one per person you can
+  # whisper with, so you pick whose to read rather than seeing them all at
+  # once: the GM's with each player, a player's with the GM and each other
+  # player (named by their active characters here).
+  def feed_filters(campaign, membership)
+    names = whisper_characters(campaign, membership).group_by(&:identity_id)
+    players = campaign.memberships.player.includes(:identity).where.not(identity_id: membership.identity_id)
+    threads = players.map { [ "Private: #{names[_1.identity_id]&.map(&:short_name)&.to_sentence || _1.identity.display_name}", "private-#{_1.identity_id}" ] }
+    threads.unshift([ "Private with the GM", "private-gm" ]) unless membership.gm?
+    # data-label keeps the plain name: feed_controller.js adds "· 2 new" to the shown one.
+    threads = threads.map { |label, value| [ label, value, { data: { label: label } } ] }
+    [ %w[ Everything all ], %w[ Story story ], [ "Table talk", "talk" ], %w[ Dice dice ], *threads ]
+  end
+
+  # Other players' active characters here: who you can whisper to.
+  def whisper_characters(campaign, membership)
+    players = campaign.memberships.player.where.not(identity_id: membership.identity_id).select(:identity_id)
+    campaign.characters.played.active.where(identity_id: players).order(:name)
   end
 
   # The composer's first speak-as choice: the GM narrates during a session; a
