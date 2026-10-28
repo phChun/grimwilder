@@ -34,18 +34,14 @@ class ChatTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "speak-as sits in one row of three, or two by two for a player with two characters" do
+  test "speak-as is a dropdown of the player's characters, table talk and a whisper to the GM" do
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".composer__voices.composer__voices--3 input[name=speak_as]", 3
+    assert_equal [ "As Tibbs", "Table talk", "To GM" ], css_select(".composer select[name=speak_as] option").map(&:text)
 
     identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
     get campaign_path(@campaign)
-    assert_select ".composer__voices.composer__voices--2 input[name=speak_as]", 4
-
-    identities(:pip).characters.create!(name: "Rue", path: "Rogue", brawn: 1, agility: 3, wits: 2, presence: 2, campaign: @campaign)
-    get campaign_path(@campaign)
-    assert_select ".composer__voices.composer__voices--3 input[name=speak_as]", 5
+    assert_select ".composer select[name=speak_as] option", 4
   end
 
     test "a blank message isn't sent, and outsiders can't post" do
@@ -73,20 +69,20 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select "#table_feed > li:nth-child(2)##{dom_id(roll)}.feed-item--dice"
     assert_select "#table_feed > li:nth-child(3).feed-item--talk .chat-line__body", "oof"
     assert_select ".feed__filter input[type=radio]", 3
-    assert_select ".composer input[name=speak_as]", 3
-    assert_select ".composer input[name=speak_as][value=?][checked]", "character:#{characters(:tibbs).id}"
-    assert_select ".composer input[name=speak_as][value=whisper] + span", "To GM"
+    assert_select ".composer select[name=speak_as] option", 3
+    assert_select ".composer select[name=speak_as] option[value=?][selected]", "character:#{characters(:tibbs).id}"
+    assert_select ".composer select[name=speak_as] option[value=whisper]", "To GM"
     assert_select ".table-rail__head .suspense-meter"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
-    assert_select ".composer input[name=speak_as]", 3
-    assert_select ".composer input[name=speak_as][value=table_talk][checked]", 1, "between sessions the GM starts on table talk"
-    assert_select ".composer input[name=speak_as][value=narration] + span", "Narrate"
-    assert_select ".composer input[name=speak_as][value=npc] + span", "As NPC"
+    assert_select ".composer select[name=speak_as] option", 3
+    assert_select ".composer select[name=speak_as] option[value=table_talk][selected]", 1, "between sessions the GM starts on table talk"
+    assert_select ".composer select[name=speak_as] option[value=narration]", "Narrate"
+    assert_select ".composer select[name=speak_as] option[value=npc]", "As NPC"
     assert_select ".composer input[name=speaker_name]"
-    assert_select ".composer input[name=speak_as][value=whisper]", 0
+    assert_select ".composer select[name=speak_as] option[value=whisper]", 0
   end
 
   test "the rail can keep your place: a scroller, a hidden new-lines pill, and who made each line" do

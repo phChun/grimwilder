@@ -100,7 +100,6 @@ Rails.application.routes.draw do
       resources :scenes, only: %i[ new create update ] do
         resource :ending, only: %i[ new create ], module: :scenes
       end
-      resources :notes, only: :create
       resources :messages, only: %i[ create destroy ]
       resource :rest, only: :create
       resource :rest_reset, only: %i[ new create ]

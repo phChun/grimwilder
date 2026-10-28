@@ -24,7 +24,7 @@
   </div>
 
   <div class="feed">
-    <%= render "shared/segmented", name: "#{prefix}_filter", legend: "Show", options: [ %w[ all Everything ], %w[ story Story ], %w[ dice Dice ] ], checked: "all", id_prefix: "#{prefix}_filter", classes: "feed__filter" %>
+    <%= render "shared/segmented", name: "#{prefix}_filter", legend: "Show", options: [ %w[ all All ], %w[ story Chat ], %w[ dice Dice ] ], checked: "all", id_prefix: "#{prefix}_filter", classes: "feed__filter" %>
 
     <div class="feed__scroller" data-feed-target="scroller" data-action="scroll->feed#scrolled">
       <div>
@@ -49,8 +49,11 @@
   <% else %>
     <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
       <% voices = gm ? [ %w[ narration Narrate ], [ "npc", "As NPC" ], [ "table_talk", "Table talk" ] ] : speakers.map { [ "character:#{_1.id}", "As #{_1.short_name}" ] } + [ [ "table_talk", "Table talk" ], [ "whisper", "To GM" ] ] %>
-      <%# In rows: one row of up to three, two by two for four (two characters), three across for more. %>
-      <%= render "shared/segmented", name: "speak_as", legend: "Speak as", options: voices, checked: default_voice(membership, speakers, speaker), id_prefix: "#{prefix}_voice", classes: "composer__voices composer__voices--#{voices.size == 4 ? 2 : voices.size.clamp(1, 3)}" %>
+      <%# Who's speaking, as a dropdown: a player's characters, table talk and a whisper to the GM; the GM's narration, an NPC and table talk. %>
+      <div class="composer__voice">
+        <label class="composer__voice-label" for="<%= prefix %>_voice">Speak as</label>
+        <%= select_tag :speak_as, options_for_select(voices.map(&:reverse), default_voice(membership, speakers, speaker)), id: "#{prefix}_voice", class: "field__input composer__voice-select" %>
+      </div>
       <div class="composer__npc">
         <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
         <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
@@ -62,13 +65,5 @@
         <button type="submit" class="button button--primary composer__send">Send</button>
       </div>
     <% end %>
-
-    <details class="table-rail__note" data-details-memory-target="section" data-section="note">
-      <summary class="table-rail__summary"><span>Log a game event</span><%= icon(:chevron) %></summary>
-      <%= form_with url: campaign_notes_path(campaign), class: "inline-form log-note-form" do %>
-        <input type="text" name="text" required maxlength="200" autocomplete="off" placeholder="Tibbs enters a frenzy…" class="field__input" aria-label="A game event for the log">
-        <button type="submit" class="button button--small">Log it</button>
-      <% end %>
-    </details>
   <% end %>
 </section>

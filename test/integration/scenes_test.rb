@@ -67,16 +67,6 @@ class ScenesTest < ActionDispatch::IntegrationTest
     assert_nil @campaign.current_scene
   end
 
-  test "anyone at the table can add a note" do
-    sign_in_as identities(:pip)
-
-    post campaign_notes_path(@campaign), params: { text: "Tibbs enters a frenzy" }
-    assert_redirected_to campaign_path(@campaign, anchor: "roll-log")
-
-    follow_redirect!
-    assert_select "#table_feed .feed-item--note", /Pip\s+Tibbs enters a frenzy/
-  end
-
   test "players can't start or end scenes" do
     session = PlaySession.start!(@campaign, characters: [ @tibbs ], by: identities(:gwen))
     scene = Scene.start!(session, title: "The bridge", by: identities(:gwen))

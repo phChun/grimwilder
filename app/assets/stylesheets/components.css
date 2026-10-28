@@ -1094,8 +1094,6 @@ form.button_to, .button_to { margin: 0; }
 
 .log-entry--note { --entry-color: var(--line-strong); padding-block: var(--space-1); }
 .log-note__text { color: var(--muted); }
-.log-note-form { margin-top: var(--space-3); }
-.log-note-form .field__input { min-width: 0; }
 .scene-form__opening { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .scene-form__opening[open] > .fold__summary { margin-bottom: var(--space-3); }
 .scene-form__opening .fold__title { font-family: var(--font-ui); font-size: 1rem; font-weight: 700; }
@@ -2429,25 +2427,23 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 
 /* Composer */
 .composer { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 12px 14px; border-top: 1px solid var(--line-soft); }
-.composer__voices { grid-template-columns: repeat(var(--voice-columns, 3), minmax(0, 1fr)); }
-.composer__voices--1 { --voice-columns: 1; }
-.composer__voices--2 { --voice-columns: 2; }
+/* Speak as: a dropdown above the message box. */
+.composer__voice { display: flex; align-items: center; gap: var(--space-2); }
+.composer__voice-label { flex: none; font-size: 0.85rem; color: var(--muted); }
+.composer__voice-select { flex: 1; min-width: 0; }
 /* A long name is cut short rather than spilling out of its cell. */
-.composer__voices .segmented__text { display: block; padding-inline: var(--space-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .composer__npc { display: none; }
-.composer:has(input[name=speak_as][value=npc]:checked) .composer__npc { display: block; }
+.composer:has(select[name=speak_as] option[value=npc]:checked) .composer__npc { display: block; }
 .composer__row { display: flex; align-items: center; gap: var(--space-2); }
 .composer__hint { flex: 1; min-width: 0; margin: 0; font-size: 12px; color: var(--dim); }
 .composer__send { flex: none; padding-inline: var(--space-5); }
 /* Three lines to start, growing with the text up to about ten. */
 .composer__input { width: 100%; min-height: 5.5rem; max-height: 16rem; resize: vertical; field-sizing: content; }
-.composer:has(input[name=speak_as][value^=character]:checked) .composer__input,
-.composer:has(input[name=speak_as][value=narration]:checked) .composer__input { font-family: var(--font-display); font-style: italic; font-size: 17px; }
+.composer:has(select[name=speak_as] option[value^=character]:checked) .composer__input,
+.composer:has(select[name=speak_as] option[value=narration]:checked) .composer__input { font-family: var(--font-display); font-style: italic; font-size: 17px; }
 
 /* A done campaign: no composer, just this. */
 .table-rail__done { margin: 0; padding: 14px; border-top: 1px solid var(--line-soft); font-size: 0.87rem; color: var(--muted); }
-.table-rail__note { padding: 0 14px 6px; }
-.table-rail__note[open] { padding-bottom: 14px; }
 
 /* ---------- Interaction states ----------
    Every clickable control says so: hover adds a ring (where there's a pointer,

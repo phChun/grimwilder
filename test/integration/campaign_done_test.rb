@@ -67,7 +67,6 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", edit_campaign_path(@campaign, anchor: "done"), "Reopen it"
 
     assert_no_difference -> { @campaign.rolls.count } do
-      post campaign_notes_path(@campaign), params: { text: "One more thing" }
       post campaign_pool_roll_path(@campaign, pools(:lookouts))
     end
     assert_match(/is done/, flash[:alert])
