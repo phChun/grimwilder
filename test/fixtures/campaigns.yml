@@ -1,3 +1,4 @@
 bramblewood:
   name: The Bramblewood Accord
   join_code: abcd-efgh-ijkl
+  optional_rules: ["stat_progression", "legacy_cores", "level_zero"]

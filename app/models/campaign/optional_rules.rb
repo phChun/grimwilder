@@ -1,6 +1,7 @@
-# The optional rules a GM turns on for the table, in settings (P6 pg. 175–178).
-# Rules a character opts into with the GM's say-so (stat progression, legacy
-# cores, level 0) stay on the character; these change what the table offers:
+# The optional rules a GM turns on for the table, in settings (P6 pg. 175–179),
+# grouped there by GROUPS. Stat progression, legacy cores and level 0 are the
+# GM's say-so for options each character then takes up on their sheet
+# (Character#rule_allows?); the rest change what the table offers:
 #
 # - `weapon_styles` (Gear, pg. 177): character forms ask for two styles.
 # - `vigor_pool`, `armor`, `supplies`, `wealth` (pg. 175–176): pools each
@@ -24,6 +25,9 @@ module Campaign::OptionalRules
 
   # rule => [name, page, what it does]
   RULES = {
+    "stat_progression" => [ "Stat progression", 175, "Once, a character can give up a talent for +1 to a stat (to a max of 3)." ],
+    "legacy_cores" => [ "Legacy core talents", 179, "The Fighter, Psion and Bard may use their older core talents." ],
+    "level_zero" => [ "Level 0", 177, "New characters may start at level 0: no core talent and 3 stat points, until their first XP." ],
     "weapon_styles" => [ "Weapon styles", 177, "Each PC's weapons have two styles that shape the fiction." ],
     "vigor_pool" => [ "Vigor pool", 175, "For games without healing magic: a 3d Vigor pool each, rolled to clear 1 harm, refreshed by a rest or downtime." ],
     "armor" => [ "Armor", 176, "Light armor gives a 1d Armor pool each session, heavy 2d: roll it after a physical consequence to lessen it." ],
@@ -36,6 +40,14 @@ module Campaign::OptionalRules
     "token_initiative" => [ "Token initiative", 175, "In an intense moment, each player gets 2 tokens to spend on story beats; all regain them once they're spent." ],
     "active_vigilance" => [ "Active vigilance", 178, "A story roll for what a PC notices: perfect, a reveal; messy, a hint; grim, the GM strikes." ],
     "writers_room" => [ "Writers' room", 178, "Tangles and thread needn't come from vantage; only details that benefit the party cost thread." ]
+  }.freeze
+
+  # How settings lays the rules out.
+  GROUPS = {
+    "Characters" => %w[ stat_progression legacy_cores level_zero weapon_styles ],
+    "Pools and gear" => %w[ vigor_pool armor supplies wealth encumbrance ],
+    "Advancement and rests" => %w[ milestone_levels focused_growth rest_resets ],
+    "At the table" => %w[ token_initiative active_vigilance writers_room ]
   }.freeze
 
   def optional_rules=(value)

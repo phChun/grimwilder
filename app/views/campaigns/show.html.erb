@@ -63,7 +63,11 @@
           <% elsif @mine %>
             <%= link_to "Open my character", character_path(@mine), class: "button button--primary" %>
           <% else %>
-            <%= link_to "Make your character", new_character_path(campaign_id: campaign.id), class: "button button--primary" %>
+            <% if campaign.makes_characters?(Current.identity) %>
+              <%= link_to "Make your character", new_character_path(campaign_id: campaign.id), class: "button button--primary" %>
+            <% else %>
+              <span class="field__hint">The GM makes the characters here: pick one up for grabs.</span>
+            <% end %>
           <% end %>
           <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button" %>
         </div>

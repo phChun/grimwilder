@@ -2697,3 +2697,10 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .vex__toggles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .vex__does { margin: 0; font-size: 0.9rem; color: var(--grim); }
 .vex__hint { margin: 0; }
+
+/* Campaign settings: Characters and Optional rules, each its own section. */
+.settings-form .fieldset { display: grid; gap: var(--space-2); min-width: 0; }
+.settings-form__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: var(--space-1) var(--space-3); }
+.settings-form__group + .settings-form__group { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
+.settings-form__rule { align-items: flex-start; }
+.settings-form__rule small { color: var(--dim); font-weight: 400; }

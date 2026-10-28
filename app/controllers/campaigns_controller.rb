@@ -35,7 +35,9 @@ class CampaignsController < ApplicationController
 
   def update
     if Current.campaign.update(campaign_params)
-      redirect_to Current.campaign, notice: "Campaign saved."
+      # The Characters and Optional rules sections come back to settings.
+      section = params[:section].presence_in(%w[ settings-characters settings-rules ])
+      redirect_to (section ? edit_campaign_path(Current.campaign, anchor: section) : Current.campaign), notice: "Campaign saved."
     else
       load_settings
       render :edit, status: :unprocessable_entity
@@ -53,7 +55,7 @@ class CampaignsController < ApplicationController
     end
 
     def campaign_params
-      params.expect(campaign: [ :name, :pitch, :setting, :party_never, :group_arc, party_is: [], optional_rules: [] ])
+      params.expect(campaign: [ :name, :pitch, :setting, :party_never, :group_arc, :players_make_characters, :players_set_level, :starting_level, party_is: [], optional_rules: [], allowed_paths: [] ])
     end
 
     def load_settings
