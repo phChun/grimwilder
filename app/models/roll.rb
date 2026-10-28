@@ -1,7 +1,8 @@
 # One roll at the table: an action or defense roll from a character sheet, a
 # story roll, a quarrel, a montage, or a pool roll; a marker for a session or
 # scene boundary; or a short note ("Tibbs enters a frenzy"). A campaign's rolls are its shared log, broadcast to everyone at
-# the table as they land; rolls on hidden pools reach only the GM. Each is
+# the table as they land; rolls on hidden pools, and rolls made secret (gm_only),
+# reach only the GM, and whoever made a secret one. Each is
 # stamped with the session and scene that were going when it was made.
 #
 # Names are copied in when rolled, so the log still reads right after a
@@ -26,7 +27,12 @@ class Roll < ApplicationRecord
   validates :outcome, inclusion: { in: Grimwild::Dice::RESULTS }, allow_nil: true, if: :pool? # power pools rolled as an action
 
   scope :recent, -> { order(created_at: :desc, id: :desc) }
-  scope :visible_to, ->(membership) { membership&.gm? ? all : where(gm_only: false) }
+  scope :visible_to, ->(membership) {
+    if membership&.gm? then all
+    elsif membership then where(gm_only: false).or(where(identity_id: membership.identity_id))
+    else where(gm_only: false)
+    end
+  }
   scope :table_log, ->(membership, limit: 50) { visible_to(membership).includes(:identity, :pool).recent.limit(limit) }
 
   before_validation :stamp_session, on: :create
@@ -43,9 +49,10 @@ class Roll < ApplicationRecord
       name: character&.name || by.display_name, question: text.to_s.squish.first(200))
   end
 
-  # Players follow the open log; the GM also follows the GM-only one.
+  # Players follow the open log and their own secret rolls; the GM also
+  # follows the GM-only one.
   def self.streams_for(campaign, membership)
-    [ [ campaign, :rolls ], ([ campaign, :gm_rolls ] if membership&.gm?) ].compact
+    [ [ campaign, :rolls ], (membership&.gm? ? [ campaign, :gm_rolls ] : ([ membership, :rolls ] if membership)) ].compact
   end
 
   # The roller's own d6s plus any assist dice: together they set the result.
@@ -96,14 +103,18 @@ class Roll < ApplicationRecord
 
     # Into the table's rail (TableFeed), after the newest line.
     def broadcast_to_table
-      broadcast_append_later_to table_stream, target: "table_feed", partial: "rolls/feed_item", locals: { roll: self }
+      table_streams.each { broadcast_append_later_to _1, target: "table_feed", partial: "rolls/feed_item", locals: { roll: self } }
     end
 
     def broadcast_change_to_table
-      broadcast_replace_later_to table_stream, partial: "rolls/feed_item", locals: { roll: self }
+      table_streams.each { broadcast_replace_later_to _1, partial: "rolls/feed_item", locals: { roll: self } }
     end
 
-    def table_stream
-      [ campaign, (gm_only? ? :gm_rolls : :rolls) ]
+    # A secret roll goes to the GM, and to a player who made it.
+    def table_streams
+      return [ [ campaign, :rolls ] ] unless gm_only?
+
+      roller = campaign.memberships.find_by(identity: identity)
+      [ [ campaign, :gm_rolls ], ([ roller, :rolls ] if roller && !roller.gm?) ].compact
     end
 end

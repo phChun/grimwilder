@@ -4,7 +4,7 @@
 <% elsif roll.note? %>
   <%= render "rolls/note", roll: roll %>
 <% else %>
-  <li id="<%= dom_id(roll) %>" class="<%= class_names("log-entry", "log-entry--#{roll.outcome}": roll.outcome, "log-entry--quarrel": roll.quarrel?) %>">
+  <li id="<%= dom_id(roll) %>" class="<%= class_names("log-entry", "log-entry--#{roll.outcome}": roll.outcome, "log-entry--quarrel": roll.quarrel?, "log-entry--gm-only": roll.gm_only?) %>">
     <div class="log-entry__head">
       <p class="log-entry__title">
         <% case roll.kind %>
@@ -19,7 +19,7 @@
         <% else %>
           <strong><%= roll.name %></strong> <%= roll.stat.capitalize %> <%= roll.kind %>
         <% end %>
-        <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+        <% if roll.gm_only? %><span class="tag tag--gm-only">GM only</span><% end %>
       </p>
       <% if roll.quarrel? %>
         <span class="log-entry__result"><%= quarrel_result(roll) %></span>

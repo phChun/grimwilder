@@ -29,12 +29,13 @@ module Character::Rolling
   # assist_bonuses: { ally id => bonus ids } ticked for an assist (Shepherd).
   # panache: Panache spent to remove thorns; removing them all rolls them as
   # panache dice instead (pg. 81).
-  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], assist_bonuses: {}, panache: 0, help_from: nil, random: Random)
+  def roll!(stat_name, by:, mode: "action", spend_spark: 0, help: 0, assists: [], thorns: 0, bonuses: [], assist_bonuses: {}, panache: 0, help_from: nil, gm_only: false, random: Random)
     stat_name = stat_name.to_s
     raise ArgumentError, "#{name} is #{status}; return them to play to roll." if gone?
     raise ArgumentError, "#{campaign.name} is done." if campaign&.done?
     raise ArgumentError, "Pick Brawn, Agility, Wits or Presence." unless Grimwild::STATS.include?(stat_name)
     raise ArgumentError, "Pick an action or a defense roll." unless MODES.include?(mode)
+    raise ArgumentError, "Only a roll at a table can be kept for the GM." if gm_only && campaign.nil?
     check_spark_spend!(spend_spark)
     raise ArgumentError, "Extra dice and thorns go from 0 to #{MAX_EXTRA}." unless [ help, thorns ].all? { _1.in?(0..MAX_EXTRA) }
     check_assists!(assists)
@@ -56,7 +57,8 @@ module Character::Rolling
       boosts: Array.new(removed.positive? && reasons.empty? && thorns.zero? ? removed : 0) { random.rand(1..8) },
       stat_dice: stat(stat_name), help_dice: help, help_from: (help_from.to_s.squish.first(60).presence if help.positive?), spark_spent: spend_spark, damage_reasons: reasons,
       talent_bonuses: bonus_records(talent_rolled, ignored: ignored) + panache_records(removed),
-      assists: helping.flat_map { |ally, rolled| ally.assist_entries(rolled, random: random) }
+      assists: helping.flat_map { |ally, rolled| ally.assist_entries(rolled, random: random) },
+      gm_only: gm_only
     )
     result = roll.interpretation
     roll.outcome, roll.critical = result.result, result.critical

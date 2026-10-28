@@ -15,17 +15,17 @@
     <% end %>
   </li>
 <% elsif roll.pool? && roll.outcome.nil? %>
-  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="feed-item feed-item--dice feed-pool">
+  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="<%= class_names("feed-item", "feed-item--dice", "feed-pool", "feed-item--gm-only": roll.gm_only?) %>">
     <p class="feed-pool__line">
       <span class="feed-pool__name"><%= roll.name %><%= ": #{roll.phase}" if roll.phase %></span>
       <span class="feed-pool__change"><% if roll.dropped %><%= roll.remaining + roll.dropped.to_i %>d → <strong><%= roll.remaining %>d</strong><% end %></span>
       <span class="feed-pool__who"><%= roll.identity.display_name %></span>
-      <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+      <% if roll.gm_only? %><span class="tag tag--gm-only">GM only</span><% end %>
     </p>
     <p class="feed-item__meta"><%= pool_roll_summary(roll) %></p>
   </li>
 <% else %>
-  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="<%= class_names("feed-item", "feed-item--dice", "feed-roll", "feed-item--#{roll.outcome}": roll.outcome, "feed-roll--#{roll_result_tier(roll)}": roll.outcome) %>">
+  <li id="<%= dom_id(roll) %>" data-identity="<%= roll.identity_id %>" class="<%= class_names("feed-item", "feed-item--dice", "feed-roll", "feed-item--#{roll.outcome}": roll.outcome, "feed-roll--#{roll_result_tier(roll)}": roll.outcome, "feed-item--gm-only": roll.gm_only?) %>">
     <p class="feed-roll__head">
       <% case roll.kind %>
       <% when "pool" %>
@@ -39,7 +39,7 @@
       <% else %>
         <strong><%= roll.name %></strong> <%= roll.stat.capitalize %><%= " defense" if roll.defense? %>
       <% end %>
-      <% if roll.gm_only? %><span class="tag">GM only</span><% end %>
+      <% if roll.gm_only? %><span class="tag tag--gm-only">GM only</span><% end %>
       <%= time %>
     </p>
     <% if roll.question %>

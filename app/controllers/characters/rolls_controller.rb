@@ -1,7 +1,7 @@
 # Action and defense rolls from the sheet. The setup folds open on the stat
 # card itself; the server rolls, then the sheet shows the result as a toast.
 # Rolls of a seated character also land in the campaign's log for the whole
-# table.
+# table, or only the GM's when the player keeps it secret.
 class Characters::RollsController < ApplicationController
   include CharacterScoped
 
@@ -9,7 +9,7 @@ class Characters::RollsController < ApplicationController
     stat = params.expect(:stat)
     @character.roll!(stat, by: Current.identity, mode: params[:mode].presence || "action",
       spend_spark: params[:spark].to_i, help: help(stat), thorns: situational_thorns(stat), assists: assists, bonuses: params[:bonuses],
-      assist_bonuses: assist_bonuses, panache: params[:panache].to_i, help_from: params[:help_from])
+      assist_bonuses: assist_bonuses, panache: params[:panache].to_i, help_from: params[:help_from], gm_only: params[:gm_only] == "1")
     redirect_to @character
   rescue ArgumentError => error
     redirect_to @character, alert: error.message
