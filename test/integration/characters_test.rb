@@ -121,13 +121,14 @@ class CharactersTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get character_path(@tibbs)
-    assert_select ".stat-card details.stat-roll", 4
+    assert_select ".stat-card .stat-roll dialog.roll-dialog", 4
     assert_select ".stat-card--marked button.mark-toggle[aria-pressed=true]", "Marked"
     assert_select ".stat-card button.mark-toggle[aria-pressed=false]", { count: 3, text: "Mark" }
     assert_select "#damage .mark-toggle", 0, "marks are on the stat cards now"
-    assert_select "details.stat-roll summary", text: "Roll Agility"
-    assert_select "details.stat-roll .popover__head button.close-button[aria-label=Close]", 4
-    assert_select "details.stat-roll form[action=?]", character_rolls_path(@tibbs) do |forms|
+    assert_select ".stat-roll button.stat-roll__toggle[data-action=?]", "roll-dialog#open", text: "Roll Agility"
+    assert_select "dialog.roll-dialog[aria-labelledby=roll_agility_title] h2#roll_agility_title", "Roll Agility"
+    assert_select "dialog.roll-dialog button.close-button[aria-label=Close][data-action=?]", "roll-dialog#close", 4
+    assert_select "dialog.roll-dialog form[action=?]", character_rolls_path(@tibbs) do |forms|
       agility = forms.find { _1.at_css("input[name=stat][value=agility]") }
       assert_equal 2, agility.css("input[name=spark]").size, "0 or the 1 spark Tibbs holds"
       assert agility.at_css("input[name=dice][value='3'][min='3']"), "dice start at the stat"
@@ -212,11 +213,11 @@ class CharactersTest < ActionDispatch::IntegrationTest
 
     get character_path(@tibbs)
     assert_select "#talent-spellcraft a[href='#{character_path(@tibbs, cast: "spellcraft", anchor: "stats")}']", text: /Cast/
-    assert_select "details.stat-roll[open]", 0
+    assert_select ".stat-roll[data-roll-dialog-open-value=true]", 0
 
     get character_path(@tibbs, cast: "spellcraft")
-    assert_select "details.stat-roll[open]", 1
-    assert_select "details.stat-roll[open] #roll_wits_bonus_spellcraft-cast[checked]", 1
+    assert_select ".stat-roll[data-roll-dialog-open-value=true]", 1
+    assert_select ".stat-roll[data-roll-dialog-open-value=true] #roll_wits_bonus_spellcraft-cast[checked]", 1
     assert_select "#roll_wits_bonus_spellcraft-potent[checked]", 0
 
     post character_rolls_path(@tibbs), params: { stat: "wits", mode: "action", dice: 2, total_thorns: 0, bonuses: [ "spellcraft/cast" ] }
