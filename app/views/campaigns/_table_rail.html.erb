@@ -1,5 +1,5 @@
-<%# locals: (campaign:, membership:, feed:, speakers:, speaker: nil, suspense: nil, quick_roll: nil, classes: nil) %>
-<%# The table's rail: chat and log in one time-ordered stream (TableFeed), filtered in the browser, with the composer. speakers: the active characters this member can speak as; speaker: the one picked first; quick_roll: where the die button goes. %>
+<%# locals: (campaign:, membership:, feed:, speakers:, speaker: nil, suspense: nil, classes: nil) %>
+<%# The table's rail: chat and log in one time-ordered stream (TableFeed), filtered in the browser, with the composer. speakers: the active characters this member can speak as; speaker: the one picked first; %>
 <% feed.streams.each do |stream| %>
   <%= turbo_stream_from(*stream) %>
 <% end %>
@@ -58,9 +58,6 @@
       <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
       <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
       <div class="composer__row">
-        <% if quick_roll %>
-          <%= link_to quick_roll, class: "button composer__roll", "aria-label": "Roll", title: "Roll" do %><%= icon(:die, size: 18) %><% end %>
-        <% end %>
         <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
         <button type="submit" class="button button--primary composer__send">Send</button>
       </div>

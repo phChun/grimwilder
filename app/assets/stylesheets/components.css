@@ -1809,14 +1809,14 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 /* Wide screens: the rail sticks beside the page at the viewport's height, and
    the feed takes what's left, so the composer is always in view. */
 @media (min-width: 60rem) {
-  .fluid__rail.table-rail { position: sticky; top: var(--space-4); max-height: min(80vh, calc(100vh - 2 * var(--space-4))); }
+  .fluid__rail.table-rail { position: sticky; top: var(--space-4); height: calc(100vh - 2 * var(--space-4)); }
   .fluid__rail.table-rail .feed,
   .gm-view__side .table-rail .feed { flex: 1 1 auto; min-height: 0; }
   .fluid__rail.table-rail .feed__scroller,
   .gm-view__side .table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
-  /* The GM table: the chat at a set height (70vh, never under 34rem), and Kept crucibles under
+  /* The GM table: the chat at a set height (85vh, never under 38rem), and Kept crucibles under
      it at its full length; the page scrolls to reach it, so this column doesn't stick. */
-  .gm-view__side > .table-rail { height: max(34rem, 70vh); }
+  .gm-view__side > .table-rail { height: max(38rem, 85vh); }
 }
 .gm-view__side { display: flex; flex-direction: column; gap: var(--space-3); }
 
@@ -2437,7 +2437,6 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .composer__npc { display: none; }
 .composer:has(input[name=speak_as][value=npc]:checked) .composer__npc { display: block; }
 .composer__row { display: flex; align-items: center; gap: var(--space-2); }
-.composer__roll { width: var(--tap); padding: 0; flex: none; }
 .composer__hint { flex: 1; min-width: 0; margin: 0; font-size: 12px; color: var(--dim); }
 .composer__send { flex: none; padding-inline: var(--space-5); }
 /* Three lines to start, growing with the text up to about ten. */
