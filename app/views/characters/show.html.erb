@@ -177,33 +177,30 @@
           </ul>
         <% end %>
 
-        <%# Vex (pg. 30): a flash of emotion and its response, a beat or two; a scene's end or a rest clears it. %>
-        <% if @character.vex %>
-          <div class="vex vex--on">
-            <span class="vex__name"><strong>Vex: <%= @character.vex.capitalize %></strong><% if @character.vex_subject %> · <%= @character.vex_subject %><% end %></span>
-            <span class="vex__does"><%= Character::Damage::VEX_RESPONSES[@character.vex] %></span>
-            <% if tends %><%= button_to "It passes", character_vex_path(@character), method: :delete, class: "button button--ghost button--small" %><% end %>
-          </div>
-        <% elsif tends && @character.in_play? %>
-          <details class="fold vex">
-            <summary class="fold__summary"><span class="fold__title">Take vex</span></summary>
-            <%= form_with url: character_vex_path(@character), class: "vex__form stack" do %>
-              <fieldset class="vex__responses">
-                <legend class="field__hint">An intense flash of emotion prompts an instinctive response. You choose how it plays out.</legend>
-                <% Character::Damage::VEX_RESPONSES.each do |response, does| %>
-                  <label class="check vex__response">
-                    <%= radio_button_tag :vex, response, false, required: true, id: "vex_#{response}" %>
-                    <span><strong><%= response.capitalize %></strong>: <%= does %></span>
-                  </label>
+        <%# Vex (pg. 30): a flash of emotion and the response it prompts, a beat or two. Like harm, a row of toggles: tap one to take that vex, the lit one to let it pass; a scene's end or a rest clears it too. %>
+        <div class="vex">
+          <p class="vex__label">Vex</p>
+          <div class="harm__toggles vex__toggles">
+            <% Character::Damage::VEX_RESPONSES.each do |response, does| %>
+              <% on = @character.vex == response %>
+              <% if tends && (on || @character.in_play?) %>
+                <% if on %>
+                  <%= button_to response.capitalize, character_vex_path(@character), method: :delete, class: "harm-toggle vex-toggle", "aria-pressed": "true", title: "#{does} Tap when it passes." %>
+                <% else %>
+                  <%= button_to response.capitalize, character_vex_path(@character), params: { vex: response }, class: "harm-toggle vex-toggle", "aria-pressed": "false", title: does %>
                 <% end %>
-              </fieldset>
-              <input type="text" name="subject" maxlength="<%= Character::Damage::VEX_SUBJECT_LIMIT %>" autocomplete="off" placeholder="At what? the ogre, the dark…" class="field__input" aria-label="What the vex is about (optional)">
-              <% answers = @character.talent_entries.map(&:key) & %w[ frenzy iron-will psychic-warrior tumultuous-mind ] %>
-              <% if answers.any? %><p class="field__hint">Talents that answer vex: <%= answers.map { Talent.find(_1).name }.to_sentence %>.</p><% end %>
-              <button type="submit" class="button button--small">Take vex</button>
+              <% else %>
+                <span class="<%= class_names("harm-toggle vex-toggle", "harm-toggle--on": on) %>" title="<%= does %>"><%= response.capitalize %><span class="visually-hidden"><%= on ? ": yes" : ": no" %></span></span>
+              <% end %>
             <% end %>
-          </details>
-        <% end %>
+          </div>
+          <% if @character.vex %>
+            <p class="vex__does"><%= Character::Damage::VEX_RESPONSES[@character.vex] %><% if @character.vex_subject %> (<%= @character.vex_subject %>)<% end %></p>
+          <% elsif tends %>
+            <% answers = @character.talent_entries.map(&:key) & %w[ frenzy iron-will psychic-warrior tumultuous-mind ] %>
+            <p class="field__hint vex__hint">A flash of emotion and the response it prompts; you choose how it plays out.<% if answers.any? %> Talents that answer it: <%= answers.map { Talent.find(_1).name }.to_sentence %>.<% end %></p>
+          <% end %>
+        </div>
 
         <% if tends %>
           <%= form_with url: character_conditions_path(@character), class: "condition-form" do |form| %>

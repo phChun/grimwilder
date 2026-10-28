@@ -102,7 +102,9 @@ class GmHarmTest < ActionDispatch::IntegrationTest
     assert_match "took vex (flight, the ogre) on Tibbs", campaigns(:bramblewood).rolls.note.last.question
 
     get character_path(tibbs)
-    assert_select ".vex--on .vex__name", /Vex: Flight · the ogre/
+    assert_select "#damage .vex-toggle[aria-pressed=true]", "Flight"
+    assert_select "#damage .vex-toggle[aria-pressed=false]", 3
+    assert_select "#damage .vex__does", /Run from the subject.*\(the ogre\)/
     get campaign_table_path(campaigns(:bramblewood))
     assert_select ".party-card__harm", /Vex: flight \(the ogre\)/
 
