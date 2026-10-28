@@ -21,7 +21,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select "#table_feed > li", 0
-    assert_select "turbo-cable-stream-source", 6, "pool and table refreshes, the live banner, the open log, the chat and your own whispers"
+    assert_select "turbo-cable-stream-source", 7, "pool and table refreshes, the live banner, the open log, your own secret rolls, the chat and your own whispers"
 
     sign_out
     sign_in_as identities(:gwen)
@@ -81,6 +81,44 @@ class TableLogTest < ActionDispatch::IntegrationTest
       end
     end
     assert_no_turbo_stream_broadcasts [ @campaign, :rolls ]
+  end
+
+  test "a player can keep a roll for the GM: only the GM and they see it" do
+    @campaign.memberships.create!(identity: identities(:ada), role: "player")
+
+    sign_in_as identities(:pip)
+    get character_path(characters(:tibbs))
+    assert_select "dialog.roll-dialog input[type=checkbox][name=gm_only]", 4, "one in each stat's setup"
+
+    perform_enqueued_jobs do
+      assert_turbo_stream_broadcasts [ @campaign, :gm_rolls ], count: 1 do
+        assert_turbo_stream_broadcasts [ memberships(:pip_player), :rolls ], count: 1 do
+          post character_rolls_path(characters(:tibbs)), params: { stat: "wits", gm_only: "1" }
+        end
+      end
+    end
+    assert_no_turbo_stream_broadcasts [ @campaign, :rolls ]
+    assert @campaign.rolls.sole.gm_only?
+
+    get campaign_path(@campaign)
+    assert_select "#table_feed > li", 1
+    assert_select "#table_feed .tag", "GM only"
+
+    sign_out
+    sign_in_as identities(:ada)
+    get campaign_path(@campaign)
+    assert_select "#table_feed > li", 0
+
+    sign_out
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
+    assert_select "#table_feed > li", 1
+  end
+
+  test "a character at no table has no one to keep a roll from" do
+    tibbs = characters(:tibbs)
+    tibbs.update!(campaign: nil)
+    assert_raises(ArgumentError) { tibbs.roll!("wits", by: identities(:pip), gm_only: true) }
   end
 
   test "taking spark from a critical updates the log entry live" do

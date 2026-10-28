@@ -25,7 +25,16 @@ class RollTest < ActiveSupport::TestCase
     assert_equal @tibbs.name, roll.name
   end
 
+  test "a story roll for no one in particular can be the GM's alone" do
+    roll = Roll.story!(campaign: @campaign, by: identities(:gwen), question: "Is the spy lying?", gm_only: true)
+
+    assert roll.gm_only?
+    assert_includes @campaign.rolls.visible_to(memberships(:gwen_gm)), roll
+    assert_not_includes @campaign.rolls.visible_to(memberships(:pip_player)), roll
+  end
+
   test "story rolls stay within the rules" do
+    assert_raises(ArgumentError) { Roll.story!(campaign: @campaign, by: identities(:gwen), character: @tibbs, gm_only: true) }
     assert_raises(ArgumentError) { Roll.story!(campaign: @campaign, by: identities(:gwen), odds: 4) }
     assert_raises(ArgumentError) { Roll.story!(campaign: @campaign, by: identities(:gwen), spend_spark: 1) }
     assert_raises(ArgumentError) { Roll.story!(campaign: @campaign, by: identities(:pip), character: @tibbs, spend_spark: 2) }

@@ -97,6 +97,10 @@
         </fieldset>
       <% end %>
 
+      <% if character.campaign %>
+        <label class="check stat-roll__secret"><%= check_box_tag :gm_only, "1", false, id: "#{prefix}_gm_only" %> Only the GM sees it <small class="field__hint">(kept out of the other players' log)</small></label>
+      <% end %>
+
       <div class="stat-roll__actions">
         <button type="submit" name="mode" value="action" class="button button--primary stat-roll__go" data-stat-roll-target="label"><%= stat_roll_label(dice, damage) %></button>
         <button type="submit" name="mode" value="defense" class="button">Defense</button>

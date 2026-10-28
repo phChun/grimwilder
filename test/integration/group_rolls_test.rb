@@ -83,6 +83,31 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     assert_empty @campaign.roll_calls
   end
 
+  test "the GM can keep a story roll for no one in particular to themselves" do
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
+    assert_select "#rolls input[type=checkbox][name=gm_only]"
+
+    post campaign_story_rolls_path(@campaign), params: { question: "Is the spy lying?", gm_only: "1" }
+    roll = @campaign.rolls.story.recent.first
+    assert roll.gm_only?
+    get campaign_table_path(@campaign)
+    assert_select "#table_feed", text: /Is the spy lying\?/
+
+    sign_out
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select "#table_feed", text: /Is the spy lying\?/, count: 0
+  end
+
+  test "a story roll for a character is never secret: their player rolls it" do
+    sign_in_as identities(:gwen)
+    post campaign_story_rolls_path(@campaign), params: { character_id: @tibbs.id, gm_only: "1" }
+    call = @campaign.roll_calls.open.sole
+    call.roll!(@tibbs, by: identities(:pip))
+    assert_not @campaign.rolls.story.recent.first.gm_only?
+  end
+
   test "a bad story roll goes back with the reason" do
     sign_in_as identities(:gwen)
 
