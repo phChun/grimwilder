@@ -8,7 +8,7 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.done?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
+<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.done?, "table-rail--open": !campaign.done?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>
@@ -24,7 +24,11 @@
   </div>
 
   <div class="feed">
-    <%= render "shared/segmented", name: "#{prefix}_filter", legend: "Show", options: [ %w[ all All ], %w[ story Chat ], %w[ dice Dice ] ], checked: "all", id_prefix: "#{prefix}_filter", classes: "feed__filter" %>
+    <%# What the feed shows; CSS hides the rest (components.css, "Filters"), lines that arrive live included. %>
+    <div class="feed__filter">
+      <label class="feed__filter-label" for="<%= prefix %>_filter">Show</label>
+      <%= select_tag "#{prefix}_filter", options_for_select([ %w[ Everything all ], %w[ Story story ], [ "Table talk", "talk" ], %w[ Private private ], %w[ Dice dice ] ], "all"), id: "#{prefix}_filter", class: "field__input feed__filter-select" %>
+    </div>
 
     <div class="feed__scroller" data-feed-target="scroller" data-action="scroll->feed#scrolled">
       <div>
@@ -48,11 +52,11 @@
     <p class="table-rail__done"><%= campaign.name %> is done. The log stays here to read.</p>
   <% else %>
     <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
-      <% voices = gm ? [ %w[ narration Narrate ], [ "npc", "As NPC" ], [ "table_talk", "Table talk" ] ] : speakers.map { [ "character:#{_1.id}", "As #{_1.short_name}" ] } + [ [ "table_talk", "Table talk" ], [ "whisper", "To GM" ] ] %>
-      <%# Who's speaking, as a dropdown: a player's characters, table talk and a whisper to the GM; the GM's narration, an NPC and table talk. %>
+      <%# Who's speaking, as a dropdown: a player's characters, table talk and a whisper to the GM; the GM's narration, an NPC, table talk and a whisper to each player's character. %>
+      <% voices = speak_as_voices(campaign, membership, speakers) %>
       <div class="composer__voice">
         <label class="composer__voice-label" for="<%= prefix %>_voice">Speak as</label>
-        <%= select_tag :speak_as, options_for_select(voices.map(&:reverse), default_voice(membership, speakers, speaker)), id: "#{prefix}_voice", class: "field__input composer__voice-select" %>
+        <%= select_tag :speak_as, options_for_select(voices, default_voice(membership, speakers, speaker)), id: "#{prefix}_voice", class: "field__input composer__voice-select" %>
       </div>
       <div class="composer__npc">
         <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>

@@ -1,7 +1,7 @@
 <%# locals: (message:) %>
-<%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right, and the delete button shows only in the GM's rail (.table-rail--gm, not once the campaign is done; the server checks too). Players' copies carry it hidden: a broadcast can't tell who's watching. %>
+<%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right, and the delete button shows on every line in the GM's rail and on your own lines in anyone's (CSS, not once the campaign is done; the server checks too). Other copies carry it hidden: a broadcast can't tell who's watching. %>
 <% time = capture do %><time class="feed-item__time" datetime="<%= message.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= message.created_at.utc.strftime("%H:%M UTC") %></time><% end %>
-<li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": !message.story?) %>" data-identity="<%= message.identity_id %>" data-kind="<%= message.kind %>">
+<li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": message.table_talk?, "feed-item--private": message.whisper?) %>" data-identity="<%= message.identity_id %>" data-kind="<%= message.kind %>">
   <% case message.kind %>
   <% when "narration" %>
     <div class="chat-line__card chat-line__card--narration">
@@ -16,7 +16,7 @@
     <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
   <% when "whisper" %>
     <div class="chat-line__card chat-line__card--whisper">
-      <p class="chat-line__label"><%= icon(:lock, size: 13) %> <%= message.name %> to the GM · only you and the GM <%= time %></p>
+      <p class="chat-line__label"><%= icon(:lock, size: 13) %> <%= message.name %> to <%= message.recipient_name || "the GM" %> · private <%= time %></p>
       <p class="chat-line__body"><%= chat_format(message.body) %></p>
     </div>
   <% else %>

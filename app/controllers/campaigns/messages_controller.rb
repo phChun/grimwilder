@@ -1,12 +1,11 @@
-# Table chat; the GM can also delete a line. The composer's speak-as picker sends speak_as: "narration",
-# "npc" (with speaker_name), "table_talk", "whisper", or "character:<id>". The
+# Table chat; the GM can delete any line, and anyone their own. The composer's speak-as picker sends speak_as: "narration",
+# "npc" (with speaker_name), "table_talk", "whisper" (a player's, to the GM),
+# "whisper:<character id>" (the GM's, to that character's player), or "character:<id>". The
 # model decides who may speak which way. The new line reaches everyone who
 # should see it, the sender included, over the chat streams, so a Turbo
 # submit gets nothing back but the form being cleared.
 class Campaigns::MessagesController < ApplicationController
   include CampaignScoped
-
-  before_action :require_gm, only: :destroy
 
   def create
     Current.campaign.messages.create!(identity: Current.identity, body: params[:body], **speaking)
@@ -22,9 +21,13 @@ class Campaigns::MessagesController < ApplicationController
     end
   end
 
-  # The GM takes a line out of the chat, for everyone (Message broadcasts the removal).
+  # The GM, or whoever wrote it, takes a line out of the chat, for everyone
+  # who could see it (Message broadcasts the removal).
   def destroy
-    Current.campaign.messages.find(params[:id]).destroy!
+    message = Current.campaign.messages.visible_to(Current.membership).find(params[:id])
+    return head :forbidden unless Current.membership.gm? || message.identity_id == Current.identity.id
+
+    message.destroy!
     respond_to do |format|
       format.turbo_stream { head :no_content }
       format.html { redirect_back_or_to table_path_for_viewer }
@@ -37,6 +40,7 @@ class Campaigns::MessagesController < ApplicationController
 
       case kind
       when "character" then { kind: "in_character", character: Current.campaign.characters.find_by(id: character_id) }
+      when "whisper" then { kind: "whisper", to_character: character_id && Current.campaign.characters.played.find_by(id: character_id) }
       when "npc" then { kind: "npc", speaker_name: params[:speaker_name] }
       when *Message.kinds.keys then { kind: kind }
       else { kind: "table_talk" }

@@ -37,7 +37,7 @@ class ChatTest < ActionDispatch::IntegrationTest
   test "speak-as is a dropdown of the player's characters, table talk and a whisper to the GM" do
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_equal [ "As Tibbs", "Table talk", "To GM" ], css_select(".composer select[name=speak_as] option").map(&:text)
+    assert_equal [ "As Tibbs", "Table talk", "Privately to the GM" ], css_select(".composer select[name=speak_as] option").map(&:text)
 
     identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
     get campaign_path(@campaign)
@@ -68,21 +68,41 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select "#table_feed > li:nth-child(1).chat-line--narration .chat-line__label", /GM · Cut to/
     assert_select "#table_feed > li:nth-child(2)##{dom_id(roll)}.feed-item--dice"
     assert_select "#table_feed > li:nth-child(3).feed-item--talk .chat-line__body", "oof"
-    assert_select ".feed__filter input[type=radio]", 3
+    assert_equal [ "Everything", "Story", "Table talk", "Private", "Dice" ], css_select(".feed__filter option").map(&:text)
     assert_select ".composer select[name=speak_as] option", 3
     assert_select ".composer select[name=speak_as] option[value=?][selected]", "character:#{characters(:tibbs).id}"
-    assert_select ".composer select[name=speak_as] option[value=whisper]", "To GM"
+    assert_select ".composer select[name=speak_as] option[value=whisper]", "Privately to the GM"
     assert_select ".table-rail__head .suspense-meter"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
-    assert_select ".composer select[name=speak_as] option", 3
+    assert_select ".composer select[name=speak_as] option", 4
     assert_select ".composer select[name=speak_as] option[value=table_talk][selected]", 1, "between sessions the GM starts on table talk"
+    assert_select ".composer select[name=speak_as] option[value=?]", "whisper:#{characters(:tibbs).id}", "Privately to Tibbs"
     assert_select ".composer select[name=speak_as] option[value=narration]", "Narrate"
     assert_select ".composer select[name=speak_as] option[value=npc]", "As NPC"
     assert_select ".composer input[name=speaker_name]"
     assert_select ".composer select[name=speak_as] option[value=whisper]", 0
+  end
+
+  test "the GM whispers to one player, picked by their character" do
+    @campaign.memberships.create!(identity: identities(:stranger), role: :player)
+    sign_in_as identities(:gwen)
+    post campaign_messages_path(@campaign), params: { speak_as: "whisper:#{characters(:tibbs).id}", body: "The miller lies." }, as: :turbo_stream
+    assert_response :no_content
+    whisper = @campaign.messages.last
+    assert_equal [ "whisper", identities(:pip), "Tibbs" ], [ whisper.kind, whisper.recipient, whisper.recipient_name ]
+
+    sign_out
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select ".chat-line--whisper .chat-line__label", /Gwen to Tibbs · private/
+
+    sign_out
+    sign_in_as identities(:stranger)
+    get campaign_path(@campaign)
+    assert_no_match "The miller lies.", response.body
   end
 
   test "the rail can keep your place: a scroller, a hidden new-lines pill, and who made each line" do
@@ -116,7 +136,7 @@ class ChatTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".chat-line--whisper .chat-line__label", /only you and the GM/
+    assert_select ".chat-line--whisper .chat-line__label", /to the GM · private/
     assert_select ".chat-line--whisper .chat-line__body", "Secret plan"
 
     sign_out
@@ -134,18 +154,23 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select ".table-rail", 0
   end
 
-  test "the GM deletes a line, for everyone; nobody else can" do
+  test "a player deletes their own line, but not someone else's" do
     line = @campaign.messages.create!(identity: identities(:pip), name: "Pip", kind: "table_talk", body: "oops, wrong window")
+    gms = @campaign.messages.create!(identity: identities(:gwen), kind: "table_talk", body: "Welcome")
 
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".table-rail", 1
-    assert_select ".table-rail--gm", 0, "the delete buttons stay hidden"
+    assert_select ".table-rail.table-rail--open", 1
+    assert_select ".table-rail--gm", 0, "only their own lines show the button"
 
     assert_no_difference -> { Message.count } do
-      delete campaign_message_path(@campaign, line), as: :turbo_stream
+      delete campaign_message_path(@campaign, gms), as: :turbo_stream
     end
     assert_response :forbidden
+
+    assert_difference -> { Message.count }, -1 do
+      delete campaign_message_path(@campaign, line), as: :turbo_stream
+    end
   end
 
   test "the GM's rail shows the delete buttons, and deleting broadcasts the removal" do

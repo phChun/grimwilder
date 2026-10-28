@@ -128,7 +128,7 @@ export default class extends Controller {
     } else {
       const scroller = this.scrollerTarget
       scroller.scrollTop = -(scroller.scrollHeight - scroller.clientHeight - this.fromTop)
-      // Lines the Story / Dice filter hides don't count.
+      // Lines the filter (Story, Table talk, Private, Dice) hides don't count.
       this.unread += lines.filter((line) => line.getClientRects().length > 0).length
       this.render()
     }

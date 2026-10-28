@@ -2311,7 +2311,9 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .avatar[data-presence="idle"] { border-color: var(--presence-idle); }
 
 .feed { position: relative; display: flex; flex-direction: column; gap: var(--space-3); padding: 12px 14px 0; }
-.feed__filter { grid-template-columns: repeat(3, 1fr); }
+.feed__filter { display: flex; align-items: center; gap: var(--space-2); }
+.feed__filter-label { flex: none; font-size: 0.85rem; color: var(--muted); }
+.feed__filter-select { flex: 1; min-width: 0; }
 
 /* Newest at the bottom: a column-reverse scroller stays pinned to the newest line as lines arrive. */
 .feed__scroller { display: flex; flex-direction: column-reverse; max-height: 80vh; overflow-y: auto; overscroll-behavior: contain; }
@@ -2349,9 +2351,11 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 @keyframes feed-new-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @media (prefers-reduced-motion: reduce) { .feed__new { animation: none; } }
 
-/* Filters: Story is messages only, Dice is rolls and pool changes only. */
-.table-rail:has(.feed__filter input[value=story]:checked) .feed__items > :not(.feed-item--story):not(.feed-item--talk),
-.table-rail:has(.feed__filter input[value=dice]:checked) .feed__items > :not(.feed-item--dice) { display: none; }
+/* Filters: Story is the fiction (narration, NPCs, in character, scene dividers and game events), Table talk is out of character, Private is whispers, Dice is rolls and pool changes. */
+.table-rail:has(.feed__filter option[value=story]:checked) .feed__items > :not(.feed-item--story):not(.feed-item--event),
+.table-rail:has(.feed__filter option[value=talk]:checked) .feed__items > :not(.feed-item--talk),
+.table-rail:has(.feed__filter option[value=private]:checked) .feed__items > :not(.feed-item--private),
+.table-rail:has(.feed__filter option[value=dice]:checked) .feed__items > :not(.feed-item--dice) { display: none; }
 
 .feed-item { min-width: 0; }
 .feed-item__time { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--dim); }
@@ -2395,10 +2399,10 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 
 /* Chat lines, by kind */
 .chat-line { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
-/* The GM's delete button on each chat line: only in the GM's rail, quiet until the line is hovered or the button focused. */
+/* The delete button on each chat line: on every line in the GM's rail, and on your own (marked by feed_controller.js) in anyone's, until the campaign is done; quiet until the line is hovered or the button focused. */
 .chat-line__delete-form { display: none; }
-.table-rail--gm .chat-line { position: relative; padding-right: 36px; }
-.table-rail--gm .chat-line__delete-form { display: block; position: absolute; top: -8px; right: -6px; margin: 0; }
+.table-rail--gm .chat-line, .table-rail--open .chat-line--mine { position: relative; padding-right: 36px; }
+.table-rail--gm .chat-line__delete-form, .table-rail--open .chat-line--mine .chat-line__delete-form { display: block; position: absolute; top: -8px; right: -6px; margin: 0; }
 .chat-line__delete { display: inline-flex; align-items: center; justify-content: center; width: var(--tap); height: var(--tap); border: 0; border-radius: var(--radius-sm); background: none; color: var(--dim); opacity: 0.35; cursor: pointer; }
 .chat-line:hover .chat-line__delete, .chat-line__delete:focus-visible { opacity: 1; }
 .chat-line__delete:hover { color: var(--grim); }

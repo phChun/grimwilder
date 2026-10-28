@@ -96,6 +96,19 @@ module CampaignsHelper
     characters.find { _1.identity_id == membership.identity_id && _1.active? }&.short_name || "making one"
   end
 
+  # The composer's speak-as choices, as [label, value]: a player's characters,
+  # table talk and a whisper to the GM; the GM's narration, an NPC, table talk
+  # and a whisper to each player's active character here.
+  def speak_as_voices(campaign, membership, speakers)
+    if membership.gm?
+      players = campaign.memberships.player.pluck(:identity_id)
+      whispers = campaign.characters.played.active.where(identity_id: players).order(:name).map { [ "Privately to #{_1.short_name}", "whisper:#{_1.id}" ] }
+      [ %w[ Narrate narration ], [ "As NPC", "npc" ], [ "Table talk", "table_talk" ], *whispers ]
+    else
+      speakers.map { [ "As #{_1.short_name}", "character:#{_1.id}" ] } + [ [ "Table talk", "table_talk" ], [ "Privately to the GM", "whisper" ] ]
+    end
+  end
+
   # The composer's first speak-as choice: the GM narrates during a session; a
   # player speaks as their character if they have one here.
   def default_voice(membership, speakers, speaker)
