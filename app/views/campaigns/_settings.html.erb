@@ -1,4 +1,4 @@
-<%# locals: (memberships:, gm:) %>
+<%# locals: (memberships:, blocks:, gm:) %>
 <% if gm && !Current.campaign.done? %>
   <div class="stack">
     <h3 class="fold__heading">Invite players</h3>
@@ -18,11 +18,29 @@
           <small><%= membership.gm? ? "GM" : "Player" %><%= " · you" if membership == Current.membership %></small>
         </span>
         <% if gm && membership.player? %>
-          <%= button_to "Remove", campaign_membership_path(Current.campaign, membership), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Remove #{membership.identity.display_name}?" } } %>
+          <%# Remove: the invite link still lets them back. Block: removed, and kept out (Campaign::Blocking). %>
+          <span class="list__actions">
+            <%= button_to "Remove", campaign_membership_path(Current.campaign, membership), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Remove #{membership.identity.display_name}? They can join again with the invite link." } } %>
+            <%= button_to "Block", campaign_blocks_path(Current.campaign), params: { membership_id: membership.id }, class: "button button--quiet button--danger-text button--small", form: { data: { turbo_confirm: "Block #{membership.identity.display_name}? They're removed, and the invite link won't let them back in until you unblock them." } } %>
+          </span>
         <% end %>
       </li>
     <% end %>
   </ul>
+  <% if gm && blocks.any? %>
+    <h3 class="fold__heading">Blocked</h3>
+    <ul class="list">
+      <% blocks.each do |block| %>
+        <li class="list__item">
+          <span>
+            <strong><%= block.identity.display_name %></strong>
+            <small>since <%= l(block.created_at.to_date, format: :long) %></small>
+          </span>
+          <%= button_to "Unblock", campaign_block_path(Current.campaign, block), method: :delete, class: "button button--quiet button--small" %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 </div>
 
 <%# Campaign::Done: a read-only archive that frees everyone for another campaign. %>

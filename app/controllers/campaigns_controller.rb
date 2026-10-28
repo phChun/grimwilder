@@ -60,6 +60,7 @@ class CampaignsController < ApplicationController
 
     def load_settings
       @memberships = Current.campaign.memberships.includes(:identity).order(:role, :created_at)
+      @blocks = Current.campaign.blocks.includes(:identity).order(:created_at)
     end
 
     def load_overview

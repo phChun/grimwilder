@@ -28,6 +28,9 @@ class UpForGrabsTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
     assert_select "#up-for-grabs form[action=?] button", character_claim_path(marlo), "Play Marlo"
 
+    get character_path(marlo)
+    assert_select ".identity__line", { text: /played by/, count: 0 }, "the GM only holds it"
+
     assert_difference -> { @campaign.rolls.where(kind: "note").count }, 1 do
       post character_claim_path(marlo)
     end

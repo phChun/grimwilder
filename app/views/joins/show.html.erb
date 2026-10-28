@@ -13,6 +13,9 @@
     <% if @membership %>
       <p>You're already at this table.</p>
       <%= link_to "Open campaign", campaign_path(@campaign), class: "button button--primary button--wide" %>
+    <% elsif @blocked %>
+      <p>The GM has blocked you from <%= @campaign.name %>, so this link won't let you in.</p>
+      <%= link_to "Your campaigns", campaigns_path, class: "button button--wide" %>
     <% elsif @campaign.done? %>
       <p><%= @campaign.name %> is done, so no one can join it now.</p>
     <% elsif @no_room %>

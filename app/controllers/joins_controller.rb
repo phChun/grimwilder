@@ -5,6 +5,7 @@ class JoinsController < ApplicationController
 
   def show
     @membership = Current.identity&.membership_in(@campaign)
+    @blocked = !@membership && @campaign.blocked?(Current.identity)
     # Joining needs room in their plan (Identity::Plans).
     @no_room = authenticated? && !@membership && !Current.identity.room_to_play?
     unless authenticated?

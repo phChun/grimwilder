@@ -83,4 +83,56 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_campaign_path(campaign)
     assert memberships(:gwen_gm).reload
   end
+
+  test "the GM blocks a player: removed, and the link won't let them back" do
+    campaign = campaigns(:bramblewood)
+    sign_in_as identities(:gwen)
+
+    get edit_campaign_path(campaign)
+    assert_select "form[action=?] button", campaign_blocks_path(campaign), "Block"
+
+    assert_difference -> { campaign.memberships.count }, -1 do
+      post campaign_blocks_path(campaign), params: { membership_id: memberships(:pip_player).id }
+    end
+    assert_redirected_to edit_campaign_path(campaign, anchor: "settings")
+    assert campaign.blocked?(identities(:pip))
+
+    follow_redirect!
+    block = campaign.blocks.sole
+    assert_select "form[action=?] button", campaign_block_path(campaign, block), "Unblock"
+
+    sign_out
+    sign_in_as identities(:pip)
+    get join_path(campaign.join_code)
+    assert_select "p", /blocked you/
+    assert_no_difference -> { campaign.memberships.count } do
+      post join_path(campaign.join_code)
+    end
+    get campaign_path(campaign)
+    assert_response :not_found
+
+    sign_out
+    sign_in_as identities(:gwen)
+    delete campaign_block_path(campaign, block)
+    assert_not campaign.blocked?(identities(:pip))
+
+    sign_out
+    sign_in_as identities(:pip)
+    assert_difference -> { campaign.memberships.count }, 1 do
+      post join_path(campaign.join_code)
+    end
+  end
+
+  test "only the GM blocks, and never a GM" do
+    campaign = campaigns(:bramblewood)
+    sign_in_as identities(:pip)
+    post campaign_blocks_path(campaign), params: { membership_id: memberships(:gwen_gm).id }
+    assert_response :forbidden
+
+    sign_out
+    sign_in_as identities(:gwen)
+    post campaign_blocks_path(campaign), params: { membership_id: memberships(:gwen_gm).id }
+    assert_response :not_found
+    assert_not campaign.blocked?(identities(:gwen))
+  end
 end
