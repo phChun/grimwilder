@@ -59,6 +59,12 @@ class CharactersController < ApplicationController
         @membership = Current.identity.memberships.find_by!(campaign: campaign)
         @feed = TableFeed.new(campaign, @membership)
         @speakers = Current.identity.characters.where(campaign: campaign).played.active.ordered
+        # A player rolls the table's shared pools from their own sheet.
+        if @character.owned_by?(Current.identity) && @membership.player? && !campaign.done? && @character.active? && !@character.up_for_grabs?
+          @table_pools = campaign.pools.shared.visible_to(@membership).includes(:last_rolled_by).ordered
+          # The pool rows are the table's, which read the campaign from Current.
+          Current.campaign, Current.membership = campaign, @membership
+        end
       end
     end
 

@@ -1401,7 +1401,9 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
    absent on touch). */
 [data-tip] { position: relative; }
 .harm-toggle[data-tip]:hover::after,
-.harm-toggle[data-tip]:focus-visible::after {
+.harm-toggle[data-tip]:focus-visible::after,
+.campaign-hero__rule[data-tip]:hover::after,
+.campaign-hero__rule[data-tip]:focus-visible::after {
   content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); z-index: 20; width: max-content; max-width: min(16rem, 70vw);
   padding: 6px 10px; transform: translateX(-50%); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface);
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.4); font-size: 0.8rem; font-weight: 500; line-height: 1.35; color: var(--text); text-align: center; white-space: normal; pointer-events: none;
@@ -2048,29 +2050,34 @@ li.popover__head { margin: 0; padding-left: var(--space-3); }
 /* ---------- Campaign page (campaigns#show) ---------- */
 
 .site-main:has(.campaign-page) { max-width: 82rem; }
-.campaign-page { display: flex; flex-direction: column; gap: 40px; }
-.campaign-page__main { display: flex; flex-direction: column; gap: 40px; }
-.campaign-page__side { display: flex; flex-direction: column; gap: 20px; }
+/* One column to read down (hero, party, what looms, previously on), the table's chat in the rail beside it. */
+.campaign-page__main { display: flex; flex-direction: column; gap: 44px; }
 
-/* Hero */
-/* Same columns as the .fluid page below (main 640px, rail 340–420px, same gap),
-   so the action card lines up with the side column under it. */
-.campaign-hero { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 32px var(--space-5); }
-.campaign-hero__about { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+/* Hero: what it's about, its rules, and what to do here. */
+.campaign-hero { display: flex; flex-direction: column; gap: 14px; padding-bottom: 32px; border-bottom: 1px solid var(--line-soft); }
 .campaign-hero .eyebrow { margin: 0; }
 .campaign-hero__title { margin: 0; font-size: clamp(2.4rem, 7vw, 3.75rem); line-height: 1.02; }
 .campaign-hero__pitch { max-width: 36rem; margin: 0; font-family: var(--font-display); font-style: italic; font-size: 1.35rem; line-height: 1.4; color: var(--text-soft); }
 .campaign-hero__pitch--empty { font-family: var(--font-ui); font-style: normal; font-size: 0.95rem; color: var(--dim); }
-.campaign-hero__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--space-3) var(--space-5); margin: var(--space-3) 0 0; }
+.campaign-hero__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--space-3) var(--space-5); margin: var(--space-2) 0 0; }
 .campaign-hero__facts dt { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
 .campaign-hero__facts dd { margin: 2px 0 0; font-weight: 600; }
+.campaign-hero__rules { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
+.campaign-hero__rules-label { margin-right: 4px; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.campaign-hero__rule { padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 0.85rem; color: var(--text-soft); cursor: help; }
+.campaign-hero__rule:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-/* The campaign page's actions, in a row above the party: the main one first, settings last, spread across. */
-.campaign-actions { display: grid; gap: var(--space-2); }
-.campaign-actions__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
-.campaign-actions__row .button_to { margin: 0; }
+/* The actions: the main one first, then the rest beside it, settings or leaving at the far end. */
+.campaign-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }
+.campaign-actions .button_to { margin: 0; }
+.campaign-actions__end { margin-left: auto; }
 .campaign-actions__hint { margin: 0; font-size: 0.87rem; color: var(--muted); }
 .campaign-actions__done { font-family: var(--font-display); font-size: 1.05rem; color: var(--text); }
+
+/* What looms: a card per pool, read-only. */
+.looms { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 12px; }
+.looms .pool-glance { padding: 14px 16px; }
+.pool-glance__kind { font-size: 0.8rem; color: var(--dim); }
 
 /* "Open my character" for a player with several here: a button with a menu. */
 .go-menu { position: relative; }
@@ -2719,3 +2726,6 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .settings-form__group + .settings-form__group { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
 .settings-form__rule { align-items: flex-start; }
 .settings-form__rule small { color: var(--dim); font-weight: 400; }
+
+/* A player's table rolls on their sheet: the shared pools. */
+.table-rolls { display: grid; gap: var(--space-3); }

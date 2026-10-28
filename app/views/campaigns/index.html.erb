@@ -11,7 +11,8 @@
 <ul class="tool-grid__list" aria-label="Your campaigns">
   <% (active + done).each do |membership| %>
     <li>
-      <%= link_to campaign_path(membership.campaign), class: class_names("tool-card", "tool-card--ready": !membership.campaign.done?) do %>
+      <%# Straight to where you play: the GM table, or your character's sheet (Campaigns::PlaysController); a done campaign opens its page. %>
+      <%= link_to (membership.campaign.done? ? campaign_path(membership.campaign) : campaign_play_path(membership.campaign)), class: class_names("tool-card", "tool-card--ready": !membership.campaign.done?) do %>
         <span class="tool-card__name"><%= membership.campaign.name %></span>
         <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if membership.campaign.done? %> · done <%= l(membership.campaign.done_at.to_date, format: :long) %><% end %></span>
       <% end %>

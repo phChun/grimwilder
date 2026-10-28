@@ -1,8 +1,8 @@
 require "test_helper"
 
-# The campaign page (campaigns#show): the pitch, the party, "Previously on…",
-# and a side column with the pools, who's here and kept crucibles. Players
-# also roll pools and story rolls here and follow the log.
+# The campaign page (campaigns#show): an overview to read down (the pitch and
+# its rules, the party, what looms, "Previously on…") with the table's chat
+# beside it. Nobody rolls here: players roll on their sheets.
 class CampaignPageTest < ActionDispatch::IntegrationTest
   setup { @campaign = campaigns(:bramblewood) }
 
@@ -19,9 +19,10 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".campaign-hero__facts dd", "Mercenaries"
     assert_select ".campaign-hero__facts dd", "Uncover the Truth"
     assert_select ".campaign-hero__facts dd", "The Bramble Marches"
-    assert_select ".campaign-actions__row a.button--primary[href=?]", campaign_table_path(@campaign), "Open the GM table"
-    assert_select ".campaign-actions__row button[data-clipboard-text-value=?]", join_url(@campaign.join_code), text: /Copy invite link/
-    assert_select ".campaign-actions__row form[action=?] button", campaign_join_code_path(@campaign), "Reset link"
+    assert_select ".campaign-actions a.button--primary[href=?]", campaign_table_path(@campaign), "Open the GM table"
+    assert_select ".campaign-actions button[data-clipboard-text-value=?]", join_url(@campaign.join_code), text: /Copy invite link/
+    assert_select ".campaign-actions a[href=?]", edit_campaign_path(@campaign), "Campaign settings"
+    assert_select ".campaign-hero__rule[data-tip]", @campaign.rules_in_play.size
   end
 
   test "a GM with no pitch yet is asked for one; a player just gets their character" do
@@ -33,10 +34,10 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".campaign-hero .eyebrow", "Campaign · Playing Tibbs"
+    assert_select ".campaign-hero .eyebrow", "Campaign · GM Gwen · Playing Tibbs"
     assert_select ".campaign-hero__pitch", 0
-    assert_select ".campaign-actions__row a.button--primary[href=?]", character_path(characters(:tibbs)), "Open my character"
-    assert_select ".campaign-actions__row button[data-action*=copy]", 0, "no invite link for players"
+    assert_select ".campaign-actions a.button--primary[href=?]", character_path(characters(:tibbs)), "Open my character"
+    assert_select ".campaign-actions button[data-action*=copy]", 0, "no invite link for players"
   end
 
   test "a player with two characters here picks which to open" do
@@ -45,8 +46,8 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
 
     assert_select ".eyebrow", /Playing Tibbs and Moss/
-    assert_select ".campaign-actions__row a.button--primary", 0
-    assert_select ".campaign-actions__row details.go-menu" do
+    assert_select ".campaign-actions a.button--primary", 0
+    assert_select ".campaign-actions details.go-menu" do
       assert_select "summary.button--primary", /Open my character/
       assert_select ".go-menu__item", 2
       assert_select ".go-menu__item[href=?]", character_path(moss), /Moss\s+Druid · level 1/
@@ -103,39 +104,46 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".older-sessions__all[href=?]", campaign_play_sessions_path(@campaign), "All 3 sessions"
   end
 
-  test "the GM sees pools at a glance and how many are hidden; players roll the visible ones here" do
+  test "what looms is for reading: the GM sees how many are hidden, and players roll on their sheets" do
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
     assert_select "#pools .pool-glance", 2, "the hidden ambush isn't listed"
     assert_select "#pools .pool-glance__hidden", /1 hidden pool, only you see it/
-    assert_select "#rolls", 0, "the GM rolls story at the table"
-    assert_select ".table-rail", 0
+    assert_select "#rolls", 0
+    assert_select ".fluid__rail.table-rail #table_feed", 1, "the chat sits beside the page for the GM too"
 
     sign_out
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    brawl = "##{dom_id(pools(:brawl))}"
-    assert_select "#pools .pool-row", 2
-    assert_select "#pools .pool-glance__hidden", 0
-    assert_select "#{brawl} .badge--push", "Nothing dropped: push?"
-    assert_select "#{brawl} details.pool-row__more form[action=?]", campaign_pool_push_path(@campaign, pools(:brawl))
-    assert_select "#{brawl} details.pool-row__more form[action=?] input[name=drop_first][value='1']", campaign_pool_roll_path(@campaign, pools(:brawl))
-    assert_select "#rolls form[action=?]", campaign_story_rolls_path(@campaign)
+    assert_select "#pools .pool-glance", 2
+    assert_select "#pools .pool-row", 0, "no rolling here"
+    assert_select "#pools a[href=?]", character_path(characters(:tibbs), anchor: "table-rolls"), "Roll from your sheet"
+    assert_select "#rolls", 0, "the GM calls for rolls"
     assert_select ".table-rail #table_feed"
-    assert_select ".table-rail .table-rail__note", 0, "game events go in the chat"
   end
 
-  test "at the table: members with their character or role, and kept crucibles hidden until there are some" do
-    @campaign.memberships.create!(identity: identities(:stranger), role: :player)
+  test "a player rolls the table's pools from their sheet, and comes back to it" do
+    sign_in_as identities(:pip)
+    get character_path(characters(:tibbs))
+    brawl = "#table-rolls ##{dom_id(pools(:brawl))}"
+    assert_select "#table-rolls .pool-row", 2
+    assert_select "#{brawl} .badge--push", "Nothing dropped: push?"
+    assert_select "#{brawl} details.pool-row__more form[action=?]", campaign_pool_push_path(@campaign, pools(:brawl))
+    assert_select "#table-rolls #rolls", 0
+
+    post campaign_pool_roll_path(@campaign, pools(:brawl)), headers: { "HTTP_REFERER" => character_url(characters(:tibbs)) }
+    assert_redirected_to character_path(characters(:tibbs), anchor: "table-rolls")
+
+    get character_path(characters(:bram))
+    assert_select "#table-rolls", 0, "not on someone else's sheet"
+  end
+
+  test "a player can leave but not reach settings, and kept crucibles hide until there are some" do
     sign_in_as identities(:pip)
 
     get campaign_path(@campaign)
-    assert_select ".members__item", 3
-    assert_select ".members__item:has(.members__name:contains('Gwen')) .members__role--gm", "GM"
-    assert_select ".members__item:has(.members__name:contains('Pip')) .members__role", "Tibbs"
-    assert_select ".members__item:has(.members__name:contains('Stranger')) .members__role", "making one"
     assert_select "a[href=?]", edit_campaign_path(@campaign), 0, "settings are the GM's"
-    assert_select ".campaign-actions__row form[action=?] button", campaign_membership_path(@campaign, memberships(:pip_player)), "Leave campaign"
+    assert_select ".campaign-actions form[action=?] button", campaign_membership_path(@campaign, memberships(:pip_player)), "Leave campaign"
     assert_select "[data-controller=kept-crucibles][hidden] button[data-action=?]", "kept-crucibles#clear", "Clear"
   end
 
@@ -195,5 +203,22 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     get crucible_path("gm")
     assert_select "turbo-frame#crucible", count: 0
     assert_select "h1", "GM crucible"
+  end
+
+  test "a campaign card opens your screen, and each screen links back to the campaign page" do
+    sign_in_as identities(:gwen)
+    get campaigns_path
+    assert_select ".tool-card[href=?]", campaign_play_path(@campaign)
+    get campaign_play_path(@campaign)
+    assert_redirected_to campaign_table_path(@campaign)
+    follow_redirect!
+    assert_select ".scene-bar__status a[href=?]", campaign_path(@campaign), "Campaign page"
+
+    sign_out
+    sign_in_as identities(:pip)
+    get campaign_play_path(@campaign)
+    assert_redirected_to character_path(characters(:tibbs))
+    follow_redirect!
+    assert_select ".identity__line a.identity__campaign[href=?]", campaign_path(@campaign), @campaign.name
   end
 end
