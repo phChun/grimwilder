@@ -15,7 +15,7 @@ module Character::StatProgression
 
   # Room for it: not taken yet, a talent slot free to give up, the stat below 3.
   def can_progress_stat?(stat)
-    !stat_progressed? && talents_to_choose.positive? && Grimwild::STATS.include?(stat.to_s) && self.stat(stat) < 3
+    !stat_progressed? && rule_allows?(:stat_progression) && talents_to_choose.positive? && Grimwild::STATS.include?(stat.to_s) && self.stat(stat) < 3
   end
 
   def progress_stat!(stat, by:)

@@ -36,7 +36,8 @@ class CharactersController < ApplicationController
 
   def update
     @character.changed_by = Current.identity
-    if @character.update(character_params.except(:level_zero)) # only a new character starts at level 0
+    # Only a new character starts at level 0; a table can keep levels to XP and milestones.
+    if @character.update(character_params.except(:level_zero, *(:level unless @character.sets_own_level?)))
       redirect_to @character
     else
       load_play if params[:quick]

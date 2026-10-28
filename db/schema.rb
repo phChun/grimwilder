@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_28_000422) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_28_035653) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -44,6 +44,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_28_000422) do
     t.string "group_arc"
     t.datetime "done_at"
     t.json "optional_rules", default: [], null: false
+    t.boolean "players_make_characters", default: true, null: false
+    t.boolean "players_set_level", default: true, null: false
+    t.integer "starting_level"
+    t.json "allowed_paths", default: [], null: false
     t.index ["done_at"], name: "index_campaigns_on_done_at"
     t.index ["join_code"], name: "index_campaigns_on_join_code", unique: true
   end

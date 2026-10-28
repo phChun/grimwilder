@@ -18,30 +18,41 @@
     </div>
     <div class="field">
       <%= form.label :path, "Path", class: "field__label" %>
-      <%= form.select :path, Grimwild.paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
-      <p class="field__hint">Your path gives its core talent. Add another talent from any path below.</p>
+      <%# The table's GM may close some paths and options (Campaign::CharacterSettings); a character keeps what it already has. %>
+      <% table = character.campaign %>
+      <% paths = Grimwild.paths.select { |path, _| table.nil? || table.path_allowed?(path) || path == character.path_was } %>
+      <%= form.select :path, paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
+      <p class="field__hint">Your path gives its core talent. Add another talent from any path below.<% if table && table.allowed_paths.any? %> <%= table.name %> has <%= pluralize(table.allowed_paths.size, "path") %> open.<% end %></p>
       <% legacy = Talent.all.select(&:legacy_core_of) %>
       <% unless character.persisted? %>
-        <div class="field field--inline">
-          <%= form.label :level, "Level", class: "field__label" %>
-          <%= form.select :level, (1..Grimwild::MAX_LEVEL).to_a, {}, class: "field__input field__input--short" %>
-        </div>
-        <p class="field__hint">Joining a table that's already under way? Start at its level: a talent for each level, and the core talent's growth.</p>
+        <% if (start = table&.starting_level) %>
+          <p class="field__hint">New characters at <%= table.name %> start at level <%= start %>.</p>
+        <% else %>
+          <div class="field field--inline">
+            <%= form.label :level, "Level", class: "field__label" %>
+            <%= form.select :level, (1..Grimwild::MAX_LEVEL).to_a, {}, class: "field__input field__input--short" %>
+          </div>
+          <p class="field__hint">Joining a table that's already under way? Start at its level: a talent for each level, and the core talent's growth.</p>
+          <% if character.rule_allows?(:level_zero) %>
+            <label class="check">
+              <%= form.check_box :level_zero %>
+              Start at level 0: no core talent yet, and 3 stat points instead of 4 (optional rule, pg. 177).
+            </label>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% if character.rule_allows?(:legacy_cores) || character.legacy_core? %>
         <label class="check">
-          <%= form.check_box :level_zero %>
-          Start at level 0: no core talent yet, and 3 stat points instead of 4 (optional rule, pg. 177). Ask your GM first.
+          <%= form.check_box :legacy_core %>
+          Use the legacy core talent, where the path has one (<%= legacy.map { "#{_1.legacy_core_of}: #{_1.name.delete_suffix(" (Legacy)")}" }.to_sentence %>; pg. 179).
         </label>
       <% end %>
-      <label class="check">
-        <%= form.check_box :legacy_core %>
-        Use the legacy core talent, where the path has one (<%= legacy.map { "#{_1.legacy_core_of}: #{_1.name.delete_suffix(" (Legacy)")}" }.to_sentence %>; pg. 179). Ask your GM first.
-      </label>
     </div>
     <%# Once made, the edit page's "At the table" section seats or moves the character. %>
     <% unless character.persisted? %>
       <div class="field">
         <%= form.label :campaign_id, "Campaign", class: "field__label" %>
-        <%= form.select :campaign_id, Current.identity.campaigns.active.order(:name).map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
+        <%= form.select :campaign_id, Current.identity.campaigns.active.order(:name).select { _1.makes_characters?(Current.identity) }.map { |campaign| [ campaign.name, campaign.id ] }, { include_blank: "Not in a campaign" }, class: "field__input" %>
       </div>
     <% end %>
     <% if Current.identity.memberships.gm.exists? %>
@@ -60,10 +71,14 @@
           <%= form.text_field :farewell, maxlength: Character::Farewell::FAREWELL_LIMIT, autocomplete: "off", class: "field__input" %>
         </div>
       <% end %>
-      <div class="field field--inline">
-        <%= form.label :level, class: "field__label" %>
-        <%= form.number_field :level, min: (character.level_zero? ? 0 : 1), max: Grimwild::MAX_LEVEL, class: "field__input field__input--short" %>
-      </div>
+      <% if character.sets_own_level? %>
+        <div class="field field--inline">
+          <%= form.label :level, class: "field__label" %>
+          <%= form.number_field :level, min: (character.level_zero? ? 0 : 1), max: Grimwild::MAX_LEVEL, class: "field__input field__input--short" %>
+        </div>
+      <% else %>
+        <p class="field__hint">Level <%= character.level %>: at <%= character.campaign.name %>, levels change with XP and milestones.</p>
+      <% end %>
     <% end %>
   </section>
 

@@ -46,17 +46,63 @@
           <%= form.label :setting, "Setting", class: "field__label" %>
           <%= form.text_field :setting, maxlength: 80, autocomplete: "off", placeholder: "The Bramble Marches", class: "field__input" %>
         </div>
-        <fieldset class="fieldset">
-          <legend class="field__label">Optional rules</legend>
-          <input type="hidden" name="campaign[optional_rules][]" value="">
-          <% Campaign::OptionalRules::RULES.each do |rule, (rule_name, page, does)| %>
-            <label class="check">
-              <%= check_box_tag "campaign[optional_rules][]", rule, campaign.optional_rule?(rule), id: "rule-#{rule}" %>
-              <span><strong><%= rule_name %></strong> (pg. <%= page %>): <%= does %></span>
-            </label>
-          <% end %>
-          <p class="field__hint">Pools a rule gives (Vigor, Armor, Supplies, Coins) arrive at the start of the next session. Players opt into stat progression, legacy core talents and starting at level 0 on their own sheets, with your say-so.</p>
+        <%= form.submit "Save", class: "button button--primary" %>
+      <% end %>
+    </section>
+
+    <%# What the GM decides about characters here (Campaign::CharacterSettings). %>
+    <section id="settings-characters" class="card stack" aria-labelledby="settings-characters-title">
+      <h2 id="settings-characters-title" class="card__title">Characters</h2>
+      <%= form_with model: campaign, class: "stack settings-form" do |form| %>
+        <input type="hidden" name="section" value="settings-characters">
+        <label class="check">
+          <%= form.check_box :players_make_characters %>
+          <span><strong>Players make their own characters.</strong> Off, you make them (up for grabs) and players pick one.</span>
+        </label>
+        <label class="check">
+          <%= form.check_box :players_set_level %>
+          <span><strong>Players set their own level.</strong> Off, levels change only with XP or a milestone.</span>
+        </label>
+        <div class="field field--inline">
+          <%= form.label :starting_level, "New characters start at", class: "field__label" %>
+          <%= form.select :starting_level, [ [ "The player's choice", "" ], *(campaign.optional_rule?(:level_zero) ? [ [ "Level 0", 0 ] ] : []), *(1..Grimwild::MAX_LEVEL).map { [ "Level #{_1}", _1 ] } ], {}, class: "field__input" %>
+        </div>
+        <fieldset class="fieldset settings-form__paths">
+          <legend class="field__label">Paths open here</legend>
+          <input type="hidden" name="campaign[allowed_paths][]" value="">
+          <div class="settings-form__grid">
+            <% Grimwild.paths.each_key do |path| %>
+              <label class="check">
+                <%= check_box_tag "campaign[allowed_paths][]", path, campaign.path_allowed?(path), id: "path-#{path.parameterize}" %>
+                <%= path %>
+              </label>
+            <% end %>
+          </div>
+          <p class="field__hint">Untick a path to close it. Characters already playing keep theirs.</p>
         </fieldset>
+        <%= form.submit "Save", class: "button button--primary" %>
+      <% end %>
+    </section>
+
+    <%# The optional rules (Campaign::OptionalRules), grouped as GROUPS lays them out. %>
+    <section id="settings-rules" class="card stack" aria-labelledby="settings-rules-title">
+      <h2 id="settings-rules-title" class="card__title">Optional rules</h2>
+      <p class="field__hint">From the book's Game Options (pg. 175–179). Pools a rule gives arrive at once; characters already using an option keep it if you turn it off.</p>
+      <%= form_with model: campaign, class: "stack settings-form" do |form| %>
+        <input type="hidden" name="section" value="settings-rules">
+        <input type="hidden" name="campaign[optional_rules][]" value="">
+        <% Campaign::OptionalRules::GROUPS.each do |group, rules| %>
+          <fieldset class="fieldset settings-form__group">
+            <legend class="field__label"><%= group %></legend>
+            <% rules.each do |rule| %>
+              <% rule_name, page, does = Campaign::OptionalRules::RULES.fetch(rule) %>
+              <label class="check settings-form__rule">
+                <%= check_box_tag "campaign[optional_rules][]", rule, campaign.optional_rule?(rule), id: "rule-#{rule}" %>
+                <span><strong><%= rule_name %></strong> <small>pg. <%= page %></small><br><span class="field__hint"><%= does %></span></span>
+              </label>
+            <% end %>
+          </fieldset>
+        <% end %>
         <%= form.submit "Save", class: "button button--primary" %>
       <% end %>
     </section>
