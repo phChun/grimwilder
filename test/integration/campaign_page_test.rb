@@ -122,7 +122,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select "#{brawl} details.pool-row__more form[action=?] input[name=drop_first][value='1']", campaign_pool_roll_path(@campaign, pools(:brawl))
     assert_select "#rolls form[action=?]", campaign_story_rolls_path(@campaign)
     assert_select ".table-rail #table_feed"
-    assert_select ".table-rail form[action=?]", campaign_notes_path(@campaign)
+    assert_select ".table-rail .table-rail__note", 0, "game events go in the chat"
   end
 
   test "at the table: members with their character or role, and kept crucibles hidden until there are some" do

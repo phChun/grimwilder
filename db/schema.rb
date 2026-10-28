@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_28_035653) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_28_041233) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -160,11 +160,14 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_28_035653) do
     t.datetime "updated_at", null: false
     t.string "kind", default: "table_talk", null: false
     t.string "speaker_name"
+    t.integer "recipient_id"
+    t.string "recipient_name"
     t.index ["campaign_id", "created_at"], name: "index_messages_on_campaign_id_and_created_at"
     t.index ["campaign_id", "kind"], name: "index_messages_on_campaign_id_and_kind"
     t.index ["campaign_id"], name: "index_messages_on_campaign_id"
     t.index ["character_id"], name: "index_messages_on_character_id"
     t.index ["identity_id"], name: "index_messages_on_identity_id"
+    t.index ["recipient_id"], name: "index_messages_on_recipient_id"
   end
 
   create_table "passkeys", force: :cascade do |t|
@@ -347,6 +350,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_28_035653) do
   add_foreign_key "messages", "campaigns", on_delete: :cascade
   add_foreign_key "messages", "characters", on_delete: :nullify
   add_foreign_key "messages", "identities"
+  add_foreign_key "messages", "identities", column: "recipient_id", on_delete: :nullify
   add_foreign_key "passkeys", "identities"
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade

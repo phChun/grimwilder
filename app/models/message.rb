@@ -7,9 +7,13 @@
 # - in_character: a player as their active character seated here (the GM may
 #   speak as any of them).
 # - table_talk: anyone, as themselves.
-# - whisper: a player to the GM. Only the sender and the GM ever see it: it's
-#   never broadcast to the table, and visible_to filters it from every
-#   player-facing query, the way hidden pools are.
+# - whisper: private, between two people. A player's goes to the GM (no
+#   recipient) or to another player; the GM's to a player. A player is picked
+#   by their character (to_character: sets recipient and copies the
+#   character's name into recipient_name). Only those two ever see it (the
+#   GM's side is every GM; the GM doesn't see players' whispers to each
+#   other): it's never broadcast to the table, and visible_to filters it from
+#   everyone else's queries, the way hidden pools are.
 #
 # The speaker's name is copied in, so the chat still reads right after a
 # rename or delete.
@@ -21,6 +25,10 @@ class Message < ApplicationRecord
   belongs_to :campaign
   belongs_to :identity
   belongs_to :character, optional: true
+  belongs_to :recipient, class_name: "Identity", optional: true
+
+  # The GM's whisper names a character; it reaches that character's player.
+  attr_reader :to_character
 
   enum :kind, %w[ narration npc in_character table_talk whisper ].index_by(&:itself), default: "table_talk", validate: true
 
@@ -41,8 +49,11 @@ class Message < ApplicationRecord
   after_destroy_commit :broadcast_removal
 
   scope :visible_to, ->(membership) {
-    if membership&.gm? then all
-    else where.not(kind: "whisper").or(where(kind: "whisper", identity_id: membership&.identity_id))
+    if membership.nil? then where.not(kind: "whisper")
+    elsif membership.gm?
+      gms = membership.campaign.memberships.gm.select(:identity_id)
+      where.not(kind: "whisper").or(where(kind: "whisper", recipient_id: nil)).or(where(kind: "whisper", identity_id: gms))
+    else where.not(kind: "whisper").or(where(kind: "whisper", identity_id: membership.identity_id)).or(where(kind: "whisper", recipient_id: membership.identity_id))
     end
   }
 
@@ -52,13 +63,29 @@ class Message < ApplicationRecord
   end
 
   # The streams a member's rail follows: the table, plus the GM's stream for
-  # whispers, or a player's own for theirs.
+  # whispers, or a player's own for theirs (sent or received).
   def self.streams_for(campaign, membership)
     [ [ campaign, :chat ], (membership&.gm? ? [ campaign, :gm ] : [ membership, :chat ]) ].compact
   end
 
   def story?
     !whisper? && !table_talk?
+  end
+
+  # A whisper's two sides, for feed_controller.js to find a conversation's
+  # lines: a player by their identity id, the GM as "gm".
+  def from_side
+    sent_by_gm? ? "gm" : identity_id.to_s if whisper?
+  end
+
+  def to_side
+    recipient_id&.to_s || "gm" if whisper?
+  end
+
+  def to_character=(character)
+    @to_character = character
+    self.recipient = character&.identity
+    self.recipient_name = character&.short_name
   end
 
   private
@@ -77,8 +104,8 @@ class Message < ApplicationRecord
         errors.add(:base, "Only people at this table can talk here")
       elsif GM_KINDS.include?(kind) && !membership.gm?
         errors.add(:kind, "#{kind.humanize.downcase} is the GM's")
-      elsif whisper? && membership.gm?
-        errors.add(:kind, "to the GM is for players")
+      elsif whisper?
+        whispers_to_someone_allowed(membership)
       elsif in_character?
         speaks_as_an_active_character(membership)
       elsif character
@@ -94,6 +121,22 @@ class Message < ApplicationRecord
       end
     end
 
+    def sent_by_gm?
+      identity&.membership_in(campaign)&.gm?
+    end
+
+    # A player whispers to the GM (no recipient) or another player; the GM,
+    # to a player. Players are picked by their active character here.
+    def whispers_to_someone_allowed(membership)
+      return if recipient.nil? && !membership.gm?
+
+      if recipient.nil? || recipient == identity || recipient.membership_in(campaign)&.player? != true
+        errors.add(:recipient, "must be another player at this table")
+      elsif to_character && (to_character.campaign_id != campaign_id || !to_character.active?)
+        errors.add(:recipient, "must be an active character at this table")
+      end
+    end
+
     def broadcast_to_table
       table_streams.each { broadcast_append_to _1, target: "table_feed", partial: "messages/message", locals: { message: self } }
     end
@@ -105,6 +148,7 @@ class Message < ApplicationRecord
     def table_streams
       return [ [ campaign, :chat ] ] unless whisper?
 
-      [ [ campaign, :gm ], identity.membership_in(campaign)&.then { [ _1, :chat ] } ].compact
+      players = [ identity, recipient ].compact.filter_map { _1.membership_in(campaign) }.reject(&:gm?)
+      [ ([ campaign, :gm ] if recipient.nil? || sent_by_gm?), *players.map { [ _1, :chat ] } ].compact
     end
 end
