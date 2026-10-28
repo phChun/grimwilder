@@ -106,4 +106,14 @@ class PlaySessionsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select ".toast__message", "Session 1 is still going."
   end
+
+  test "the history works before any session, with only rolls between" do
+    Roll.note!(campaign: @campaign, by: identities(:gwen), text: "The party meets at the inn.")
+    assert_empty @campaign.play_sessions
+
+    sign_in_as identities(:pip)
+    get campaign_play_sessions_path(@campaign)
+    assert_response :success
+    assert_select ".session-card--between .session-card__title", "Before Session 1"
+  end
 end
