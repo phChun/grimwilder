@@ -505,6 +505,7 @@ form.button_to, .button_to { margin: 0; }
 
 .list__item:first-child { border-top: 0; }
 .list__item small { display: block; }
+.list__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
 
 .copy-field { display: flex; gap: var(--space-2); }
 .copy-field__input { flex: 1; min-width: 0; font-size: 0.9rem; }
@@ -601,8 +602,22 @@ form.button_to, .button_to { margin: 0; }
 .crucible__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
 .crucible__hint { margin: 0; color: var(--dim); }
 
-.crucible__results { display: grid; gap: var(--space-3); }
-.roll-result { display: grid; gap: var(--space-1); }
+/* Each table's reading side by side when there's room, a rule between them. Every one has a
+   rule on its left, and the -1px margin plus clip hides it on whichever starts a row. */
+.crucible__results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-3) 0;
+  overflow: hidden;
+}
+.crucible__results > * { grid-column: 1 / -1; }
+.crucible__results > .roll-result {
+  grid-column: auto;
+  margin-left: -1px;
+  padding-inline: var(--space-4);
+  border-left: 1px solid var(--line);
+}
+.roll-result { display: grid; align-content: start; gap: var(--space-1); }
 .roll-result__label { margin: 0; font-size: 0.85rem; color: var(--dim); }
 .roll-result__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
@@ -1043,8 +1058,10 @@ form.button_to, .button_to { margin: 0; }
   text-align: center;
 }
 
+.crucible--compact .crucible__results { overflow: visible; }
 .crucible--compact .roll-result {
   align-content: start;
+  margin-left: 0;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4) var(--space-4);
   background: var(--surface-2);

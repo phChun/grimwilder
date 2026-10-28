@@ -421,8 +421,7 @@ small { font-size: 0.8em; color: var(--dim); }
 
 /* ---------- Layout ---------- */
 
-.site-main,
-.site-footer {
+.site-main {
   width: 100%;
   max-width: var(--page);
   margin-inline: auto;
@@ -449,17 +448,26 @@ small { font-size: 0.8em; color: var(--dim); }
   .fluid__rail { max-width: none; }
 }
 
+/* Full width, like the header: the toolkit's links on the left, the legal notice on the right. */
 .site-footer {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-3) var(--space-6);
-  padding-block: var(--space-5);
+  padding: var(--space-5) var(--space-4);
   border-top: 1px solid var(--line-soft);
   color: var(--dim);
   font-size: 0.85rem;
 }
 
-.site-footer p { max-width: var(--measure); margin: 0; }
+.site-footer p { margin: 0; }
+
+/* Wide enough: two equal halves, the notice right-aligned in its own. */
+@media (min-width: 48rem) {
+  .site-footer { display: grid; grid-template-columns: 1fr 1fr; }
+  .site-footer p { text-align: right; }
+}
 .site-footer a { color: inherit; }
 
 .site-footer__tools {

@@ -4,6 +4,11 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-28
 
+- **Sign-ins last six hours**, then you sign in again with a code or a passkey.
+- **Up-for-grabs characters** no longer say "played by" the GM who holds them.
+- **Crucibles:** each table's reading sits side by side when there's room, with a rule between them.
+- **The footer spans the page**: the toolkit's links on the left, the legal notice on the right.
+- **The GM can block a player** from settings: they're removed, and the invite link won't let them back in until they're unblocked. Remove still lets them rejoin with the link.
 - **Secret rolls.** The GM's story roll for no one in particular can be "Only I see it", and a player's ability roll "Only the GM sees it". GM-only rolls are outlined in dashed purple, like whispers. ([#59](https://github.com/phChun/grimwilder/pull/59))
 - **The campaign page is an overview**: the hero, the party, what looms and "Previously on…". Players roll the shared pools on their sheets, and only the GM calls for rolls. ([#58](https://github.com/phChun/grimwilder/pull/58))
 - **Campaign settings are the GM's.** Players leave from the campaign page. ([#57](https://github.com/phChun/grimwilder/pull/57))

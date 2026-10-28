@@ -18,7 +18,7 @@
         <h1 id="sheet-name" class="identity__name"><%= @character.name %></h1>
         <p class="identity__line">
           <%= @character.path %> <%= @character.level %><% @character.backgrounds.each do |background| %> · <%= background["name"] %><% end %><% if @character.features.any? %> · <em><%= @character.features.to_sentence %></em><% end %>
-          <% unless editable %> · played by <%= @character.identity.display_name %><% end %>
+          <% unless editable || @character.up_for_grabs? %> · played by <%= @character.identity.display_name %><% end %>
           <% if campaign %> · at <%= link_to campaign.name, campaign_path(campaign), class: "identity__campaign" %><% end %>
         </p>
       </div>

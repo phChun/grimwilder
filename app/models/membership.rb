@@ -6,10 +6,11 @@ class Membership < ApplicationRecord
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
 
   validates :identity_id, uniqueness: { scope: :campaign_id }
-  validate :within_plan, on: :create
+  validate :within_plan, :not_blocked, on: :create
 
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
+  after_destroy_commit :send_open_pages_away
 
   # Each open page checks in this often (presence_controller.js); a member not
   # heard from for longer than PRESENCE_WINDOW is gone. Pages say whether
@@ -59,6 +60,16 @@ class Membership < ApplicationRecord
         mine.up_for_grabs.update_all(identity_id: gm.identity_id)
       end
       mine.update_all(campaign_id: nil, up_for_grabs: false)
+    end
+
+    # A player removed or blocked may still have the campaign open: refresh
+    # their pages (the rail follows [membership, :chat]), which now 404.
+    def send_open_pages_away
+      Turbo::StreamsChannel.broadcast_refresh_to(self, :chat) if player? && !destroyed_by_association
+    end
+
+    def not_blocked
+      errors.add(:base, "The GM has blocked you from #{campaign.name}.") if campaign&.blocked?(identity)
     end
 
     def ensure_campaign_keeps_a_gm

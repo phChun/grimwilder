@@ -60,4 +60,20 @@ class SignInTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a[href=?]", new_session_path
   end
+
+  test "a sign-in lasts six hours" do
+    sign_in_as identities(:gwen)
+    get campaigns_path
+    assert_response :success
+
+    session_record = identities(:gwen).sessions.last
+    travel Session::LIFETIME + 1.minute do
+      get campaigns_path
+      assert_redirected_to new_session_path
+      assert_nil Session.resume(session_record.signed_id), "refused even if a browser keeps the cookie"
+
+      Session.cleanup
+      assert_not Session.exists?(session_record.id)
+    end
+  end
 end

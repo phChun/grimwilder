@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_28_041233) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_28_180000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -29,6 +29,18 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_28_041233) do
     t.datetime "updated_at", null: false
     t.json "additions", default: [], null: false
     t.index ["character_id"], name: "index_arcana_on_character_id"
+  end
+
+  create_table "campaign_blocks", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.integer "identity_id", null: false
+    t.integer "blocked_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blocked_by_id"], name: "index_campaign_blocks_on_blocked_by_id"
+    t.index ["campaign_id", "identity_id"], name: "index_campaign_blocks_on_campaign_id_and_identity_id", unique: true
+    t.index ["campaign_id"], name: "index_campaign_blocks_on_campaign_id"
+    t.index ["identity_id"], name: "index_campaign_blocks_on_identity_id"
   end
 
   create_table "campaigns", force: :cascade do |t|
@@ -342,6 +354,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_28_041233) do
   end
 
   add_foreign_key "arcana", "characters", on_delete: :cascade
+  add_foreign_key "campaign_blocks", "campaigns", on_delete: :cascade
+  add_foreign_key "campaign_blocks", "identities", column: "blocked_by_id", on_delete: :nullify
+  add_foreign_key "campaign_blocks", "identities", on_delete: :cascade
   add_foreign_key "characters", "campaigns"
   add_foreign_key "characters", "identities"
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify

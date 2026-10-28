@@ -1,5 +1,5 @@
 # Passwordless authentication: an emailed code (MagicLink) or a passkey starts
-# a Session, remembered by a signed, http-only cookie.
+# a Session, remembered by a signed, http-only cookie for Session::LIFETIME.
 #
 # Every request resumes the session if there is one, so pages can show who is
 # signed in. The play tools stay public; controllers that need a signed-in
@@ -28,8 +28,10 @@ module Authentication
     end
 
     def resume_session
-      if session_record = Session.find_signed(cookies.signed[:session_token])
+      if session_record = Session.resume(cookies.signed[:session_token])
         Current.session = session_record
+      elsif cookies[:session_token]
+        cookies.delete(:session_token) # expired (Session::LIFETIME) or gone
       end
     end
 
@@ -55,7 +57,7 @@ module Authentication
       identity.touch(:last_signed_in_at)
       identity.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session_record|
         Current.session = session_record
-        cookies.signed.permanent[:session_token] = { value: session_record.signed_id, httponly: true, same_site: :lax }
+        cookies.signed[:session_token] = { value: session_record.signed_id, expires: session_record.expires_at, httponly: true, same_site: :lax }
       end
     end
 

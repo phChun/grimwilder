@@ -76,6 +76,7 @@ Rails.application.routes.draw do
       resource :play, only: :show
       resource :table, only: :show
       resources :memberships, only: :destroy
+      resources :blocks, only: %i[ create destroy ] # the GM keeps someone out (Campaign::Blocking)
       resources :story_rolls, only: :create
       resource :feed, only: :show # older lines for the table rail, as you scroll back
       resources :quarrels, only: %i[ new create ]

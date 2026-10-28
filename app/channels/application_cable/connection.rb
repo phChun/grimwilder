@@ -6,7 +6,7 @@ module ApplicationCable
     identified_by :current_identity
 
     def connect
-      self.current_identity = Session.find_signed(cookies.signed[:session_token])&.identity
+      self.current_identity = Session.resume(cookies.signed[:session_token])&.identity
     end
   end
 end
