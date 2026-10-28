@@ -38,7 +38,8 @@ module CampaignsHelper
   def harm_line(character)
     harm = HARM.select { character.public_send(:"#{_1}?") }.map(&:capitalize)
     marks = Grimwild::STATS.select { character.marked?(_1) }.map { "#{_1.capitalize} marked" }
-    (harm + marks + character.conditions.pluck("name")).join(" · ").presence
+    vex = "Vex: #{character.vex}#{" (#{character.vex_subject})" if character.vex_subject}" if character.vex
+    (harm + marks + character.conditions.pluck("name") + [ vex ].compact).join(" · ").presence
   end
 
   # "Pressure · everyone sees", "Timer · hidden from players", "Resource · ran out 20 minutes ago"

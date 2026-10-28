@@ -1367,17 +1367,37 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .stat-roll__actions { display: flex; gap: var(--space-2); }
 .stat-roll__go { flex: 1; min-height: 48px; font-size: 1rem; }
 
-/* The sheet's top: stats, then harm. With room (a laptop beside the rail),
-   the stats sit two by two (Brawn, Agility / Wits, Presence) with harm beside them. */
+/* The sheet's top: the stats across, then harm and vex in one card with
+   conditions beside it. Narrow, the stats go two by two and the cards stack. */
 .sheet { container: sheet / inline-size; }
 .sheet__top { display: flex; flex-direction: column; gap: 12px; }
+/* Harm, vex and conditions: on a phone, three cards one under another; with
+   room, one card, harm with vex under it and conditions beside them. */
+.damage-card { display: grid; gap: 12px; margin-top: 12px; }
+.damage-card > div { display: flex; flex-direction: column; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.damage-card .card__title { margin: 0; }
+.damage-card .button_to { margin: 0; }
+.sheet__top .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 @container sheet (min-width: 40rem) {
-  /* Harm is as tall as the stats beside it (its conditions stay right under
-     the harm toggles), until a roll setup opens and makes the stats much taller. */
-  .sheet__top { display: grid; grid-template-columns: minmax(0, 3fr) minmax(15rem, 2fr); align-items: stretch; }
-  .sheet__top:has(.stat-roll[open]) { align-items: start; }
-  .sheet__top .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .damage-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "harm conditions" "vex conditions"; gap: 0; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+  .damage-card > div { padding: 0; border: 0; border-radius: 0; background: none; }
+  .damage-card > .damage-card__harm { grid-area: harm; padding: 0 18px 18px 0; }
+  .damage-card > .damage-card__vex { grid-area: vex; padding: 18px 18px 0 0; border-top: 1px solid var(--line-soft); }
+  .damage-card > .damage-card__conditions { grid-area: conditions; padding-left: 18px; border-left: 1px solid var(--line-soft); }
+}
+@container sheet (min-width: 48rem) {
+  .sheet__top .stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* What a harm or vex toggle means, on hover or focus (title is slow, and
+   absent on touch). */
+[data-tip] { position: relative; }
+.harm-toggle[data-tip]:hover::after,
+.harm-toggle[data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); z-index: 20; width: max-content; max-width: min(16rem, 70vw);
+  padding: 6px 10px; transform: translateX(-50%); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.4); font-size: 0.8rem; font-weight: 500; line-height: 1.35; color: var(--text); text-align: center; white-space: normal; pointer-events: none;
 }
 
 /* The roll you just made, of any kind, as a toast at the top of the toast
@@ -2661,3 +2681,10 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 /* A fieldset won't shrink below its content unless told; the odds wrap in a narrow rail. */
 .scene-plan-form__opening { display: grid; gap: var(--space-2); min-width: 0; }
 .segmented--auto.scene-plan-form__odds { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr)); }
+
+/* Vex on the Harm card (pg. 30): four toggles like harm's, the response's line under the lit one. */
+.vex { display: grid; gap: var(--space-2); margin-top: var(--space-3); }
+.vex__label { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.vex__toggles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vex__does { margin: 0; font-size: 0.9rem; color: var(--grim); }
+.vex__hint { margin: 0; }

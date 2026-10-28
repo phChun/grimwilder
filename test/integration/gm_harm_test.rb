@@ -12,9 +12,9 @@ class GmHarmTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get character_path(@tibbs)
 
-    assert_select "#damage form[action=?] button[aria-pressed=false]", character_damage_path(@tibbs), text: "Bloodied"
+    assert_select "#damage form[action=?] button[aria-pressed=false]", character_damage_path(@tibbs), text: /\ABloodied: \+1t to Brawn and Agility/
     assert_select ".stat-card form[action=?] button[aria-label=?]", character_damage_path(@tibbs), "Mark Agility", text: "Mark"
-    assert_select "#damage form[action=?]", character_conditions_path(@tibbs)
+    assert_select "#conditions form[action=?]", character_conditions_path(@tibbs)
     assert_select "details.stat-roll", 0, "only the owner rolls"
     assert_select ".identity .tally", 0, "nor spends spark or thread"
     assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(@tibbs)
@@ -92,5 +92,38 @@ class GmHarmTest < ActionDispatch::IntegrationTest
       patch character_damage_path(@tibbs), params: { character: { bloodied: true } }
     end
     assert @tibbs.reload.bloodied?
+  end
+
+  test "vex: the GM inflicts it with a response, the table sees it, and it passes" do
+    tibbs = characters(:tibbs)
+    sign_in_as identities(:gwen)
+    post character_vex_path(tibbs), params: { vex: "flight", subject: "  the ogre " }
+    assert_equal [ "flight", "the ogre" ], tibbs.reload.values_at(:vex, :vex_subject)
+    assert_match "took vex (flight, the ogre) on Tibbs", campaigns(:bramblewood).rolls.note.last.question
+
+    get character_path(tibbs)
+    assert_select "#damage .vex-toggle[aria-pressed=true][data-tip^=?]", "Run from the subject", text: /\AFlight/
+    assert_select "#damage .vex-toggle[aria-pressed=false]", 3
+    assert_select "#damage .vex__does", /Run from the subject.*\(the ogre\)/
+    get campaign_table_path(campaigns(:bramblewood))
+    assert_select ".party-card__harm", /Vex: flight \(the ogre\)/
+
+    delete character_vex_path(tibbs)
+    assert_nil tibbs.reload.vex
+    post character_vex_path(tibbs), params: { vex: "panic" }
+    assert_nil tibbs.reload.vex, "only the book's four responses"
+  end
+
+  test "vex clears when the scene ends and at a rest" do
+    tibbs = characters(:tibbs)
+    session = PlaySession.start!(campaigns(:bramblewood), characters: [ tibbs ], by: identities(:gwen))
+    scene = Scene.start!(session, title: "The mill", by: identities(:gwen))
+    tibbs.reload.update!(vex: "freeze")
+    scene.end!(by: identities(:gwen))
+    assert_nil tibbs.reload.vex
+
+    tibbs.update!(vex: "fight")
+    tibbs.rest!(by: identities(:gwen))
+    assert_nil tibbs.reload.vex
   end
 end

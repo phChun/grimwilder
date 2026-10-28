@@ -2,6 +2,17 @@
 module Character::Damage
   extend ActiveSupport::Concern
 
+  # Vex (pg. 30): the instinctive response to a flash of emotion, lasting a
+  # beat or two. Shown on the Harm card until it passes, a scene ends or a rest.
+  VEXES = %w[ fight flight freeze freakout ].freeze
+  VEX_RESPONSES = {
+    "fight" => "Lash out recklessly at the subject of your fear or hate.",
+    "flight" => "Run from the subject, taking whatever path is nearest.",
+    "freeze" => "Stop in your tracks, the emotion taking over your mind.",
+    "freakout" => "Do something else that puts you, others or your surroundings in harm's way."
+  }.freeze
+  VEX_SUBJECT_LIMIT = 60
+
   HARMS = %w[ bloodied rattled desperate ].freeze
   # "4d poisoned": a condition that's also a timer pool (pg. 30).
   CONDITION_POOL = /\A(\d+)d\s+(\S.*)\z/i
@@ -15,6 +26,9 @@ module Character::Damage
 
     belongs_to :harm_changed_by, class_name: "Identity", optional: true
     before_save :note_harm_change, if: -> { changed_by && harm_changing? }
+    validates :vex, inclusion: { in: VEXES }, allow_nil: true
+    normalizes :vex, with: ->(value) { value.presence }
+    normalizes :vex_subject, with: ->(value) { value.squish.first(VEX_SUBJECT_LIMIT).presence }
   end
 
   def marked?(stat)
@@ -89,12 +103,20 @@ module Character::Damage
     !public_send(harm) ? harm : (desperate? ? "dropped" : "desperate")
   end
 
+  def take_vex(response, subject: nil)
+    self.vex, self.vex_subject = response, subject
+  end
+
+  def shake_off_vex
+    self.vex = self.vex_subject = nil
+  end
+
   # A significant rest (pg. 31) clears all marks and harm. Doesn't save.
   # Also clears what a rest heals on a talent's companion (a vassal's or
   # animal companion's damage boxes).
   def rest(by: nil)
     self.changed_by = by if by
-    assign_attributes(Grimwild::STATS.to_h { [ "marked_#{_1}", false ] }.merge(bloodied: false, rattled: false, desperate: false))
+    assign_attributes(Grimwild::STATS.to_h { [ "marked_#{_1}", false ] }.merge(bloodied: false, rattled: false, desperate: false, vex: nil, vex_subject: nil))
     reset_talent_uses(per: :rest)
   end
 
@@ -161,7 +183,7 @@ module Character::Damage
   private
     def harm_changing?
       HARMS.any? { will_save_change_to_attribute?(_1) } || Grimwild::STATS.any? { will_save_change_to_attribute?("marked_#{_1}") } ||
-        will_save_change_to_conditions?
+        will_save_change_to_conditions? || will_save_change_to_vex?
     end
 
     def note_harm_change
@@ -195,7 +217,10 @@ module Character::Damage
         end
       end
 
-      [ ("marked #{marked.to_sentence}" if marked.any?), ("cleared #{cleared.to_sentence}" if cleared.any?), added_part, changed ]
+      took_vex = "took vex (#{vex}#{", #{vex_subject}" if vex_subject})" if will_save_change_to_vex? && vex
+      cleared << "the vex" if will_save_change_to_vex? && vex.nil?
+
+      [ ("marked #{marked.to_sentence}" if marked.any?), ("cleared #{cleared.to_sentence}" if cleared.any?), added_part, changed, took_vex ]
         .compact.join(", ").presence
     end
 end

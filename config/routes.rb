@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       end
       resource :experience, only: :create
       resource :damage, only: :update
+      resource :vex, only: %i[ create destroy ]
       resources :conditions, only: %i[ create destroy ] do
         resource :roll, only: :create, module: :conditions
       end
