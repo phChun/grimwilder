@@ -58,7 +58,7 @@ class MessageTest < ActiveSupport::TestCase
     whisper = say(@pip, "whisper").tap(&:save!)
     talk = say(@stranger, "table_talk").tap(&:save!)
 
-    assert_equal [ whisper, talk ], Message.chat_for(@campaign, memberships(:gwen_gm)), "the GM sees every whisper"
+    assert_equal [ whisper, talk ], Message.chat_for(@campaign, memberships(:gwen_gm)), "the GM sees whispers to them"
     assert_equal [ whisper, talk ], Message.chat_for(@campaign, memberships(:pip_player)), "the sender sees their own"
     assert_equal [ talk ], Message.chat_for(@campaign, @stranger.membership_in(@campaign)), "another player doesn't"
     assert_empty Message.where(kind: "whisper").visible_to(nil), "nor does anyone outside"
@@ -72,6 +72,43 @@ class MessageTest < ActiveSupport::TestCase
     end
     assert_no_turbo_stream_broadcasts [ @campaign, :chat ]
     assert_no_turbo_stream_broadcasts [ @stranger.membership_in(@campaign), :chat ]
+  end
+
+  test "the GM's whisper reaches that character's player and the GM, no one else" do
+    whisper = say(@gwen, "whisper", to_character: @tibbs)
+    assert_turbo_stream_broadcasts [ @campaign, :gm ], count: 1 do
+      assert_turbo_stream_broadcasts [ memberships(:pip_player), :chat ], count: 1 do
+        whisper.save!
+      end
+    end
+    assert_no_turbo_stream_broadcasts [ @campaign, :chat ]
+    assert_no_turbo_stream_broadcasts [ @stranger.membership_in(@campaign), :chat ]
+
+    assert_includes Message.chat_for(@campaign, memberships(:pip_player)), whisper
+    assert_not_includes Message.chat_for(@campaign, @stranger.membership_in(@campaign)), whisper
+  end
+
+  test "a GM's whisper needs a player's character; a player's goes to the GM or another player, not themselves" do
+    assert_not say(@gwen, "whisper").valid?
+    assert_not say(@pip, "whisper", to_character: @tibbs).valid?
+    assert say(@gwen, "whisper", to_character: @tibbs).valid?
+    assert say(@stranger, "whisper", to_character: @tibbs).valid?
+  end
+
+  test "players' whispers to each other reach only the two of them, not the GM" do
+    whisper = say(@stranger, "whisper", to_character: @tibbs)
+    assert_turbo_stream_broadcasts [ memberships(:pip_player), :chat ], count: 1 do
+      assert_turbo_stream_broadcasts [ @stranger.membership_in(@campaign), :chat ], count: 1 do
+        whisper.save!
+      end
+    end
+    assert_no_turbo_stream_broadcasts [ @campaign, :gm ]
+    assert_no_turbo_stream_broadcasts [ @campaign, :chat ]
+
+    assert_includes Message.chat_for(@campaign, memberships(:pip_player)), whisper
+    assert_includes Message.chat_for(@campaign, @stranger.membership_in(@campaign)), whisper
+    assert_not_includes Message.chat_for(@campaign, memberships(:gwen_gm)), whisper
+    assert_equal [ @stranger.id.to_s, @pip.id.to_s ], [ whisper.from_side, whisper.to_side ]
   end
 
   test "everything else goes to the table's stream" do

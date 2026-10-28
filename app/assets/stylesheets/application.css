@@ -54,6 +54,9 @@
   /* Meta-currencies */
   --spark: #e6b450;
   --thread: #8fc0e8;
+  /* Your own chat lines: a cool tint against the warm surfaces incoming lines use. */
+  --mine-bg: #1b2631;
+  --mine-line: #34506a;
   --suspense: #b88ce6;
   --suspense-text: #c9a8ec;
   --suspense-bg: #1f1a24;
