@@ -1,100 +1,106 @@
 <%# locals: (character:, stat:, allies:, cast: nil) %>
-<%# The roll setup, folded into the stat card. Only one card's setup is open at a time (details name="stat-roll"), and the open card spans two columns. Open, the Roll button hides and the setup's ✕ closes it, from the card's top right corner. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. Each ally's assist talents (Guardian, Shepherd, Teamwork) sit under their name, and Panache is a choice like spark. A talent's Cast button links here with cast: its key, which opens the setup with its cast ticked. %>
+<%# The roll setup, in a modal: the stat card's Roll button opens it (roll_dialog_controller.js), so the sheet doesn't shift; Escape, the ✕ or a click outside closes it, and rolling closes it (the page refreshes and the roll toast shows). Wide, its sections sit two by two. The steppers show totals: dice with the stat's own, thorns with the ones damage adds (the controller takes the difference). Talents that fit the stat are ticks (Character::TalentBonuses); automatic ones are listed, already counted. Each ally's assist talents (Guardian, Shepherd, Teamwork) sit under their name, and Panache is a choice like spark. A talent's Cast button links here with cast: its key, which opens the setup with its cast ticked. %>
 <% damage = character.damage_thorns(stat) %>
 <% dice = character.stat(stat) %>
 <% prefix = "roll_#{stat}" %>
 <% bonuses = character.talent_bonuses_for(stat) %>
 <% casting = bonuses.map { _2.id } & (cast && character.talent_entries.find { _1.key == cast }&.cast_bonus_ids).to_a %>
-<%= tag.details class: "stat-roll", name: "stat-roll", open: casting.any? do %>
-  <summary class="button stat-roll__toggle">Roll <%= stat.capitalize %></summary>
-  <%= render "shared/popover_head", title: "Roll #{stat.capitalize}" %>
+<div class="stat-roll" data-controller="roll-dialog" data-roll-dialog-open-value="<%= casting.any? %>">
+  <button type="button" class="button stat-roll__toggle" aria-haspopup="dialog" data-action="roll-dialog#open">Roll <%= stat.capitalize %></button>
+  <dialog class="roll-dialog" aria-labelledby="<%= prefix %>_title" data-roll-dialog-target="dialog" data-action="click->roll-dialog#backdrop turbo:submit-end->roll-dialog#submitted">
+    <header class="roll-dialog__head">
+      <h2 id="<%= prefix %>_title" class="roll-dialog__title">Roll <%= stat.capitalize %></h2>
+      <span class="roll-dialog__dice"><%= dice %>d<% if damage.positive? %> · <%= damage %>t from damage<% end %></span>
+      <%= render "shared/close_button", action: "roll-dialog#close", css: "roll-dialog__close" %>
+    </header>
 
-  <%= form_with url: character_rolls_path(character), class: "stat-roll__form", data: { controller: "stat-roll", action: "input->stat-roll#update change->stat-roll#update" } do %>
-    <input type="hidden" name="stat" value="<%= stat %>">
+    <%= form_with url: character_rolls_path(character), class: "stat-roll__form roll-dialog__form", data: { controller: "stat-roll", action: "input->stat-roll#update change->stat-roll#update" } do %>
+      <input type="hidden" name="stat" value="<%= stat %>">
 
-    <div class="stat-roll__steppers">
-      <%= render "shared/stepper", text: "Dice", name: "dice", id: "#{prefix}_dice", value: dice, min: dice, max: dice + Character::Rolling::MAX_EXTRA %>
-      <%= render "shared/stepper", text: "Thorns", name: "total_thorns", id: "#{prefix}_thorns", value: damage, min: damage, max: damage + Character::Rolling::MAX_EXTRA %>
-    </div>
-    <div class="field stat-roll__help">
-      <label class="stat-roll__label" for="<%= prefix %>_help_from">Extra dice from <small>optional: an NPC, the scene</small></label>
-      <input type="text" id="<%= prefix %>_help_from" name="help_from" maxlength="60" autocomplete="off" class="field__input" placeholder="The innkeeper">
-    </div>
-    <% if (note = damage_thorns_note(character, stat)) %>
-      <p class="stat-roll__note"><%= note %></p>
-    <% end %>
-
-    <% if character.spark.positive? %>
-      <div class="stat-roll__group">
-        <span class="stat-roll__label" id="<%= prefix %>_spark_label">Spend spark <small>+1d each</small></span>
-        <%= render "shared/segmented", name: "spark", legend: "Spend spark", options: (0..character.spark).map { [ _1, _1.zero? ? "None" : "+#{_1}" ] }, checked: 0, id_prefix: "#{prefix}_spark", classes: "segmented--auto" %>
+      <div class="stat-roll__steppers">
+        <%= render "shared/stepper", text: "Dice", name: "dice", id: "#{prefix}_dice", value: dice, min: dice, max: dice + Character::Rolling::MAX_EXTRA %>
+        <%= render "shared/stepper", text: "Thorns", name: "total_thorns", id: "#{prefix}_thorns", value: damage, min: damage, max: damage + Character::Rolling::MAX_EXTRA %>
       </div>
-    <% end %>
-
-    <% if (panache = character.panache_use) && character.uses_left(panache).positive? %>
-      <div class="stat-roll__group">
-        <span class="stat-roll__label">Spend panache <small>−1 thorn each; remove them all and they roll as panache dice</small></span>
-        <%= render "shared/segmented", name: "panache", legend: "Spend panache", options: (0..character.uses_left(panache)).map { [ _1, _1.zero? ? "None" : "−#{_1}t" ] }, checked: 0, id_prefix: "#{prefix}_panache", classes: "segmented--auto" %>
+      <div class="field stat-roll__help">
+        <label class="stat-roll__label" for="<%= prefix %>_help_from">Extra dice from <small>optional: an NPC, the scene</small></label>
+        <input type="text" id="<%= prefix %>_help_from" name="help_from" maxlength="60" autocomplete="off" class="field__input" placeholder="The innkeeper">
+        <% if (note = damage_thorns_note(character, stat)) %>
+          <p class="stat-roll__note"><%= note %></p>
+        <% end %>
       </div>
-    <% end %>
 
-    <% if bonuses.any? %>
-      <fieldset class="stat-roll__group">
-        <legend class="stat-roll__label">Talents <small>tick what fits; the log names them</small></legend>
-        <ul class="stat-roll__talents">
-          <% bonuses.each do |talent, bonus| %>
-            <% effect = talent_bonus_effect(character, bonus, stat) %>
-            <li>
-              <% if bonus.auto? %>
-                <%= tag.span class: "stat-roll__talent stat-roll__talent--auto", data: { stat_roll_target: "auto", dice: character.bonus_dice(bonus, stat), defense_only: bonus.defense_only? } do %>
-                  <%= icon(:check) %>
-                  <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
-                <% end %>
-              <% else %>
-                <label class="check stat-roll__talent">
-                  <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), checked: casting.include?(bonus.id), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), add_thorns: character.bonus_thorns(bonus), defense_only: bonus.defense_only? } %>
-                  <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
-                </label>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      </fieldset>
-    <% end %>
+      <% if character.spark.positive? %>
+        <div class="stat-roll__group">
+          <span class="stat-roll__label" id="<%= prefix %>_spark_label">Spend spark <small>+1d each</small></span>
+          <%= render "shared/segmented", name: "spark", legend: "Spend spark", options: (0..character.spark).map { [ _1, _1.zero? ? "None" : "+#{_1}" ] }, checked: 0, id_prefix: "#{prefix}_spark", classes: "segmented--auto" %>
+        </div>
+      <% end %>
 
-    <% if allies.any? %>
-      <fieldset class="stat-roll__group">
-        <legend class="stat-roll__label">Assists <small>1d each, shares the risk</small></legend>
-        <div class="stat-roll__assists">
-          <% allies.each do |ally| %>
-            <div class="stat-roll__assist">
-              <label class="check">
-                <%= check_box_tag "assists[]", ally.id, false, id: "#{prefix}_assist_#{ally.id}" %>
-                <%= ally.name %>
-              </label>
-              <% ally.assist_bonuses.each do |talent, bonus| %>
-                <% effect = [ ("+#{bonus.dice}d" if bonus.dice.positive?), ("defense only" if bonus.defense_only?) ].compact.join(" · ") %>
+      <% if (panache = character.panache_use) && character.uses_left(panache).positive? %>
+        <div class="stat-roll__group">
+          <span class="stat-roll__label">Spend panache <small>−1 thorn each; remove them all and they roll as panache dice</small></span>
+          <%= render "shared/segmented", name: "panache", legend: "Spend panache", options: (0..character.uses_left(panache)).map { [ _1, _1.zero? ? "None" : "−#{_1}t" ] }, checked: 0, id_prefix: "#{prefix}_panache", classes: "segmented--auto" %>
+        </div>
+      <% end %>
+
+      <% if bonuses.any? %>
+        <fieldset class="stat-roll__group">
+          <legend class="stat-roll__label">Talents <small>tick what fits; the log names them</small></legend>
+          <ul class="stat-roll__talents">
+            <% bonuses.each do |talent, bonus| %>
+              <% effect = talent_bonus_effect(character, bonus, stat) %>
+              <li>
                 <% if bonus.auto? %>
-                  <%= tag.span class: "stat-roll__talent stat-roll__talent--auto", data: { stat_roll_target: "allyAuto", ally: ally.id, dice: bonus.dice, defense_only: bonus.defense_only? } do %>
+                  <%= tag.span class: "stat-roll__talent stat-roll__talent--auto", data: { stat_roll_target: "auto", dice: character.bonus_dice(bonus, stat), defense_only: bonus.defense_only? } do %>
                     <%= icon(:check) %>
-                    <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(ally, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                    <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
                   <% end %>
                 <% else %>
                   <label class="check stat-roll__talent">
-                    <%= tag.input type: "checkbox", name: "assist_bonuses[#{ally.id}][]", value: bonus.id, id: "#{prefix}_assist_#{ally.id}_#{bonus.id.parameterize}", data: { ally: ally.id, dice: bonus.dice, defense_only: bonus.defense_only? } %>
-                    <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(ally, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                    <%= tag.input type: "checkbox", name: "bonuses[]", value: bonus.id, id: "#{prefix}_bonus_#{bonus.id.parameterize}", disabled: !character.bonus_ready?(bonus), checked: casting.include?(bonus.id), data: { dice: character.bonus_dice(bonus, stat), ignore_thorns: character.bonus_ignored_damage(bonus, stat), add_thorns: character.bonus_thorns(bonus), defense_only: bonus.defense_only? } %>
+                    <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(character, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
                   </label>
                 <% end %>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
-      </fieldset>
-    <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </fieldset>
+      <% end %>
 
-    <div class="stat-roll__actions">
-      <button type="submit" name="mode" value="action" class="button button--primary stat-roll__go" data-stat-roll-target="label"><%= stat_roll_label(dice, damage) %></button>
-      <button type="submit" name="mode" value="defense" class="button">Defense</button>
-    </div>
-  <% end %>
-<% end %>
+      <% if allies.any? %>
+        <fieldset class="stat-roll__group">
+          <legend class="stat-roll__label">Assists <small>1d each, shares the risk</small></legend>
+          <div class="stat-roll__assists">
+            <% allies.each do |ally| %>
+              <div class="stat-roll__assist">
+                <label class="check">
+                  <%= check_box_tag "assists[]", ally.id, false, id: "#{prefix}_assist_#{ally.id}" %>
+                  <%= ally.name %>
+                </label>
+                <% ally.assist_bonuses.each do |talent, bonus| %>
+                  <% effect = [ ("+#{bonus.dice}d" if bonus.dice.positive?), ("defense only" if bonus.defense_only?) ].compact.join(" · ") %>
+                  <% if bonus.auto? %>
+                    <%= tag.span class: "stat-roll__talent stat-roll__talent--auto", data: { stat_roll_target: "allyAuto", ally: ally.id, dice: bonus.dice, defense_only: bonus.defense_only? } do %>
+                      <%= icon(:check) %>
+                      <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(ally, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                    <% end %>
+                  <% else %>
+                    <label class="check stat-roll__talent">
+                      <%= tag.input type: "checkbox", name: "assist_bonuses[#{ally.id}][]", value: bonus.id, id: "#{prefix}_assist_#{ally.id}_#{bonus.id.parameterize}", data: { ally: ally.id, dice: bonus.dice, defense_only: bonus.defense_only? } %>
+                      <span><strong><%= talent.name %>:</strong> <%= talent_bonus_label(ally, talent, bonus) %><% if effect.present? %> <small><%= effect %></small><% end %></span>
+                    </label>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </fieldset>
+      <% end %>
+
+      <div class="stat-roll__actions">
+        <button type="submit" name="mode" value="action" class="button button--primary stat-roll__go" data-stat-roll-target="label"><%= stat_roll_label(dice, damage) %></button>
+        <button type="submit" name="mode" value="defense" class="button">Defense</button>
+      </div>
+    <% end %>
+  </dialog>
+</div>

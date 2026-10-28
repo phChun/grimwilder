@@ -1335,26 +1335,35 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .stat-card .stat-card__mark { min-width: 5.5rem; padding: 0 10px; border-style: dashed; border-radius: var(--radius-sm); color: var(--dim); font-size: 0.8rem; }
 .stat-card .stat-card__mark[aria-pressed="true"] { border-style: solid; border-color: var(--grim); background: var(--grim-bg); color: var(--grim); }
 
-.stat-card:has(.stat-roll[open]) {
-  grid-column: span 2;
-  border-color: transparent;
-  background: var(--ember-soft);
-  box-shadow: inset 0 0 0 2px var(--ember);
-}
+.stat-roll { margin-top: auto; }
+.stat-roll__toggle { width: 100%; }
 
-@media (max-width: 23.99rem) {
-  .stat-card:has(.stat-roll[open]) { grid-column: 1 / -1; }
+/* The roll setup, in a modal: wide, its sections two by two (dice and thorns
+   beside where the extra dice come from, spark beside panache, talents beside
+   assists); on a phone, one column filling the screen. */
+.roll-dialog {
+  width: min(46rem, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 16px 20px 20px;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 12px 32px -8px rgb(0 0 0 / 0.85);
+  overflow-y: auto;
 }
-
-.stat-roll { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
-.stat-roll > summary { list-style: none; width: 100%; }
-.stat-roll > summary::-webkit-details-marker { display: none; }
-.stat-roll[open] > summary { display: none; }
-/* Open, the setup's ✕ sits in the card's top right corner, clear of the name. */
-.stat-card:has(.stat-roll[open]) { position: relative; }
-.stat-card:has(.stat-roll[open]) .stat-card__name { padding-right: var(--tap); }
-.stat-roll .popover__head { margin: 0; }
-.stat-roll .popover__head .close-button { position: absolute; top: 4px; right: 4px; }
+.roll-dialog[open] { display: flex; flex-direction: column; gap: 14px; animation: roll-toast-in 180ms ease-out; }
+.roll-dialog::backdrop { background: rgb(10 9 7 / 0.7); }
+@media (prefers-reduced-motion: reduce) { .roll-dialog[open] { animation: none; } }
+.roll-dialog__head { display: flex; align-items: baseline; gap: var(--space-3); padding-right: var(--tap); }
+.roll-dialog__title { margin: 0; font-family: var(--font-display); font-size: 1.5rem; }
+.roll-dialog__dice { font-family: var(--font-dice); color: var(--text-soft); }
+.roll-dialog__close { position: absolute; top: 8px; right: 8px; }
+.roll-dialog .roll-dialog__form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 16px 24px; align-items: start; }
+.roll-dialog .roll-dialog__form > .stat-roll__actions { grid-column: 1 / -1; }
+@media (max-width: 40rem) {
+  .roll-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); padding: 14px 16px 16px; }
+}
 
 .stat-roll__form { display: flex; flex-direction: column; gap: 12px; }
 .stat-roll__steppers { display: flex; flex-wrap: wrap; gap: 10px 20px; }
