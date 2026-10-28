@@ -2412,8 +2412,8 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__delete { display: inline-flex; align-items: center; justify-content: center; width: var(--tap); height: var(--tap); border: 0; border-radius: var(--radius-sm); background: none; color: var(--dim); opacity: 0.35; cursor: pointer; }
 .chat-line:hover .chat-line__delete, .chat-line__delete:focus-visible { opacity: 1; }
 .chat-line__delete:hover { color: var(--grim); }
-/* Incoming lines sit and read from the left; your own (feed_controller.js marks them) from the right. Narration spans the rail either way. */
-.chat-line--mine { align-items: flex-end; text-align: right; }
+/* Incoming lines sit on the left; your own (feed_controller.js marks them) on the right, their text still reading left to right. Narration spans the rail either way. */
+.chat-line--mine { align-items: flex-end; }
 .chat-line--mine .chat-line__head, .chat-line--mine .chat-line__label { justify-content: flex-end; }
 .chat-line__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); margin: 0; font-size: 13px; }
 .chat-line__who { color: var(--text-soft); }
