@@ -69,7 +69,11 @@
               <span class="field__hint">The GM makes the characters here: pick one up for grabs.</span>
             <% end %>
           <% end %>
-          <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button" %>
+          <% if gm %>
+            <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button" %>
+          <% else %>
+            <%= button_to "Leave campaign", campaign_membership_path(campaign, Current.membership), method: :delete, class: "button button--ghost", form: { class: "campaign-actions__leave", data: { turbo_confirm: "Leave #{campaign.name}? Your characters stay yours, unseated." } } %>
+          <% end %>
         </div>
         <% if campaign.done? %>
           <p class="campaign-actions__hint"><em class="campaign-actions__done">The story's told.</em> Everything here stays to look back on.<% if @mine %> Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.<% end %></p>
