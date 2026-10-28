@@ -36,7 +36,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".campaign-hero .eyebrow", "Campaign · Playing Tibbs"
     assert_select ".campaign-hero__pitch", 0
     assert_select ".campaign-actions__row a.button--primary[href=?]", character_path(characters(:tibbs)), "Open my character"
-    assert_select ".campaign-actions__row button", 0, "no invite link for players"
+    assert_select ".campaign-actions__row button[data-action*=copy]", 0, "no invite link for players"
   end
 
   test "a player with two characters here picks which to open" do
@@ -134,11 +134,12 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".members__item:has(.members__name:contains('Gwen')) .members__role--gm", "GM"
     assert_select ".members__item:has(.members__name:contains('Pip')) .members__role", "Tibbs"
     assert_select ".members__item:has(.members__name:contains('Stranger')) .members__role", "making one"
-    assert_select ".campaign-actions__row a.button:not(.button--ghost)[href=?]", edit_campaign_path(@campaign), "Campaign settings"
+    assert_select "a[href=?]", edit_campaign_path(@campaign), 0, "settings are the GM's"
+    assert_select ".campaign-actions__row form[action=?] button", campaign_membership_path(@campaign, memberships(:pip_player)), "Leave campaign"
     assert_select "[data-controller=kept-crucibles][hidden] button[data-action=?]", "kept-crucibles#clear", "Clear"
   end
 
-  test "the GM sets the pitch in settings; players can only leave" do
+  test "the GM sets the pitch in settings; players can't open them" do
     sign_in_as identities(:gwen)
     get edit_campaign_path(@campaign)
     assert_select "form[action=?] input[name='campaign[party_is][]']", campaign_path(@campaign), 2
@@ -158,9 +159,7 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:pip)
     get edit_campaign_path(@campaign)
-    assert_select "#settings form[action=?]", campaign_membership_path(@campaign, memberships(:pip_player))
-    assert_select "input[name='campaign[pitch]']", 0
-    assert_select "form[action=?] button", campaign_path(@campaign), count: 0
+    assert_response :forbidden
 
     patch campaign_path(@campaign), params: { campaign: { pitch: "Mine now" } }
     assert_response :forbidden

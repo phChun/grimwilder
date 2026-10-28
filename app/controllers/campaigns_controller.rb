@@ -5,7 +5,7 @@ class CampaignsController < ApplicationController
 
   skip_before_action :set_campaign, only: %i[ index create ]
   skip_before_action :refuse_when_done, only: %i[ update destroy ]
-  before_action :require_gm, only: %i[ update destroy ]
+  before_action :require_gm, only: %i[ edit update destroy ]
 
   def index
     @memberships = Current.identity.memberships.includes(:campaign).order(created_at: :desc)
@@ -28,7 +28,7 @@ class CampaignsController < ApplicationController
     load_overview
   end
 
-  # Settings: the pitch, members and the invite link (the GM's), or leaving.
+  # Settings: the GM's only. A player leaves from the campaign page.
   def edit
     load_settings
   end
