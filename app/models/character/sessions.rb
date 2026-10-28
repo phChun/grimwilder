@@ -48,6 +48,7 @@ module Character::Sessions
   def end_scene!
     reset_talent_uses(per: :scene)
     end_frenzy
+    shake_off_vex
     save!
     refresh_talent_pools!(per: :scene)
   end
