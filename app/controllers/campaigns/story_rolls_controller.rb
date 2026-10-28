@@ -1,9 +1,11 @@
-# Story rolls from the Rolls fold. For a character, it's a roll call: that
-# character's player rolls it (RollCall). The GM can call on anyone at the
-# table, a player on their own characters. For no one in particular (the GM
-# testing luck, say) it's rolled straight away.
+# Story rolls from the GM's Rolls fold. For a character, it's a roll call:
+# that character's player rolls it (RollCall). For no one in particular (the
+# GM testing luck, say) it's rolled straight away. Only the GM calls for
+# rolls; a player's talent rolls are their own (Characters::TalentRollsController).
 class Campaigns::StoryRollsController < ApplicationController
   include CampaignScoped, StoryRollParams
+
+  before_action :require_gm
 
   def create
     if (character = called_character)

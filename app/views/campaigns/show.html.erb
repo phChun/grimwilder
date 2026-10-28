@@ -8,11 +8,12 @@
 <% campaign = Current.campaign %>
 <% gm = gm? %>
 
-<%# The campaign page reads like a series overview: who's in it, what it's about, what happened last time. Players also roll pools and story rolls here, and follow the log. %>
-<div class="campaign-page" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
-  <section class="campaign-hero" aria-labelledby="campaign-name">
-    <div class="campaign-hero__about">
-      <p class="eyebrow">Campaign<% if campaign.done? %> · Done <%= l(campaign.done_at.to_date, format: :long) %><% end %> · <%= gm ? "You're the GM" : (@mine ? "Playing #{@mine_all.map(&:short_name).to_sentence}" : "You're a player") %></p>
+<%# The campaign page reads like a series overview: what it's about, who's in it, what looms and what happened last time, with the table's chat beside it. It's for reading: players roll on their sheets (characters/_table_rolls), the GM at the GM table. %>
+<% gms = @memberships.select(&:gm?).map { _1.identity.display_name } %>
+<div class="fluid campaign-page" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
+  <div class="fluid__main campaign-page__main">
+    <section class="campaign-hero" aria-labelledby="campaign-name">
+      <p class="eyebrow">Campaign<% if campaign.done? %> · Done <%= l(campaign.done_at.to_date, format: :long) %><% end %> · <%= gm ? "You're the GM" : "GM #{gms.to_sentence}" %><% if !gm && @mine %> · Playing <%= @mine_all.map(&:short_name).to_sentence %><% end %></p>
       <h1 id="campaign-name" class="campaign-hero__title"><%= campaign.name %></h1>
       <% if campaign.pitch.present? %>
         <p class="campaign-hero__pitch"><%= campaign.pitch %></p>
@@ -27,60 +28,60 @@
           <div><dt>Setting</dt><dd><%= campaign.setting || "—" %></dd></div>
         </dl>
       <% end %>
-    </div>
-  </section>
+      <%# The table's optional rules, one quiet line; each says what it does on hover or focus. %>
+      <% if campaign.rules_in_play.any? %>
+        <p class="campaign-hero__rules"><span class="campaign-hero__rules-label">Optional rules</span>
+          <% campaign.rules_in_play.each do |rule_name, page, does| %>
+            <span class="campaign-hero__rule" tabindex="0" data-tip="<%= does %> (pg. <%= page %>)"><%= rule_name %></span>
+          <% end %>
+        </p>
+      <% end %>
 
-  <div class="fluid">
-    <div class="fluid__main campaign-page__main">
-      <%# What to do here, in a row above the party: the GM's table, invite link and settings, or a player's character. Campaign::Done: a read-only archive; the history is the way back in, and the GM reopens it from settings. %>
-      <section class="campaign-actions" aria-label="Campaign actions">
-        <div class="campaign-actions__row">
-          <% if campaign.done? %>
-            <%= link_to "Read the history", campaign_play_sessions_path(campaign), class: "button button--primary" %>
-            <% if gm %>
-              <%= link_to "Reopen it", edit_campaign_path(campaign, anchor: "done"), class: "button" %>
-            <% end %>
-          <% elsif gm %>
-            <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary" %>
-            <%= render "campaigns/copy_join_button", url: join_url(campaign.join_code) %>
-            <%= button_to "Reset link", campaign_join_code_path(campaign), method: :patch, class: "button", title: "Make a new invite link; the current one stops working", form: { data: { turbo_confirm: "The current link will stop working. Continue?" } } %>
-          <% elsif @mine_all.many? %>
-            <%# More than one character here: the button opens a menu of their sheets. %>
-            <details id="open-character" class="go-menu" data-controller="menu" data-action="toggle->menu#place">
-              <summary class="button button--primary go-menu__button">Open my character <%= icon(:chevron, size: 16) %></summary>
-              <ul class="go-menu__list" data-menu-target="panel">
-                <%= render "shared/popover_head", title: "Open which character?", list: true %>
-                <% @mine_all.each do |character| %>
-                  <li>
-                    <%= link_to character_path(character), class: "go-menu__item" do %>
-                      <span class="go-menu__name"><%= character.name %></span>
-                      <span class="go-menu__meta"><%= character.path %> · level <%= character.level %></span>
-                    <% end %>
-                  </li>
-                <% end %>
-              </ul>
-            </details>
-          <% elsif @mine %>
-            <%= link_to "Open my character", character_path(@mine), class: "button button--primary" %>
-          <% else %>
-            <% if campaign.makes_characters?(Current.identity) %>
-              <%= link_to "Make your character", new_character_path(campaign_id: campaign.id), class: "button button--primary" %>
-            <% else %>
-              <span class="field__hint">The GM makes the characters here: pick one up for grabs.</span>
-            <% end %>
-          <% end %>
-          <% if gm %>
-            <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button" %>
-          <% else %>
-            <%= button_to "Leave campaign", campaign_membership_path(campaign, Current.membership), method: :delete, class: "button button--ghost", form: { class: "campaign-actions__leave", data: { turbo_confirm: "Leave #{campaign.name}? Your characters stay yours, unseated." } } %>
-          <% end %>
-        </div>
+      <%# What to do here: the GM's table, invite link and settings, or a player's character. Campaign::Done: a read-only archive; the history is the way back in, and the GM reopens it from settings. %>
+      <div class="campaign-actions" aria-label="Campaign actions" role="group">
         <% if campaign.done? %>
-          <p class="campaign-actions__hint"><em class="campaign-actions__done">The story's told.</em> Everything here stays to look back on.<% if @mine %> Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.<% end %></p>
-        <% elsif !gm && !@mine %>
-          <p class="campaign-actions__hint">Seat them in <%= campaign.name %> and they'll join the party.<% if @up_for_grabs.any? %> Or <a href="#up-for-grabs">pick one that's up for grabs</a>.<% end %></p>
+          <%= link_to "Read the history", campaign_play_sessions_path(campaign), class: "button button--primary" %>
+          <% if gm %>
+            <%= link_to "Reopen it", edit_campaign_path(campaign, anchor: "done"), class: "button" %>
+          <% end %>
+        <% elsif gm %>
+          <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary" %>
+          <%= render "campaigns/copy_join_button", url: join_url(campaign.join_code) %>
+        <% elsif @mine_all.many? %>
+          <%# More than one character here: the button opens a menu of their sheets. %>
+          <details id="open-character" class="go-menu" data-controller="menu" data-action="toggle->menu#place">
+            <summary class="button button--primary go-menu__button">Open my character <%= icon(:chevron, size: 16) %></summary>
+            <ul class="go-menu__list" data-menu-target="panel">
+              <%= render "shared/popover_head", title: "Open which character?", list: true %>
+              <% @mine_all.each do |character| %>
+                <li>
+                  <%= link_to character_path(character), class: "go-menu__item" do %>
+                    <span class="go-menu__name"><%= character.name %></span>
+                    <span class="go-menu__meta"><%= character.path %> · level <%= character.level %></span>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </details>
+        <% elsif @mine %>
+          <%= link_to "Open my character", character_path(@mine), class: "button button--primary" %>
+        <% elsif campaign.makes_characters?(Current.identity) %>
+          <%= link_to "Make your character", new_character_path(campaign_id: campaign.id), class: "button button--primary" %>
+        <% else %>
+          <span class="field__hint">The GM makes the characters here: pick one up for grabs.</span>
         <% end %>
-      </section>
+        <% if gm %>
+          <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button campaign-actions__end" %>
+        <% else %>
+          <%= button_to "Leave campaign", campaign_membership_path(campaign, Current.membership), method: :delete, class: "button button--ghost", form: { class: "campaign-actions__end", data: { turbo_confirm: "Leave #{campaign.name}? Your characters stay yours, unseated." } } %>
+        <% end %>
+      </div>
+      <% if campaign.done? %>
+        <p class="campaign-actions__hint"><em class="campaign-actions__done">The story's told.</em> Everything here stays to look back on.<% if @mine %> Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.<% end %></p>
+      <% elsif !gm && !@mine %>
+        <p class="campaign-actions__hint">Seat them in <%= campaign.name %> and they'll join the party.<% if @up_for_grabs.any? %> Or <a href="#up-for-grabs">pick one that's up for grabs</a>.<% end %></p>
+      <% end %>
+    </section>
 
       <section id="party" class="gm-section" aria-labelledby="party-title">
         <div class="gm-section__head">
@@ -166,6 +167,35 @@
         <% end %>
       </section>
 
+      <%# What looms: the shared pools as tracks, for reading. Players roll them on their sheets; the GM at the GM table. %>
+      <section id="pools" class="gm-section" aria-labelledby="pools-title">
+        <div class="gm-section__head">
+          <h2 id="pools-title" class="gm-section__title">What looms</h2>
+          <% if gm && !campaign.done? %>
+            <%= link_to "Pools at the table", campaign_table_path(campaign, anchor: "pools"), class: "button button--ghost button--small" %>
+          <% elsif @mine && !campaign.done? %>
+            <%= link_to "Roll from your sheet", character_path(@mine, anchor: "table-rolls"), class: "button button--ghost button--small" %>
+          <% end %>
+        </div>
+        <% shown = @pools.reject(&:hidden?) %>
+        <% if shown.any? %>
+          <div class="looms">
+            <% shown.each do |pool| %>
+              <div class="pool-glance card">
+                <div class="pool-glance__head"><span><%= pool.name %></span><span class="pool-glance__size"><%= pool.size %>d</span></div>
+                <%= render "shared/pool_track", pool: pool %>
+                <span class="pool-glance__kind"><%= pool.kind.capitalize %> pool</span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="empty"><%= gm ? "No pools showing." : "Nothing yet. Your GM adds pools as the story needs." %></p>
+        <% end %>
+        <% if gm && @hidden_pools.positive? %>
+          <p class="pool-glance__hidden"><%= icon(:eye_off) %> <%= pluralize(@hidden_pools, "hidden pool") %>, only you see <%= @hidden_pools == 1 ? "it" : "them" %></p>
+        <% end %>
+      </section>
+
       <section id="previously" class="gm-section" aria-labelledby="previously-title">
         <h2 id="previously-title" class="gm-section__title">Previously on…</h2>
         <% if @previous %>
@@ -204,69 +234,9 @@
           <p class="empty"><%= @session ? "#{@session.title} is the first. Its story shows here once it ends." : "No sessions yet." %> <%= link_to "Session history", campaign_play_sessions_path(campaign) %></p>
         <% end %>
       </section>
-    </div>
-
-    <aside class="fluid__rail campaign-page__side" aria-label="The table at a glance">
-      <section id="pools" class="card side-card" aria-labelledby="pools-title">
-        <h2 id="pools-title" class="side-card__title">What looms</h2>
-        <% shown = @pools.reject(&:hidden?) %>
-        <% if gm %>
-          <% shown.each do |pool| %>
-            <div class="pool-glance">
-              <div class="pool-glance__head"><span><%= pool.name %></span><span class="pool-glance__size"><%= pool.size %>d</span></div>
-              <%= render "shared/pool_track", pool: pool %>
-            </div>
-          <% end %>
-          <% if @hidden_pools.positive? %>
-            <p class="pool-glance__hidden"><%= icon(:eye_off) %> <%= pluralize(@hidden_pools, "hidden pool") %>, only you see <%= @hidden_pools == 1 ? "it" : "them" %></p>
-          <% end %>
-          <% if @pools.none? %><p class="empty">No pools yet. Add them at the <%= link_to "GM table", campaign_table_path(campaign, anchor: "pools") %>.</p><% end %>
-        <% else %>
-          <div class="pool-rows">
-            <% shown.each do |pool| %>
-              <%= render "campaigns/pools/pool", pool: pool, my_characters: @my_characters, gm: false %>
-            <% end %>
-          </div>
-          <% if shown.none? %><p class="empty">Nothing yet. Your GM adds pools as the story needs.</p><% end %>
-        <% end %>
-      </section>
-
-      <% unless gm || campaign.done? %>
-        <details id="rolls" class="card side-card" data-details-memory-target="section" data-section="rolls">
-          <summary class="gm-fold__summary"><span class="side-card__title">Rolls</span><%= icon(:chevron, size: 18) %></summary>
-          <%= render "campaigns/rolls", characters: @characters, my_characters: @my_characters %>
-        </details>
-      <% end %>
-
-      <% if campaign.rules_in_play.any? %>
-        <section class="card side-card" aria-labelledby="rules-title">
-          <h2 id="rules-title" class="side-card__title">Optional rules</h2>
-          <ul class="rules-in-play">
-            <% campaign.rules_in_play.each do |rule_name, page, does| %>
-              <li><strong><%= rule_name %></strong> <small>pg. <%= page %></small><br><span class="field__hint"><%= does %></span></li>
-            <% end %>
-          </ul>
-        </section>
-      <% end %>
-
-      <section class="card side-card" aria-labelledby="members-title">
-        <h2 id="members-title" class="side-card__title">At the table</h2>
-        <ul class="members">
-          <% @memberships.each do |membership| %>
-            <li class="members__item">
-              <span class="monogram monogram--28" aria-hidden="true"><%= initial(membership.identity.display_name) %></span>
-              <span class="members__name"><%= membership.identity.display_name %></span>
-              <span class="<%= class_names("members__role", "members__role--gm": membership.gm?) %>"><%= member_role(membership, @characters) %></span>
-            </li>
-          <% end %>
-        </ul>
-      </section>
-
-      <% unless gm %>
-        <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: @my_characters.select(&:active?), suspense: true %>
-      <% end %>
 
       <%= render "campaigns/kept_crucibles" %>
-    </aside>
-  </div>
+    </div>
+
+    <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: (gm ? [] : @my_characters.select(&:active?)), suspense: true, classes: "fluid__rail" %>
 </div>

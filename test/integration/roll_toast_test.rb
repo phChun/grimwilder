@@ -6,8 +6,8 @@ class RollToastTest < ActionDispatch::IntegrationTest
     @campaign = campaigns(:bramblewood)
   end
 
-  test "a story roll shows its toast back on the campaign page, to the one who rolled it" do
-    sign_in_as identities(:pip)
+  test "a story roll shows its toast back at the table, to the one who rolled it" do
+    sign_in_as identities(:gwen)
     post campaign_story_rolls_path(@campaign), params: { question: "Is the bridge out?", odds: 2 }
     follow_redirect!
 
@@ -17,8 +17,8 @@ class RollToastTest < ActionDispatch::IntegrationTest
     assert_select "#roll-toast .roll-result__word", 1
 
     sign_out
-    sign_in_as identities(:gwen)
-    get campaign_table_path(@campaign)
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
     assert_select "#roll-toast", 0, "someone else's roll is in the log, not a toast"
   end
 

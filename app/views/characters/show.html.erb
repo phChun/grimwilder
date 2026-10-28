@@ -19,6 +19,7 @@
         <p class="identity__line">
           <%= @character.path %> <%= @character.level %><% @character.backgrounds.each do |background| %> · <%= background["name"] %><% end %><% if @character.features.any? %> · <em><%= @character.features.to_sentence %></em><% end %>
           <% unless editable %> · played by <%= @character.identity.display_name %><% end %>
+          <% if campaign %> · at <%= link_to campaign.name, campaign_path(campaign), class: "identity__campaign" %><% end %>
         </p>
       </div>
 
@@ -232,6 +233,10 @@
           <% if @character.conditions.empty? && !tends %><p class="field__hint">None.</p><% end %>
       </div>
     </section>
+
+    <% if @table_pools %>
+      <%= render "characters/table_rolls", campaign: campaign, pools: @table_pools, my_characters: @speakers.to_a %>
+    <% end %>
 
     <section id="talents" class="card" aria-labelledby="sheet-talents" data-controller="talent-uses talent-fold">
       <div class="talents__head">

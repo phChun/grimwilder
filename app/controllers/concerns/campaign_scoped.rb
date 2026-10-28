@@ -44,7 +44,18 @@ module CampaignScoped
       gm? && !Current.campaign.done? ? campaign_table_path(Current.campaign, anchor: anchor) : campaign_path(Current.campaign, anchor: anchor)
     end
 
+    # Back where play happens; a player who rolled from their sheet (it holds
+    # the table's pools and group rolls) goes back to it.
     def back_to_table(anchor: nil, **options)
-      redirect_to table_path_for_viewer(anchor: anchor), **options
+      if (sheet = sheet_rolled_from)
+        redirect_to character_path(sheet, anchor: "table-rolls"), **options
+      else
+        redirect_to table_path_for_viewer(anchor: anchor), **options
+      end
+    end
+
+    def sheet_rolled_from
+      id = URI(request.referer.to_s).path[%r{\A/characters/(\d+)\z}, 1] rescue nil
+      id && Current.campaign.characters.where(identity: Current.identity).find_by(id: id)
     end
 end

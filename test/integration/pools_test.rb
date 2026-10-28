@@ -24,10 +24,10 @@ class PoolsTest < ActionDispatch::IntegrationTest
   test "a player sees visible pools only, and no GM controls" do
     sign_in_as identities(:pip)
 
-    get campaign_path(@campaign)
+    get character_path(characters(:tibbs))
     assert_response :success
-    assert_select "#pools .pool-row__name", text: "Lookouts spot you"
-    assert_select "#pools .pool-row__name", text: "Goblin ambush", count: 0
+    assert_select "#table-rolls .pool-row__name", text: "Lookouts spot you"
+    assert_select "#table-rolls .pool-row__name", text: "Goblin ambush", count: 0
     assert_select "#pool-new", count: 0
     assert_select "form[action=?]", campaign_pool_reset_path(@campaign, pools(:brawl)), count: 0
     assert_select "form[action=?]", campaign_pool_path(@campaign, pools(:lookouts)), count: 0
@@ -97,7 +97,7 @@ class PoolsTest < ActionDispatch::IntegrationTest
     wand = @campaign.pools.create!(name: "Blasting Wand", kind: "power", starting_size: 4)
     sign_in_as identities(:pip)
 
-    get campaign_path(@campaign)
+    get character_path(characters(:tibbs))
     assert_select "##{dom_id(wand)} .pool-row__action-roll select[name=character_id] option", 2, "no one, or Tibbs"
     assert_select "##{dom_id(pools(:lookouts))} .pool-row__action-roll", 0
 

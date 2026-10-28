@@ -1,8 +1,9 @@
-# Montages: whoever calls one picks the seated characters taking part, then
-# each player rolls their own (RollCall).
+# Montages: the GM calls one and picks the seated characters taking part,
+# then each player rolls their own (RollCall).
 class Campaigns::MontagesController < ApplicationController
   include CampaignScoped
 
+  before_action :require_gm
   before_action :set_characters
 
   def new

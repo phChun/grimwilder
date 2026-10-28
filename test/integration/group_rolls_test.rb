@@ -1,26 +1,28 @@
 require "test_helper"
 
-# Story rolls, quarrels and montages are called from the Rolls fold, then each
-# player rolls their own dice in the roll call modal (or the GM rolls for them).
+# Story rolls, quarrels and montages are called by the GM from the Rolls fold,
+# then each player rolls their own dice in the roll call modal (or the GM
+# rolls for them).
 class GroupRollsTest < ActionDispatch::IntegrationTest
   setup do
     @campaign = campaigns(:bramblewood)
     @tibbs, @bram = characters(:tibbs), characters(:bram)
   end
 
-  test "call a story roll for your character, then roll it in the modal with spark" do
-    sign_in_as identities(:pip)
-    get campaign_path(@campaign)
-    assert_select "#story_character option", 2, "no one, or Tibbs"
+  test "the GM calls a story roll for a character, and their player rolls it in the modal with spark" do
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
     assert_select "#rolls input[name=spark]", 0, "spark is picked when rolling"
 
     assert_no_difference -> { @campaign.rolls.story.count } do
       post campaign_story_rolls_path(@campaign), params: { question: "Is the bridge out?", odds: 1, character_id: @tibbs.id }
     end
-    assert_redirected_to campaign_path(@campaign, anchor: "rolls")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "rolls")
     call = @campaign.roll_calls.open.sole
 
-    follow_redirect!
+    sign_out
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
     frame = "#roll_call_campaign_#{@campaign.id}"
     assert_select "#{frame} dialog .roll-call__title", "Story roll"
     assert_select "#{frame} .roll-call__question", "Is the bridge out?"
@@ -45,10 +47,15 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     assert_select "#roll-toast", 0, "not twice: no toast as well"
   end
 
-  test "the GM can call on anyone for a story roll; a player only on their own characters" do
+  test "only the GM calls for rolls, on anyone at the table" do
     sign_in_as identities(:pip)
-    post campaign_story_rolls_path(@campaign), params: { character_id: @bram.id }
-    assert_response :not_found
+    post campaign_story_rolls_path(@campaign), params: { character_id: @tibbs.id }
+    assert_response :forbidden
+    post campaign_montages_path(@campaign), params: { participants: { @tibbs.id => { in: "1" } } }
+    assert_response :forbidden
+    post campaign_quarrels_path(@campaign), params: { participants: { @tibbs.id => { role: "quarrel" }, @bram.id => { role: "quarrel" } } }
+    assert_response :forbidden
+    assert_empty @campaign.roll_calls
 
     sign_out
     sign_in_as identities(:gwen)
@@ -85,7 +92,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
   end
 
   test "settle a quarrel: each player rolls their own side" do
-    sign_in_as identities(:pip)
+    sign_in_as identities(:gwen)
 
     get new_campaign_quarrel_path(@campaign)
     assert_select "select[name=?]", "participants[#{@tibbs.id}][role]"
@@ -94,10 +101,12 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     post campaign_quarrels_path(@campaign), params: { stakes: "Who keeps the map?", participants: {
       @tibbs.id => { role: "quarrel" }, @bram.id => { role: "quarrel" }
     } }
-    assert_redirected_to campaign_path(@campaign, anchor: "rolls")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "rolls")
     call = @campaign.roll_calls.open.sole
 
-    follow_redirect!
+    sign_out
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
     assert_select ".roll-call__seat", 2
     assert_select ".roll-call__seat form", 1, "only Tibbs is Pip's to roll"
     assert_select ".roll-call__waiting", "Waiting to roll"
@@ -140,7 +149,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
   end
 
   test "an assist must back someone who's quarreling" do
-    sign_in_as identities(:pip)
+    sign_in_as identities(:gwen)
 
     post campaign_quarrels_path(@campaign), params: { participants: {
       @tibbs.id => { role: "quarrel" }, @bram.id => { role: "assist-#{@tibbs.id}" }
@@ -161,16 +170,19 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
   end
 
   test "call a montage, and the GM rolls for everyone left" do
-    sign_in_as identities(:pip)
-    get campaign_path(@campaign)
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
     assert_select "#rolls form[action=?]", campaign_montages_path(@campaign)
 
     get new_campaign_montage_path(@campaign)
     assert_select "input[type=checkbox]", 2
 
     post campaign_montages_path(@campaign), params: { scene: "The climb", participants: { @tibbs.id => { in: "1" }, @bram.id => { in: "1" } } }
-    assert_redirected_to campaign_path(@campaign, anchor: "rolls")
+    assert_redirected_to campaign_table_path(@campaign, anchor: "rolls")
     call = @campaign.roll_calls.open.sole
+
+    sign_out
+    sign_in_as identities(:pip)
     post campaign_roll_call_rolls_path(@campaign), params: { roll_call_id: call.id, character_id: @tibbs.id, spark: 1 }
 
     sign_out
@@ -190,7 +202,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
   end
 
   test "a montage needs someone in it" do
-    sign_in_as identities(:pip)
+    sign_in_as identities(:gwen)
 
     post campaign_montages_path(@campaign), params: { participants: { @tibbs.id => { in: "0" } } }
     assert_select ".toast__message", "Pick who takes part in the montage."
@@ -198,15 +210,20 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
   end
 
   test "one call at a time, and calling it off gives spark back" do
-    sign_in_as identities(:pip)
+    sign_in_as identities(:gwen)
     post campaign_montages_path(@campaign), params: { participants: { @tibbs.id => { in: "1" }, @bram.id => { in: "1" } } }
     call = @campaign.roll_calls.open.sole
 
     post campaign_quarrels_path(@campaign), params: { participants: { @tibbs.id => { role: "quarrel" }, @bram.id => { role: "quarrel" } } }
     assert_select ".toast__message", "Finish or cancel the montage that's waiting first."
 
+    sign_out
+    sign_in_as identities(:pip)
     post campaign_roll_call_rolls_path(@campaign), params: { roll_call_id: call.id, character_id: @tibbs.id, spark: 1 }
     assert_equal 0, @tibbs.reload.spark
+
+    sign_out
+    sign_in_as identities(:gwen)
 
     delete campaign_roll_call_path(@campaign), params: { roll_call_id: call.id }
     assert_redirected_to campaign_roll_call_path(@campaign)
