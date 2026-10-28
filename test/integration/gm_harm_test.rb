@@ -12,9 +12,9 @@ class GmHarmTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get character_path(@tibbs)
 
-    assert_select "#damage form[action=?] button[aria-pressed=false]", character_damage_path(@tibbs), text: "Bloodied"
+    assert_select "#damage form[action=?] button[aria-pressed=false]", character_damage_path(@tibbs), text: /\ABloodied: \+1t to Brawn and Agility/
     assert_select ".stat-card form[action=?] button[aria-label=?]", character_damage_path(@tibbs), "Mark Agility", text: "Mark"
-    assert_select "#damage form[action=?]", character_conditions_path(@tibbs)
+    assert_select "#conditions form[action=?]", character_conditions_path(@tibbs)
     assert_select "details.stat-roll", 0, "only the owner rolls"
     assert_select ".identity .tally", 0, "nor spends spark or thread"
     assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(@tibbs)
@@ -102,7 +102,7 @@ class GmHarmTest < ActionDispatch::IntegrationTest
     assert_match "took vex (flight, the ogre) on Tibbs", campaigns(:bramblewood).rolls.note.last.question
 
     get character_path(tibbs)
-    assert_select "#damage .vex-toggle[aria-pressed=true]", "Flight"
+    assert_select "#damage .vex-toggle[aria-pressed=true][data-tip^=?]", "Run from the subject", text: /\AFlight/
     assert_select "#damage .vex-toggle[aria-pressed=false]", 3
     assert_select "#damage .vex__does", /Run from the subject.*\(the ogre\)/
     get campaign_table_path(campaigns(:bramblewood))

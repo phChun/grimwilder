@@ -282,8 +282,8 @@ class CharactersTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get character_path(@tibbs)
-    assert_select "#damage .condition", 2
-    assert_select "#damage .condition__size", "4d"
+    assert_select "#conditions .condition", 2
+    assert_select "#conditions .condition__size", "4d"
     assert_select "#damage button[aria-label=?]", "Roll 4d poisoned", 1
     assert_select "#damage button[aria-label=?]", "Roll broken arm", 0, "not a pool"
 
