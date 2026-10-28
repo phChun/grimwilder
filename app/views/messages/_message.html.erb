@@ -15,9 +15,11 @@
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--character"><%= message.name %></strong> <span class="chat-line__note">in character · <%= message.identity.display_name %></span> <%= time %></p>
     <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
   <% when "whisper" %>
+    <%# Only ever shown inside its own conversation, so it's just the words and the time; the label is for screen readers. %>
     <div class="chat-line__card chat-line__card--whisper">
-      <p class="chat-line__label"><%= icon(:lock, size: 13) %> <%= message.name %> to <%= message.recipient_name || "the GM" %> · private <%= time %></p>
+      <p class="visually-hidden"><%= message.name %> to <%= message.recipient_name || "the GM" %>, privately</p>
       <p class="chat-line__body"><%= chat_format(message.body) %></p>
+      <p class="chat-line__whisper-time"><%= time %></p>
     </div>
   <% else %>
     <p class="chat-line__head"><strong class="chat-line__who"><%= message.name %></strong> <%= time %></p>

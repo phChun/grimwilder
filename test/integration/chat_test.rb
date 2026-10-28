@@ -99,7 +99,7 @@ class ChatTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".chat-line--whisper[data-from=gm][data-to=?] .chat-line__label", identities(:pip).id.to_s, /Gwen to Tibbs · private/
+    assert_select ".chat-line--whisper[data-from=gm][data-to=?] .visually-hidden", identities(:pip).id.to_s, /Gwen to Tibbs, privately/
 
     sign_out
     sign_in_as identities(:stranger)
@@ -138,7 +138,7 @@ class ChatTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_select ".chat-line--whisper .chat-line__label", /to the GM · private/
+    assert_select ".chat-line--whisper .visually-hidden", /to the GM, privately/
     assert_select ".chat-line--whisper .chat-line__body", "Secret plan"
 
     sign_out

@@ -2438,7 +2438,8 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__label { flex-wrap: wrap; }
 .chat-line .feed-item__time { white-space: nowrap; }
 .chat-line__label { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ember); }
-.chat-line__card--whisper .chat-line__label { color: var(--suspense-text); letter-spacing: 0.02em; text-transform: none; font-size: 12px; }
+.chat-line__whisper-time { margin: 0; line-height: 1; }
+.chat-line__whisper-time .feed-item__time { margin: 0; }
 
 /* Composer */
 .composer { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 12px 14px; border-top: 1px solid var(--line-soft); }
