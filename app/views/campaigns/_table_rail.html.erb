@@ -24,10 +24,11 @@
   </div>
 
   <div class="feed">
-    <%# What the feed shows; CSS hides the rest (components.css, "Filters"), lines that arrive live included. A private conversation is picked by the other side: feed_controller.js marks its lines and points Speak as at them. %>
+    <%# What the feed shows, and where the composer sends (it's the form's context): CSS hides the rest (components.css, "Filters"), lines that arrive live included. A private conversation is picked by the other side: feed_controller.js marks its lines and sets the composer's line and placeholder. %>
+    <% filters = feed_filters(campaign, membership, speakers) %>
     <div class="feed__filter">
       <label class="feed__filter-label" for="<%= prefix %>_filter">Show</label>
-      <%= select_tag "#{prefix}_filter", options_for_select(feed_filters(campaign, membership), "all"), id: "#{prefix}_filter", class: "field__input feed__filter-select", data: { feed_target: "filter", action: "feed#filter" } %>
+      <%= select_tag :context, options_for_select(filters, "all"), id: "#{prefix}_filter", form: "#{prefix}_composer", class: "field__input feed__filter-select", data: { feed_target: "filter", action: "feed#filter" } %>
       <%# Unread private messages (feed_controller.js); it opens the first conversation with any. %>
       <button type="button" class="feed__unread" hidden data-feed-target="unread" data-action="feed#openUnread"></button>
     </div>
@@ -53,19 +54,26 @@
   <% if campaign.done? %>
     <p class="table-rail__done"><%= campaign.name %> is done. The log stays here to read.</p>
   <% else %>
-    <%= form_with url: campaign_messages_path(campaign), class: "composer", data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
-      <%# Who's speaking, as a dropdown: a player's characters, table talk and a whisper to the GM; the GM's narration, an NPC, table talk and a whisper to each player's character. %>
-      <% voices = speak_as_voices(campaign, membership, speakers) %>
-      <div class="composer__voice">
-        <label class="composer__voice-label" for="<%= prefix %>_voice">Speak as</label>
-        <%= select_tag :speak_as, options_for_select(voices, default_voice(membership, speakers, speaker)), id: "#{prefix}_voice", class: "field__input composer__voice-select" %>
-      </div>
-      <div class="composer__npc">
-        <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
-        <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
-      </div>
+    <%# No picker for where it goes: Show decides (the GM may still voice an NPC in the story views, and a player with more than one character here picks which speaks). %>
+    <%= form_with url: campaign_messages_path(campaign), id: "#{prefix}_composer", class: class_names("composer", "composer--no-character": !gm && speakers.none?), data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
+      <p class="composer__to" data-feed-target="to"><%= filters.first.last[:data][:to] %></p>
+      <% if gm %>
+        <div class="composer__voices">
+          <%= render "shared/segmented", name: "voice", legend: "Who's speaking", options: [ %w[ narration Narrate ], [ "npc", "As NPC" ] ], checked: "narration", id_prefix: "#{prefix}_voice", classes: "composer__voice-pick" %>
+          <div class="composer__npc">
+            <label class="visually-hidden" for="<%= prefix %>_npc">NPC name</label>
+            <input type="text" id="<%= prefix %>_npc" name="speaker_name" maxlength="60" autocomplete="off" placeholder="Who's speaking? Miller Hode…" class="field__input">
+          </div>
+        </div>
+      <% elsif speakers.many? %>
+        <div class="composer__voices">
+          <%= render "shared/segmented", name: "character_id", legend: "Who's speaking", options: speakers.map { [ _1.id, "As #{_1.short_name}" ] }, checked: (speaker || speakers.first).id, id_prefix: "#{prefix}_speaker", classes: "composer__voice-pick" %>
+        </div>
+      <% elsif speakers.one? %>
+        <input type="hidden" name="character_id" value="<%= speakers.first.id %>">
+      <% end %>
       <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
-      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="Say something…" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
+      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="<%= filters.first.last[:data][:placeholder] %>" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
       <div class="composer__row">
         <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
         <button type="submit" class="button button--primary composer__send">Send</button>

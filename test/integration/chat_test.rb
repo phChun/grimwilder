@@ -1,62 +1,64 @@
 require "test_helper"
 
-# The table rail: chat and log in one stream, the composer's speak-as picker,
-# whispers to the GM and the filters.
+# The table rail: chat and log in one stream, the Show choice that also says
+# where the composer sends, whispers and the filters.
 class ChatTest < ActionDispatch::IntegrationTest
   setup { @campaign = campaigns(:bramblewood) }
 
-  test "a player speaks in character, as themselves, or to the GM, live" do
+  test "a player speaks in character from the story views, as themselves from Table talk, and to the GM from their conversation, live" do
     sign_in_as identities(:pip)
 
     assert_turbo_stream_broadcasts [ @campaign, :chat ], count: 2 do
-      post campaign_messages_path(@campaign), params: { speak_as: "character:#{characters(:tibbs).id}", body: "Ash, hold the door." }, as: :turbo_stream
+      post campaign_messages_path(@campaign), params: { context: "all", body: "Ash, hold the door." }, as: :turbo_stream
       assert_response :no_content
-      post campaign_messages_path(@campaign), params: { speak_as: "table_talk", body: "brb" }, as: :turbo_stream
+      post campaign_messages_path(@campaign), params: { context: "talk", body: "brb" }, as: :turbo_stream
     end
-    post campaign_messages_path(@campaign), params: { speak_as: "whisper", body: "Does Tibbs know the miller?" }, as: :turbo_stream
+    post campaign_messages_path(@campaign), params: { context: "private-gm", body: "Does Tibbs know the miller?" }, as: :turbo_stream
 
     assert_equal [ %w[ in_character Gibbletibble\ "Tibbs" ], %w[ table_talk Pip ], %w[ whisper Pip ] ], @campaign.messages.order(:id).map { [ _1.kind, _1.name ] }
   end
 
-  test "the GM narrates, voices NPCs and talks; a player can't narrate, voice an NPC or speak as someone else's character" do
+  test "the GM narrates or voices an NPC from the story views; a player can't, nor speak as someone else's character" do
     sign_in_as identities(:gwen)
-    post campaign_messages_path(@campaign), params: { speak_as: "narration", body: "Smoke pours through the slats." }
-    post campaign_messages_path(@campaign), params: { speak_as: "npc", speaker_name: "Miller Hode", body: "Leave the sacks!" }
-    assert_equal %w[ narration npc ], @campaign.messages.order(:id).pluck(:kind)
+    post campaign_messages_path(@campaign), params: { context: "story", body: "Smoke pours through the slats." }
+    post campaign_messages_path(@campaign), params: { context: "story", voice: "npc", speaker_name: "Miller Hode", body: "Leave the sacks!" }
+    post campaign_messages_path(@campaign), params: { context: "talk", voice: "npc", body: "Pizza's here" }
+    assert_equal %w[ narration npc table_talk ], @campaign.messages.order(:id).pluck(:kind)
 
     sign_out
     sign_in_as identities(:pip)
-    assert_no_difference -> { Message.count } do
-      post campaign_messages_path(@campaign), params: { speak_as: "narration", body: "I narrate now" }, as: :turbo_stream
-      assert_response :unprocessable_entity
-      post campaign_messages_path(@campaign), params: { speak_as: "npc", speaker_name: "Hode", body: "Hi" }, as: :turbo_stream
-      post campaign_messages_path(@campaign), params: { speak_as: "character:#{characters(:bram).id}", body: "As Bram" }, as: :turbo_stream
-    end
+    post campaign_messages_path(@campaign), params: { context: "story", voice: "npc", speaker_name: "Hode", character_id: characters(:bram).id, body: "As Bram" }, as: :turbo_stream
+    assert_equal [ "in_character", characters(:tibbs) ], [ @campaign.messages.last.kind, @campaign.messages.last.character ], "their own character speaks"
   end
 
-  test "speak-as is a dropdown of the player's characters, table talk and a whisper to the GM" do
+  test "there's no speak-as picker: a player with two characters here picks which speaks" do
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
-    assert_equal [ "As Tibbs", "Table talk", "Privately to the GM" ], css_select(".composer select[name=speak_as] option").map(&:text)
+    assert_select ".composer select", 0
+    assert_select ".composer input[type=hidden][name=character_id][value=?]", characters(:tibbs).id.to_s
+    assert_select ".composer__to", "To the table, in character"
+    assert_select ".composer textarea[placeholder=?]", "What does Tibbs say?"
 
-    identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
+    moss = identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
     get campaign_path(@campaign)
-    assert_select ".composer select[name=speak_as] option", 4
+    assert_select ".composer input[type=radio][name=character_id]", 2
+    post campaign_messages_path(@campaign), params: { context: "story", character_id: moss.id, body: "Hm." }, as: :turbo_stream
+    assert_equal moss, @campaign.messages.last.character
   end
 
     test "a blank message isn't sent, and outsiders can't post" do
     sign_in_as identities(:pip)
     assert_no_difference -> { Message.count } do
-      post campaign_messages_path(@campaign), params: { speak_as: "table_talk", body: "   " }
+      post campaign_messages_path(@campaign), params: { context: "talk", body: "   " }
     end
 
     sign_out
     sign_in_as identities(:stranger)
-    post campaign_messages_path(@campaign), params: { speak_as: "table_talk", body: "Hello?" }
+    post campaign_messages_path(@campaign), params: { context: "talk", body: "Hello?" }
     assert_response :not_found
   end
 
-  test "the rail merges chat and log in time order, with the speak-as picker for each role" do
+  test "the rail merges chat and log in time order, with Show's choices for each role" do
     @campaign.messages.create!(identity: identities(:gwen), kind: "narration", body: "Smoke pours through the slats.", created_at: 2.minutes.ago)
     roll = characters(:tibbs).roll!("agility", by: identities(:pip))
     roll.update_columns(created_at: 1.minute.ago)
@@ -69,29 +71,25 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select "#table_feed > li:nth-child(2)##{dom_id(roll)}.feed-item--dice"
     assert_select "#table_feed > li:nth-child(3).feed-item--talk .chat-line__body", "oof"
     assert_equal [ "Everything", "Story", "Table talk", "Dice", "Private with the GM" ], css_select(".feed__filter option").map(&:text)
-    assert_select ".composer select[name=speak_as] option", 3
-    assert_select ".composer select[name=speak_as] option[value=?][selected]", "character:#{characters(:tibbs).id}"
-    assert_select ".composer select[name=speak_as] option[value=whisper]", "Privately to the GM"
+    assert_select ".feed__filter select[name=context][form=?]", "rail_#{@campaign.id}_composer"
+    assert_select ".feed__filter option[value=private-gm][data-to=?][data-placeholder=?]", "Privately to the GM", "Only the GM and you see this…"
     assert_select ".table-rail__head .suspense-meter"
 
     sign_out
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
-    assert_select ".composer select[name=speak_as] option", 4
-    assert_select ".composer select[name=speak_as] option[value=table_talk][selected]", 1, "between sessions the GM starts on table talk"
-    assert_select ".composer select[name=speak_as] option[value=?][data-thread=?]", "whisper:#{characters(:tibbs).id}", identities(:pip).id.to_s, "Privately to Tibbs"
     assert_select ".table-rail .feed__filter option[value=?]", "private-#{identities(:pip).id}", "Private: Tibbs"
     assert_select ".feed__filter option[value=private]", 0, "no one place shows everyone's whispers"
-    assert_select ".composer select[name=speak_as] option[value=narration]", "Narrate"
-    assert_select ".composer select[name=speak_as] option[value=npc]", "As NPC"
+    assert_select ".composer input[type=radio][name=voice][value=narration][checked]"
+    assert_select ".composer input[type=radio][name=voice][value=npc]"
     assert_select ".composer input[name=speaker_name]"
-    assert_select ".composer select[name=speak_as] option[value=whisper]", 0
+    assert_select ".composer textarea[placeholder=?]", "Narrate the scene, or voice an NPC…"
   end
 
   test "the GM whispers to one player, picked by their character" do
     @campaign.memberships.create!(identity: identities(:stranger), role: :player)
     sign_in_as identities(:gwen)
-    post campaign_messages_path(@campaign), params: { speak_as: "whisper:#{characters(:tibbs).id}", body: "The miller lies." }, as: :turbo_stream
+    post campaign_messages_path(@campaign), params: { context: "private-#{identities(:pip).id}", body: "The miller lies." }, as: :turbo_stream
     assert_response :no_content
     whisper = @campaign.messages.last
     assert_equal [ "whisper", identities(:pip), "Tibbs" ], [ whisper.kind, whisper.recipient, whisper.recipient_name ]

@@ -85,7 +85,7 @@ class CampaignDoneTest < ActionDispatch::IntegrationTest
     assert_select ".table-rail .composer", 0
     assert_select ".table-rail__done"
     assert_no_difference -> { Message.count } do
-      post campaign_messages_path(@campaign), params: { speak_as: "table_talk", body: "hello?" }
+      post campaign_messages_path(@campaign), params: { context: "talk", body: "hello?" }
     end
   end
 

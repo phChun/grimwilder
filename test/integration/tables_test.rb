@@ -115,7 +115,7 @@ class TablesTest < ActionDispatch::IntegrationTest
 
     get campaign_table_path(@campaign)
     assert_select ".table-rail #table_feed"
-    assert_equal [ "Narrate", "As NPC", "Table talk", "Privately to Tibbs" ], css_select(".table-rail select[name=speak_as] option").map(&:text)
+    assert_equal [ "Narrate", "As NPC" ], css_select(".table-rail .composer .segmented__text").map(&:text)
     assert_select ".table-rail #table_feed .chat-line__body", "Ready."
     assert_select "details#crucibles summary .gm-section__title", "Crucible"
     assert_select "details#crucibles turbo-frame#crucible[loading=lazy]"

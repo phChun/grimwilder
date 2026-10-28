@@ -4,10 +4,11 @@ import { Controller } from "@hotwired/stimulus"
 // broadcasts), so the per-viewer part happens here: your own lines sit on the
 // right, and the lines of the private conversation picked in Show are marked
 // (by its two sides, data-from and data-to: a player's identity id or "gm"),
-// since CSS can't match a line to the choice. Whispers you haven't read
-// (newer than when you last had their conversation open, kept per browser in
-// localStorage) add "· 2 new" to the conversation in Show and light a pill
-// beside it.
+// since CSS can't match a line to the choice. Show is also where the composer
+// sends, so its line ("Privately to Tibbs") and placeholder follow it. Chat
+// you haven't seen (newer than when its view was last on screen, kept per
+// browser in localStorage) adds "· 2 new" to Story, Table talk or the
+// conversation in Show and lights a pill beside it.
 //
 // It also keeps your place. Reading the latest, new lines scroll into view;
 // scrolled up into history, you stay put and a "3 new" pill offers the way
@@ -19,7 +20,7 @@ import { Controller } from "@hotwired/stimulus"
 const NEAR_LATEST = 48 // px from the newest line that still counts as reading it
 
 export default class extends Controller {
-  static targets = ["scroller", "newPill", "newCount", "list", "older", "filter", "unread"]
+  static targets = ["scroller", "newPill", "newCount", "list", "older", "filter", "unread", "to"]
   static values = { viewer: String, side: String, before: String, more: Boolean, olderUrl: String }
 
   connect() {
@@ -123,43 +124,51 @@ export default class extends Controller {
     this.thread = this.chosen?.startsWith("private-") ? this.chosen.slice("private-".length) : null
     this.element.querySelectorAll(".chat-line").forEach((line) => this.mark(line))
     this.renderUnread()
+    if (this.hasFilterTarget) this.renderComposer()
   }
 
-  // Unread whispers by conversation. One showing on a visible page (its
-  // conversation picked in Show) is read.
+  // Unread chat by where it's read: "story", "talk", or a private
+  // conversation's other side. Someone else's line showing on a visible page
+  // is read (Everything reads story and talk; a conversation, its whispers).
   renderUnread() {
     if (!this.hasFilterTarget) return
     const read = this.readState()
     const counts = {}
     let changed = false
 
-    this.element.querySelectorAll(".chat-line[data-from][data-to]").forEach((line) => {
-      const { from, to } = line.dataset
-      if (!from || !to || from === this.sideValue) return
+    this.element.querySelectorAll(".chat-line").forEach((line) => {
+      const { from, to, identity } = line.dataset
+      if (identity === this.viewerValue) return
+      const key = from && to ? from : line.classList.contains("feed-item--talk") ? "talk" : "story"
       const at = Date.parse(line.querySelector("time")?.getAttribute("datetime")) || 0
-      if (at <= (read.threads[from] || read.since)) return
+      if (at <= (read.threads[key] || read.since)) return
       if (!document.hidden && line.getClientRects().length > 0) {
-        read.threads[from] = at
+        read.threads[key] = at
         changed = true
       } else {
-        counts[from] = (counts[from] || 0) + 1
+        counts[key] = (counts[key] || 0) + 1
       }
     })
     if (changed) this.saveReadState(read)
 
     let total = 0
-    this.firstUnread = null
+    let firstPrivate = null
+    let firstOther = null
     this.filterTarget.querySelectorAll("option[data-label]").forEach((option) => {
-      const n = counts[option.value.slice("private-".length)] || 0
+      const isPrivate = option.value.startsWith("private-")
+      const n = counts[isPrivate ? option.value.slice("private-".length) : option.value] || 0
       total += n
-      if (n && !this.firstUnread) this.firstUnread = option.value
+      if (n && isPrivate) firstPrivate ||= option.value
+      if (n && !isPrivate) firstOther ||= option.value
       option.textContent = n ? `${option.dataset.label} · ${n} new` : option.dataset.label
     })
+    this.firstUnread = firstPrivate || firstOther
 
     if (this.hasUnreadTarget) {
       this.unreadTarget.hidden = total === 0
-      this.unreadTarget.textContent = `${total} private`
-      this.unreadTarget.setAttribute("aria-label", `${total} unread private ${total === 1 ? "message" : "messages"}: open the conversation`)
+      this.unreadTarget.classList.toggle("feed__unread--private", !!firstPrivate)
+      this.unreadTarget.textContent = `${total} unread`
+      this.unreadTarget.setAttribute("aria-label", `${total} unread ${total === 1 ? "message" : "messages"}: open them`)
     }
   }
 
@@ -172,7 +181,7 @@ export default class extends Controller {
   // { since, threads: { other side => newest read time } }, in ms. The first visit
   // counts what's already there as read.
   readState() {
-    const key = `whispers-read:${this.olderUrlValue}:${this.viewerValue}`
+    const key = `chat-read:${this.olderUrlValue}:${this.viewerValue}`
     try {
       const saved = JSON.parse(localStorage.getItem(key))
       if (saved?.threads) return saved
@@ -183,16 +192,23 @@ export default class extends Controller {
   }
 
   saveReadState(state) {
-    try { localStorage.setItem(`whispers-read:${this.olderUrlValue}:${this.viewerValue}`, JSON.stringify(state)) } catch {}
+    try { localStorage.setItem(`chat-read:${this.olderUrlValue}:${this.viewerValue}`, JSON.stringify(state)) } catch {}
   }
 
-  // Show changed. Picking a private conversation also points Speak as at it.
+  // Show changed. It's also where the composer sends, so its line and
+  // placeholder follow.
   filter() {
     this.chosen = this.filterTarget.value
     this.markAll()
-    const voice = this.thread && this.element.querySelector(`select[name=speak_as] option[data-thread="${this.thread}"]`)
-    if (voice) voice.selected = true
     this.toLatest()
+  }
+
+  renderComposer() {
+    const option = this.filterTarget?.selectedOptions[0]
+    if (!option) return
+    if (this.hasToTarget) this.toTarget.textContent = option.dataset.to
+    const input = this.element.querySelector(".composer__input")
+    if (input) input.placeholder = option.dataset.placeholder
   }
 
   // The scroller is column-reverse: scrollTop is 0 at the newest line and goes
