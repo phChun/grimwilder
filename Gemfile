@@ -65,7 +65,7 @@ end
 gem "reactionview", "~> 0.6.0"
 
 # Passkeys (WebAuthn) for passwordless sign-in
-gem "webauthn", "~> 3.4"
+gem "webauthn", "~> 3.5"
 
 # Trust X-Forwarded-For only from Cloudflare's IP ranges, so request.remote_ip
 # (and rate_limit) sees the player's address behind the Cloudflare proxy.
