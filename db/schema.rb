@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_28_180000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_30_060000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -137,6 +137,15 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_28_180000) do
     t.index ["email_address"], name: "index_identities_on_email_address", unique: true
     t.index ["last_signed_in_at"], name: "index_identities_on_last_signed_in_at"
     t.index ["webauthn_user_handle"], name: "index_identities_on_webauthn_user_handle", unique: true
+  end
+
+  create_table "interests", force: :cascade do |t|
+    t.string "email_address", null: false
+    t.string "role"
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_interests_on_email_address", unique: true
   end
 
   create_table "magic_links", force: :cascade do |t|

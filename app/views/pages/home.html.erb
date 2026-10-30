@@ -1,57 +1,201 @@
-<section class="hero">
-  <p class="eyebrow">A play toolkit for Grimwild: Community Edition</p>
-  <h1 class="hero__title">Grimwilder</h1>
-  <p class="hero__lede">
-    Everything you reach for at the table, without the page-flipping: roll stat dice against thorns,
-    track diminishing pools, smash crucibles together, and keep your adventurers close at hand.
-  </p>
-  <div class="hero__actions">
-    <%# Signed out, campaigns sends you through sign-in and back. %>
-    <%= link_to "Start a campaign and build characters", campaigns_path(anchor: "campaign-new"), class: "button button--primary" %>
-  </div>
-</section>
+<%# The front door, written like a marketing page for someone who hasn't played with Grimwilder yet: the hero with an example of play, how it works, the table and the sheets each beside a picture of them, the free tools, then the buttons again. The examples are made of the app's own dice and chat styles; they're illustrations, not live data. %>
+<div class="home">
+  <section class="home-hero">
+    <div class="home-hero__copy">
+      <p class="eyebrow">A play toolkit for Grimwild: Community Edition</p>
+      <h1 class="home-hero__title">Grimwilder</h1>
+      <p class="home-hero__tagline">Keep the dice honest and the story moving.</p>
+      <p class="home-hero__lede">
+        Grimwilder handles the fiddly parts of a Grimwild game so the table can stay in the story.
+        The GM runs the session from one screen, every player's sheet rolls its own dice,
+        and everyone shares one log of what happened.
+      </p>
+      <%= render "pages/cta" %>
+    </div>
 
-<section class="tool-grid" aria-labelledby="tools-heading">
-  <h2 id="tools-heading" class="section-title">Free tools</h2>
+    <figure class="showcase" aria-label="An example of play: the GM's narration, a roll in the shared log, and a pool running down">
+      <div class="showcase__bar">
+        <span class="showcase__live">Live</span>
+        <span>Session 8 · Scene 2, The mill fire</span>
+      </div>
+      <div class="showcase__feed">
+        <p class="showcase__line showcase__line--narration">
+          <span class="showcase__who">GM · Cut to</span>
+          Smoke pours from the mill as the waterwheel catches.
+        </p>
+        <p class="showcase__line">
+          <span class="showcase__who showcase__who--npc">Old Hesk <small>voiced by GM</small></span>
+          “Leave the grain! The roof's coming down!”
+        </p>
+        <div class="showcase__roll">
+          <p class="showcase__who">Tibbs rolls Agility · 3d + 1 spark, 1 thorn</p>
+          <div class="showcase__dice">
+            <%= render "shared/die", value: 2, size: 32 %>
+            <%= render "shared/die", value: 5, size: 32, state: :highest %>
+            <%= render "shared/die", value: 3, size: 32 %>
+            <%= render "shared/die", value: 4, size: 32, extra: "die--spark" %>
+            <%= render "shared/die", value: 6, kind: "d8", size: 32 %>
+            <span class="showcase__word">Messy</span>
+          </div>
+          <p class="showcase__reason">Success, with an impact move.</p>
+        </div>
+        <div class="showcase__pool">
+          <span class="showcase__pool-name"><span class="showcase__pool-size">4d → 2d</span> The roof gives way</span>
+          <span class="pool-track" aria-hidden="true">
+            <span class="pool-track__segment pool-track__segment--full"></span>
+            <span class="pool-track__segment pool-track__segment--full"></span>
+            <span class="pool-track__segment"></span>
+            <span class="pool-track__segment"></span>
+          </span>
+        </div>
+        <p class="showcase__line showcase__line--mine">
+          <span class="showcase__who">Tibbs</span>
+          “Out the window. Now!”
+        </p>
+      </div>
+    </figure>
+  </section>
 
-  <ul class="tool-grid__list">
-    <li>
-      <%= link_to roll_path, class: "tool-card tool-card--ready" do %>
-        <span class="tool-card__glyph" aria-hidden="true">d6</span>
-        <span class="tool-card__name">Action roll</span>
-        <span class="tool-card__desc">Stat dice against thorns. Reads the highest die, applies cuts, calls criticals.</span>
-      <% end %>
-    </li>
-    <li>
-      <%= link_to crucibles_path, class: "tool-card tool-card--ready" do %>
-        <span class="tool-card__glyph" aria-hidden="true">6&times;6</span>
-        <span class="tool-card__name">Crucibles</span>
-        <span class="tool-card__desc">Roll 2d6 on the book's tables and smash the results together for NPCs, sites and settlements.</span>
-      <% end %>
-    </li>
-    <li>
-      <%= link_to talents_path, class: "tool-card tool-card--ready" do %>
-        <span class="tool-card__glyph" aria-hidden="true"><%= Talent.all.size %></span>
-        <span class="tool-card__name">Talents</span>
-        <span class="tool-card__desc">Every path's talents, plus background and heritage talents, with a one-line gist of each.</span>
-      <% end %>
-    </li>
-    <%# Characters and campaigns need an account; signed out, the hero's button leads there. %>
-    <% if authenticated? %>
+  <section class="home-steps" aria-labelledby="steps-heading">
+    <h2 id="steps-heading" class="visually-hidden">How it works</h2>
+    <ol class="steps">
+      <li class="step">
+        <span class="step__number" aria-hidden="true">1</span>
+        <h3 class="step__name">The GM starts a campaign</h3>
+        <p class="step__desc">They pitch it, pick the optional rules, and share its invite link with the players.</p>
+      </li>
+      <li class="step">
+        <span class="step__number" aria-hidden="true">2</span>
+        <h3 class="step__name">Build the party</h3>
+        <p class="step__desc">Everyone makes a character from any of the <%= Grimwild.paths.size %> paths, at any level, and takes a seat.</p>
+      </li>
+      <li class="step">
+        <span class="step__number" aria-hidden="true">3</span>
+        <h3 class="step__name">Play</h3>
+        <p class="step__desc">The GM runs scenes and calls for rolls; players roll from their sheets, and it all lands in one log.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="home-section" aria-labelledby="table-heading">
+    <header class="home-section__head">
+      <p class="eyebrow">For the whole table</p>
+      <h2 id="table-heading" class="home-section__title">Play at the table</h2>
+      <p class="home-section__lede">In the same room or apart, everyone sees the same dice the moment they land.</p>
+    </header>
+    <ul class="feature-list">
+      <li class="feature">
+        <h3 class="feature__name">The GM table</h3>
+        <p class="feature__desc">Scenes, suspense, the party's harm and spark at a glance, pools to roll and reveal, and crucibles close by.</p>
+      </li>
+      <li class="feature">
+        <h3 class="feature__name">One shared log</h3>
+        <p class="feature__desc">Rolls are made on the server, so everyone sees the same dice. Spark is spent and taken for you, and the GM's secret rolls stay secret.</p>
+      </li>
+      <li class="feature">
+        <h3 class="feature__name">Roll calls</h3>
+        <p class="feature__desc">The GM calls for a story roll, a montage or a quarrel, and each player rolls their own dice from wherever they are.</p>
+      </li>
+      <li class="feature">
+        <h3 class="feature__name">Table chat</h3>
+        <p class="feature__desc">Narration, NPC voices, in-character lines, table talk and private whispers, side by side with the dice.</p>
+      </li>
+      <li class="feature">
+        <h3 class="feature__name">Sessions and scenes</h3>
+        <p class="feature__desc">Start and end them, rest, take downtime. Resets, XP and level-ups are handled, and every session's recap and rolls are kept.</p>
+      </li>
+      <li class="feature">
+        <h3 class="feature__name">Optional rules</h3>
+        <p class="feature__desc">Switch on the book's optional rules for a campaign: milestone levels, vigor and armor, encumbrance, tick pools and more.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="home-section home-section--split" aria-labelledby="sheets-heading">
+    <figure class="sheet-sample" aria-label="An example stat card: Agility, 3 dice, marked, with 1 of 2 spark">
+      <div class="sheet-sample__who">
+        <span class="sheet-sample__monogram" aria-hidden="true">T</span>
+        <span>
+          <span class="sheet-sample__name">Tibbs</span>
+          <span class="sheet-sample__meta">Rogue · level 3</span>
+        </span>
+        <%= render "shared/pips", kind: "spark", value: 1, max: 2 %>
+      </div>
+      <div class="sheet-sample__stat">
+        <span class="sheet-sample__stat-name">Agility</span>
+        <span class="sheet-sample__marked">Marked</span>
+        <span class="sheet-sample__dice">3d</span>
+      </div>
+      <p class="sheet-sample__harm">Bloodied · +1t to Brawn and Agility</p>
+      <span class="sheet-sample__roll" aria-hidden="true">Roll 3d + 2t</span>
+    </figure>
+
+    <div>
+      <header class="home-section__head">
+        <p class="eyebrow">For every player</p>
+        <h2 id="sheets-heading" class="home-section__title">Character sheets that roll</h2>
+        <p class="home-section__lede">Your sheet knows your stats, your harm and your talents, and adds them up for you.</p>
+      </header>
+      <ul class="feature-list feature-list--stacked">
+        <li class="feature">
+          <h3 class="feature__name">Everything in one roll</h3>
+          <p class="feature__desc">Stat dice, spark, assists, thorns from harm and your talents' bonuses add up in one setup, and the result says why it came out that way.</p>
+        </li>
+        <li class="feature">
+          <h3 class="feature__name">Harm and conditions</h3>
+          <p class="feature__desc">Marks, bloodied, rattled and desperate, vex, and conditions that count down as pools. The GM can tend them too.</p>
+        </li>
+        <li class="feature">
+          <h3 class="feature__name">Talents that work</h3>
+          <p class="feature__desc">Uses to tick, talent pools to roll, choices to make, re-skins, and talents that change a roll after it's made.</p>
+        </li>
+        <li class="feature">
+          <h3 class="feature__name">Arcana</h3>
+          <p class="feature__desc">Magic items with their touchstones and power pools, refilled each session, and expendables you use up.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="home-section tool-grid" aria-labelledby="tools-heading">
+    <header class="home-section__head">
+      <p class="eyebrow">No account needed</p>
+      <h2 id="tools-heading" class="home-section__title">Free tools</h2>
+    </header>
+    <ul class="tool-grid__list">
       <li>
-        <%= link_to characters_path, class: "tool-card tool-card--ready" do %>
-          <span class="tool-card__glyph" aria-hidden="true">&#9776;</span>
-          <span class="tool-card__name">Characters</span>
-          <span class="tool-card__desc">Stats, damage, spark, bonds and talents on a sheet that rolls for you.</span>
+        <%= link_to roll_path, class: "tool-card tool-card--ready" do %>
+          <span class="tool-card__glyph" aria-hidden="true">d6</span>
+          <span class="tool-card__name">Action roll</span>
+          <span class="tool-card__desc">Stat dice against thorns. Reads the highest die, applies cuts, calls criticals, and folds in talents like Panache.</span>
         <% end %>
       </li>
       <li>
-        <%= link_to pools_path, class: "tool-card tool-card--ready" do %>
-          <span class="tool-card__glyph" aria-hidden="true">4d</span>
-          <span class="tool-card__name">Pools</span>
-          <span class="tool-card__desc">Task, pressure, timer and resource pools for your campaign. Roll them, drop the 1–3s, watch them run out.</span>
+        <%= link_to crucibles_path, class: "tool-card tool-card--ready" do %>
+          <span class="tool-card__glyph" aria-hidden="true"><%= Crucible.all.size %></span>
+          <span class="tool-card__name">Crucibles</span>
+          <span class="tool-card__desc">The book's tables of evocative words. Roll, smash the results together, and keep the ones you like.</span>
         <% end %>
       </li>
+      <li>
+        <%= link_to talents_path, class: "tool-card tool-card--ready" do %>
+          <span class="tool-card__glyph" aria-hidden="true"><%= Talent.all.reject(&:retired?).size %></span>
+          <span class="tool-card__name">Talents</span>
+          <span class="tool-card__desc">Every path's talents, plus background, heritage and legacy talents, with a one-line gist of each.</span>
+        <% end %>
+      </li>
+    </ul>
+  </section>
+
+  <section class="home-close" aria-labelledby="close-heading">
+    <% if !authenticated? && !Identity.signups_open? %>
+      <h2 id="close-heading" class="home-close__title">Want a seat at the table?</h2>
+      <p class="home-close__lede">Grimwilder is in a closed beta. Tell us you're interested and we'll be in touch.</p>
+      <%= render "pages/cta" %>
+    <% else %>
+      <h2 id="close-heading" class="home-close__title">Bring it to your next session.</h2>
+      <p class="home-close__lede">Running a campaign is free, and so is playing in as many as you like.</p>
+      <%= render "pages/cta" %>
     <% end %>
-  </ul>
-</section>
+  </section>
+</div>

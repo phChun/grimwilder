@@ -1,0 +1,14 @@
+<%# locals: (search_label:, placeholder:, filter: nil) %>
+<%# The search box above an admin list. It's a GET form, so the search sits in the URL (?q=) and pagy's page links keep it. filter: an optional dropdown, { name:, label:, options: [[text, value], …] }, that searches as soon as it changes (auto_submit_controller.js). %>
+<%= form_with url: request.path, method: :get, class: "admin-search", role: "search", data: { controller: "auto-submit" } do |form| %>
+  <%= form.label :q, search_label, class: "visually-hidden" %>
+  <%= form.search_field :q, value: search_query, placeholder: placeholder, class: "field__input", autocomplete: "off" %>
+  <% if filter %>
+    <%= form.label filter[:name], filter[:label], class: "visually-hidden" %>
+    <%= form.select filter[:name], filter[:options], { selected: params[filter[:name]] }, class: "field__input admin-search__filter", data: { action: "change->auto-submit#submit" } %>
+  <% end %>
+  <%= form.submit "Search", name: nil, class: "button" %>
+  <% if search_query.present? || (filter && params[filter[:name]].present?) %>
+    <%= link_to "Clear", request.path, class: "button button--ghost" %>
+  <% end %>
+<% end %>

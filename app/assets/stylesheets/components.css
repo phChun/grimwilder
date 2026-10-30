@@ -81,14 +81,139 @@
 
 /* ---------- Home ---------- */
 
-.hero {
-  padding-block: var(--space-5) var(--space-7);
-  max-width: 46rem;
+/* A marketing page: a hero with an example of play beside it, three steps, the table and the
+   sheets (the sheets beside an example stat card), the free tools, then the buttons again. The
+   examples (.showcase, .sheet-sample) are static pictures made of the app's own dice and chat
+   looks. Side by side from 60rem; stacked below. */
+.home { display: grid; gap: clamp(var(--space-7), 8vw, 6rem); padding-bottom: var(--space-7); overflow-x: clip; }
+
+.home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: center;
+  padding-top: var(--space-5);
+  isolation: isolate;
+}
+/* An ember glow behind the hero, like light from the table's lamp. */
+.home-hero::before {
+  content: "";
+  position: absolute;
+  inset: -4rem 0 auto auto;
+  z-index: -1;
+  width: min(48rem, 90vw);
+  height: 32rem;
+  background: radial-gradient(closest-side, rgb(232 131 74 / 0.16), transparent);
+  pointer-events: none;
+}
+@media (min-width: 60rem) {
+  .home-hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+}
+.home-hero__title { margin: 0 0 var(--space-2); font-size: clamp(3rem, 9vw, 5.5rem); line-height: 1; }
+.home-hero__tagline { margin: 0 0 var(--space-4); font-family: var(--font-display); font-style: italic; font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.25; color: var(--ember); }
+.home-hero__lede { margin: 0; max-width: var(--measure); font-size: 1.15rem; color: var(--muted); }
+
+.home-cta { margin-top: var(--space-5); }
+.home-cta__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+
+/* The hero's example of play: a window onto a live table. */
+.showcase {
+  margin: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow), 0 30px 60px -30px rgb(0 0 0 / 0.9);
+}
+.showcase__bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line-soft); font-size: 0.85rem; color: var(--muted); }
+.showcase__live { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--perfect); }
+.showcase__live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--perfect); }
+.showcase__feed { display: grid; gap: var(--space-4); padding: var(--space-4); }
+.showcase__line { display: grid; gap: 2px; margin: 0; max-width: 85%; }
+.showcase__line--narration { font-family: var(--font-display); font-style: italic; font-size: 1.05rem; color: var(--text-soft); }
+.showcase__line--mine { justify-self: end; padding: var(--space-2) var(--space-3); background: var(--mine-bg); border: 1px solid var(--mine-line); border-radius: var(--radius-control); }
+.showcase__who { margin: 0; font-family: var(--font-ui); font-style: normal; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; color: var(--dim); }
+.showcase__who--npc { color: var(--suspense-text); }
+.showcase__who small { font-weight: 400; color: var(--dim); }
+.showcase__roll { display: grid; gap: var(--space-2); padding: var(--space-3); background: var(--surface-2); border: 1px solid var(--line-soft); border-radius: var(--radius-control); }
+.showcase__dice { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.showcase__dice .die { animation: none; }
+.showcase__word { margin-left: var(--space-2); font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; line-height: 1; color: var(--messy); }
+.showcase__reason { margin: 0; font-size: 0.85rem; color: var(--text-soft); }
+.showcase__pool { display: grid; gap: var(--space-2); }
+.showcase__pool-name { font-size: 0.9rem; color: var(--text-soft); }
+.showcase__pool-size { margin-right: var(--space-2); font-family: var(--font-dice); font-weight: 600; color: var(--ember); }
+
+/* How it works: three numbered steps. */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--space-5); margin: 0; padding: 0; list-style: none; counter-reset: none; }
+.step { display: grid; gap: var(--space-2); padding: var(--space-5); background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--radius-card); }
+.step__number { display: inline-grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--ember); border-radius: 50%; font-family: var(--font-dice); font-weight: 600; color: var(--ember); }
+.step__name { margin: 0; font-size: 1.3rem; }
+.step__desc { margin: 0; color: var(--text-soft); }
+
+/* The feature sections. */
+.home-section__head { margin-bottom: var(--space-5); }
+.home-section__head .eyebrow { margin-bottom: var(--space-2); }
+.home-section__title { margin: 0 0 var(--space-2); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.1; }
+.home-section__lede { margin: 0; max-width: var(--measure); font-size: 1.1rem; color: var(--muted); }
+.feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5) var(--space-6);
+}
+.feature-list--stacked { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+.feature { padding-left: var(--space-4); border-left: 2px solid var(--ember); }
+.feature__name { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: 1.2rem; color: var(--text); }
+.feature__desc { margin: 0; font-size: 0.95rem; color: var(--text-soft); }
+
+.home-section--split { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-7); align-items: center; }
+/* Stacked, the words come first and the picture after them; side by side, the picture leads. */
+.home-section--split > .sheet-sample { order: 1; }
+@media (min-width: 60rem) {
+  .home-section--split { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+  .home-section--split > .sheet-sample { order: 0; }
 }
 
-.hero__title { font-size: clamp(3rem, 9vw, 5.5rem); margin-bottom: var(--space-4); }
-.hero__lede { font-size: 1.2rem; color: var(--muted); max-width: var(--measure); }
-.hero__actions { margin-top: var(--space-5); }
+/* The sheets section's example stat card. */
+.sheet-sample {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow), 0 30px 60px -30px rgb(0 0 0 / 0.9);
+}
+.sheet-sample__who { display: flex; align-items: center; gap: var(--space-3); }
+.sheet-sample__who .pips { margin-left: auto; }
+.sheet-sample__monogram { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ember-soft); border: 1px solid var(--ember); font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--ember); }
+.sheet-sample__name { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; line-height: 1.1; }
+.sheet-sample__meta { display: block; font-size: 0.85rem; color: var(--muted); }
+.sheet-sample__stat { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); background: var(--surface-2); border-radius: var(--radius-control); }
+.sheet-sample__stat-name { font-family: var(--font-display); font-size: 1.4rem; }
+.sheet-sample__marked { padding: 2px 10px; border: 1px solid var(--grim); border-radius: var(--radius-sm); background: var(--grim-bg); font-size: 0.8rem; color: var(--grim); }
+.sheet-sample__dice { margin-left: auto; font-family: var(--font-dice); font-weight: 600; font-size: 28px; color: var(--grim); }
+.sheet-sample__harm { margin: 0; font-size: 0.9rem; color: var(--grim); }
+.sheet-sample__roll { display: grid; place-items: center; min-height: var(--tap); border-radius: var(--radius-control); background: var(--ember); font-weight: 600; color: var(--ember-ink); }
+
+/* The closing call to action. */
+.home-close {
+  display: grid;
+  justify-items: center;
+  padding: clamp(var(--space-6), 6vw, var(--space-7)) var(--space-5);
+  text-align: center;
+  background: radial-gradient(ellipse at top, rgb(232 131 74 / 0.12), transparent 70%), var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+.home-close__title { margin: 0 0 var(--space-2); font-size: clamp(1.8rem, 4vw, 2.4rem); }
+.home-close__lede { margin: 0; color: var(--muted); }
+.home-close .home-cta__actions { justify-content: center; }
 
 .tool-grid__list {
   list-style: none;
@@ -473,6 +598,34 @@ form.button_to, .button_to { margin: 0; }
 /* ---------- Auth pages ---------- */
 
 .auth { max-width: 28rem; }
+
+/* "I'm interested" (/interest): the role radios in a row, and a honeypot kept off screen. */
+.field__optional { font-weight: 400; color: var(--dim); }
+.interest__roles { margin: 0; padding: 0; border: 0; }
+.interest__roles legend { padding: 0; margin-bottom: var(--space-2); }
+.interest__role { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap); margin-right: var(--space-4); }
+.interest__website { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.interest__next { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+/* Long text in an admin table stays on one line, cut off with an ellipsis; the full text shows
+   in a tooltip (truncated_tip_controller.js). */
+.admin-truncate { display: block; max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-truncate--note { max-width: 14rem; }
+.floating-tip {
+  position: fixed;
+  z-index: 50;
+  max-width: min(24rem, calc(100vw - 16px));
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.4);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
 .auth__panel { display: grid; }
 .auth__aside { margin: var(--space-4) 0 0; font-size: 0.95rem; }
 
@@ -2628,6 +2781,27 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 /* Admin zone (/admin): counts, then wide tables that scroll on their own on a phone. */
 .admin-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
 .admin-nav [aria-current="page"] { color: var(--text); text-decoration: underline; text-decoration-color: var(--ember); text-underline-offset: 0.35em; }
+
+/* Admin lists: a search box above, and pagy's count and page links below. */
+.admin-search { display: flex; flex-wrap: wrap; gap: var(--space-2); max-width: 46rem; margin-bottom: var(--space-4); }
+.admin-search .field__input { flex: 1 1 14rem; }
+.admin-search .admin-search__filter { flex: 0 1 11rem; }
+.admin-pages { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-4); color: var(--muted); font-size: 0.9rem; }
+.admin-pages .series-nav { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.admin-pages .series-nav a {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  color: var(--text);
+  text-decoration: none;
+}
+.admin-pages .series-nav a[href]:hover { border-color: var(--ember); }
+.admin-pages .series-nav a[aria-current="page"] { background: var(--ember); border-color: var(--ember); color: var(--ember-ink); font-weight: 600; }
+.admin-pages .series-nav a[aria-disabled="true"]:not([aria-current]) { color: var(--dim); border-style: dashed; }
 
 .admin-stats {
   display: grid;

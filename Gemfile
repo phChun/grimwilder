@@ -70,3 +70,5 @@ gem "webauthn", "~> 3.4"
 # Trust X-Forwarded-For only from Cloudflare's IP ranges, so request.remote_ip
 # (and rate_limit) sees the player's address behind the Cloudflare proxy.
 gem "cloudflare-rails"
+
+gem "pagy", "~> 43.8"

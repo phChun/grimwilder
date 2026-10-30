@@ -1,0 +1,42 @@
+<% content_for :title, "I'm interested" %>
+
+<div class="auth">
+  <header class="page-header">
+    <p class="eyebrow">Closed beta</p>
+    <h1>I'm interested</h1>
+    <p class="page-header__lede">Grimwilder is invite-only for now. Leave your email and we'll be in touch when there's room at the table.</p>
+  </header>
+
+  <section class="panel auth__panel">
+    <%= form_with model: @interest, url: interest_path, class: "stack" do |form| %>
+      <% if @interest.errors.any? %>
+        <p class="form-error"><%= @interest.errors.full_messages.to_sentence %></p>
+      <% end %>
+      <div class="field">
+        <%= form.label :email_address, "Email", class: "field__label" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "email", placeholder: "you@example.com", maxlength: 254, class: "field__input" %>
+      </div>
+      <fieldset class="field interest__roles">
+        <legend class="field__label">At the table, you'd mostly… <span class="field__optional">(optional)</span></legend>
+        <% Interest::ROLES.each do |key, role_label| %>
+          <label class="interest__role">
+            <%= form.radio_button :role, key %>
+            <span><%= role_label %></span>
+          </label>
+        <% end %>
+      </fieldset>
+      <div class="field">
+        <%= form.label :note, class: "field__label" do %>Anything you'd like us to know? <span class="field__optional">(optional)</span><% end %>
+        <%= form.text_area :note, rows: 4, maxlength: Interest::NOTE_LIMIT, placeholder: "How you play, your group, what drew you to Grimwild…", class: "field__input", aria: { describedby: "interest_note_hint" } %>
+        <p id="interest_note_hint" class="field__hint"><%= Interest::NOTE_LIMIT %> characters at most.</p>
+      </div>
+      <%# A honeypot: hidden from people, filled in by bots. %>
+      <div class="interest__website" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+      </div>
+      <%= form.submit "I'm interested", class: "button button--primary button--wide" %>
+    <% end %>
+    <p class="field__hint">We'll only use your email to tell you about Grimwilder. Already have an account? <%= link_to "Sign in", new_session_path %>.</p>
+  </section>
+</div>

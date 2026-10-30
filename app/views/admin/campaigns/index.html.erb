@@ -3,9 +3,11 @@
 <header class="page-header">
   <p class="eyebrow">Admin</p>
   <h1>Campaigns</h1>
-  <p class="page-header__lede"><%= pluralize(@campaigns.size, "campaign") %>, active first. Read-only: admins don't get into campaigns they aren't in.</p>
+  <p class="page-header__lede">Active first. Read-only: admins don't get into campaigns they aren't in.</p>
   <%= render "admin/nav" %>
 </header>
+
+<%= render "admin/search", search_label: "Search campaigns", placeholder: "Campaign name" %>
 
 <div class="admin-table">
   <table>
@@ -36,3 +38,4 @@
     </tbody>
   </table>
 </div>
+<%= render "admin/pages", pagy: @pagy, noun: "campaign" %>
