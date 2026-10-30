@@ -72,6 +72,20 @@ class CharacterP6PathsTest < ActiveSupport::TestCase
     assert @tibbs.reload.valid?
   end
 
+  test "Trap Making is retired too (removed in the CE): out of the Artificer's list, kept where it's taken" do
+    trap_making = Talent.find("trap-making")
+    assert trap_making.retired?
+    assert_not_includes Talent.groups.find { _1.key == "artificer" }.talents, trap_making
+    assert_not_includes Talent.choosable_for("Artificer"), trap_making
+
+    @tibbs.talent_keys = %w[ trap-making ]
+    assert_not @tibbs.valid?
+    assert_includes @tibbs.errors[:talent_keys], "can't include Trap Making; the book dropped it"
+
+    @tibbs.update_columns(talent_keys: %w[ trap-making ])
+    assert @tibbs.reload.valid?
+  end
+
   test "core talents keep their notes now: the Vassal's spark and thread are shared" do
     assert_match "Your spark and thread are shared", Talent.find("vassal").note
   end

@@ -85,7 +85,8 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
     end
 
     # The core talent first, then the rest A to Z. Retired talents (Flurry,
-    # cut in Preview 6) stay on sheets that have them, out of the catalog.
+    # cut in Preview 6; Trap Making, in the CE) stay on sheets that have them,
+    # out of the catalog.
     def talents
       Talent.all.select { |talent| talent.group == self && !talent.retired? }.sort_by { [ _1.core? ? 0 : 1, _1.name.downcase ] }
     end
