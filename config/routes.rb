@@ -118,6 +118,7 @@ Rails.application.routes.draw do
       resource :done, only: %i[ create destroy ] # the GM marks the campaign done, or reopens it
       resource :reset, only: :create # the GM clears sessions and the roll log
       resource :downtime, only: %i[ new create ]
+      resource :brief, only: :show
 
       resources :pools, only: %i[ index create update destroy ] do
         scope module: :pools do

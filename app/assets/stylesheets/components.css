@@ -2972,3 +2972,7 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .rule-pools__goal .pool-track { grid-column: 1 / -1; }
 .rule-pools__goal form { grid-column: 1 / -1; justify-self: start; margin: 0; }
 .rule-pools__goal-size { font-family: var(--font-dice); color: var(--muted); }
+
+/* "Copy for an AI" (campaigns/briefs/show): the party as Markdown in an editable box. */
+.brief__text { min-height: 18rem; font-family: var(--font-dice); font-size: 0.85rem; line-height: 1.5; resize: vertical; }
+.brief__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
