@@ -1,5 +1,5 @@
 # A roll a talent calls for (config/talents.yml `rolls:`), offered as a button
-# on the talent's card: a story roll at some odds (Pact's 3d to wield the
+# on the talent's card: a story roll at some odds (Hex's 3d to wield the
 # patron's magic) or a montage (According to Plan's flashback). It may spend a
 # thread or one of the talent's uses first, and a montage may roll extra dice
 # (Scout Ahead's 3d). With `rising`, a story roll takes +1t for each time its

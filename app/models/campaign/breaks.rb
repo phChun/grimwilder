@@ -1,7 +1,7 @@
 # Rest and downtime (pg. 31). A rest is a significant stretch of time: it
 # clears all marks and harm. Downtime goes further: PCs fully heal, including
-# relevant conditions, and reset per-session talents, and every campaign pool
-# is rolled. Both apply to the characters at the current session, or to
+# relevant conditions, and reset per-session talents, every campaign pool
+# is rolled, and then the GM picks one and depletes it completely. Both apply to the characters at the current session, or to
 # everyone seated between sessions.
 module Campaign::Breaks
   extend ActiveSupport::Concern
@@ -51,7 +51,9 @@ module Campaign::Breaks
 
   # clear: "character_id:index" for each condition to clear (the form ticks
   # them all; untick permanent ones).
-  def downtime!(by:, clear: [], random: Random)
+  # deplete: the id of the campaign pool the GM picks to come to pass, after
+  # the rolls (nothing more happens if the rolls already emptied it).
+  def downtime!(by:, clear: [], deplete: nil, random: Random)
     picks = condition_picks(clear)
 
     transaction do
@@ -68,6 +70,9 @@ module Campaign::Breaks
         character.refresh_talent_pools!(per: :rest)
       end
       downtime_pools.each { _1.roll!(by: by, random: random) }
+      if deplete.present? && (pool = pools.shared.where(kind: "campaign").find_by(id: deplete)) && pool.rollable?
+        pool.deplete!(by: by)
+      end
     end
   end
 

@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // The talent choices form (characters/talent_choices/edit), filled from the
 // crucible rolled at its foot: a tapped word (crucible:pick) goes into the
 // next box of the choice it's for. A choice says which crucible and table it
-// takes (Pact's natures from Nature, desires from Desires) and how many words
+// takes (Hex's natures from Nature, desires from Desires) and how many words
 // make one pick: a spell theorem is two ("wild fire"), so the second word
 // joins the first.
 export default class extends Controller {

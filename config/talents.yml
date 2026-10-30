@@ -1,4 +1,4 @@
-# Talents from Grimwild: Community Edition Preview 6 (text CC0; based on
+# Talents from Grimwild: Community Edition (text CC0; based on
 # Grimwild by J. D. Maxwell, Oddity Press, CC BY 4.0). One group per path
 # (core talent + path talents) plus background/heritage talents (pg. 89).
 #
@@ -6,6 +6,8 @@
 # book's sidebar tip for a talent. Any talent can be taken by any path (pg. 53).
 # "summary" is our own one-line gist for the character sheet (not book text);
 # keep it under 100 characters.
+# "key" (optional) fixes a talent's key when the book renames it (Pact is now
+# Hex), so saved characters keep it; otherwise the key comes from the name.
 # "choices" are picks a talent asks for (Talent::Choice): `pick` at level 1
 # plus `growth` by level, from `from` (or named `groups`, with `min_each`),
 # `open: true` when the book's list is only suggestions, `same_as` to reuse
@@ -113,8 +115,9 @@
     rolls:
     - { kind: story, odds: 2, label: Overload the arcana, use: overloads, rising: true }
   - name: Magnum Opus
-    summary: "Build a mythic arcana: a 6d power pool whose touchstones you roll and lock in over time."
-    text: You’re in the process of creating a mythic arcana. It has a 6d power pool as normal, but before each session, roll 3 random touchstones. Each time, you can choose 1 touchstone to lock in, never rolling for it again.
+    summary: "A mythic arcana in the making: roll touchstones each session and lock one in; the GM sets effects."
+    text: You’re in the process of creating a mythic arcana. Before each session, roll 3 random touchstones. Each time, you can choose 1 touchstone to lock in, never rolling for it again. Work with your GM to determine the arcana’s effects.
+    note: 'If you’re unsure of what mechanics to use, consider the following: Each session, you have a 6d power pool for spell effects. You can drop 1d before rolling to make the effect potent.'
     page: 56
     arcana:
     - { tier: mythic, count: 1, opus: true }
@@ -166,6 +169,7 @@
   - name: Jack of All Trades
     summary: "+1d on montage rolls, and a 3d power pool of know-how from your travels."
     text: You take +1d on montage rolls and have a 3d power pool to represent the smattering of knowledge from your travels.
+    note: When you get surprising results from this pool, make it meaningful. What past experience helped you here? Do you still remember the story?
     page: 58
     uses:
     - { key: knowledge, label: Knowledge, pool: 3, pool_kind: power, per: session }
@@ -176,12 +180,12 @@
     text: When given time, you can tell potent lies, such as telling the king you're their bastard or a prophecy foretelling the fall of the capital. You can push yourself to do it on the spot.
     page: 58
   - name: Friendly Face
-    summary: "In any new town you know someone, make a friend or meet a fan who'll do you a favor."
+    summary: "In any new town, know someone, make a friend or meet a fan for a favor; spark to owe them."
     text: 'In any new town or district of a city you go to, you can always: know someone useful—quickly make a friend—be recognized by a fan. They’ll gladly do you a reasonable favor. Take spark if you promise to pay them back.'
     page: 58
   - name: Bardic Lore
     summary: "3 wises, +1 thread a session, and +1d on story rolls about what you know."
-    text: You gain any 3 wises and 1 extra thread per session. You take +1d on any story rolls pertaining to what you know or story details you add.
+    text: You gain any 3 wises. You also gain 1 extra thread per session, and take +1d on any story rolls pertaining to what you know or story details you add.
     page: 58
     bonuses:
     - { key: lore, label: "It's about what you know, or a detail you added", only: [ story ] }
@@ -201,7 +205,7 @@
   tagline: You don't just fight—you crush anything and everything in your path until nothing stands before you.
   core:
     name: Frenzy
-    summary: "Once a session (or when hurt), rage for a scene: +1d per mark, ignore harm thorns, wreck things."
+    summary: "Once a session, or when bloodied or vexed, rage: +1d per mark, ignore damage thorns, wreck things."
     text: 'Once per session, or when you get bloodied or take vex, you can enter a frenzy for a scene. During the frenzy, you can only take aggressive actions. You also: take +1d for each mark you have and ignore all thorns from harm and marks—always add collateral damage: send something flying—smash mooks—throw insults—wreck something—always get a final action when dropped. On a critical, ignore getting dropped.
 
 
@@ -230,7 +234,7 @@
     page: 60
   - name: Flesh Wounds
     summary: "Take a Flesh Wound (+1t until the scene ends) instead of getting bloodied."
-    text: When you would get bloodied, you can instead take a Flesh Wound, a condition that inflicts +1t on all rolls, and is cleared when the scene ends. On a disaster, you take the harm as normal.
+    text: When you would get bloodied, you can instead take a Flesh Wound, a condition that inflicts +1t on all rolls, and is cleared when the scene ends. On a disaster, you cannot take a Flesh Wound.
     page: 60
   - name: Into the Fray
     summary: "First in: 5s count as 6s and 4s as 1s on your first roll, and you set up whoever follows."
@@ -267,7 +271,7 @@
   core:
     name: Channel Divinity
     summary: "Cast through your god: a 6d major rite and two 4d minor rites, refilled each session."
-    text: 'CHANNEL DIVINITY Core Talent You have spellcasting ability, calling upon your deity to channel their magic. You roll a rite pool to cast spells, and that pool and your god’s title serve as touchstones. Your major rite is a 6d power pool, and your 2 minor rites are 4d power pools. They replenish each session. You can drop 1d and roll to cast a potent spell. Spells without risk are automatically successful, unless potent.
+    text: 'You have spellcasting ability, calling upon your deity to channel their magic. You roll a rite pool to cast spells, and that pool and your god’s title serve as touchstones. Your major rite is a 6d power pool, and your 2 minor rites are 4d power pools. They replenish each session. You can drop 1d and roll to cast a potent spell. Spells cast without risk are automatically successful, but still roll the pool.
 
 
       GROWTH: At levels 3 and 6, gain +1d to each rite pool.'
@@ -397,8 +401,8 @@
   tagline: You become one with your weapon, and through it, you find your real purpose in this life.
   core:
     name: Weapon Mastery
-    summary: "+1d fighting in your style, and mastery each scene to add critical effects."
-    text: 'WEAPON MASTERY Core Talent Choose a fighting style you have mastered: brawling—dual-wielding—onehanded—ranged—two-handed. When you fight, defend, or assist in your style, take +1d. Each scene, you have 2 mastery to spend when using this style to add a critical effect.
+    summary: "+1d to fight, defend or assist in your style, and mastery each scene to add critical effects."
+    text: 'Choose a fighting style you have mastered: brawling—dual-wielding—one-handed—ranged—two-handed. When you fight, defend, or assist in your style, take +1d. Each scene, you have 2 mastery to spend when using this style to add a critical effect.
 
 
       GROWTH: At levels 3 and 6, gain +1 mastery per scene.'
@@ -454,7 +458,7 @@
   - name: Control
     summary: "Once a session, declare a zone foes can't cross without dealing with you."
     text: Once per session, you can declare a zone that enemies cannot cross without dealing with you. If they attempt to move past you, you can interrupt them. On a perfect, take spark. You can push yourself to do it again.
-    note: Some foes are too large to control. Even experienced, a warrior with control over an area won't stop a dragon—but they may get a parting shot (roll the pool), or move with them.
+    note: Some foes are too large to control. Even an experienced warrior with control over an area won't stop a dragon—consider a secondary effect instead. This could be getting a parting shot (roll a task pool), moving with them, or hindering them in another way.
     page: 66
     uses:
     - { key: control, label: Control, count: 1, per: session }
@@ -481,7 +485,7 @@
   tagline: Your body is a vessel through which you channel your discipline into grace, precision, and the never-ending journey towards perfection.
   core:
     name: Discipline
-    summary: "4 flow each scene to ignore thorns or try fluid maneuvers; interrupt once a session."
+    summary: "4 flow a scene: ignore odds thorns, fluid maneuvers, potent grace; interrupt once a session."
     text: 'Never face a disadvantage due to a weapon matchup. Once per session, you can interrupt with a: philosophical point—quick reaction—stunning strike. Each scene, you have 4 flow. Spend it to:
 
 
@@ -603,7 +607,7 @@
     - { key: guard, label: "Assisting on a defense", only: [ defense ], assist: true, auto: true }
   - name: Rebuke
     summary: "When the GM spends suspense on an impact move, +1d on your follow-up against the source."
-    text: When the GM spends suspense to prompt an impact move, you take +1d on any follow-up action against the source. On a critical, take spark. (Roll, then choose an option, rewrite for clarity.)
+    text: When the GM spends suspense to prompt an impact move, you take +1d on any follow-up action against the source. On a critical, take spark.
     page: 70
     bonuses:
     - { key: rebuke, label: "Following up against the source of a suspense-prompted impact move" }
@@ -669,7 +673,7 @@
     uses:
     - { key: echo, label: Echo, count: 1, per: session }
   - name: Mind Blast
-    summary: "A critical on a bastion roll clears instability and unleashes mental collateral damage."
+    summary: "A critical bastion roll adds no instability and lowers it by 1, with mental collateral damage."
     text: 'On a critical bastion roll, ignore any increases to instability, and lower it by 1. This causes mental collateral damage around you: confusion—hallucinations—headaches—panic. One time only, you can make this a ritual-level effect, affecting all within miles. [Psion Only]'
     page: 72
   - name: Foresight
@@ -732,6 +736,7 @@
   - name: Animal Companion
     summary: "A loyal animal with 3 tricks (rolled at 3d), 2 flaws and a bond with each PC."
     text: 'You’re accompanied by a fiercely loyal animal. Each PC adds a reciprocal bond with it. Choose 3 tricks and 2 flaws. You roll 3d for its tricks and 1d otherwise. It has only two damage boxes, marked (for any mark) and hurt (for any harm). It can always exit a scene when hurt. If lost, you can bond with a new animal. Tricks: distract—fight—guard—perform—rescue—retrieve—scout—search—track—warn. Flaws: aggressive—clumsy—grumpy—insatiable—jumpy—noisy—overprotective—scary—unruly.'
+    note: Come up with your own tricks & flaws for other companions such as hired bodyguards or homunculi. The GM may let you take this again for 3 extra tricks and another hurt damage box.
     page: 74
     rolls:
     - { kind: action, dice: 3, as: trick, label: "One of its tricks" }
@@ -853,7 +858,7 @@
     uses:
     - { key: thread, thread: 1 }
   - name: Opportunist
-    summary: "+1d following up when someone nearby defends; push to add a critical bonus to an ally."
+    summary: "+1d following up when someone nearby defends; push to add a bonus to a nearby ally's critical."
     text: When someone nearby rolls defense, you take +1d on an immediate follow-up. On a critical by a nearby ally, you can push yourself to add a critical bonus.
     page: 76
     bonuses:
@@ -1009,7 +1014,8 @@
     - { key: fierce-protector, label: Fierce Protector, count: 1, per: session }
   - name: Shared Soul
     summary: "Merge with your vassal, sharing talents, aspects and harm, and using its pool or your stats."
-    text: You can merge with your vassal, sharing path talents, aspects, and incoming harm. You can choose to use the power pool or your own stats, and when your anchors break, take +1d on the story roll.
+    text: You can merge with your vassal, sharing path talents, aspects, and incoming harm. You can choose to use the power pool or your own stats, and when your anchors break, take +1d on the story roll. [Summoner Only]
+    note: This can open up a lot of character concepts. You could be a werewolf, have the ghost of a family member possessing you, or know the alchemical secret to turn yourself into a mutated monster!
     page: 80
     bonuses:
     - { key: anchors, label: "Your anchors broke", only: [ story ] }
@@ -1045,7 +1051,7 @@
   core:
     name: Panache
     summary: "2 panache each scene to strip thorns before rolling; a roll cut by a thorn earns more."
-    text: 'Each scene, you have 2 panache to fuel your derring-do. Before making a roll, you can spend panache, removing that many thorns. If you remove all thorns, they become panache dice instead, increasing the final result level on a 7 or 8. When one of your rolls is cut by a thorn, you gain 1 panache (ignoring your max).
+    text: 'You wield the spotlight as well as any blade, allowing great feats of charm and skill. Each scene, you have 2 panache to fuel your derring-do. Before making a roll, you can spend panache, removing that many thorns. If you remove all thorns, they become panache dice instead, increasing the final result level on a 7 or 8. When one of your rolls is cut by a thorn, you gain 1 panache (ignoring your max).
 
 
       Quick Wit: Once per session, you can interrupt an impact move with a: humorous quip—quick flourish—timely distraction.
@@ -1063,7 +1069,7 @@
   - name: Audacity
     summary: "Reckless acts: 5s count as 6s and 4s as 1s, and onlookers are struck by what you did."
     text: 'When you act with pure reckless abandon, 5s count as 6s, but 4s count as 1s. Regardless of the outcome, those around you are briefly struck by: awe—bewilderment—panic—excitement.'
-    note: These are the kinds of ideas that you alone have the gall to attempt, consequences be damned, and often a part of tangles or voluntarily increased stakes.
+    note: These are the kinds of ideas that you alone have the gall to attempt, consequences be damned—potentially as a tangle with voluntarily increasing stakes.
     page: 82
     bonuses:
     - { key: abandon, label: "Pure reckless abandon: 5s count as 6s, 4s as 1s", dice: 0, counts_as: reckless }
@@ -1089,7 +1095,7 @@
     bonuses:
     - { key: improvise, label: "Improvising with your surroundings (push yourself from the card)" }
   - name: Lucky
-    summary: "A 1d Luck pool each session to roll as a bonus die after any roll. Spark on a grim."
+    summary: "A 1d Luck pool a session: a bonus die after your rolls or story rolls about you. Spark on a grim."
     text: Each session you have a 1d Luck pool. You can roll it as a bonus die after any roll you make and story rolls related to you. On a grim, take spark.
     page: 82
     follow_ups:
@@ -1107,6 +1113,7 @@
   - name: The Legend of…
     summary: "Tales of your exploits spread; take spark when you play into your legend."
     text: 'Many recognize you as a hero, others as a cad and ne''er-do-well. Track tales of your exploits with campaign pools. Take spark when you play into it by: leaving a calling card—saying your catchphrase in a dramatic moment—indulging a fan.'
+    note: Use the crucible below to discover what people have taken to calling you.
     page: 82
     crucible: legend
 - key: warlock
@@ -1116,7 +1123,8 @@
   aka: magus, occultist, pactmaker
   tagline: You have made a pact with a greater being—power in exchange for service, a pact that may prove to be a double-edged sword.
   core:
-    name: Pact
+    name: Hex
+    key: pact # the book renamed Pact to Hex; the key stays so saved characters keep it
     summary: "Wield your patron's magic with story rolls, plus a changeable Eldritch Talent and a Patience pool."
     text: 'You have magic bestowed by a patron, allowing you to make a story roll (usually 3d) to wield their magic as a weapon, or ask to channel a potent magical effect using their nature as the touchstone. They gift you an Eldritch Talent—a changeable path talent manifesting with your patron’s trappings. Given time to commune, you can change an Eldritch Talent.
 
@@ -1228,7 +1236,7 @@
   core:
     name: Hidden Magic
     summary: "Cast with Presence using 2 words of power, which burn until next session."
-    text: 'You understand the ancient magic inherent in the world. You have spellcasting ability, rolling Presence to cast using any 2 words of power as the touchstones. When you use a word, burn it—you can''t use it again until the next session. Given time, you can make this spell potent. You begin with 6 words of power from the crucible. Spells without risk are automatically successful and don’t burn words, unless potent.
+    text: 'You understand the ancient magic inherent in the world. You have spellcasting ability, rolling Presence to cast using any 2 words of power as the touchstones. When you use a word, burn it—you can''t use it again until the next session. Given time, you can make this spell potent. You begin with 6 words of power from the crucible. Spells cast without risk require no roll, and don’t burn words, unless potent.
 
 
       Ritualist: Take +1d when completing ritual invocations, and you can use relevant words of power as anchors.
@@ -1255,7 +1263,7 @@
   talents:
   - name: Bailiwick
     summary: "One word of power is your domain: burn any other word to use it; a critical restores all."
-    text: You are known to other witches by a title and the power inherent in your magical domain—your Bailiwick. Choose 1 word of power. You can burn any other word to use it, and on a critical, you regain the use of all words.
+    text: You are known to other witches by a title and the power inherent in your magical domain—your Bailiwick. Choose 1 word of power. You can burn any other word to use it, and on a critical, you regain the use of all words. [Witch Only]
     note: This isn’t just a specialty. You’re not just a witch that knows the word for Star, you’re The Witch of Sacred Stars. This means you have the responsibility of upholding it, as well.
     page: 86
     choices:
@@ -1274,7 +1282,7 @@
     - { kind: story, odds: 2, label: Send your familiar }
   - name: Homely Hovel
     summary: "Given time, bless a homestead: outside help on all rolls there, plus two wondrous traits."
-    text: 'Given time, you can bless a homestead to overflow with power. You get outside help on all rolls while on its grounds. Choose two wondrous traits to give it such as: traveling—ritual anchor—healing—caretaker. You can only have one homestead like this at a time. charming castle mysterious cottage rickety glade unsettling manor vibrant shack whimsical temple'
+    text: 'Given time, you can bless a homestead to overflow with power. You get outside help on all rolls while on its grounds. Choose two wondrous traits to give it such as: traveling—ritual anchor—healing—caretaker. You can only have one homestead like this at a time. Use the crucible below for ideas on your hovel.'
     page: 86
     crucible: hovel
     choices:

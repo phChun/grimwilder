@@ -40,6 +40,26 @@ class CampaignBreaksTest < ActiveSupport::TestCase
     assert_equal [ "Downtime", "The Guild's reach" ], @campaign.rolls.order(:id).last(2).map { _1.marker? ? _1.name : _1.pool.name }
   end
 
+  test "downtime depletes the campaign pool the GM picks, after the rolls" do
+    guild = @campaign.pools.create!(name: "The Guild's reach", kind: "campaign", starting_size: 4)
+    winter = @campaign.pools.create!(name: "Winter comes", kind: "campaign", starting_size: 4)
+
+    @campaign.downtime!(by: identities(:gwen), deplete: winter.id, random: FixedDice.new([ 6, 6, 6, 6, 6, 6, 6, 6 ]))
+
+    assert_equal 4, guild.reload.size
+    assert winter.reload.depleted?
+    assert_equal "depleted", winter.last_action
+    assert_equal [ "rolled", "depleted" ], winter.rolls.order(:id).pluck(:pool_action)
+  end
+
+  test "depleting a linked pool ends its last phase" do
+    pool = @campaign.pools.create!(name: "The war", kind: "campaign", phases_text: "4d Border raids + 4d Siege")
+    pool.deplete!(by: identities(:gwen))
+
+    assert pool.reload.depleted?
+    assert_equal "Siege", pool.phase_name
+  end
+
   test "downtime refills talent pools" do
     @bram.update!(talent_keys: [ "bulwark" ])
     PlaySession.start!(@campaign, characters: [ @bram ], by: identities(:gwen)).end!(by: identities(:gwen))

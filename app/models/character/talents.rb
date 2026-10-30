@@ -79,7 +79,7 @@ module Character::Talents
     end
 
     # A talent already on the sheet stays when the book later limits it to
-    # another path ("[Bard Only]" in Preview 6) or drops it (Flurry); only new
+    # another path ("[Bard Only]", "[Witch Only]") or drops it (Flurry); only new
     # picks, or a new path, are checked against it.
     def talents_are_choosable
       kept = will_save_change_to_path? ? [] : Array(talent_keys_in_database)

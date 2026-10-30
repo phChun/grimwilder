@@ -10,6 +10,6 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
   test "the footer names the edition the rules follow" do
     get root_path
-    assert_select ".site-footer cite", "Grimwild: Community Edition Preview 6"
+    assert_select ".site-footer cite", "Grimwild: Community Edition"
   end
 end

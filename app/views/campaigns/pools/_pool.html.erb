@@ -30,6 +30,8 @@
         Pushed by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped, take a mark
       <% elsif pool.last_action == "ticked" %>
         Ticked by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped
+      <% elsif pool.last_action == "depleted" %>
+        Depleted in downtime by <%= pool.last_rolled_by&.display_name || "someone" %>
       <% elsif pool.last_action == "smite" %>
         Smitten by <%= pool.last_rolled_by&.display_name || "someone" %>: 1d dropped
       <% else %>

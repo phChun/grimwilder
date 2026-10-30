@@ -6,7 +6,7 @@
     <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
     <h1>Downtime</h1>
     <p class="page-header__lede">
-      Everyone fully heals and resets per-session talents, and you roll the campaign pools (pg. 31).
+      Everyone fully heals and resets per-session talents, you roll the campaign pools, then pick one to deplete completely (pg. 31).
       <%= Current.campaign.current_session ? "It applies to the characters at #{Current.campaign.current_session.title.downcase}." : "Between sessions, it applies to everyone seated." %>
     </p>
   </header>
@@ -27,6 +27,23 @@
         <p class="field__hint">No one has a condition.</p>
       <% end %>
     </fieldset>
+
+    <% if @pools.any? %>
+      <fieldset class="roll-setup__group">
+        <legend class="field__label">After the rolls, deplete</legend>
+        <label class="check">
+          <%= radio_button_tag "deplete", "", true, id: "downtime_deplete_none" %>
+          <span>None</span>
+        </label>
+        <% @pools.each do |pool| %>
+          <label class="check">
+            <%= radio_button_tag "deplete", pool.id, false, id: "downtime_deplete_#{pool.id}" %>
+            <span><strong><%= pool.name %></strong> (<%= pool.size %>d): <%= pool.outcome %></span>
+          </label>
+        <% end %>
+        <p class="field__hint">The story moves forward: that pool drops to 0d after it rolls. If the roll already empties it, nothing more happens.</p>
+      </fieldset>
+    <% end %>
 
     <p class="field__hint">
       Marks and harm clear for <%= @characters.map(&:name).to_sentence.presence || "no one" %>.

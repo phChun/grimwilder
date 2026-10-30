@@ -1,6 +1,6 @@
 # Grimwilder
 
-A play toolkit for the tabletop RPG **Grimwild: Community Edition** (CE Preview 6). It's meant for use at the table, not as a rules reference: each tool quotes only as much of the book as a player needs in the moment.
+A play toolkit for the tabletop RPG **Grimwild: Community Edition**. It's meant for use at the table, not as a rules reference: each tool quotes only as much of the book as a player needs in the moment.
 
 ## What it does
 

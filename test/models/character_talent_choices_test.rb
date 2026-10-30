@@ -126,7 +126,8 @@ class CharacterTalentChoicesTest < ActiveSupport::TestCase
   end
 
   test "Bailiwick without Hidden Magic: the player names their own word" do
-    @tibbs.update!(talent_keys: [ "bailiwick" ])
+    # Witch only in the CE, so a Rogue can't take it now; a sheet that already had it keeps it.
+    @tibbs.update_columns(talent_keys: [ "bailiwick" ])
     bailiwick = Talent.find("bailiwick").choice(:word)
     assert @tibbs.choice_open?(bailiwick)
 
