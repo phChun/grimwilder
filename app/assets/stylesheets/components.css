@@ -603,10 +603,12 @@ form.button_to, .button_to { margin: 0; }
 .crucible__hint { margin: 0; color: var(--dim); }
 
 /* Each table's reading side by side when there's room, a rule between them. Every one has a
-   rule on its left, and the -1px margin plus clip hides it on whichever starts a row. */
+   rule on its left, and the -1px margin plus clip hides it on whichever starts a row.
+   A column per table at most (--tables, set in the view): the hint and the smash span every
+   track, so auto-fit alone would keep empty ones and squeeze the readings to the left. */
 .crucible__results {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(12rem, 100% / var(--tables, 1) - 1px)), 1fr));
   gap: var(--space-3) 0;
   overflow: hidden;
 }
@@ -617,6 +619,13 @@ form.button_to, .button_to { margin: 0; }
   padding-inline: var(--space-4);
   border-left: 1px solid var(--line);
 }
+/* One table on the crucible page: just the text. No "rolled 3" label, and no chip when there's
+   only one reading; two readings keep their chips to choose between. (The compact roller keeps
+   them all: its chips fill talent choices.) */
+.crucible__results[data-count="1"] .roll-result__label,
+.crucible__results[data-count="1"] .roll-result:not(:has(.chip + .chip)) { display: none; }
+.crucible__results[data-count="1"] .roll-result { padding-inline: 0; border-left: 0; }
+.crucible__results[data-count="1"] .roll-result__smash { margin-top: 0; }
 .roll-result { display: grid; align-content: start; gap: var(--space-1); }
 .roll-result__label { margin: 0; font-size: 0.85rem; color: var(--dim); }
 .roll-result__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
@@ -1060,7 +1069,10 @@ form.button_to, .button_to { margin: 0; }
 .crucible__stage { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
 .crucible__full { margin-left: auto; font-size: 0.85rem; }
 
-.crucible--compact .crucible__results { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--space-3); }
+.crucible--compact .crucible__results {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(13rem, (100% - var(--space-3) * (var(--tables, 1) - 1)) / var(--tables, 1) - 1px)), 1fr));
+  gap: var(--space-3);
+}
 .crucible--compact .crucible__hint {
   grid-column: 1 / -1;
   padding: var(--space-5) var(--space-4);

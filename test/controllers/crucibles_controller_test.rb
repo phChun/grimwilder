@@ -13,6 +13,7 @@ class CruciblesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-controller=crucible] [data-crucible-target=table]", 2
     assert_select ".crucible__tables[data-count='2']"
+    assert_select ".crucible__results[data-count='2'][style='--tables: 2']"
     assert_select "td[data-row='6'][data-col='2']", text: "fortune teller"
   end
 
