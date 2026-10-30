@@ -4,6 +4,10 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-30
 
+- **Expanded downtime**, an optional rule: the GM picks how each character spends downtime (rest, plan ahead, pursue a goal, unwind or venture), and it replaces carousing. ([#73](https://github.com/phChun/grimwilder/pull/73))
+- **Clearer downtime pools**: the form says every campaign pool rolls before the one you pick is depleted. ([#73](https://github.com/phChun/grimwilder/pull/73))
+- **New crucibles**: the solo rules' consequences (rolled on a d8) and a random potion. ([#73](https://github.com/phChun/grimwilder/pull/73))
+- **Wild Shape** lists the book's example wild talents. ([#73](https://github.com/phChun/grimwilder/pull/73))
 - **A new home page** that shows what Grimwilder does at the table and on a sheet, with an example of play. ([#72](https://github.com/phChun/grimwilder/pull/72))
 - **I'm interested**: while sign-ups are closed, leave your email, how you'd play and a note, and we'll be in touch. ([#72](https://github.com/phChun/grimwilder/pull/72))
 - **Admin**: an Interested list to make accounts from, and search and pages on every list. ([#72](https://github.com/phChun/grimwilder/pull/72))
