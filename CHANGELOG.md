@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-30
 
+- **The home page** says what Grimwilder keeps track of, rather than calling Grimwild fiddly. ([#76](https://github.com/phChun/grimwilder/pull/76))
 - **The Respite fold-out** shows Rest again: it was squeezed beside the close button. ([#75](https://github.com/phChun/grimwilder/pull/75))
 - **Links look good when shared**: pasting a Grimwilder link in Discord, Slack or iMessage shows a preview card, and an invite link names its campaign and GM. ([#74](https://github.com/phChun/grimwilder/pull/74))
 - **Search engines** get a sitemap and stay off signed-in pages and invite links. ([#74](https://github.com/phChun/grimwilder/pull/74))
