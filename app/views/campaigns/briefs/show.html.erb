@@ -1,0 +1,19 @@
+<% content_for :title, "Copy for an AI · #{Current.campaign.name}" %>
+
+<%# Its own page, and from the GM table's "Copy for an AI" a modal (shared/_frame_modal). The box is editable; Copy takes what's in it (copy_text_controller.js). %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to Current.campaign.name, campaign_table_path(Current.campaign) %></p>
+    <h1>Copy for an AI</h1>
+    <p class="page-header__lede">The campaign and your party as Markdown, to hand to an AI that helps you tell the story: the pitch, then each character's story, bonds, talents and harm. No stats or dice, and nothing only you can see. Edit it here before you copy.</p>
+  </header>
+
+  <div class="brief stack" data-controller="copy-text">
+    <label class="visually-hidden" for="brief_markdown">The party as Markdown</label>
+    <%= text_area_tag "brief_markdown", @markdown, id: "brief_markdown", class: "field__input brief__text", rows: 18, spellcheck: false, data: { copy_text_target: "source" } %>
+    <div class="brief__actions">
+      <button type="button" class="button button--primary" data-action="copy-text#copy">Copy Markdown</button>
+      <span class="field__hint" data-copy-text-target="status" aria-live="polite"></span>
+    </div>
+  </div>
+<% end %>

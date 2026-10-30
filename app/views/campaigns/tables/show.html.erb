@@ -61,6 +61,7 @@
     <section id="table" class="gm-section" aria-labelledby="party-title">
       <div class="gm-section__head">
         <h2 id="party-title" class="gm-section__title">Party</h2>
+        <%= link_to "Copy for an AI", campaign_brief_path(campaign), class: "button button--small", data: { turbo_frame: "modal" } %>
       </div>
       <div class="party-grid">
         <% seats.each do |membership, seated| %>
