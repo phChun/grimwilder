@@ -457,6 +457,12 @@ Live at **https://grimwilder.com** since 2026-10-24 (`www.` redirects to it, `co
 - **Errors**: `ErrorNotifier` (a `Rails.error` subscriber, on when `ERROR_EMAIL_TO` is set; it's a Kamal secret, so the address stays out of the repo) emails a server error or a failed job, at most once an hour for the same error, and skips 4xx errors such as not found. It sends through the same SMTP, so it can't report email itself being down; `bin/kamal logs` has everything.
 - **Sign-ups are closed** (`ALLOW_SIGNUPS: false`). An admin makes accounts at `/admin/accounts` (see *Admin*).
 
+## Search engines and link previews
+
+- `layouts/_meta` (in the layout's head) writes the description, a canonical link, and Open Graph and Twitter card tags. A page sets its own with `content_for :description` (roll, crucibles and each crucible's blurb, talents, an invite link); the title comes from `content_for :title`. The preview image is `app/assets/images/og-image.png` (1200x630), our own: the wordmark, tagline and a messy roll, laid out in HTML with the app's fonts and screenshotted with headless Chrome. Never use the book's art.
+- An invite link's preview (`joins/show`) says only what the page shows anyone holding the link: the campaign's name and its GM.
+- `public/robots.txt` allows the free tools and disallows the signed-in areas and `/join/`, and points at `/sitemap.xml` (`SitemapsController`, a builder view listing home, roll, crucibles, talents and every crucible from the data).
+
 ## Licensing (must keep)
 
 - The footer must credit *Grimwild* by J. D. Maxwell (Oddity Press) under **CC BY 4.0**, say the site is unofficial and not endorsed, and note that the CE text is CC0.

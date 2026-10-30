@@ -69,6 +69,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get "sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: "xml" }
+
   # "I'm interested", while sign-ups are closed: the form, then thanks.
   resource :interest, only: %i[ new create show ]
 
