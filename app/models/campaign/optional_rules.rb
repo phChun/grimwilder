@@ -13,6 +13,8 @@
 #   session can give bonus XP for what happened in play.
 # - `rest_resets` (pg. 175): sessions don't reset spark, thread or talents;
 #   the GM's Reset does, at a rest (Campaign#rest_reset!).
+# - `expanded_downtime` (pg. 142): the GM picks each character's downtime
+#   action (Campaign::DowntimeActions); carousing goes.
 # - `token_initiative`, `active_vigilance`, `writers_room` (pg. 175, 178): how
 #   the table plays; listed so everyone knows, nothing to track.
 module Campaign::OptionalRules
@@ -37,6 +39,7 @@ module Campaign::OptionalRules
     "milestone_levels" => [ "Milestone levels", 177, "No XP after sessions: the party levels up after completing a major group arc." ],
     "focused_growth" => [ "Focused growth", 177, "Twice the XP to level, with a chance of bonus XP at the end of each session." ],
     "rest_resets" => [ "Rest resets", 175, "Talents, thread and spark reset at a rest instead of each session." ],
+    "expanded_downtime" => [ "Expanded downtime", 142, "In downtime each PC rests, plans ahead, pursues a goal, unwinds or ventures (two if they sell a treasure), instead of carousing and everyone healing." ],
     "token_initiative" => [ "Token initiative", 175, "In an intense moment, each player gets 2 tokens to spend on story beats; all regain them once they're spent." ],
     "active_vigilance" => [ "Active vigilance", 178, "A story roll for what a PC notices: perfect, a reveal; messy, a hint; grim, the GM strikes." ],
     "writers_room" => [ "Writers' room", 178, "Tangles and thread needn't come from vantage; only details that benefit the party cost thread." ]
@@ -46,7 +49,7 @@ module Campaign::OptionalRules
   GROUPS = {
     "Characters" => %w[ stat_progression legacy_cores level_zero weapon_styles ],
     "Pools and gear" => %w[ vigor_pool armor supplies wealth encumbrance ],
-    "Advancement and rests" => %w[ milestone_levels focused_growth rest_resets ],
+    "Advancement and rests" => %w[ milestone_levels focused_growth rest_resets expanded_downtime ],
     "At the table" => %w[ token_initiative active_vigilance writers_room ]
   }.freeze
 

@@ -112,7 +112,7 @@ module Character::TalentUses
         last_dice: [], last_dropped: nil, last_action: nil, last_rolled_by: nil, last_rolled_at: nil
       )
     end
-    talent_pools.where(arcanum_id: nil, made_by_talent: false).where.not(use_key: pool_uses.map(&:id)).destroy_all
+    talent_pools.where(arcanum_id: nil, made_by_talent: false, goal: false).where.not(use_key: pool_uses.map(&:id)).destroy_all
     talent_pools.where(made_by_talent: true).select { per == :session || _1.refresh == per.to_s }.each(&:destroy)
     refresh_arcana_pools!(refill: true) if per == :session
   end

@@ -9,7 +9,11 @@ class CrucibleTest < ActiveSupport::TestCase
       assert_includes Crucible::GROUPS.keys, crucible.group
 
       crucible.tables.each do |table|
-        assert_equal 6, table.rows.size, "#{crucible.key}/#{table.name} rows"
+        if table.d8?
+          assert_equal 2, table.width, "#{crucible.key}/#{table.name}: a d8 table is eight rows of two"
+        else
+          assert_equal 6, table.rows.size, "#{crucible.key}/#{table.name} rows"
+        end
         assert_includes Crucible::WIDTHS, table.width, "#{crucible.key}/#{table.name}"
         table.rows.each { |row| assert_equal table.width, row.size, "#{crucible.key}/#{table.name}: #{row.inspect}" }
         assert_equal table.width, table.columns.size, "#{crucible.key}/#{table.name} columns" if table.columns
@@ -37,7 +41,9 @@ class CrucibleTest < ActiveSupport::TestCase
     assert_equal [ "alche-", "-knob" ], Crucible.find("magitechnobabble").tables.then { [ _1.first.cell(1, 1), _1.last.cell(6, 6) ] }
     assert_equal [ "honor—valor", "my trait, …", "my lack of…" ], Crucible.find("tenet_builder").tables.sole.then { [ _1.cell(1, 1), _1.cell(2, 3), _1.cell(6, 3) ] }
     assert_equal [ "favor", "blessing" ], Crucible.find("treasure").tables.sole.then { [ _1.cell(1, 1), _1.cell(6, 3) ] }
-    assert_equal %w[ foggy tapered flask glass colorful strange mist oil ], Crucible.find("potion_qualities").tables.flat_map { [ _1.cell(1, 1), _1.cell(6, 1) ] }
+    potion = Crucible.find("potion").tables
+    assert_equal [ "wither, fungus, servant", "pierce, bone, mask", "shock, terror, heart" ], potion.first.then { [ _1.cell(1, 1), _1.cell(1, 6), _1.cell(6, 6) ] }
+    assert_equal %w[ foggy tapered flask glass colorful strange mist oil ], potion.drop(1).flat_map { [ _1.cell(1, 1), _1.cell(6, 1) ] }
     assert_equal "magitechnobabble", Talent.find("infusion").crucible
     assert_equal "tenet_builder", Talent.find("oathsworn").crucible
   end
@@ -85,6 +91,16 @@ class CrucibleTest < ActiveSupport::TestCase
     assert_nil Crucible.find("eldritch_mutations").tables.first.column_dice(0)
     assert_nil Crucible.find("vassal").tables.first.column_label(0), "Build, under Build"
     assert_equal "Playful", Crucible.find("legend").tables.first.column_label(0)
+  end
+
+  test "the solo rules' consequences are d8 tables, checked against the Community Edition (pg. 194)" do
+    low, high = %w[ solo_low_stakes solo_high_stakes ].map { Crucible.find(_1).tables.sole }
+    assert [ low, high ].all?(&:d8?)
+    assert_equal [ "set dressing", "harm" ], [ low.cell(1, 1), low.cell(8, 2) ]
+    assert_equal [ "vex", "harm & condition" ], [ high.cell(1, 1), high.cell(8, 2) ]
+    assert_not low.headed?
+    assert_nil low.column_dice(0)
+    assert_match "@slander.x", Crucible.find("solo_low_stakes").credit
   end
 
   test "find raises not found for unknown keys" do

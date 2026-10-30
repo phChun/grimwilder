@@ -699,17 +699,61 @@
     - [vehicle, spell cast, contact]
     - [rare reagent, art piece, title or rank]
     - [beast or companion, trade goods, blessing]
-- key: potion_qualities
-  name: Potion qualities
+- key: potion
+  name: Random potion
   group: magic
   page: 203
-  blurb: How a potion looks in its vessel.
-  how: "Roll once on each list: it's a foggy flask with colorful mist inside."
+  blurb: A potion's touchstones, and how it looks in its vessel.
+  how: "Roll once on each table. The touchstones give three words: keep two and drop the third, then pick a function as the last touchstone (attack, enhance, hinder, influence, protect, restore, reveal, summon, transform or traverse). The qualities say how it looks: it's a foggy flask with colorful mist inside. It's a minor arcana, used up for one potent effect."
   tables:
+  - name: Touchstones
+    rows:
+    - ["wither, fungus, servant", "explode, fire, cascade", "ooze, oil, bubble", "confuse, hex, whispers", "speak, spirit, shroud", "pierce, bone, mask"]
+    - ["cryptic, light, beauty", "shadow, doom, skull", "glimmer, air, fog", "quick, barrier, grow", "venom, vine, claw", "sense, life, guide"]
+    - ["spread, ash, blind", "sticky, slime, slick", "adapt, water, frost", "shield, mind, vigor", "body, thorn, fang", "break, wound, stitch"]
+    - ["phantom, mist, eye", "wild, vermin, web", "rattle, earth, hand", "truth, sight, gate", "friend, feeling, false", "silence, lightning, dark"]
+    - ["dream, smoke, beacon", "slow, pull, swirl", "wander, poison, crown", "prismatic, stasis, flash", "blight, energy, sap", "stupor, sound, trance"]
+    - ["drift, wing, anchor", "unseen, nature, quiet", "sleep, bugs, plague", "curious, lore, hide", "might, ward, shatter", "shock, terror, heart"]
   - { name: "It's a…", columns: ["It's a…"], rows: [[foggy], [opaque], [thin], [round], [square], [tapered]] }
   - { name: Vessel, columns: [Vessel], rows: [[flask], [bottle], [vial], [jug], [draft], [glass]] }
   - { name: With…, columns: [With…], rows: [[colorful], [faint], [drifting], [living], [viscous], [strange]] }
   - { name: …inside, columns: […inside], rows: [[mist], [bubbles], [glitter], [sludge], [reagent], [oil]] }
+- key: solo_low_stakes
+  name: "Solo consequences: low and normal stakes"
+  group: solo
+  page: 194
+  credit: Solo rules adapted from @slander.x on Discord, with permission.
+  blurb: Trouble for an impact move in solo play, when the stakes are low or normal.
+  how: Roll a d8 and pick the more fitting of the two. Harm is for particularly hard hits.
+  tables:
+  - name: Low and normal stakes
+    rows:
+    - [set dressing, set dressing]
+    - [lose something, collateral damage]
+    - [one mark, vex]
+    - [strain bond, lose something]
+    - [collateral damage, one mark]
+    - [condition (short), lock down]
+    - [two marks, raise stakes]
+    - [pressure pool, harm]
+- key: solo_high_stakes
+  name: "Solo consequences: high and dire stakes"
+  group: solo
+  page: 194
+  credit: Solo rules adapted from @slander.x on Discord, with permission.
+  blurb: Trouble for an impact move in solo play, when the stakes are high or dire.
+  how: Roll a d8 and pick the more fitting of the two. With dire stakes or on a disaster, also roll a peril pool.
+  tables:
+  - name: High and dire stakes
+    rows:
+    - [vex, lose something]
+    - [collateral damage, condition (short)]
+    - [strain bond, two marks]
+    - [harm, condition (long)]
+    - [pressure pool, harm]
+    - [twist, lock down]
+    - [counter, condition (urgent)]
+    - [two harm, harm & condition]
 - key: monster_fairy_circles
   name: Fairy Circles
   group: monsters

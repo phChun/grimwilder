@@ -5,7 +5,8 @@
 # switch them", so every roll on a 6x6 table reads two ways. Some crucibles
 # are narrower (six rows of 1, 2 or 3 words: the seasons' lists, Build-a-
 # vassal): the first die picks the row and the second the column, one
-# reading. Rolls happen in the browser (crucible_controller.js); this class
+# reading. A d8 table is eight rows of two (roll d8, pick between them).
+# Rolls happen in the browser (crucible_controller.js); this class
 # just serves the tables. `credit` names whoever made one, where the book does.
 class Crucible
   GROUPS = {
@@ -14,6 +15,7 @@ class Crucible
     "characters" => "Characters",
     "magic" => "Magic",
     "time" => "Time passing",
+    "solo" => "Solo play",
     "monsters" => "Monsters"
   }.freeze
   WIDTHS = [ 1, 2, 3, 6 ].freeze
@@ -27,6 +29,17 @@ class Crucible
       rows.first.size
     end
 
+    # A d8 table (the solo rules' consequences, pg. 194) is eight rows of two:
+    # the d8 picks the row and you choose between its two cells.
+    def d8?
+      rows.size == 8
+    end
+
+    # Only a 6-row table with more than one column heads its columns.
+    def headed?
+      width > 1 && !d8?
+    end
+
     # A column's own heading, or nil where it would only repeat the table's name
     # (Build-a-vassal's "Build, Build"): those show just their dice.
     def column_label(column)
@@ -37,7 +50,7 @@ class Crucible
     # The second die's faces for a column of a 2- or 3-column table ("1–3", "5–6"),
     # as crucible_controller.js maps them (pg. 6); nil where the die is the column.
     def column_dice(column)
-      return unless width.in?([ 2, 3 ])
+      return unless width.in?([ 2, 3 ]) && !d8?
 
       faces = 6 / width
       "#{column * faces + 1}–#{(column + 1) * faces}"

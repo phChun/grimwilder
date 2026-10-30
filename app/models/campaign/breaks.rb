@@ -53,21 +53,29 @@ module Campaign::Breaks
   # them all; untick permanent ones).
   # deplete: the id of the campaign pool the GM picks to come to pass, after
   # the rolls (nothing more happens if the rolls already emptied it).
-  def downtime!(by:, clear: [], deplete: nil, random: Random)
+  # actions: with Expanded downtime, what each character does instead of
+  # everyone healing (Campaign::DowntimeActions).
+  def downtime!(by:, clear: [], deplete: nil, actions: {}, random: Random)
     picks = condition_picks(clear)
 
     transaction do
       resting = resting_characters
-      post_marker!("Downtime", by: by, text: ("Everyone heals: #{resting.map(&:name).to_sentence}." if resting.any?))
+      marker = post_marker!("Downtime", by: by, text: ("Everyone heals: #{resting.map(&:name).to_sentence}." if resting.any? && !expanded_downtime?))
 
       resting.each do |character|
-        cleared = picks.fetch(character.id.to_s, [])
-        character.rest(by: by)
-        character.conditions = character.conditions.reject.with_index { |_, index| cleared.include?(index) }
+        unless expanded_downtime?
+          cleared = picks.fetch(character.id.to_s, [])
+          character.rest(by: by)
+          character.conditions = character.conditions.reject.with_index { |_, index| cleared.include?(index) }
+        end
         character.reset_talent_uses(per: :session)
         character.save!
         character.refresh_talent_pools!(per: :session)
         character.refresh_talent_pools!(per: :rest)
+      end
+      if expanded_downtime?
+        done = take_downtime_actions!(resting, picks: actions.to_h.stringify_keys, cleared: picks, by: by, random: random)
+        marker&.update!(question: [ marker.question, ("#{done.join("; ")}." if done.any?) ].compact.join(" ").presence)
       end
       downtime_pools.each { _1.roll!(by: by, random: random) }
       if deplete.present? && (pool = pools.shared.where(kind: "campaign").find_by(id: deplete)) && pool.rollable?

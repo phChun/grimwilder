@@ -3,7 +3,9 @@
 <% campaign = character.campaign %>
 <% uses = character.rule_uses %>
 <% slots = campaign&.optional_rule?(:encumbrance) %>
-<% if uses.any? || slots %>
+<% goals = campaign&.expanded_downtime? ? character.goal_pools.to_a : [] %>
+<% planned = campaign&.expanded_downtime? && character.prep_note.present? %>
+<% if uses.any? || slots || goals.any? || planned %>
   <section id="talent-rule" class="card stack rule-pools" aria-labelledby="sheet-rules">
     <h2 id="sheet-rules" class="card__title">Table rules</h2>
     <% uses.each do |use| %>
@@ -16,12 +18,43 @@
       <% end %>
       <% if use.key == "vigor" %><p class="field__hint">Catch your breath: roll it to clear 1 harm on the Harm card. A rest or downtime refreshes it.</p><% end %>
       <% if use.key == "coins" %>
-        <p class="field__hint">Roll it for larger purchases; drop 1d first for huge expenses. Carousing by selling off treasure adds 2d, up to 8d.</p>
-        <% if tends && pool && pool.size < Character::RulePools::MAX_COINS && character.in_play? %>
+        <p class="field__hint">Roll it for larger purchases; drop 1d first for huge expenses.<% unless character.carousing_replaced? %> Carousing by selling off treasure adds 2d, up to 8d.<% end %></p>
+        <% if tends && pool && pool.size < Character::RulePools::MAX_COINS && character.in_play? && !character.carousing_replaced? %>
           <%= button_to "+2d Coins: carousing", character_coins_path(character), class: "button button--small button--ghost", form: { class: "talent-card__action" } %>
         <% end %>
       <% end %>
       <% if use.key == "armor" && character.bulwark_reworked? %><p class="field__hint">Bulwark adds 2d here: rolling it avoids the consequence instead of lessening it.</p><% end %>
+    <% end %>
+    <% if planned %>
+      <div class="rule-pools__plan">
+        <p><strong>Planned ahead:</strong> <%= character.prep_note %>
+          <% if character.prep_thread.positive? %>
+            <%= render "shared/pips", kind: "thread", value: 1 %>
+          <% else %>
+            <span class="field__hint">(thread spent)</span>
+          <% end %>
+        </p>
+        <% if tends && character.prep_thread.positive? && character.in_play? %>
+          <%= button_to "Spend this thread", character_plan_thread_path(character), method: :delete, class: "button button--small button--ghost" %>
+        <% end %>
+        <p class="field__hint">For details from that preparation, beyond your usual thread. It's lost when time passes again.</p>
+      </div>
+    <% end %>
+    <% if goals.any? %>
+      <div class="rule-pools__goals">
+        <h3 class="rule-pools__subtitle">Goals</h3>
+        <% goals.each do |goal| %>
+          <div class="rule-pools__goal">
+            <span class="rule-pools__goal-name"><%= goal.name.delete_prefix("#{character.short_name}: ") %></span>
+            <span class="rule-pools__goal-size"><%= goal.depleted? ? "Reached" : "#{goal.size}d left" %></span>
+            <%= render "shared/pool_track", pool: goal %>
+            <% if tends && character.in_play? %>
+              <%= button_to "Let go", character_goal_path(character, goal), method: :delete, class: "button button--small button--ghost", form: { data: { turbo_confirm: "Let go of #{goal.name}?" } } %>
+            <% end %>
+          </div>
+        <% end %>
+        <p class="field__hint">Each rolls when the GM picks Pursue a goal for you in downtime.</p>
+      </div>
     <% end %>
     <% if slots %>
       <p class="rule-pools__slots"><strong>Encumbrance:</strong> room for <%= pluralize(character.gear_slots, "slot") %> of gear (2 + Brawn), beyond main armor and weapons. Small items take half a slot; large or bulky ones two or more.</p>

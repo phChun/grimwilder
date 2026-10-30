@@ -2,7 +2,7 @@
 # is the tenant boundary: campaign-owned records carry campaign_id, and
 # controllers load them through Current.campaign.
 class Campaign < ApplicationRecord
-  include Blocking, Breaks, Done, Reset, OptionalRules, CharacterSettings
+  include Blocking, Breaks, DowntimeActions, Done, Reset, OptionalRules, CharacterSettings
 
   JOIN_CODE_LENGTH = 12
 
@@ -70,8 +70,7 @@ class Campaign < ApplicationRecord
   # A boundary in the log ("Session 4 begins", "Rest"), which also refreshes everyone's table.
   def post_marker!(name, by:, text: nil, play_session: nil, scene: nil, level_ups: [])
     rolls.create!(kind: "marker", identity: by, name: name, play_session: play_session, scene: scene, question: text.to_s.strip.presence,
-      sides: level_ups.map { { "character_id" => _1.id, "name" => _1.name, "level" => _1.level } })
-    broadcast_table_refresh
+      sides: level_ups.map { { "character_id" => _1.id, "name" => _1.name, "level" => _1.level } }).tap { broadcast_table_refresh }
   end
 
   # Boundaries (a session starting, a rest) change what everyone's table shows,

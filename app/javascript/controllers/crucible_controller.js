@@ -4,7 +4,8 @@ import { rollDie } from "grimwild/dice"
 // Rolls on a crucible's tables. On a 6x6 table each roll is 2d6 read two
 // ways (pg. 6): first die = row, second = column, and switched. A narrower
 // table (six rows of 1, 2 or 3 words) reads once: the first die picks the
-// row, the second the column (a list needs only the first). The chosen words lead,
+// row, the second the column (a list needs only the first). A d8 table (eight
+// rows of two) rolls one d8 for the row and offers both cells. The chosen words lead,
 // smashed together; under them each table's roll is a row: its name, the dice, then
 // the readings as chips; the first starts chosen, tap another to choose it. A lone
 // reading is ember text, unless a form around the roller listens for crucible:pick,
@@ -37,9 +38,12 @@ export default class extends Controller {
   roll(index) {
     const table = this.tableTargets[index]
     const width = Number(table.dataset.width) || 6
-    const a = rollDie(6)
-    const b = width === 1 ? null : rollDie(6)
-    const pairs = width === 6 ? (a === b ? [[a, b]] : [[a, b], [b, a]]) : [[a, b ? Math.ceil((b * width) / 6) : 1]]
+    const d8 = Number(table.dataset.rows) === 8
+    const a = rollDie(d8 ? 8 : 6)
+    const b = width === 1 || d8 ? null : rollDie(6)
+    const pairs = d8 ? [[a, 1], [a, 2]]
+      : width === 6 ? (a === b ? [[a, b]] : [[a, b], [b, a]])
+      : [[a, b ? Math.ceil((b * width) / 6) : 1]]
 
     table.querySelectorAll("td.is-hit").forEach((cell) => cell.classList.remove("is-hit"))
     const readings = pairs.map(([row, col]) => {
@@ -48,7 +52,7 @@ export default class extends Controller {
       return { row, col, word: cell.textContent.trim() }
     })
 
-    this.rolls.set(index, { name: table.dataset.name, dice: [a, b].filter(Boolean), readings, chosen: 0, fresh: true })
+    this.rolls.set(index, { name: table.dataset.name, dice: [a, b].filter(Boolean), d8, readings, chosen: 0, fresh: true })
   }
 
   choose(event) {
@@ -99,9 +103,9 @@ export default class extends Controller {
       dice.className = "crucible-roll__dice"
       dice.append(...roll.dice.map((value) => {
         const die = document.createElement("span")
-        die.className = "die die--d6 die--28"
+        die.className = `die ${roll.d8 ? "die--d8" : "die--d6"} die--28`
         if (!roll.fresh) die.style.animation = "none"
-        die.setAttribute("aria-label", `d6 showing ${value}`)
+        die.setAttribute("aria-label", `${roll.d8 ? "d8" : "d6"} showing ${value}`)
         die.textContent = value
         return die
       }))
