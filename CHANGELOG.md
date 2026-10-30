@@ -4,6 +4,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-30
 
+- **Talent summaries are written for choosing**: what each talent lets you do, how often, and the catch. ([#70](https://github.com/phChun/grimwilder/pull/70))
+- **Trap Making is retired**, as the Community Edition removed it. Sheets that have it keep it. ([#70](https://github.com/phChun/grimwilder/pull/70))
 - **The Community Edition.** Talents follow its text and summaries, and the footer names it. Page numbers are still Preview 6's until they're re-checked. ([#68](https://github.com/phChun/grimwilder/pull/68))
 - **Pact is now Hex**, the Warlock's core talent. Saved characters keep it. ([#68](https://github.com/phChun/grimwilder/pull/68))
 - **Shared Soul is Summoner only, Bailiwick Witch only.** Sheets that already have them keep them. ([#68](https://github.com/phChun/grimwilder/pull/68))
