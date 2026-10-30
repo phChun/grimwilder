@@ -1,0 +1,63 @@
+<% content_for :title, "Interested · Admin" %>
+
+<header class="page-header">
+  <p class="eyebrow">Admin</p>
+  <h1>Interested</h1>
+  <p class="page-header__lede">People who asked to try Grimwilder, newest first. Make an account and let them know they can sign in.</p>
+  <%= render "admin/nav" %>
+</header>
+
+<%= render "admin/search", search_label: "Search the interested", placeholder: "Email or note",
+  filter: { name: :role, label: "How they'd play", options: [ [ "Everyone", "" ], *Interest::ROLES.invert.to_a, [ "Didn't say", "none" ] ] } %>
+
+<% if @interests.any? %>
+  <div class="admin-table">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Email</th>
+          <th scope="col">Asked</th>
+          <th scope="col">Plays</th>
+          <th scope="col">Note</th>
+          <th scope="col">Account</th>
+          <th scope="col"><span class="visually-hidden">Remove</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @interests.each do |interest| %>
+          <tr>
+            <td><span class="admin-truncate" tabindex="0" data-controller="truncated-tip" data-action="mouseenter->truncated-tip#show mouseleave->truncated-tip#hide focus->truncated-tip#show blur->truncated-tip#hide keydown.esc->truncated-tip#hide"><%= interest.email_address %></span></td>
+            <td><%= time_ago_in_words(interest.updated_at) %> ago</td>
+            <td><%= interest.role_label || "—" %></td>
+            <td>
+              <% if interest.note %>
+                <span class="admin-truncate admin-truncate--note" tabindex="0" data-controller="truncated-tip" data-action="mouseenter->truncated-tip#show mouseleave->truncated-tip#hide focus->truncated-tip#show blur->truncated-tip#hide keydown.esc->truncated-tip#hide"><%= interest.note %></span>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td>
+              <% if (account = @accounts[interest.email_address]) %>
+                Has one, on <%= account.current_plan.name %>
+              <% else %>
+                <%= form_with url: admin_interest_account_path(interest), class: "admin-plan" do |form| %>
+                  <%= form.label "identity[plan]", "Plan for #{interest.email_address}", class: "visually-hidden", for: "interest_#{interest.id}_plan" %>
+                  <%= form.select "identity[plan]", Plan.all.map { [ _1.name, _1.key ] }, { selected: "free" }, class: "field__input", id: "interest_#{interest.id}_plan" %>
+                  <%= form.submit "Make account", class: "button button--small" %>
+                <% end %>
+              <% end %>
+            </td>
+            <td>
+              <%= button_to "Remove", admin_interest_path(interest), method: :delete, class: "button button--ghost button--small", form: { data: { turbo_confirm: "Remove #{interest.email_address} from the list?" } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/pages", pagy: @pagy, noun: "person" %>
+<% elsif search_query.present? || params[:role].present? %>
+  <p class="empty">No one matches that search.</p>
+<% else %>
+  <p class="empty">No one yet. The home page's "I'm interested" leads to the form while sign-ups are closed.</p>
+<% end %>

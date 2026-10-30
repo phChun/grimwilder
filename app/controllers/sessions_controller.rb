@@ -6,6 +6,9 @@ class SessionsController < ApplicationController
 
   require_unauthenticated_access only: %i[ new create ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_path, alert: "Too many attempts. Try again in a few minutes." }
+  # Per address too, so no one can fill an inbox with codes from many IPs.
+  rate_limit to: 5, within: 15.minutes, only: :create, name: "per-email", by: -> { params[:email_address].to_s.strip.downcase },
+    with: -> { redirect_to new_session_path, alert: "We've sent that address several codes already. Check your inbox, or try again in 15 minutes." }
 
   def new
   end

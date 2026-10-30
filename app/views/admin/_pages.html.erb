@@ -1,0 +1,6 @@
+<%# locals: (pagy:, noun:) %>
+<%# Under an admin list: "Displaying accounts 51-100 of 230 in total", then pagy's page links when there's more than one page (AdminHelper). %>
+<div class="admin-pages">
+  <%= admin_pages_info(pagy, noun) %>
+  <%= admin_pages_nav(pagy, noun) %>
+</div>

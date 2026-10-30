@@ -3,9 +3,11 @@
 <header class="page-header">
   <p class="eyebrow">Admin</p>
   <h1>Accounts</h1>
-  <p class="page-header__lede"><%= pluralize(@identities.size, "account") %>, newest first. Sign-ups are <%= Identity.signups_open? ? "open" : "closed" %>.</p>
+  <p class="page-header__lede">Newest first. Sign-ups are <%= Identity.signups_open? ? "open" : "closed" %>.</p>
   <%= render "admin/nav" %>
 </header>
+
+<%= render "admin/search", search_label: "Search accounts", placeholder: "Email or name" %>
 
 <div class="admin-table">
   <table>
@@ -47,6 +49,7 @@
     </tbody>
   </table>
 </div>
+<%= render "admin/pages", pagy: @pagy, noun: "account" %>
 
 <section id="account-new" class="card add-card stack admin-new" aria-labelledby="account-new-title">
   <h2 id="account-new-title" class="tool-card__name">Create new account</h2>

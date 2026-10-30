@@ -62,7 +62,13 @@ Rails.application.routes.draw do
     root "dashboards#show"
     resources :identities, only: %i[ index create update ], path: "accounts"
     resources :campaigns, only: :index
+    resources :interests, only: %i[ index destroy ] do
+      resource :account, only: :create, module: :interests
+    end
   end
+
+  # "I'm interested", while sign-ups are closed: the form, then thanks.
+  resource :interest, only: %i[ new create show ]
 
   namespace :passkeys do
     resource :challenge, only: :create

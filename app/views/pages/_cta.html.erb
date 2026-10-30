@@ -1,0 +1,16 @@
+<%# The home page's buttons, in the hero and again at the foot: they follow who's looking. Signed out while sign-ups are closed, "I'm interested" leads to the form (/interest) and Sign in stays for testers. %>
+<div class="home-cta">
+  <div class="home-cta__actions">
+    <% if authenticated? %>
+      <%= link_to "Your campaigns", campaigns_path, class: "button button--primary" %>
+      <%= link_to "Your characters", characters_path, class: "button" %>
+    <% elsif Identity.signups_open? %>
+      <%# Signed out, campaigns sends you through sign-in and back. %>
+      <%= link_to "Start a campaign", campaigns_path(anchor: "campaign-new"), class: "button button--primary" %>
+      <%= link_to "Try the action roller", roll_path, class: "button" %>
+    <% else %>
+      <%= link_to "I'm interested", new_interest_path, class: "button button--primary" %>
+      <%= link_to "Sign in", new_session_path, class: "button" %>
+    <% end %>
+  </div>
+</div>

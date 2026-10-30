@@ -17,19 +17,17 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer__tools a", text: "Characters", count: 0
   end
 
-  test "the home page offers characters and pools once you're signed in" do
+  test "the home page's free tools need no account, and signed in the hero leads to your things" do
     get root_path
     assert_select "#tools-heading", "Free tools"
-    assert_select ".hero__actions a.button--primary[href=?]", campaigns_path(anchor: "campaign-new"), "Start a campaign and build characters"
+    assert_select ".home-cta__actions a.button--primary[href=?]", campaigns_path(anchor: "campaign-new"), "Start a campaign"
     assert_select ".tool-card[href=?]", talents_path
-    assert_select ".tool-card[href=?]", characters_path, 0
-    assert_select ".tool-card", 3, "signed out, just the free tools"
+    assert_select ".tool-card", 3, "just the free tools"
 
     sign_in_as identities(:pip)
     get root_path
-    assert_select ".tool-card[href=?]", characters_path
-    assert_select ".tool-card[href=?]", pools_path
-    assert_select ".tool-card[href=?]", new_session_path, 0
+    assert_select ".home-cta__actions a[href=?]", characters_path
+    assert_select ".tool-card", 3
   end
 
   test "signed in, every page's tabs start with all campaigns and end with your characters" do

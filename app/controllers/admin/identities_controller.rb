@@ -1,4 +1,4 @@
-# Every account, making one by hand while sign-ups are closed, and choosing
+# Every account, searchable by email or name, 50 a page; making one by hand while sign-ups are closed, and choosing
 # each one's plan (Identity::Plans). A new account signs in like any other,
 # with an emailed code.
 class Admin::IdentitiesController < Admin::BaseController
@@ -32,7 +32,8 @@ class Admin::IdentitiesController < Admin::BaseController
 
   private
     def load_identities
-      @identities = Identity.includes(memberships: :campaign).order(created_at: :desc)
-      @passkey_counts = Passkey.group(:identity_id).count
+      @pagy, identities = pagy(:offset, search(Identity.order(created_at: :desc), "email_address", "name"), limit: PER_PAGE)
+      @identities = identities.includes(memberships: :campaign).to_a
+      @passkey_counts = Passkey.where(identity_id: @identities.map(&:id)).group(:identity_id).count
     end
 end
