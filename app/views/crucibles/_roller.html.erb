@@ -10,7 +10,7 @@
       <%= link_to "Full page", crucible_path(crucible), class: "crucible__full", data: { turbo_frame: "_top" } %>
     </div>
 
-    <div class="crucible__results" style="--tables: <%= crucible.tables.size %>" data-crucible-target="results" aria-live="polite">
+    <div class="crucible__results" style="--tables: <%= crucible.tables.size %>" data-count="<%= crucible.tables.size %>" data-crucible-target="results" aria-live="polite">
       <p class="crucible__hint"><%= crucible.how %> <small>(pg. <%= crucible.page %><%= "; #{crucible.credit}" if crucible.credit %>)</small></p>
     </div>
   </div>

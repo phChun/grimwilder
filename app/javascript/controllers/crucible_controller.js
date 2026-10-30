@@ -4,8 +4,10 @@ import { rollDie } from "grimwild/dice"
 // Rolls on a crucible's tables. On a 6x6 table each roll is 2d6 read two
 // ways (pg. 6): first die = row, second = column, and switched. A narrower
 // table (six rows of 1, 2 or 3 words) reads once: the first die picks the
-// row, the second the column (a list needs only the first). Results are chips; the
-// first reading of each table starts chosen, tap another to choose it. "Keep"
+// row, the second the column (a list needs only the first). Each table's roll is a
+// card: its name, the dice, then the readings as chips; the first starts chosen,
+// tap another to choose it. A lone reading is plain text, unless a form around
+// the roller listens for crucible:pick, where tapping it fills a box. "Keep"
 // saves the chosen words as one line in a per-crucible list in localStorage.
 // Tapping a chip also sends crucible:pick ({ word, table }), so a form around
 // the roller can use the word (feature_fill_controller.js), and Keep sends
@@ -17,6 +19,7 @@ export default class extends Controller {
   connect() {
     this.rolls = new Map() // table index -> { name, readings: [{row, col, word}], chosen }
     this.kept = this.loadKept()
+    this.picks = Boolean(this.element.closest("[data-action*='crucible:pick']"))
     this.renderKept()
   }
 
@@ -89,11 +92,19 @@ export default class extends Controller {
 
       const label = document.createElement("p")
       label.className = "roll-result__label"
-      const dice = document.createElement("span")
+      label.textContent = roll.name
+      const dice = document.createElement("p")
       dice.className = "roll-result__roll"
-      dice.textContent = `rolled ${roll.dice.join(" and ")}`
-      label.append(`${roll.name} `, dice)
-      block.append(label)
+      dice.textContent = `Rolled ${roll.dice.join(" and ")}`
+      block.append(label, dice)
+
+      if (roll.readings.length === 1 && !this.picks) {
+        const text = document.createElement("p")
+        text.className = "roll-result__text"
+        text.textContent = roll.readings[0].word
+        block.append(text)
+        return block
+      }
 
       const chips = document.createElement("div")
       chips.className = "roll-result__chips"

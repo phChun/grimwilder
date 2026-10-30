@@ -4,7 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-30
 
-- **Crucible tables and results spread out** by how many tables there are: one has the page's width, with bigger cells, and two share it. Results take a column per table, and a crucible with one table shows just the text it rolled. ([#69](https://github.com/phChun/grimwilder/pull/69))
+- **Crucible tables and results spread out** by how many tables there are: one has the page's width, with bigger cells, and two share it. Each table's roll is a card (its name, the dice, then the readings), a column per table; a single reading is plain text, not a button. ([#69](https://github.com/phChun/grimwilder/pull/69))
 - **Talent summaries are written for choosing**: what each talent lets you do, how often, and the catch. ([#70](https://github.com/phChun/grimwilder/pull/70))
 - **Trap Making is retired**, as the Community Edition removed it. Sheets that have it keep it. ([#70](https://github.com/phChun/grimwilder/pull/70))
 - **The Community Edition.** Talents follow its text and summaries, and the footer names it. Page numbers are still Preview 6's until they're re-checked. ([#68](https://github.com/phChun/grimwilder/pull/68))
