@@ -8,7 +8,7 @@ class TalentTest < ActiveSupport::TestCase
       assert talents.first.core?, group.name if group.path?
       assert_equal rest.map { _1.name.downcase }.sort, rest.map { _1.name.downcase }, group.name
     end
-    assert_equal %w[ Pact Affliction Blood\ Rituals Knowing\ Gaze ], Talent.groups.find { _1.key == "warlock" }.talents.first(4).map(&:name)
+    assert_equal %w[ Hex Affliction Blood\ Rituals Knowing\ Gaze ], Talent.groups.find { _1.key == "warlock" }.talents.first(4).map(&:name)
   end
 
   test "18 paths, each with a core talent and 7 path talents (the Adventurer has none), plus background talents" do
@@ -59,7 +59,7 @@ class TalentTest < ActiveSupport::TestCase
     assert_includes Talent.choosable_for("Bard"), folk_hero
     assert_not_includes Talent.choosable_for("Rogue"), folk_hero
     assert_not folk_hero.paragraphs.join.include?("Only]")
-    assert_equal %w[ folk-hero mind-blast monster-menagerie ], Talent.all.select { _1.only_paths.any? }.map(&:key).sort
+    assert_equal %w[ bailiwick folk-hero mind-blast monster-menagerie shared-soul ], Talent.all.select { _1.only_paths.any? }.map(&:key).sort
   end
 
   test "core talents aren't choosable" do
@@ -164,7 +164,12 @@ class TalentChoiceTest < ActiveSupport::TestCase
     assert_equal Grimwild.magic_schools.keys, Talent.find("specialty-school").choice(:school).options
     assert_includes Grimwild.magic_schools.keys, "necromancy"
 
+    assert Talent.find("shared-soul").prohibited_for?("Witch")
+    assert_not Talent.find("bailiwick").prohibited_for?("Witch")
+    assert Talent.find("bailiwick").prohibited_for?("Rogue")
+
     pact = Talent.find("pact")
+    assert_equal "Hex", pact.name, "renamed in the book; the key stays"
     assert_equal %w[ natures desires name trappings communication following ], pact.choices.map(&:key)
     assert_equal "Nature", pact.choice(:natures).table
     assert_not pact.choice(:following).open?

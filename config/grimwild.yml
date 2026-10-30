@@ -1,4 +1,4 @@
-# Reference lists from Grimwild: Community Edition Preview 6 used by the
+# Reference lists from Grimwild: Community Edition used by the
 # character sheet (text CC0; based on Grimwild by J. D. Maxwell, Oddity Press,
 # CC BY 4.0). Page numbers refer to the book.
 
@@ -25,7 +25,7 @@ paths:
   Sorcerer: Sorcery
   Summoner: Vassal
   Swashbuckler: Panache
-  Warlock: Pact
+  Warlock: Hex
   Witch: Hidden Magic
   Wizard: Spellcraft
 

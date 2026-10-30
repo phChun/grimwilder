@@ -62,7 +62,7 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
   end
 
   def self.build(attributes, group:, core:)
-    key = keyify(attributes["name"])
+    key = attributes["key"] || keyify(attributes["name"])
     new(key: key, name: attributes["name"], summary: attributes["summary"], text: attributes["text"], note: attributes["note"], page: attributes["page"],
       group: group, core: core, uses: Array(attributes["uses"]).map { Talent::Use.from(key, _1) },
       rolls: Array(attributes["rolls"]).each_with_index.map { Talent::Roll.from(key, _2, _1) },

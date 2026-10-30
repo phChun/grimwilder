@@ -162,6 +162,17 @@ class Pool < ApplicationRecord
     record!(size: size - 1, dice: last_dice, dropped: 1, action: "pushed", by: by)
   end
 
+  # Downtime (pg. 31): after the campaign pools roll, the GM picks one and
+  # depletes it completely, so its event comes to pass. A linked pool skips to
+  # its last phase.
+  def deplete!(by:)
+    raise ArgumentError, "#{name} is at 0d" if depleted?
+    raise ArgumentError, "#{campaign.name} is done." if campaign.done?
+
+    assign_attributes(phase: phases.size - 1, starting_size: phases.last["size"]) if linked?
+    record!(size: 0, dice: [], dropped: size, action: "depleted", by: by)
+  end
+
   # A tick pool (optional rule, pg. 178) is never rolled: each time it's
   # triggered, exactly 1d drops.
   def tick!(by:)
@@ -190,7 +201,7 @@ class Pool < ApplicationRecord
     end
   end
 
-  # A talent pool that comes back at 0d (Talent::Use#refill): Pact's Patience
+  # A talent pool that comes back at 0d (Talent::Use#refill): Hex's Patience
   # every time (the patron visits), the Vassal once before it resets.
   def refills_left?
     (refills = talent_use&.refills) ? refills_used < refills : false

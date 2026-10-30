@@ -298,6 +298,7 @@ module RollsHelper
     case roll.pool_action
     when "pushed" then "Pushed: 1d dropped, take a mark. #{left}"
     when "ticked" then "Ticked: 1d dropped. #{left}"
+    when "depleted" then "Depleted in downtime. #{left}"
     when "smite" then "#{roll.character&.name || "Someone"} smites: 1d dropped. #{left}"
     when "rolled_after_drop" then "Dropped 1d, then rolled #{roll.dice.size}d: #{roll.dropped}d dropped in all. #{left}"
     else "Rolled #{roll.dice.size}d: #{roll.dropped.zero? ? "nothing dropped" : "#{roll.dropped}d dropped"}. #{left}"

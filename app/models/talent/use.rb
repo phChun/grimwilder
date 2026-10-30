@@ -18,7 +18,7 @@
 #
 # `per`: when it resets: each `session` or `scene`, at a `rest` (rest and
 # downtime), or `never` (charges kept until spent; a one-time potion).
-# A pool can also `refill` at 0d: `always` (Pact's Patience) or that many
+# A pool can also `refill` at 0d: `always` (Hex's Patience) or that many
 # times before it resets; `push` refills it only when you push yourself (the
 # Vassal).
 #

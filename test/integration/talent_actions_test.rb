@@ -94,11 +94,11 @@ class TalentActionsTest < ActionDispatch::IntegrationTest
     assert_select "#talent-monster-menagerie button", text: "Mote"
   end
 
-  test "a talent Preview 6 gave to another path says so quietly, and stays" do
+  test "a talent the book gave to another path says so quietly, and stays" do
     @tibbs.update_columns(talent_keys: %w[ folk-hero ])
     sign_in_as identities(:pip)
     get character_path(@tibbs)
-    assert_select "#talent-folk-hero .talent-card__only", "Now Bard only (Preview 6); kept on this sheet."
+    assert_select "#talent-folk-hero .talent-card__only", "Now Bard only; kept on this sheet."
 
     @tibbs.update!(path: "Bard")
     get character_path(@tibbs)

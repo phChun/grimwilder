@@ -2,7 +2,7 @@
 # traits, desires, schools of magic, arcana functions, weapon styles, bonds and arcs.
 module Grimwild
   # The edition of the book the rules, talents and crucibles follow.
-  EDITION = "Community Edition Preview 6"
+  EDITION = "Community Edition"
 
   STATS = %w[ brawn agility wits presence ].freeze
   PHYSICAL_STATS = %w[ brawn agility ].freeze

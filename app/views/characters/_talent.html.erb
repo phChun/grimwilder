@@ -27,8 +27,8 @@
       </p>
       <%= render "talents/kinds", talent: talent %>
       <% if talent.renamed? %><p class="talent-card__aka">Re-skinned <%= talent.book.name %></p><% end %>
-      <%# A talent Preview 6 limited to another path ("[Bard Only]") stays on a sheet that already had it; say so, quietly. %>
-      <% if talent.only_paths.any? && talent.only_paths.exclude?(character.path) %><p class="talent-card__aka talent-card__only">Now <%= talent.only_paths.to_sentence %> only (Preview 6); kept on this sheet.</p><% end %>
+      <%# A talent the book limited to another path ("[Bard Only]") stays on a sheet that already had it; say so, quietly. %>
+      <% if talent.only_paths.any? && talent.only_paths.exclude?(character.path) %><p class="talent-card__aka talent-card__only">Now <%= talent.only_paths.to_sentence %> only; kept on this sheet.</p><% end %>
       <% if talent.crucible && (crucible = Crucible.find(talent.crucible)) %>
         <p class="talent-card__crucible"><%= link_to "Roll on #{crucible.name.downcase.delete_suffix(" crucible")}", crucible_path(crucible) %></p>
       <% end %>
