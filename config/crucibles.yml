@@ -227,14 +227,14 @@
   how: 'Roll for a wise: one die picks the column (its area), the other the row.'
   tables:
   - name: Wises
-    columns: [Civil, Social, Historical, Natural, Mystical, Practical]
+    columns: [Civilization, Social, History, Nature, Mysticism, Practical]
     rows:
-    - [laws of the land, gambling, notable figures, cartography, arcane theory, cooking]
-    - [bureaucracy, banter, lost relics, natural danger, pacts & binding, smuggling]
-    - [the press, leadership, ceremonial rites, pests & plague, cosmology, clockwork]
-    - [business, showmanship, festivities, overland travel, local spirits, jury-rigging]
-    - [taboo, blending in, architecture, unnatural beasts, divine order, makeshift gear]
-    - [politics, networking, theater & arts, seeds & harvest, esoterica, humors]
+    - [laws of the land, curses & insults, notable figures, cartography, arcane theory, demolition]
+    - [bureaucracy, banter, lost relics, natural dangers, pacts & binding, smuggling]
+    - [the press, leadership, ceremonial rites, overland travel, cosmology, makeshift weapons]
+    - [curiosities, showmanship, festivities, pests & plague, local spirits, clockwork]
+    - [metalworking, blending in, architecture, unnatural beasts, divine order, jury-rigging]
+    - [politics, networking, theater & arts, seeds & harvest, forbidden knowledge, scavenging]
 - key: features
   name: Distinctive features
   group: characters
@@ -349,7 +349,7 @@
     - [birds, whispers, glowing, illusion, rapid, whirlwind]
     - [smell, static, hunger, image, emotion, glimmer]
     - [lifted, change, phrase, shock, sound, echo]
-    - [shattering, scatter, feeling, pop, brief, shimmer]
+    - [shattered, scatter, feeling, pop, brief, shimmer]
     - [shift, size, surface, agitation, apparition, sparkle]
     - [notes, vision, voice, mark, glow, dazzle]
 - key: spell
@@ -440,7 +440,7 @@
   - name: First half
     rows:
     - [choke, star, sun, dream, mist, zap]
-    - [sticky, stone, moon, feather, soot, blast]
+    - [stinky, stone, moon, feather, soot, blast]
     - [wool, dust, devil, wild, freeze, blood]
     - [smoke, snake, honey, mirror, sting, ink]
     - [shriek, mimic, goat, worm, steel, skunk]
@@ -502,7 +502,7 @@
   blurb: People important in a swashbuckler's tales.
   how: Roll once on each side and smash them together, like a bitter rival. Choose 2, and 1 more vital to the story you don't know yet.
   tables:
-  - name: Who they are to you
+  - name: How
     columns: [How, How]
     rows: [[spurned, lifelong], [obsessed, bitter], [vengeful, adoring], [treacherous, innocent], [jealous, ambitious], [mysterious, secret]]
   - name: Who
@@ -513,37 +513,41 @@
   group: time
   page: 141
   blurb: A fantastic name for a month of spring.
-  how: Roll once on each list for a month's name, like Green Bloom. Add three details for it, like atmospherics, weather or flora.
+  how: Roll once on each list for a month's name, like Green Bloom. For three details, roll three times on Atmospherics, or pick.
   tables:
   - { name: First, columns: [Spring], rows: [[green], [petal], [moss], [eager], [fresh], [well]] }
   - { name: Second, columns: [Spring], rows: [[bloom], [wind], [wave], [dawn], [shine], [hope]] }
+  - { name: Atmospherics, columns: [Atmospherics, Atmospherics], rows: [[frost melts, light rainfalls], [rivers swell, velvet moss], [buds bloom, flower fields], [emerald fields, calm winds], [luminous spores, glowing fungi], [humming bees, clear skies]] }
 - key: summer
   name: Summer months
   group: time
   page: 141
   blurb: A fantastic name for a month of summer.
-  how: Roll once on each list for a month's name, like Ash Storm. Add three details for it, like atmospherics, weather or flora.
+  how: Roll once on each list for a month's name, like Ash Storm. For three details, roll three times on Atmospherics, or pick.
   tables:
   - { name: First, columns: [Summer], rows: [[ash], [flood], [sear], [lazy], [gold], [buzz]] }
   - { name: Second, columns: [Summer], rows: [[storm], [haze], [flare], [glow], [breeze], [surge]] }
+  - { name: Atmospherics, columns: [Atmospherics, Atmospherics], rows: [[endless downpours, rippling fields], [roaring rivers, golden shimmer], [lightning skies, insect swarms], [heavy stillness, pollen bursts], [rising heat, blooming thistles], [warm winds, dying fungi]] }
 - key: fall
   name: Fall months
   group: time
   page: 141
   blurb: A fantastic name for a month of fall.
-  how: Roll once on each list for a month's name, like Husk Mist. Add three details for it, like atmospherics, weather or flora.
+  how: Roll once on each list for a month's name, like Husk Mist. For three details, roll three times on Atmospherics, or pick.
   tables:
   - { name: First, columns: [Fall], rows: [[husk], [wilt], [amber], [rust], [bitter], [turn]] }
   - { name: Second, columns: [Fall], rows: [[mist], [moon], [dew], [chill], [flow], [smoke]] }
+  - { name: Atmospherics, columns: [Atmospherics, Atmospherics], rows: [[drifting embers, silver light], [ashen haze, creeping chill], [harvested fields, frosty mornings], [pale fog, sharp scents], [rustling stalks, stinging dew drops], [crumbling leaves, pollen fires]] }
 - key: winter
   name: Winter months
   group: time
   page: 141
   blurb: A fantastic name for a month of winter.
-  how: Roll once on each list for a month's name, like Storm Tide. Add three details for it, like atmospherics, weather or flora.
+  how: Roll once on each list for a month's name, like Storm Tide. For three details, roll three times on Atmospherics, or pick.
   tables:
   - { name: First, columns: [Winter], rows: [[storm], [bleak], [quiet], [howl], [frost], [drift]] }
   - { name: Second, columns: [Winter], rows: [[tide], [gale], [sheen], [hush], [freeze], [morn]] }
+  - { name: Atmospherics, columns: [Atmospherics, Atmospherics], rows: [[whispering winds, raging blizzards], [iced branches, splintering ice], [long nights, howling skies], [dark ice, eerie auroras], [frozen rivers, endless drifts], [pale starlight, frozen silence]] }
 - key: eldritch_mutations
   name: Eldritch mutations
   group: gm
@@ -591,7 +595,7 @@
   group: characters
   page: 75
   blurb: A rogue's past crimes, and the reputation that follows them.
-  how: "Set a crime's severity and nature, your reputation from it, and your reaction: I did what I had to do, I was set up, it was a misunderstanding, I'll do it again…"
+  how: "Set a crime's severity and nature, your reputation from it, and your reaction: I did what I had to do, I was set up, it was a misunderstanding, I'll do it again, I completely forgot I did that, I've made peace with it, or never again."
   tables:
   - { name: Severity, columns: [Severity], rows: [[petty], [low-level], [moderate], [serious], [severe], [legendary]] }
   - name: Nature
@@ -640,6 +644,72 @@
   - { name: Effect, columns: [Effect], rows: [[stunning], [falling], [noisy], [poisonous], [entangling], [injuring]] }
   - { name: Trigger, columns: [Trigger], rows: [[tripwire], [pressure plate], [snare loop], [bait], [hidden], [proximity]] }
 # Monster tables (P6 pg. 146–172): the d6 lists on the monster pages, one die each.
+- key: magitechnobabble
+  name: Magitechnobabble
+  group: characters
+  page: 55
+  blurb: Buzzwords for an artificer's gizmos that almost make sense.
+  how: Roll once on each table, smash the halves together, like zapp-tron, and ramble on.
+  tables:
+  - name: First half
+    rows:
+    - [alche-, tink-, zapp-, blun-, fum-, dab-]
+    - [fizzi-, glim-, boond-, gogg-, sput-, splin-]
+    - [clank-, cogg-, whim-, phliz-, miz-, bung-]
+    - [spro-, flib-, chym-, zind-, cran-, rat-]
+    - [mag-, quib-, wob-, bogg-, jig-, quab-]
+    - [whizz-, griz-, scran-, quirk-, wiz-, jang-]
+  - name: Second half
+    rows:
+    - ["-nic", "-crank", "-nar", "-tome", "-nox", "-lash"]
+    - ["-tor", "-mage", "-gram", "-phage", "-press", "-hinge"]
+    - ["-al", "-flux", "-plex", "-tron", "-scope", "-ring"]
+    - ["-con", "-bolt", "-lock", "-spark", "-spire", "-shift"]
+    - ["-fuse", "-meter", "-gear", "-lume", "-turn", "-stone"]
+    - ["-matic", "-ator", "-cog", "-craft", "-drum", "-knob"]
+- key: tenet_builder
+  name: Tenet builder
+  group: characters
+  page: 70
+  blurb: The three tenets of a paladin's oath.
+  how: Roll, then choose an option, and rewrite it for clarity, like "I swear to bring justice to the forgotten, despite my lack of mercy."
+  tables:
+  - name: Tenet
+    columns: [I swear to bring, To / for the, Despite / because of]
+    rows:
+    - [honor—valor, forgotten—powerless, my desire for…]
+    - [justice—revenge, redeemable—irredeemable, "my trait, …"]
+    - [faith—doubt, reformers—traditionalists, my arc to…]
+    - [mercy—judgment, devout—faithless, my background of…]
+    - [strength—compassion, evil—defiled, my bond with…]
+    - [truth—wisdom, leaders—people, my lack of…]
+- key: treasure
+  name: Finding treasure
+  group: gm
+  page: 40
+  blurb: What a treasure turns out to be, when it matters.
+  how: Make a story roll for how good it is, then roll here for what it is.
+  tables:
+  - name: Treasure
+    columns: [Treasure, Treasure, Treasure]
+    rows:
+    - [favor, gold, lucrative rumor]
+    - [jewels, arcana, deed]
+    - [gear, information, service]
+    - [vehicle, spell cast, contact]
+    - [rare reagent, art piece, title or rank]
+    - [beast or companion, trade goods, blessing]
+- key: potion_qualities
+  name: Potion qualities
+  group: magic
+  page: 203
+  blurb: How a potion looks in its vessel.
+  how: "Roll once on each list: it's a foggy flask with colorful mist inside."
+  tables:
+  - { name: "It's a…", columns: ["It's a…"], rows: [[foggy], [opaque], [thin], [round], [square], [tapered]] }
+  - { name: Vessel, columns: [Vessel], rows: [[flask], [bottle], [vial], [jug], [draft], [glass]] }
+  - { name: With…, columns: [With…], rows: [[colorful], [faint], [drifting], [living], [viscous], [strange]] }
+  - { name: …inside, columns: […inside], rows: [[mist], [bubbles], [glitter], [sludge], [reagent], [oil]] }
 - key: monster_fairy_circles
   name: Fairy Circles
   group: monsters

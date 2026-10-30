@@ -4,8 +4,11 @@ import { rollDie } from "grimwild/dice"
 // Rolls on a crucible's tables. On a 6x6 table each roll is 2d6 read two
 // ways (pg. 6): first die = row, second = column, and switched. A narrower
 // table (six rows of 1, 2 or 3 words) reads once: the first die picks the
-// row, the second the column (a list needs only the first). Results are chips; the
-// first reading of each table starts chosen, tap another to choose it. "Keep"
+// row, the second the column (a list needs only the first). The chosen words lead,
+// smashed together; under them each table's roll is a row: its name, the dice, then
+// the readings as chips; the first starts chosen, tap another to choose it. A lone
+// reading is ember text, unless a form around the roller listens for crucible:pick,
+// where tapping its chip fills a box. "Keep"
 // saves the chosen words as one line in a per-crucible list in localStorage.
 // Tapping a chip also sends crucible:pick ({ word, table }), so a form around
 // the roller can use the word (feature_fill_controller.js), and Keep sends
@@ -17,6 +20,7 @@ export default class extends Controller {
   connect() {
     this.rolls = new Map() // table index -> { name, readings: [{row, col, word}], chosen }
     this.kept = this.loadKept()
+    this.picks = Boolean(this.element.closest("[data-action*='crucible:pick']"))
     this.renderKept()
   }
 
@@ -44,7 +48,7 @@ export default class extends Controller {
       return { row, col, word: cell.textContent.trim() }
     })
 
-    this.rolls.set(index, { name: table.dataset.name, dice: [a, b].filter(Boolean), readings, chosen: 0 })
+    this.rolls.set(index, { name: table.dataset.name, dice: [a, b].filter(Boolean), readings, chosen: 0, fresh: true })
   }
 
   choose(event) {
@@ -83,21 +87,35 @@ export default class extends Controller {
 
   render() {
     const sorted = [...this.rolls.entries()].sort(([a], [b]) => a - b)
-    const blocks = sorted.map(([index, roll]) => {
-      const block = document.createElement("div")
-      block.className = "roll-result"
+    const rows = sorted.map(([index, roll]) => {
+      const row = document.createElement("li")
+      row.className = "crucible-roll"
 
-      const label = document.createElement("p")
-      label.className = "roll-result__label"
+      const name = document.createElement("span")
+      name.className = "crucible-roll__name"
+      name.textContent = roll.name
+
       const dice = document.createElement("span")
-      dice.className = "roll-result__roll"
-      dice.textContent = `rolled ${roll.dice.join(" and ")}`
-      label.append(`${roll.name} `, dice)
-      block.append(label)
+      dice.className = "crucible-roll__dice"
+      dice.append(...roll.dice.map((value) => {
+        const die = document.createElement("span")
+        die.className = "die die--d6 die--28"
+        if (!roll.fresh) die.style.animation = "none"
+        die.setAttribute("aria-label", `d6 showing ${value}`)
+        die.textContent = value
+        return die
+      }))
 
-      const chips = document.createElement("div")
-      chips.className = "roll-result__chips"
-      roll.readings.forEach((reading, readingIndex) => {
+      const readings = document.createElement("span")
+      readings.className = "crucible-roll__readings"
+      if (roll.readings.length === 1 && !this.picks) {
+        // Nothing to choose and nothing to fill: the word as text, not a button.
+        const word = document.createElement("span")
+        word.className = "crucible-roll__word"
+        word.textContent = roll.readings[0].word
+        readings.append(word)
+      }
+      else roll.readings.forEach((reading, readingIndex) => {
         const chip = document.createElement("button")
         chip.type = "button"
         chip.className = "chip"
@@ -107,17 +125,23 @@ export default class extends Controller {
         chip.dataset.index = index
         chip.dataset.reading = readingIndex
         chip.dataset.action = "crucible#choose"
-        chips.append(chip)
+        readings.append(chip)
       })
-      block.append(chips)
-      return block
+
+      row.append(name, dice, readings)
+      return row
     })
+    sorted.forEach(([, roll]) => { roll.fresh = false })
 
     const smash = document.createElement("p")
     smash.className = "roll-result__smash"
     smash.textContent = this.chosenWords().join(" + ")
 
-    this.resultsTarget.replaceChildren(...blocks, smash)
+    const list = document.createElement("ul")
+    list.className = "crucible__rows"
+    list.append(...rows)
+
+    this.resultsTarget.replaceChildren(smash, list)
     this.keepButtonTarget.disabled = this.rolls.size === 0
   }
 

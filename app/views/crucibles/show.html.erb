@@ -39,7 +39,7 @@
     </button>
   </div>
 
-  <div class="crucible__tables" hidden="<%= !show_tables %>">
+  <div class="crucible__tables" data-count="<%= @crucible.tables.size %>" hidden="<%= !show_tables %>">
     <% @crucible.tables.each_with_index do |table, index| %>
       <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" data-width="<%= table.width %>" aria-labelledby="table-<%= index %>">
         <header class="crucible-table__header">
@@ -48,14 +48,16 @@
         </header>
         <div class="grid66-wrap">
         <table class="grid66">
+          <% if table.width > 1 %>
           <thead>
             <tr>
               <th scope="col"><span class="visually-hidden">Row</span></th>
               <% table.width.times do |column| %>
-                <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
+                <th scope="col"><%= table.column_label(column) || (column + 1 unless table.column_dice(column)) %><% if (dice = table.column_dice(column)) %> <span class="grid66__dice"><%= dice %></span><% end %></th>
               <% end %>
             </tr>
           </thead>
+          <% end %>
           <tbody>
             <% table.rows.each_with_index do |row, row_index| %>
               <tr>

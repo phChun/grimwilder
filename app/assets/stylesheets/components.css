@@ -596,39 +596,71 @@ form.button_to, .button_to { margin: 0; }
 /* ---------- Crucibles ---------- */
 
 .crucible-group { margin-bottom: var(--space-6); }
+/* The list's search, sticky like the talent catalog's. */
+.crucible-catalog__tools {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.crucible-catalog__search { max-width: 32rem; }
+.crucible-catalog__tools > .field__hint { margin: 0; }
+.crucible-catalog__tools > .field__hint:empty { display: none; }
+.crucible-catalog__empty { color: var(--dim); }
+.crucible-catalog .tool-grid__list > li[hidden] { display: none; }
 .tool-card small { margin-top: auto; }
 
 .crucible__roller { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); }
 .crucible__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
 .crucible__hint { margin: 0; color: var(--dim); }
 
-/* Each table's reading side by side when there's room, a rule between them. Every one has a
-   rule on its left, and the -1px margin plus clip hides it on whichever starts a row. */
-.crucible__results {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-  gap: var(--space-3) 0;
-  overflow: hidden;
-}
-.crucible__results > * { grid-column: 1 / -1; }
-.crucible__results > .roll-result {
-  grid-column: auto;
-  margin-left: -1px;
-  padding-inline: var(--space-4);
-  border-left: 1px solid var(--line);
-}
-.roll-result { display: grid; align-content: start; gap: var(--space-1); }
-.roll-result__label { margin: 0; font-size: 0.85rem; color: var(--dim); }
-.roll-result__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-
+/* The chosen words lead, smashed together; under them a row for each table: its
+   name, the dice, then the readings, on one line and only as wide as that. Rows sit side by side
+   when there's room, each a tile of its own; a row wraps only when it can't fit the screen, keeping the chips together. */
+.crucible__results { display: grid; gap: var(--space-3); }
 .roll-result__smash {
-  margin: var(--space-2) 0 0;
+  margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 4vw, 2.1rem);
   line-height: 1.2;
 }
-
 .roll-result__smash:empty { display: none; }
+.crucible__rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crucible-roll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+}
+.crucible-roll__name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.crucible-roll__dice { display: flex; gap: var(--space-1); }
+.crucible-roll__readings { display: flex; gap: var(--space-2); }
+.crucible-roll__readings .chip { white-space: nowrap; }
+/* A lone reading with nothing to choose or fill: text, not a chip. */
+.crucible-roll__word { color: var(--ember); font-size: 1.05rem; font-weight: 600; white-space: nowrap; }
 
 .chip {
   padding: var(--space-1) var(--space-3);
@@ -649,11 +681,23 @@ form.button_to, .button_to { margin: 0; }
 
 .crucible__toolbar { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
 
+/* Laid out by how many tables there are (data-count): three or more fill columns of 26rem,
+   two share the width, and one has it to itself, with bigger cells, a narrow list kept to a
+   readable width. */
 .crucible__tables {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
   gap: var(--space-5);
 }
+.crucible__tables[data-count="2"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.crucible__tables[data-count="1"] { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 40rem) {
+  .crucible__tables[data-count="1"] .grid66 { font-size: 1rem; }
+  .crucible__tables[data-count="1"] .grid66 td { padding: var(--space-2); }
+}
+.crucible__tables[data-count="1"] .crucible-table[data-width="1"] { max-width: 40rem; }
+.crucible__tables[data-count="1"] .crucible-table[data-width="2"] { max-width: 52rem; }
+.crucible__tables[data-count="1"] .crucible-table[data-width="3"] { max-width: 64rem; }
 
 .crucible__tables[hidden] { display: none; }
 
@@ -688,6 +732,8 @@ form.button_to, .button_to { margin: 0; }
 }
 
 .grid66 th { color: var(--dim); font-weight: 600; font-size: 0.75rem; }
+/* A 2- or 3-column table's second-die faces beside its heading ("Origin 1–2"). */
+.grid66__dice { font-family: var(--font-dice); font-weight: 500; white-space: nowrap; }
 .grid66 thead th:first-child,
 .grid66 tbody th { width: 1.8rem; }
 
@@ -1033,7 +1079,6 @@ form.button_to, .button_to { margin: 0; }
 .crucible-picker__label { margin-right: var(--space-1); font-size: 0.8rem; color: var(--dim); }
 .chip--small { padding: 2px var(--space-3); font-size: 0.85rem; }
 
-.roll-result__roll { font-family: var(--font-dice); font-size: 0.8rem; color: var(--dim); white-space: nowrap; }
 
 /* The GM table's roller: results as tiles, the smash as a band, and the kept
    list as a panel on the right once the card is wide enough. */
@@ -1048,9 +1093,7 @@ form.button_to, .button_to { margin: 0; }
 .crucible__stage { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
 .crucible__full { margin-left: auto; font-size: 0.85rem; }
 
-.crucible--compact .crucible__results { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--space-3); }
 .crucible--compact .crucible__hint {
-  grid-column: 1 / -1;
   padding: var(--space-5) var(--space-4);
   border: 1px dashed var(--line);
   border-radius: var(--radius-control);
@@ -1058,34 +1101,10 @@ form.button_to, .button_to { margin: 0; }
   text-align: center;
 }
 
-.crucible--compact .crucible__results { overflow: visible; }
-.crucible--compact .roll-result {
-  align-content: start;
-  margin-left: 0;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4) var(--space-4);
-  background: var(--surface-2);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-control);
-}
 
-.crucible--compact .roll-result__label {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
 
-.crucible--compact .roll-result__roll { letter-spacing: 0; text-transform: none; font-weight: 500; }
 
 .crucible--compact .roll-result__smash {
-  grid-column: 1 / -1;
   margin: 0;
   padding: var(--space-3) var(--space-4);
   background: var(--ember-soft);

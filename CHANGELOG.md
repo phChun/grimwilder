@@ -4,6 +4,9 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-30
 
+- **Search crucibles** by name, blurb or any word they roll, like the talent catalog. ([#69](https://github.com/phChun/grimwilder/pull/69))
+- **Crucibles follow the Community Edition**: CE's Extra Wises, atmospherics for each season, all seven criminal-history reactions, and new crucibles for magitechnobabble, a paladin's tenets, finding treasure and potion qualities. ([#69](https://github.com/phChun/grimwilder/pull/69))
+- **Crucible tables and results spread out** by how many tables there are: one has the page's width, with bigger cells, and two share it. A roll leads with the words smashed together, then a row per table (its name, the dice, the readings); a single reading is ember text, not a button. ([#69](https://github.com/phChun/grimwilder/pull/69))
 - **Talent summaries are written for choosing**: what each talent lets you do, how often, and the catch. ([#70](https://github.com/phChun/grimwilder/pull/70))
 - **Trap Making is retired**, as the Community Edition removed it. Sheets that have it keep it. ([#70](https://github.com/phChun/grimwilder/pull/70))
 - **The Community Edition.** Talents follow its text and summaries, and the footer names it. Page numbers are still Preview 6's until they're re-checked. ([#68](https://github.com/phChun/grimwilder/pull/68))
