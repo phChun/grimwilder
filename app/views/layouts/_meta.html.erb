@@ -1,0 +1,20 @@
+<%# What search engines and link previews (Discord, Slack, iMessage…) read: the page's own description (content_for :description) or the site's, and Open Graph and Twitter card tags with the preview image (app/assets/images/og-image.png, 1200x630, our own: no book art). %>
+<% title = content_for?(:title) ? "#{yield(:title)} · Grimwilder" : "Grimwilder — a Grimwild play toolkit" %>
+<% description = content_for?(:description) ? yield(:description).squish : "Dice, pools, crucibles and character sheets for Grimwild: Community Edition. The GM runs the session from one screen, every sheet rolls its own dice, and the table shares one log." %>
+<% url = request.base_url + request.path %>
+<meta name="description" content="<%= description %>">
+<link rel="canonical" href="<%= url %>">
+<meta property="og:site_name" content="Grimwilder">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : "Grimwilder" %>">
+<meta property="og:description" content="<%= description %>">
+<meta property="og:url" content="<%= url %>">
+<meta property="og:image" content="<%= image_url("og-image.png") %>">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Grimwilder: keep the dice honest and the story moving.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= title %>">
+<meta name="twitter:description" content="<%= description %>">
+<meta name="twitter:image" content="<%= image_url("og-image.png") %>">
+<meta name="theme-color" content="#14130f">

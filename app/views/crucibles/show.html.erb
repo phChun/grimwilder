@@ -1,6 +1,7 @@
 <%# herb:slots client %>
 <%# herb:state (show_tables: true) %>
 <% content_for :title, @crucible.name %>
+<% content_for :description, "#{@crucible.blurb} Roll the #{@crucible.name} crucible from Grimwild online, free." %>
 
 <div class="crucible" data-controller="crucible" data-crucible-key-value="<%= @crucible.key %>">
   <header class="page-header">

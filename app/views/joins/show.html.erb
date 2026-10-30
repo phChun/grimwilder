@@ -1,4 +1,6 @@
 <% content_for :title, "Join #{@campaign.name}" %>
+<%# The invite link's preview in chat says only what this page shows anyone with the link: the name and the GM. %>
+<% content_for :description, "#{"Run by #{@campaign.gms.first.display_name}. " if @campaign.gms.first}Join to sit at this Grimwild table as a player." %>
 
 <div class="auth">
   <header class="page-header">

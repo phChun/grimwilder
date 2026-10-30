@@ -1,1 +1,15 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# The free tools are for everyone; the rest needs an account, and invite
+# links (/join/…) shouldn't be indexed if someone posts one publicly.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /campaigns
+Disallow: /characters
+Disallow: /pools
+Disallow: /join/
+Disallow: /session
+Disallow: /profile
+Disallow: /passkeys
+Disallow: /interest
+
+Sitemap: https://grimwilder.com/sitemap.xml
