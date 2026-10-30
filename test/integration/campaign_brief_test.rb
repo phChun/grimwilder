@@ -25,6 +25,16 @@ class CampaignBriefTest < ActionDispatch::IntegrationTest
     assert_no_match(/Brawn|Agility \d|spark/i, markdown)
   end
 
+  test "characters up for grabs come last, marked as not picked yet" do
+    ash = @campaign.characters.create!(identity: identities(:gwen), name: "Ash", path: "Fighter", brawn: 3, agility: 2, wits: 2, presence: 1, up_for_grabs: true)
+    markdown = Campaign::Brief.new(@campaign).to_markdown
+
+    assert_match(/## Up for grabs\n\n.*\n\n### Ash\n\nFighter, level 1 · not yet picked by a player/m, markdown)
+    assert markdown.index("## The party") < markdown.index("## Up for grabs")
+    ash.update!(up_for_grabs: false)
+    assert_no_match "## Up for grabs", Campaign::Brief.new(@campaign).to_markdown
+  end
+
   test "the GM copies it from the table; players can't" do
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)

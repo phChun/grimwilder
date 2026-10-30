@@ -2,14 +2,14 @@
 # them tell the story (Campaigns::BriefsController, "Copy for an AI" on the GM
 # table): the campaign's pitch and rules, then each active character's story
 # parts, who they are, what they want, their bonds and talents and how they're
-# hurt right now. No stat numbers or dice, and nothing only the GM can see.
+# hurt right now, then any characters up for grabs. No stat numbers or dice, and nothing only the GM can see.
 class Campaign::Brief
   def initialize(campaign)
     @campaign = campaign
   end
 
   def to_markdown
-    [ campaign_section, party_section ].join("\n\n").gsub(/\n{3,}/, "\n\n").strip + "\n"
+    [ campaign_section, party_section, up_for_grabs_section ].compact.join("\n\n").gsub(/\n{3,}/, "\n\n").strip + "\n"
   end
 
   private
@@ -37,10 +37,20 @@ class Campaign::Brief
       ([ "## The party" ] + characters.map { character_section(_1, characters) }).join("\n\n")
     end
 
-    def character_section(character, party)
+    # Characters the GM made for the table that no one has picked yet: ready
+    # for the story to bring in.
+    def up_for_grabs_section
+      characters = campaign.characters.up_for_grabs.active.ordered.to_a
+      return if characters.empty?
+
+      ([ "## Up for grabs", "Characters made for this table that no player has picked yet." ] +
+        characters.map { character_section(_1, characters, claimed: false) }).join("\n\n")
+    end
+
+    def character_section(character, party, claimed: true)
       core = character.core_talent_entry
       lines = [ "### #{character.name}" ]
-      lines << "#{character.path}, level #{character.level} · played by #{character.identity.display_name}"
+      lines << "#{character.path}, level #{character.level} · #{claimed ? "played by #{character.identity.display_name}" : "not yet picked by a player"}"
       facts = {
         "Backgrounds" => character.backgrounds.map { |background| [ title(background["name"]), ("(wises: #{background["wises"].map { title(_1) }.join(", ")})" if background["wises"].any?) ].compact.join(" ") }.join("; "),
         "Traits" => with_not(character.traits, character.not_trait),
