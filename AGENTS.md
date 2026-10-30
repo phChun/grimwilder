@@ -411,7 +411,6 @@ Updated 2026-10-29. The app follows the Community Edition (the P6 update brief's
 
 **Set aside** (2026-10-27, at Shawn's request)
 - **Payments**: each paid plan's Stripe price in `config/plans.yml`, `stripe_customer_id` on identities, Stripe Checkout and the Customer Portal, and a webhook that sets `identities.plan`. The webhook only moves accounts between Free and the paid plans and must never touch one on Tester, so testers aren't downgraded; a `plan_source` (admin or stripe) can come with it.
-- **Sharing a roll without an account** (asked 2026-10-27: not now).
 
 **Not modelled** (the book gives no rules to build from)
 - Wild Shape's and the Vassal's per-form details, and the vassal's thematic path talent aspect.
@@ -422,7 +421,7 @@ Updated 2026-10-29. The app follows the Community Edition (the P6 update brief's
 **Waiting on others**
 - Open-sourcing the repo under O'Saasy, after groov's licensing review.
 
-**Decided** (2026-10-27): Sorcery's magical twist is one pick (open), not all three described; the quarry die is a follow-up on action rolls only, added after the roll.
+**Decided** (2026-10-30): no sharing a roll without an account; it won't be built. (2026-10-27): Sorcery's magical twist is one pick (open), not all three described; the quarry die is a follow-up on action rolls only, added after the roll.
 
 ## Production image
 
