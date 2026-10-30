@@ -4,6 +4,10 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-10-30
 
+- **A new home page** that shows what Grimwilder does at the table and on a sheet, with an example of play. ([#72](https://github.com/phChun/grimwilder/pull/72))
+- **I'm interested**: while sign-ups are closed, leave your email, how you'd play and a note, and we'll be in touch. ([#72](https://github.com/phChun/grimwilder/pull/72))
+- **Admin**: an Interested list to make accounts from, and search and pages on every list. ([#72](https://github.com/phChun/grimwilder/pull/72))
+- **Sign-in codes are limited per email address** too, so no one can flood an inbox. ([#72](https://github.com/phChun/grimwilder/pull/72))
 - **Search crucibles** by name, blurb or any word they roll, like the talent catalog. ([#69](https://github.com/phChun/grimwilder/pull/69))
 - **Crucibles follow the Community Edition**: CE's Extra Wises, atmospherics for each season, all seven criminal-history reactions, and new crucibles for magitechnobabble, a paladin's tenets, finding treasure and potion qualities. ([#69](https://github.com/phChun/grimwilder/pull/69))
 - **Crucible tables and results spread out** by how many tables there are: one has the page's width, with bigger cells, and two share it. A roll leads with the words smashed together, then a row per table (its name, the dice, the readings); a single reading is ember text, not a button. ([#69](https://github.com/phChun/grimwilder/pull/69))
