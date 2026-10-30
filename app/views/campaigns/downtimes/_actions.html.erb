@@ -1,0 +1,50 @@
+<%# locals: (character:) %>
+<%# Expanded downtime (Campaign::DowntimeActions): how one character spent the time. The second action is for selling a treasure. Only the boxes the picked actions need show (CSS :has() on .downtime-pick). %>
+<% field = "actions[#{character.id}]" %>
+<% goals = character.goal_pools.reject(&:depleted?) %>
+<% choices = Campaign::DowntimeActions::ACTIONS.invert.to_a %>
+<fieldset class="roll-setup__group downtime-pick">
+  <legend class="field__label"><%= character.name %></legend>
+  <div class="downtime-pick__actions">
+    <div class="field">
+      <%= label_tag "downtime_#{character.id}_first", "Action", class: "field__label" %>
+      <%= select_tag "#{field}[actions][]", options_for_select([ [ "Nothing", "" ], *choices ]), id: "downtime_#{character.id}_first", class: "field__input" %>
+    </div>
+    <div class="field">
+      <%= label_tag "downtime_#{character.id}_second", "Sold a treasure: also", class: "field__label" %>
+      <%= select_tag "#{field}[actions][]", options_for_select([ [ "No second action", "" ], *choices ]), id: "downtime_#{character.id}_second", class: "field__input" %>
+    </div>
+  </div>
+  <div class="field downtime-pick__extra downtime-pick__plan">
+    <%= label_tag "downtime_#{character.id}_plan", "What they prepare", class: "field__label" %>
+    <%= text_field_tag "#{field}[plan]", nil, id: "downtime_#{character.id}_plan", maxlength: 120, placeholder: "Borrows horses for a quick getaway", class: "field__input" %>
+    <p class="field__hint">A thread for details from it, beyond their usual thread, until time passes again.</p>
+  </div>
+  <div class="downtime-pick__extra downtime-pick__goal">
+    <div class="field">
+      <%= label_tag "downtime_#{character.id}_goal", "Goal", class: "field__label" %>
+      <%= select_tag "#{field}[goal_id]", options_for_select([ *goals.map { [ "#{_1.name.delete_prefix("#{character.short_name}: ")} (#{_1.size}d)", _1.id ] }, [ "A new goal", "new" ] ]), id: "downtime_#{character.id}_goal", class: "field__input" %>
+    </div>
+    <div class="downtime-pick__new-goal">
+      <div class="field">
+        <%= label_tag "downtime_#{character.id}_goal_name", "New goal", class: "field__label" %>
+        <%= text_field_tag "#{field}[goal_name]", nil, id: "downtime_#{character.id}_goal_name", maxlength: 80, placeholder: "Cleanse the nearby forest", class: "field__input" %>
+      </div>
+      <div class="field">
+        <%= label_tag "downtime_#{character.id}_goal_size", "Task pool", class: "field__label" %>
+        <%= select_tag "#{field}[goal_size]", options_for_select(Character::Goals::GOAL_SIZES.map { [ "#{_1}d", _1 ] }, 4), id: "downtime_#{character.id}_goal_size", class: "field__input" %>
+      </div>
+    </div>
+    <p class="field__hint">Its task pool rolls now, and each time they pursue it.</p>
+  </div>
+  <div class="field downtime-pick__extra downtime-pick__unwind">
+    <%= label_tag "downtime_#{character.id}_unwind", "How they unwind", class: "field__label" %>
+    <%= text_field_tag "#{field}[unwind]", nil, id: "downtime_#{character.id}_unwind", maxlength: 200, placeholder: "Gets a drink named after her", class: "field__input" %>
+    <p class="field__hint">A vignette for the log; they take spark.</p>
+  </div>
+  <div class="field downtime-pick__extra downtime-pick__venture">
+    <%= label_tag "downtime_#{character.id}_venture", "Where they venture", class: "field__label" %>
+    <%= text_field_tag "#{field}[venture]", nil, id: "downtime_#{character.id}_venture", maxlength: 150, placeholder: "Joins an expedition for the University", class: "field__input" %>
+    <p class="field__hint">A story roll for how it goes. Reward a minor treasure, rumor or ally as you see fit; on a messy or worse, it's complicated.</p>
+  </div>
+</fieldset>

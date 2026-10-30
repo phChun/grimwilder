@@ -81,6 +81,10 @@
               <% uses = talent_use_summary(character) %>
               <% if uses.present? %><p class="party-card__uses"><%= uses %></p><% end %>
               <% if (picks = picks_to_make_line(character)) %><p class="party-card__picks"><%= picks %></p><% end %>
+              <%# Expanded downtime's goals, to read: they roll only from the Downtime form. %>
+              <% if (goals = @goal_pools[character.id]) %>
+                <p class="party-card__goals">Goals: <%= goals.map { "#{_1.name.delete_prefix("#{character.short_name}: ")} · #{_1.depleted? ? "reached" : "#{_1.size}d"}" }.join("; ") %></p>
+              <% end %>
               <% if (pools = @talent_pools[character.id]) %>
                 <ul class="party-card__pools">
                   <% pools.each do |pool| %>

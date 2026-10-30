@@ -53,7 +53,9 @@ class Pool < ApplicationRecord
 
   scope :ordered, -> { order(:created_at, :id) }
   scope :shared, -> { where(character_id: nil) }
-  scope :talent, -> { where.not(character_id: nil) }
+  # A character's own pools, from talents, arcana and rules; their downtime
+  # goals (Character::Goals) are kept apart and roll only in downtime.
+  scope :talent, -> { where.not(character_id: nil).where(goal: false) }
   scope :visible_to, ->(membership) { membership&.gm? ? all : where(hidden: false) }
 
   # Everyone looking at the campaign's pools refetches the page; each viewer's

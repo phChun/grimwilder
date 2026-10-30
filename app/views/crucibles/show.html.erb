@@ -41,14 +41,14 @@
 
   <div class="crucible__tables" data-count="<%= @crucible.tables.size %>" hidden="<%= !show_tables %>">
     <% @crucible.tables.each_with_index do |table, index| %>
-      <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" data-width="<%= table.width %>" aria-labelledby="table-<%= index %>">
+      <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" data-width="<%= table.width %>" data-rows="<%= table.rows.size %>" aria-labelledby="table-<%= index %>">
         <header class="crucible-table__header">
           <h3 id="table-<%= index %>" class="crucible-table__name"><%= table.name %></h3>
           <button type="button" class="button button--small" data-action="crucible#rollOne" data-index="<%= index %>">Roll</button>
         </header>
         <div class="grid66-wrap">
         <table class="grid66">
-          <% if table.width > 1 %>
+          <% if table.headed? %>
           <thead>
             <tr>
               <th scope="col"><span class="visually-hidden">Row</span></th>

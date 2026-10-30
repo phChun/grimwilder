@@ -10,6 +10,7 @@ module CampaignTable
       @my_characters = @characters.select { _1.owned_by?(Current.identity) }
       @pools = Current.campaign.pools.shared.visible_to(Current.membership).includes(:last_rolled_by).ordered
       @talent_pools = Current.campaign.pools.talent.includes(:last_rolled_by).ordered.group_by(&:character_id)
+      @goal_pools = Current.campaign.expanded_downtime? ? Current.campaign.pools.where(goal: true).ordered.group_by(&:character_id) : {}
       @pool ||= Current.campaign.pools.new(starting_size: 4)
       @feed = TableFeed.new(Current.campaign, Current.membership)
       @crucible_groups = Crucible.grouped

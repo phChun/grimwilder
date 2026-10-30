@@ -2137,6 +2137,7 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 .party-card__currency,
 .party-card__uses { margin: 0; font-size: 0.9rem; color: var(--text-soft); }
 .party-card__picks { margin: 0; font-size: 0.9rem; color: var(--ember); }
+.party-card__goals { margin: 0; font-size: 0.9rem; color: var(--muted); }
 .party-card__pools { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
 .party-card .button_to { margin: 0; }
 
@@ -2947,3 +2948,24 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 
 /* A player's table rolls on their sheet: the shared pools. */
 .table-rolls { display: grid; gap: var(--space-3); }
+
+/* Expanded downtime's form (campaigns/downtimes/_actions): a character's action and a second
+   one for selling a treasure, then only the boxes those actions need. */
+.downtime-pick { display: grid; gap: var(--space-3); }
+.downtime-pick__actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-3); }
+.downtime-pick__extra { display: none; gap: var(--space-2); }
+.downtime-pick:has(option[value="plan"]:checked) .downtime-pick__plan,
+.downtime-pick:has(option[value="goal"]:checked) .downtime-pick__goal,
+.downtime-pick:has(option[value="unwind"]:checked) .downtime-pick__unwind,
+.downtime-pick:has(option[value="venture"]:checked) .downtime-pick__venture { display: grid; }
+.downtime-pick__new-goal { display: none; grid-template-columns: minmax(0, 1fr) 8rem; gap: var(--space-3); }
+.downtime-pick__goal:has(option[value="new"]:checked) .downtime-pick__new-goal { display: grid; }
+/* Expanded downtime on the sheet's Table rules card: the plan-ahead thread and goal pools. */
+.rule-pools__plan { display: grid; gap: var(--space-2); }
+.rule-pools__plan p { margin: 0; }
+.rule-pools__goals { display: grid; gap: var(--space-3); }
+.rule-pools__subtitle { margin: 0; font-size: 1rem; }
+.rule-pools__goal { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-2) var(--space-3); }
+.rule-pools__goal .pool-track { grid-column: 1 / -1; }
+.rule-pools__goal form { grid-column: 1 / -1; justify-self: start; margin: 0; }
+.rule-pools__goal-size { font-family: var(--font-dice); color: var(--muted); }

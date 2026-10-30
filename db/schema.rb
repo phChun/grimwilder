@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_10_30_060000) do
+ActiveRecord::Schema[8.2].define(version: 2026_10_30_090000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -120,6 +120,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_30_060000) do
     t.string "armor"
     t.string "vex"
     t.string "vex_subject"
+    t.string "prep_note"
+    t.integer "prep_thread", default: 0, null: false
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"
@@ -249,6 +251,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_10_30_060000) do
     t.integer "refills_used", default: 0, null: false
     t.boolean "made_by_talent", default: false, null: false
     t.boolean "tick", default: false, null: false
+    t.boolean "goal", default: false, null: false
     t.index ["arcanum_id"], name: "index_pools_on_arcanum_id", unique: true
     t.index ["campaign_id"], name: "index_pools_on_campaign_id"
     t.index ["character_id", "use_key"], name: "index_pools_on_character_id_and_use_key", unique: true, where: "made_by_talent = 0"

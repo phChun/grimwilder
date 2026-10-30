@@ -6,14 +6,22 @@
     <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
     <h1>Downtime</h1>
     <p class="page-header__lede">
-      Everyone fully heals and resets per-session talents, you roll the campaign pools, then pick one to deplete completely (pg. 31).
+      <% if Current.campaign.expanded_downtime? %>
+        Pick how each character spent the time: one action, or two different ones if they sold a treasure. Only those who rest heal. Per-session talents reset for everyone, you roll the campaign pools, then pick one to deplete completely (pg. 31, 142).
+      <% else %>
+        Everyone fully heals and resets per-session talents, you roll the campaign pools, then pick one to deplete completely (pg. 31).
+      <% end %>
       <%= Current.campaign.current_session ? "It applies to the characters at #{Current.campaign.current_session.title.downcase}." : "Between sessions, it applies to everyone seated." %>
     </p>
   </header>
 
   <%= form_with url: campaign_downtime_path(Current.campaign), class: "panel stack session-form", data: { turbo_frame: "_top" } do %>
+    <% if Current.campaign.expanded_downtime? %>
+      <%= render partial: "campaigns/downtimes/actions", collection: @characters, as: :character %>
+    <% end %>
+
     <fieldset class="roll-setup__group">
-      <legend class="field__label">Conditions that heal</legend>
+      <legend class="field__label"><%= Current.campaign.expanded_downtime? ? "Conditions that heal, for those who rest" : "Conditions that heal" %></legend>
       <% conditions = @characters.flat_map { |character| character.conditions.each_with_index.map { |condition, index| [ character, index, condition ] } } %>
       <% if conditions.any? %>
         <% conditions.each do |character, index, condition| %>
@@ -30,24 +38,28 @@
 
     <% if @pools.any? %>
       <fieldset class="roll-setup__group">
-        <legend class="field__label">After the rolls, deplete</legend>
+        <legend class="field__label">Campaign pools</legend>
+        <p class="field__hint">Every campaign pool rolls: <%= @pools.map { "#{_1.name} (#{_1.size}d)" }.to_sentence %>. Then you can pick one to deplete completely, so it comes to pass whatever it rolled.</p>
         <label class="check">
           <%= radio_button_tag "deplete", "", true, id: "downtime_deplete_none" %>
-          <span>None</span>
+          <span>Just roll them</span>
         </label>
         <% @pools.each do |pool| %>
           <label class="check">
             <%= radio_button_tag "deplete", pool.id, false, id: "downtime_deplete_#{pool.id}" %>
-            <span><strong><%= pool.name %></strong> (<%= pool.size %>d): <%= pool.outcome %></span>
+            <span>Roll them, then deplete <strong><%= pool.name %></strong>: <%= pool.outcome %></span>
           </label>
         <% end %>
-        <p class="field__hint">The story moves forward: that pool drops to 0d after it rolls. If the roll already empties it, nothing more happens.</p>
       </fieldset>
     <% end %>
 
     <p class="field__hint">
-      Marks and harm clear for <%= @characters.map(&:name).to_sentence.presence || "no one" %>.
-      <% if @pools.any? %>Campaign pools to roll: <%= @pools.map(&:name).to_sentence %>.<% else %>No campaign pools to roll.<% end %>
+      <% if Current.campaign.expanded_downtime? %>
+        Marks and harm clear for those who rest.
+      <% else %>
+        Marks and harm clear for <%= @characters.map(&:name).to_sentence.presence || "no one" %>.
+      <% end %>
+      <% if @pools.none? %>No campaign pools to roll.<% end %>
     </p>
 
     <button type="submit" class="button button--primary">Take downtime</button>

@@ -43,6 +43,8 @@ Rails.application.routes.draw do
       resource :stat_point, only: :create
       resource :oath, only: %i[ create destroy ]
       resource :coins, only: :create
+      resource :plan_thread, only: :destroy
+      resources :goals, only: :destroy
     end
   end
 

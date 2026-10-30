@@ -34,6 +34,13 @@ class CruciblesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".grid66 thead th", text: "1–3"
   end
 
+  test "a d8 table says so to the roller and has no heading row" do
+    get crucible_path("solo_high_stakes")
+    assert_select "[data-crucible-target=table][data-rows='8'][data-width='2']"
+    assert_select ".grid66 thead", 0
+    assert_select ".grid66 tbody tr", 8
+  end
+
   test "unknown crucibles are a 404" do
     get crucible_path("nope")
     assert_response :not_found

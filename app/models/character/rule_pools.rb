@@ -58,13 +58,19 @@ module Character::RulePools
 
   # Wealth (pg. 176): carousing by selling off treasure, or as the GM sees
   # fit, adds 2d to the Coins pool, up to 8d.
+  # Expanded downtime replaces carousing, so it's gone while that rule's on.
   def add_coins!(by:)
+    raise ArgumentError, "#{campaign.name} uses Expanded downtime, which replaces carousing." if carousing_replaced?
     pool = talent_pools.find_by(use_key: COINS) or raise ArgumentError, "#{short_name} has no Coins pool."
     raise ArgumentError, "#{short_name}'s Coins are at #{MAX_COINS}d." if pool.size >= MAX_COINS
 
     size = [ pool.size + 2, MAX_COINS ].min
     pool.update!(size: size, starting_size: [ pool.starting_size, size ].max)
     Roll.note!(campaign: campaign, by: by, character: self, text: "#{short_name}'s Coins grow to #{size}d.") if campaign
+  end
+
+  def carousing_replaced?
+    campaign&.expanded_downtime? || false
   end
 
   # Encumbrance (pg. 176): slots of gear beyond main armor and weapons.
