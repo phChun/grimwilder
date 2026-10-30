@@ -2220,10 +2220,13 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 li.popover__head { margin: 0; padding-left: var(--space-3); }
 .popover__title { min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.25; overflow-wrap: anywhere; }
 .scene-bar .between-scenes__actions { flex-wrap: wrap; }
-.scene-bar .between-scenes__actions .popover__head { flex-basis: 100%; }
+/* The title row fills the first line: its negative right margin (tucking the ✕ into the corner)
+   would otherwise leave a sliver there that a 0-basis button squeezes into, clipped. */
+.scene-bar .between-scenes__actions .popover__head { flex: 0 0 calc(100% + var(--space-2)); }
 .scene-bar .between-scenes__actions { width: min(20rem, calc(100vw - 2rem)); }
-.scene-bar .between-scenes__actions > :not(.popover__head) { flex: 1 1 0; min-width: 0; }
-.scene-bar .between-scenes__actions .button { width: 100%; }
+/* Buttons share the row by their labels and wrap to another row when they don't fit (Rest resets and Milestone add two). */
+.scene-bar .between-scenes__actions > :not(.popover__head) { flex: 1 1 auto; }
+.scene-bar .between-scenes__actions .button_to .button { width: 100%; }
 
 /* Folds on the GM table: Rolls and the crucible */
 .gm-fold__summary { display: flex; align-items: center; min-height: var(--tap); list-style: none; cursor: pointer; }
