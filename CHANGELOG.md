@@ -2,6 +2,13 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-10-30
+
+- **The Community Edition.** Talents follow its text and summaries, and the footer names it. Page numbers are still Preview 6's until they're re-checked. ([#68](https://github.com/phChun/grimwilder/pull/68))
+- **Pact is now Hex**, the Warlock's core talent. Saved characters keep it. ([#68](https://github.com/phChun/grimwilder/pull/68))
+- **Shared Soul is Summoner only, Bailiwick Witch only.** Sheets that already have them keep them. ([#68](https://github.com/phChun/grimwilder/pull/68))
+- **Downtime depletes a campaign pool**: after the rolls, the GM picks one on the form and it runs out. ([#68](https://github.com/phChun/grimwilder/pull/68))
+
 ## 2026-10-28
 
 - **Sign-ins last six hours**, then you sign in again with a code or a passkey. ([#61](https://github.com/phChun/grimwilder/pull/61))
