@@ -29,6 +29,14 @@ class ExpandedDowntimeIntegrationTest < ActionDispatch::IntegrationTest
     assert_select "button", text: "+2d Coins: carousing", count: 0
   end
 
+  test "the GM table's party cards list each character's goals to read" do
+    @tibbs.talent_pools.create!(campaign: @campaign, goal: true, kind: "task", name: "Tibbs: Cleanse the well", starting_size: 4)
+    sign_in_as identities(:gwen)
+    get campaign_table_path(@campaign)
+    assert_select ".party-card__goals", "Goals: Cleanse the well · 4d"
+    assert_select ".seat-pool__name", { text: "Cleanse the well", count: 0 }, "not a pool to roll there"
+  end
+
   test "a new goal without a name sends the GM back to the form" do
     sign_in_as identities(:gwen)
     post campaign_downtime_path(@campaign), params: { actions: { @tibbs.id.to_s => { actions: [ "goal" ], goal_id: "new" } } }
