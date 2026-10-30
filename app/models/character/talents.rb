@@ -79,7 +79,7 @@ module Character::Talents
     end
 
     # A talent already on the sheet stays when the book later limits it to
-    # another path ("[Bard Only]", "[Witch Only]") or drops it (Flurry); only new
+    # another path ("[Bard Only]", "[Witch Only]") or drops it (Flurry, Trap Making); only new
     # picks, or a new path, are checked against it.
     def talents_are_choosable
       kept = will_save_change_to_path? ? [] : Array(talent_keys_in_database)
@@ -92,7 +92,7 @@ module Character::Talents
         elsif talent.prohibited_for?(path) && kept.exclude?(key)
           errors.add(:talent_keys, "can't include #{talent.name} for a #{path}")
         elsif talent.retired? && kept.exclude?(key)
-          errors.add(:talent_keys, "can't include #{talent.name}; Preview 6 dropped it")
+          errors.add(:talent_keys, "can't include #{talent.name}; the book dropped it")
         elsif eldritch_talent_keys.include?(key)
           errors.add(:talent_keys, "can't include #{talent.name}; it's already an Eldritch Talent")
         end
