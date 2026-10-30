@@ -12,6 +12,7 @@ class CruciblesControllerTest < ActionDispatch::IntegrationTest
     get crucible_path("buildings")
     assert_response :success
     assert_select "[data-controller=crucible] [data-crucible-target=table]", 2
+    assert_select ".crucible__tables[data-count='2']"
     assert_select "td[data-row='6'][data-col='2']", text: "fortune teller"
   end
 
@@ -27,5 +28,6 @@ class CruciblesControllerTest < ActionDispatch::IntegrationTest
     get crucible_path("monster_cyclopean_curses")
     assert_response :success
     assert_select "*", text: /It's lonely, the last of its kind\./
+    assert_select ".crucible__tables[data-count='1'] .crucible-table[data-width='1']"
   end
 end

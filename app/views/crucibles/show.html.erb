@@ -39,7 +39,7 @@
     </button>
   </div>
 
-  <div class="crucible__tables" hidden="<%= !show_tables %>">
+  <div class="crucible__tables" data-count="<%= @crucible.tables.size %>" hidden="<%= !show_tables %>">
     <% @crucible.tables.each_with_index do |table, index| %>
       <section class="crucible-table" data-crucible-target="table" data-name="<%= table.name %>" data-width="<%= table.width %>" aria-labelledby="table-<%= index %>">
         <header class="crucible-table__header">

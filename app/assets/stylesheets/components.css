@@ -649,11 +649,23 @@ form.button_to, .button_to { margin: 0; }
 
 .crucible__toolbar { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
 
+/* Laid out by how many tables there are (data-count): three or more fill columns of 26rem,
+   two share the width, and one has it to itself, with bigger cells, a narrow list kept to a
+   readable width. */
 .crucible__tables {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
   gap: var(--space-5);
 }
+.crucible__tables[data-count="2"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); }
+.crucible__tables[data-count="1"] { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 40rem) {
+  .crucible__tables[data-count="1"] .grid66 { font-size: 1rem; }
+  .crucible__tables[data-count="1"] .grid66 td { padding: var(--space-2); }
+}
+.crucible__tables[data-count="1"] .crucible-table[data-width="1"] { max-width: 40rem; }
+.crucible__tables[data-count="1"] .crucible-table[data-width="2"] { max-width: 52rem; }
+.crucible__tables[data-count="1"] .crucible-table[data-width="3"] { max-width: 64rem; }
 
 .crucible__tables[hidden] { display: none; }
 
