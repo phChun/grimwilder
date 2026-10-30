@@ -18,7 +18,7 @@
       <button type="button" class="button button--quiet" data-action="crucible#keep" data-crucible-target="keepButton" disabled>Keep these</button>
     </div>
 
-    <div class="crucible__results" style="--tables: <%= @crucible.tables.size %>" data-count="<%= @crucible.tables.size %>" data-crucible-target="results" aria-live="polite">
+    <div class="crucible__results" data-crucible-target="results" aria-live="polite">
       <p class="crucible__hint">Roll to get two readings from each table. Tap a word to choose it, then keep the combinations you like.</p>
     </div>
 
@@ -48,14 +48,16 @@
         </header>
         <div class="grid66-wrap">
         <table class="grid66">
+          <% if table.width > 1 %>
           <thead>
             <tr>
               <th scope="col"><span class="visually-hidden">Row</span></th>
               <% table.width.times do |column| %>
-                <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
+                <th scope="col"><%= table.column_label(column) || (column + 1 unless table.column_dice(column)) %><% if (dice = table.column_dice(column)) %> <span class="grid66__dice"><%= dice %></span><% end %></th>
               <% end %>
             </tr>
           </thead>
+          <% end %>
           <tbody>
             <% table.rows.each_with_index do |row, row_index| %>
               <tr>

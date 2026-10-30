@@ -6,19 +6,28 @@
   <p class="page-header__lede">Tables of evocative words from the book. Roll, read each result both ways, smash the best ones together and interpret them, literally or figuratively.</p>
 </header>
 
-<% @groups.each do |group, crucibles| %>
-  <section class="crucible-group" aria-labelledby="group-<%= group %>">
-    <h2 id="group-<%= group %>" class="section-title"><%= Crucible::GROUPS.fetch(group) %></h2>
-    <ul class="tool-grid__list">
-      <% crucibles.each do |crucible| %>
-        <li>
-          <%= link_to crucible_path(crucible), class: "tool-card tool-card--ready" do %>
-            <span class="tool-card__name"><%= crucible.name %></span>
-            <span class="tool-card__desc"><%= crucible.blurb %></span>
-            <small><%= pluralize(crucible.tables.size, "table") %> · pg. <%= crucible.page %></small>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  </section>
-<% end %>
+<div class="crucible-catalog" data-controller="crucible-filter">
+  <div class="crucible-catalog__tools">
+    <input type="search" class="field__input crucible-catalog__search" placeholder="Search crucibles: names, treasure, tavern…" autocomplete="off" aria-label="Search crucibles" data-crucible-filter-target="query" data-action="input->crucible-filter#filter">
+    <p class="field__hint" data-crucible-filter-target="count" aria-live="polite"></p>
+  </div>
+
+  <% @groups.each do |group, crucibles| %>
+    <section class="crucible-group" data-crucible-filter-target="group" aria-labelledby="group-<%= group %>">
+      <h2 id="group-<%= group %>" class="section-title"><%= Crucible::GROUPS.fetch(group) %></h2>
+      <ul class="tool-grid__list">
+        <% crucibles.each do |crucible| %>
+          <li data-crucible-filter-target="item" data-search="<%= crucible.search_text %>">
+            <%= link_to crucible_path(crucible), class: "tool-card tool-card--ready" do %>
+              <span class="tool-card__name"><%= crucible.name %></span>
+              <span class="tool-card__desc"><%= crucible.blurb %></span>
+              <small><%= pluralize(crucible.tables.size, "table") %> · pg. <%= crucible.page %></small>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <p class="crucible-catalog__empty" data-crucible-filter-target="empty" hidden>No crucibles match. Try fewer words.</p>
+</div>

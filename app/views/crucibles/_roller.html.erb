@@ -10,7 +10,7 @@
       <%= link_to "Full page", crucible_path(crucible), class: "crucible__full", data: { turbo_frame: "_top" } %>
     </div>
 
-    <div class="crucible__results" style="--tables: <%= crucible.tables.size %>" data-count="<%= crucible.tables.size %>" data-crucible-target="results" aria-live="polite">
+    <div class="crucible__results" data-crucible-target="results" aria-live="polite">
       <p class="crucible__hint"><%= crucible.how %> <small>(pg. <%= crucible.page %><%= "; #{crucible.credit}" if crucible.credit %>)</small></p>
     </div>
   </div>
@@ -26,14 +26,16 @@
           </header>
           <div class="grid66-wrap">
             <table class="grid66">
+              <% if table.width > 1 %>
               <thead>
                 <tr>
                   <th scope="col"><span class="visually-hidden">Row</span></th>
                   <% table.width.times do |column| %>
-                    <th scope="col"><%= table.columns ? table.columns[column] : column + 1 %></th>
+                    <th scope="col"><%= table.column_label(column) || (column + 1 unless table.column_dice(column)) %><% if (dice = table.column_dice(column)) %> <span class="grid66__dice"><%= dice %></span><% end %></th>
                   <% end %>
                 </tr>
               </thead>
+              <% end %>
               <tbody>
                 <% table.rows.each_with_index do |row, row_index| %>
                   <tr>

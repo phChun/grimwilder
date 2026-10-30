@@ -65,6 +65,7 @@
       GROWTH: At levels 2, 4, and 6, you can create +1 major arcana, and learn 2 touchstones.'
     note: Arcana doesn’t regain uses when rebuilt, but those that expand vantage can still do so.
     page: 55
+    crucible: magitechnobabble
     bonuses:
     - { key: engineer, label: "Engineer: making, fixing or breaking a mechanism or arcana" }
     choices:
@@ -561,6 +562,7 @@
 
       GROWTH: At levels 2, 4, and 6, gain +1 smite per session.'
     page: 69
+    crucible: tenet_builder
     state: oath
     choices:
     - { key: tenets, label: Tenets, noun: tenet, pick: 3, open: true }

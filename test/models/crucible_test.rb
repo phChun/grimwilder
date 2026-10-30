@@ -23,7 +23,27 @@ class CrucibleTest < ActiveSupport::TestCase
     assert_match "Juniper Bloom", Crucible.find("herbalism").credit
     assert_equal [ "squat", "float" ], Crucible.find("vassal").tables.then { [ _1.first.cell(1, 1), _1.last.cell(6, 2) ] }
     assert_equal [ 3, "avenger" ], Crucible.find("legend").tables.last.then { [ _1.width, _1.cell(6, 3) ] }
-    assert_equal %w[ well hope buzz surge turn smoke drift morn ], %w[ spring summer fall winter ].flat_map { |key| Crucible.find(key).tables.map { _1.cell(6, 1) } }
+    assert_equal %w[ well hope buzz surge turn smoke drift morn ], %w[ spring summer fall winter ].flat_map { |key| Crucible.find(key).tables.first(2).map { _1.cell(6, 1) } }
+  end
+
+  test "the seasons' atmospherics, checked against the Community Edition" do
+    atmospherics = %w[ spring summer fall winter ].map { |key| Crucible.find(key).tables.last }
+    assert_equal [ "Atmospherics" ], atmospherics.map(&:name).uniq
+    assert_equal [ "frost melts", "clear skies", "endless downpours", "dying fungi", "drifting embers", "pollen fires", "whispering winds", "frozen silence" ],
+      atmospherics.flat_map { [ _1.cell(1, 1), _1.cell(6, 2) ] }
+  end
+
+  test "the Community Edition's crucibles for artificers, paladins, treasure and potions" do
+    assert_equal [ "alche-", "-knob" ], Crucible.find("magitechnobabble").tables.then { [ _1.first.cell(1, 1), _1.last.cell(6, 6) ] }
+    assert_equal [ "honor—valor", "my trait, …", "my lack of…" ], Crucible.find("tenet_builder").tables.sole.then { [ _1.cell(1, 1), _1.cell(2, 3), _1.cell(6, 3) ] }
+    assert_equal [ "favor", "blessing" ], Crucible.find("treasure").tables.sole.then { [ _1.cell(1, 1), _1.cell(6, 3) ] }
+    assert_equal %w[ foggy tapered flask glass colorful strange mist oil ], Crucible.find("potion_qualities").tables.flat_map { [ _1.cell(1, 1), _1.cell(6, 1) ] }
+    assert_equal "magitechnobabble", Talent.find("infusion").crucible
+    assert_equal "tenet_builder", Talent.find("oathsworn").crucible
+  end
+
+  test "past entanglements: How, then Who" do
+    assert_equal %w[ How Who ], Crucible.find("entanglements").tables.map(&:name)
   end
 
   test "every talent's crucible exists" do
@@ -40,7 +60,7 @@ class CrucibleTest < ActiveSupport::TestCase
   test "multi-word cells stay whole" do
     assert_equal "fortune teller", Crucible.find("buildings").tables.last.cell(6, 2)
     assert_equal "over the hill", Crucible.find("features").tables.last.cell(3, 5)
-    assert_equal %w[Civil Social Historical Natural Mystical Practical], Crucible.find("wises").tables.first.columns
+    assert_equal %w[Civilization Social History Nature Mysticism Practical], Crucible.find("wises").tables.first.columns
   end
 
   test "the spell, words of power and patron crucibles, checked against the book (pg. 83, 85, 87)" do
@@ -56,6 +76,15 @@ class CrucibleTest < ActiveSupport::TestCase
     assert_equal %w[ Nature Desires ], patron.map(&:name)
     assert_equal "dead god", patron.first.cell(4, 1)
     assert_equal "entropy", patron.last.cell(6, 6)
+  end
+
+  test "a narrower table's columns name the second die's faces" do
+    assert_equal [ "1–3", "4–6" ], Crucible.find("vassal").tables.first.then { |table| 2.times.map { table.column_dice(_1) } }
+    assert_equal [ "1–2", "3–4", "5–6" ], Crucible.find("legend").tables.first.then { |table| 3.times.map { table.column_dice(_1) } }
+    assert_nil Crucible.find("gm").tables.first.column_dice(0)
+    assert_nil Crucible.find("eldritch_mutations").tables.first.column_dice(0)
+    assert_nil Crucible.find("vassal").tables.first.column_label(0), "Build, under Build"
+    assert_equal "Playful", Crucible.find("legend").tables.first.column_label(0)
   end
 
   test "find raises not found for unknown keys" do

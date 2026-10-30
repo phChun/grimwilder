@@ -596,55 +596,71 @@ form.button_to, .button_to { margin: 0; }
 /* ---------- Crucibles ---------- */
 
 .crucible-group { margin-bottom: var(--space-6); }
+/* The list's search, sticky like the talent catalog's. */
+.crucible-catalog__tools {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.crucible-catalog__search { max-width: 32rem; }
+.crucible-catalog__tools > .field__hint { margin: 0; }
+.crucible-catalog__tools > .field__hint:empty { display: none; }
+.crucible-catalog__empty { color: var(--dim); }
+.crucible-catalog .tool-grid__list > li[hidden] { display: none; }
 .tool-card small { margin-top: auto; }
 
 .crucible__roller { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); }
 .crucible__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
 .crucible__hint { margin: 0; color: var(--dim); }
 
-/* Each table's roll is a card: its name, the dice, then the readings. A column per table at
-   most (--tables, set in the view): the hint and the smash span every track, so auto-fit alone
-   would keep empty ones and squeeze the cards to the left. With one table the card says it all,
-   so the page leaves out the smash (data-count). */
-.crucible__results {
-  --gap: var(--space-3);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(var(--card-min, 12rem), (100% - var(--gap) * (var(--tables, 1) - 1)) / var(--tables, 1) - 1px)), 1fr));
-  gap: var(--gap);
+/* The chosen words lead, smashed together; under them a row for each table: its
+   name, the dice, then the readings, on one line and only as wide as that. Rows sit side by side
+   when there's room, each a tile of its own; a row wraps only when it can't fit the screen, keeping the chips together. */
+.crucible__results { display: grid; gap: var(--space-3); }
+.roll-result__smash {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  line-height: 1.2;
 }
-.crucible__results > * { grid-column: 1 / -1; }
-.crucible__results > .roll-result {
-  grid-column: auto;
-  display: grid;
-  align-content: start;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4) var(--space-4);
-  background: var(--surface-2);
-  border: 1px solid var(--line-soft);
+.roll-result__smash:empty { display: none; }
+.crucible__rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crucible-roll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
   border-radius: var(--radius-control);
 }
-.crucible__results[data-count="1"] .roll-result__smash { display: none; }
-.roll-result__label {
-  margin: 0;
+.crucible-roll__name {
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
 }
-.crucible__results .roll-result__roll { margin: 0; }
-/* A lone reading where tapping it does nothing (no form listening for crucible:pick). */
-.roll-result__text { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text); }
-.roll-result__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-
-.roll-result__smash {
-  margin: var(--space-2) 0 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 4vw, 2.1rem);
-  line-height: 1.2;
-}
-
-.roll-result__smash:empty { display: none; }
+.crucible-roll__dice { display: flex; gap: var(--space-1); }
+.crucible-roll__readings { display: flex; gap: var(--space-2); }
+.crucible-roll__readings .chip { white-space: nowrap; }
+/* A lone reading with nothing to choose or fill: text, not a chip. */
+.crucible-roll__word { color: var(--ember); font-size: 1.05rem; font-weight: 600; white-space: nowrap; }
 
 .chip {
   padding: var(--space-1) var(--space-3);
@@ -716,6 +732,8 @@ form.button_to, .button_to { margin: 0; }
 }
 
 .grid66 th { color: var(--dim); font-weight: 600; font-size: 0.75rem; }
+/* A 2- or 3-column table's second-die faces beside its heading ("Origin 1–2"). */
+.grid66__dice { font-family: var(--font-dice); font-weight: 500; white-space: nowrap; }
 .grid66 thead th:first-child,
 .grid66 tbody th { width: 1.8rem; }
 
@@ -1061,7 +1079,6 @@ form.button_to, .button_to { margin: 0; }
 .crucible-picker__label { margin-right: var(--space-1); font-size: 0.8rem; color: var(--dim); }
 .chip--small { padding: 2px var(--space-3); font-size: 0.85rem; }
 
-.roll-result__roll { font-family: var(--font-dice); font-size: 0.8rem; color: var(--dim); white-space: nowrap; }
 
 /* The GM table's roller: results as tiles, the smash as a band, and the kept
    list as a panel on the right once the card is wide enough. */
@@ -1076,9 +1093,7 @@ form.button_to, .button_to { margin: 0; }
 .crucible__stage { display: grid; gap: var(--space-4); align-content: start; min-width: 0; }
 .crucible__full { margin-left: auto; font-size: 0.85rem; }
 
-.crucible--compact .crucible__results { --card-min: 13rem; }
 .crucible--compact .crucible__hint {
-  grid-column: 1 / -1;
   padding: var(--space-5) var(--space-4);
   border: 1px dashed var(--line);
   border-radius: var(--radius-control);
@@ -1090,7 +1105,6 @@ form.button_to, .button_to { margin: 0; }
 
 
 .crucible--compact .roll-result__smash {
-  grid-column: 1 / -1;
   margin: 0;
   padding: var(--space-3) var(--space-4);
   background: var(--ember-soft);

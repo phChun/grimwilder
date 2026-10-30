@@ -8,13 +8,30 @@ class CruciblesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", crucible_path("gm")
   end
 
+  test "index can be searched by name, blurb or any word a crucible rolls" do
+    get crucibles_path
+    assert_select "[data-controller=crucible-filter] input[type=search][data-crucible-filter-target=query]"
+    assert_select "li[data-crucible-filter-target=item]", Crucible.all.size
+    assert_select "li[data-search*='lucrative rumor'] a[href=?]", crucible_path("treasure")
+  end
+
   test "show renders each table as a 6x6 grid" do
     get crucible_path("buildings")
     assert_response :success
     assert_select "[data-controller=crucible] [data-crucible-target=table]", 2
     assert_select ".crucible__tables[data-count='2']"
-    assert_select ".crucible__results[data-count='2'][style='--tables: 2']"
     assert_select "td[data-row='6'][data-col='2']", text: "fortune teller"
+  end
+
+  test "one-column lists have no heading row; narrower tables name the die's faces" do
+    get crucible_path("eldritch_mutations")
+    assert_select ".grid66 thead", 0
+
+    get crucible_path("legend")
+    assert_select ".grid66 thead th", text: "Playful 1–2"
+
+    get crucible_path("vassal")
+    assert_select ".grid66 thead th", text: "1–3"
   end
 
   test "unknown crucibles are a 404" do
