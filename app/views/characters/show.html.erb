@@ -413,6 +413,6 @@
   </div>
 
   <% if campaign %>
-    <%= render "campaigns/table_rail", campaign: campaign, membership: @membership, feed: @feed, speakers: @speakers, speaker: (@character if editable && @character.active?), suspense: true, classes: "fluid__rail" %>
+    <%= render "campaigns/table_rail", view: "talk", campaign: campaign, membership: @membership, feed: @feed, speakers: @speakers, speaker: (@character if editable && @character.active?), suspense: true, classes: "fluid__rail" %>
   <% end %>
 </div>

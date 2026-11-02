@@ -110,12 +110,17 @@ asset_path: /rails/public/assets
 builder:
   arch: amd64
 
+  # The release this image is, shown in /admin (config/application.rb). The
+  # deploy workflow sets APP_VERSION to the release's tag; from the Mac it's the
+  # nearest tag, with how far past it and -dirty for uncommitted changes.
+  args:
+    APP_VERSION: <%= ENV["APP_VERSION"].presence || `git describe --tags --always --dirty`.strip %>
+    APP_REVISION: <%= `git rev-parse --short HEAD`.strip %>
+
   # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
   # remote: ssh://docker@docker-builder-server
   #
-  # # Pass arguments and secrets to the Docker build process
-  # args:
-  #   RUBY_VERSION: 4.0.9
+  # # Pass secrets to the Docker build process
   # secrets:
   #   - GITHUB_TOKEN
   #   - RAILS_MASTER_KEY

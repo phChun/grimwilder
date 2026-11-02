@@ -78,6 +78,12 @@ COPY --chown=1000:1000 --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=1000:1000 --from=build /rails /rails
 WORKDIR /rails
 
+# Which release this is (config/deploy.yml passes them; shown in /admin). Last,
+# so a new version doesn't bust the cached layers above.
+ARG APP_VERSION APP_REVISION
+ENV APP_VERSION=$APP_VERSION \
+    APP_REVISION=$APP_REVISION
+
 # Run as a non-root user
 USER 1000:1000
 

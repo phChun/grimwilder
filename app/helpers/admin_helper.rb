@@ -9,4 +9,13 @@ module AdminHelper
   def admin_pages_nav(pagy, noun)
     pagy.series_nav(aria_label: ERB::Util.html_escape("#{noun.capitalize} pages")).html_safe if pagy.last > 1
   end
+
+  # Which release is running (config.x.version and revision, from the image):
+  # "v1.4.0 · a1b2c3d", or "a development build" outside a released image.
+  def admin_version_line
+    version, revision = Rails.configuration.x.version, Rails.configuration.x.revision
+    return "a development build" unless version || revision
+
+    safe_join([ tag.strong(version || "an untagged build"), (tag.code(revision) if revision && revision != version) ].compact, " · ")
+  end
 end

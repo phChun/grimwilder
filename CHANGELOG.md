@@ -4,6 +4,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-02
 
+- **Chat opens on Table talk** on the GM table and on character sheets; the campaign page still shows everything. ([#84](https://github.com/phChun/grimwilder/pull/84))
+- **Releases deploy**: merging no longer ships the site; publishing a GitHub release does, and admin's Site stats shows the release running. ([#84](https://github.com/phChun/grimwilder/pull/84))
 - **Turn the invite link off**: in settings, the GM can switch the invite link off so no one new joins, and back on later. ([#83](https://github.com/phChun/grimwilder/pull/83))
 - **Game schedules**: set when your table plays (every week or few, or monthly like "first Saturday"), skip or move a date, add one-offs, and everyone sees the next game on the campaigns list, the campaign page and the GM table, in their own time zone. ([#82](https://github.com/phChun/grimwilder/pull/82))
 - **On hold**: when a plan runs fewer campaigns than you have, the most recently played keeps going and the rest wait, with chat and sheets still open. Choose which to play from the campaigns list. ([#81](https://github.com/phChun/grimwilder/pull/81))

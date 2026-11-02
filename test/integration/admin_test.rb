@@ -72,6 +72,19 @@ class AdminTest < ActionDispatch::IntegrationTest
     assert_select "td", text: campaigns(:bramblewood).name
   end
 
+  test "the stats say which release is running" do
+    sign_in_as identities(:ada)
+    get admin_root_path
+    assert_select ".admin-version", "Running a development build"
+
+    Rails.configuration.x.version, Rails.configuration.x.revision = "v1.4.0", "a1b2c3d"
+    get admin_root_path
+    assert_select ".admin-version strong", "v1.4.0"
+    assert_select ".admin-version code", "a1b2c3d"
+  ensure
+    Rails.configuration.x.version = Rails.configuration.x.revision = nil
+  end
+
   test "last sign-in outlasts signing out" do
     sign_in_as identities(:pip)
     signed_in_at = identities(:pip).reload.last_signed_in_at

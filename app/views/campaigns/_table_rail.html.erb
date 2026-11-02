@@ -1,5 +1,5 @@
-<%# locals: (campaign:, membership:, feed:, speakers:, speaker: nil, suspense: nil, classes: nil) %>
-<%# The table's rail: chat and log in one time-ordered stream (TableFeed), filtered in the browser, with the composer. speakers: the active characters this member can speak as; speaker: the one picked first; %>
+<%# locals: (campaign:, membership:, feed:, speakers:, speaker: nil, suspense: nil, classes: nil, view: nil) %>
+<%# The table's rail: chat and log in one time-ordered stream (TableFeed), filtered in the browser, with the composer. speakers: the active characters this member can speak as; speaker: the one picked first; view: the Show choice it opens on (Everything unless given). %>
 <% feed.streams.each do |stream| %>
   <%= turbo_stream_from(*stream) %>
 <% end %>
@@ -26,9 +26,11 @@
   <div class="feed">
     <%# What the feed shows, and where the composer sends (it's the form's context): CSS hides the rest (components.css, "Filters"), lines that arrive live included. A private conversation is picked by the other side: feed_controller.js marks its lines and sets the composer's line and placeholder. %>
     <% filters = feed_filters(campaign, membership, speakers) %>
+    <% view ||= "all" %>
+    <% opening = filters.find { _1.second == view } || filters.first %>
     <div class="feed__filter">
       <label class="feed__filter-label" for="<%= prefix %>_filter">Show</label>
-      <%= select_tag :context, options_for_select(filters, "all"), id: "#{prefix}_filter", form: "#{prefix}_composer", class: "field__input feed__filter-select", data: { feed_target: "filter", action: "feed#filter" } %>
+      <%= select_tag :context, options_for_select(filters, opening.second), id: "#{prefix}_filter", form: "#{prefix}_composer", class: "field__input feed__filter-select", data: { feed_target: "filter", action: "feed#filter" } %>
       <%# Unread private messages (feed_controller.js); it opens the first conversation with any. %>
       <button type="button" class="feed__unread" hidden data-feed-target="unread" data-action="feed#openUnread"></button>
     </div>
@@ -56,7 +58,7 @@
   <% else %>
     <%# No picker for where it goes: Show decides (the GM may still voice an NPC in the story views, and a player with more than one character here picks which speaks). %>
     <%= form_with url: campaign_messages_path(campaign), id: "#{prefix}_composer", class: class_names("composer", "composer--no-character": !gm && speakers.none?), data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>
-      <p class="composer__to" data-feed-target="to"><%= filters.first.last[:data][:to] %></p>
+      <p class="composer__to" data-feed-target="to"><%= opening.last[:data][:to] %></p>
       <% if gm %>
         <div class="composer__voices">
           <%= render "shared/segmented", name: "voice", legend: "Who's speaking", options: [ %w[ narration Narrate ], [ "npc", "As NPC" ] ], checked: "narration", id_prefix: "#{prefix}_voice", classes: "composer__voice-pick" %>
@@ -73,7 +75,7 @@
         <input type="hidden" name="character_id" value="<%= speakers.first.id %>">
       <% end %>
       <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
-      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="<%= filters.first.last[:data][:placeholder] %>" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
+      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="<%= opening.last[:data][:placeholder] %>" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
       <div class="composer__row">
         <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
         <button type="submit" class="button button--primary composer__send">Send</button>
