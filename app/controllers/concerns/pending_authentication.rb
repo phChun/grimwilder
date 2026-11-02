@@ -30,7 +30,7 @@ module PendingAuthentication
     # up even while sign-ups are closed, as long as the link still works (the
     # GM resetting it takes that back).
     def invited?
-      session[:invite_code].present? && Campaign.exists?(join_code: session[:invite_code])
+      session[:invite_code].present? && Campaign.exists?(join_code: session[:invite_code], join_link_enabled: true)
     end
 
     def pending_authentication_verifier

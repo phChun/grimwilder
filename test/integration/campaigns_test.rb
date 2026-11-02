@@ -52,11 +52,47 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "the GM turns the invite link off, and on again" do
+    campaign = campaigns(:bramblewood)
+    sign_in_as identities(:gwen)
+    delete campaign_join_link_path(campaign)
+    assert_redirected_to edit_campaign_path(campaign, anchor: "settings")
+    assert_not campaign.reload.join_link_enabled?
+
+    get edit_campaign_path(campaign)
+    assert_select "#settings form[action=?] button", campaign_join_link_path(campaign), "Turn the link on"
+    assert_select "#settings .copy-field", 0
+    get campaign_path(campaign)
+    assert_select ".campaign-actions button[data-clipboard-text-value]", 0
+    sign_out
+
+    sign_in_as identities(:stranger)
+    get join_path(campaign.join_code)
+    assert_select ".auth__panel", /turned this invite link off/
+    assert_select ".auth__panel form", 0
+    assert_no_difference -> { campaign.memberships.count } do
+      post join_path(campaign.join_code)
+    end
+    assert_redirected_to join_path(campaign.join_code)
+    sign_out
+
+    sign_in_as identities(:gwen)
+    post campaign_join_link_path(campaign)
+    assert campaign.reload.join_link_enabled?
+    sign_out
+    sign_in_as identities(:stranger)
+    assert_difference -> { campaign.memberships.count } do
+      post join_path(campaign.join_code)
+    end
+  end
+
   test "players can't manage the campaign" do
     campaign = campaigns(:bramblewood)
     sign_in_as identities(:pip)
 
     patch campaign_join_code_path(campaign)
+    assert_response :forbidden
+    delete campaign_join_link_path(campaign)
     assert_response :forbidden
 
     patch campaign_path(campaign), params: { campaign: { name: "Mine now" } }

@@ -10,11 +10,15 @@ class JoinsController < ApplicationController
     @no_room = authenticated? && !@membership && !Current.identity.room_to_play?
     unless authenticated?
       session[:return_to_after_authenticating] = request.url
-      session[:invite_code] = @campaign.join_code # lets them sign up while sign-ups are closed
+      session[:invite_code] = @campaign.join_code if @campaign.join_link_enabled? # lets them sign up while sign-ups are closed
     end
   end
 
   def create
+    unless @campaign.joinable? || Current.identity.membership_in(@campaign)
+      return redirect_to join_path(@campaign.join_code), alert: "#{@campaign.name} isn't taking new players through this link."
+    end
+
     @campaign.memberships.find_or_create_by!(identity: Current.identity)
     redirect_to @campaign, notice: "Welcome to #{@campaign.name}."
   end

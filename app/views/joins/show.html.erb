@@ -20,6 +20,8 @@
       <%= link_to "Your campaigns", campaigns_path, class: "button button--wide" %>
     <% elsif @campaign.archived? %>
       <p><%= @campaign.name %> is archived, so no one can join it now.</p>
+    <% elsif !@campaign.join_link_enabled? %>
+      <p>The GM has turned this invite link off, so it won't let anyone in right now. Ask them for a fresh one.</p>
     <% elsif @no_room %>
       <p><%= Current.identity.plan_limit_message(:player) %> Then come back to this link.</p>
       <%= link_to "Your campaigns", campaigns_path, class: "button button--wide" %>
