@@ -41,13 +41,6 @@ class Campaign < ApplicationRecord
     end
   end
 
-  # The invite link lets people join while it's on and the campaign isn't
-  # archived. Off, /join/:code says so and joins no one; turning it back on
-  # brings the same link back (a new link is reset_join_code!).
-  def joinable?
-    join_link_enabled? && !archived?
-  end
-
   def reset_join_code!
     self.join_code = nil
     generate_join_code

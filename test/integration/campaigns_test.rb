@@ -68,12 +68,11 @@ class CampaignsTest < ActionDispatch::IntegrationTest
 
     sign_in_as identities(:stranger)
     get join_path(campaign.join_code)
-    assert_select ".auth__panel", /turned this invite link off/
-    assert_select ".auth__panel form", 0
+    assert_response :not_found
     assert_no_difference -> { campaign.memberships.count } do
       post join_path(campaign.join_code)
     end
-    assert_redirected_to join_path(campaign.join_code)
+    assert_response :not_found
     sign_out
 
     sign_in_as identities(:gwen)

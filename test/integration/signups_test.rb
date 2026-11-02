@@ -53,10 +53,10 @@ class SignupsTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test "an invite link that's turned off lets no one sign up" do
+  test "an invite link turned off after it was opened lets no one sign up" do
     campaign = campaigns(:bramblewood)
-    campaign.update!(join_link_enabled: false)
     get join_path(campaign.join_code)
+    campaign.update!(join_link_enabled: false)
     assert_no_enqueued_emails do
       post session_path, params: { email_address: "newplayer@example.com" }
     end
