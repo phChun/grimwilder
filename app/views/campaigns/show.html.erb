@@ -63,7 +63,9 @@
           <% else %>
             <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary" %>
           <% end %>
-          <%= render "campaigns/copy_join_button", url: join_url(campaign.join_code) %>
+          <% if campaign.join_link_enabled? %>
+            <%= render "campaigns/copy_join_button", url: join_url(campaign.join_code) %>
+          <% end %>
         <% elsif @mine_all.many? %>
           <%# More than one character here: the button opens a menu of their sheets. %>
           <details id="open-character" class="go-menu" data-controller="menu" data-action="toggle->menu#place">

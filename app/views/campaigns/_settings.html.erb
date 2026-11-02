@@ -2,9 +2,17 @@
 <% if gm && !Current.campaign.archived? %>
   <div class="stack">
     <h3 class="fold__heading">Invite players</h3>
-    <p class="field__hint">Anyone with this link can sign in and join as a player.</p>
-    <%= render "campaigns/join_link", url: join_url(Current.campaign.join_code) %>
-    <%= button_to "Make a new link", campaign_join_code_path(Current.campaign), method: :patch, class: "button button--quiet button--small", form: { data: { turbo_confirm: "The current link will stop working. Continue?" } } %>
+    <% if Current.campaign.join_link_enabled? %>
+      <p class="field__hint">Anyone with this link can sign in and join as a player.</p>
+      <%= render "campaigns/join_link", url: join_url(Current.campaign.join_code) %>
+      <div class="list__actions">
+        <%= button_to "Make a new link", campaign_join_code_path(Current.campaign), method: :patch, class: "button button--quiet button--small", form: { data: { turbo_confirm: "The current link will stop working. Continue?" } } %>
+        <%= button_to "Turn the link off", campaign_join_link_path(Current.campaign), method: :delete, class: "button button--quiet button--small", form: { data: { turbo_confirm: "Turn the invite link off? No one new can join with it until you turn it back on." } } %>
+      </div>
+    <% else %>
+      <p class="field__hint">The invite link is off: no one new can join. Turning it on brings back the same link; make a new one if the old one went somewhere it shouldn't.</p>
+      <%= button_to "Turn the link on", campaign_join_link_path(Current.campaign), class: "button button--small" %>
+    <% end %>
   </div>
 <% end %>
 

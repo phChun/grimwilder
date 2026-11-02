@@ -83,6 +83,7 @@ Rails.application.routes.draw do
   resources :campaigns, except: :new do
     scope module: :campaigns do
       resource :join_code, only: :update
+      resource :join_link, only: %i[ create destroy ] # the GM turns the invite link on or off
       resource :play, only: :show
       resource :table, only: :show
       resources :memberships, only: :destroy

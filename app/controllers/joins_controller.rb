@@ -20,7 +20,8 @@ class JoinsController < ApplicationController
   end
 
   private
+    # A link the GM turned off is a 404, like one they reset.
     def set_campaign
-      @campaign = Campaign.find_by!(join_code: params[:code])
+      @campaign = Campaign.find_by!(join_code: params[:code], join_link_enabled: true)
     end
 end
