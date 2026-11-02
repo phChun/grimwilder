@@ -56,7 +56,7 @@ module Character::TalentActions
     talent = talent_entry(talent_key)
     raise ArgumentError, "#{talent.name} doesn't ask you to push yourself." unless talent.pushes?
     raise ArgumentError, "#{name} is #{status}; return them to play to push." if gone?
-    raise ArgumentError, "#{campaign.name} is archived." if campaign&.archived?
+    campaign&.refuse_play!
 
     self.changed_by = by
     took = take_mark(stat)

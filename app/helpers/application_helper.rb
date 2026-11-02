@@ -75,7 +75,7 @@ module ApplicationHelper
       [
         all_campaigns_tab,
         this_one,
-        ([ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ] unless campaign.archived?),
+        ([ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ] if campaign.playable?),
         log
       ].compact
     else

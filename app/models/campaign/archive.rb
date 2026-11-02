@@ -23,6 +23,8 @@ module Campaign::Archive
       roll_calls.open.each { _1.cancel!(by: by) }
       post_marker!("#{name} is archived", by: by)
       update!(archived_at: Time.current)
+      # Archived campaigns hold nothing: it comes back unheld, with room checked.
+      memberships.held.update_all(held_at: nil)
     end
   end
 
@@ -42,8 +44,14 @@ module Campaign::Archive
     end
   end
 
-  # Rolls, messages and roll calls check this on create, so an archived campaign's log stays as it was.
+  # Rolls, messages and roll calls check this on create, so an archived
+  # campaign's log stays as it was. On hold (Campaign::Hold), chat goes on,
+  # and so do the app's notes and markers; rolls and roll calls wait.
   def refuse_new_play(record)
-    record.errors.add(:base, "#{name} is archived. The GM can unarchive it to play.") if archived?
+    if archived?
+      record.errors.add(:base, "#{name} is archived. The GM can unarchive it to play.")
+    elsif on_hold? && !record.is_a?(Message) && !(record.is_a?(Roll) && record.kind.in?(%w[ marker note ]))
+      record.errors.add(:base, on_hold_message)
+    end
   end
 end

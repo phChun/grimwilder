@@ -5,6 +5,10 @@ class Membership < ApplicationRecord
 
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
 
+  # Held: a GM seat over its account's plan (Identity::Plans#apply_plan!).
+  scope :held, -> { where.not(held_at: nil) }
+  scope :unheld, -> { where(held_at: nil) }
+
   validates :identity_id, uniqueness: { scope: :campaign_id }
   validate :within_plan, :not_blocked, on: :create
 
@@ -30,6 +34,10 @@ class Membership < ApplicationRecord
     elsif seen_at && seen_at > now - PRESENCE_WINDOW then "idle"
     else "away"
     end
+  end
+
+  def held?
+    held_at.present?
   end
 
   # The characters this member plays here: seated, and still playing.

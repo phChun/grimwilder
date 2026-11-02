@@ -1,6 +1,7 @@
 # Starting a scene (pg. 96), maybe opening with a story roll. GM only.
 class Campaigns::ScenesController < ApplicationController
   include CampaignScoped, StoryRollParams
+  before_action :refuse_when_on_hold, only: %i[ new create ] # editing a title or notes is fine
 
   before_action :require_gm
   before_action :set_session, only: %i[ new create ]

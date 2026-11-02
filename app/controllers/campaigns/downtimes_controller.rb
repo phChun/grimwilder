@@ -4,6 +4,7 @@
 # character's action instead, and only those who rest heal. GM only.
 class Campaigns::DowntimesController < ApplicationController
   include CampaignScoped
+  before_action :refuse_when_on_hold
 
   before_action :require_gm
 

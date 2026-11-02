@@ -74,6 +74,12 @@
         <% end %>
       </div>
     <% end %>
+    <%# On hold (Campaign::Hold): the sheet still edits, but rolls wait for the GM to play it again. %>
+    <% if campaign&.on_hold? && @character.active? %>
+      <div class="claim-bar">
+        <p class="claim-bar__text"><strong><%= campaign.name %> is on hold.</strong> The GM's plan runs fewer campaigns. The sheet and chat still work; rolls wait until it's back on.</p>
+      </div>
+    <% end %>
 
     <%# A fallen or retired character's sheet says so, with the player's farewell; the owner can bring them back. %>
     <% if @character.gone? %>

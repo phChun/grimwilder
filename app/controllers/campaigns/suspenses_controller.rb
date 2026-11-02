@@ -3,6 +3,7 @@
 # and none of it goes in the log.
 class Campaigns::SuspensesController < ApplicationController
   include CampaignScoped
+  before_action :refuse_when_on_hold
 
   before_action :require_gm
 

@@ -14,7 +14,7 @@ module Roll::FollowUps
   KINDS = %w[ action defense story ].freeze
 
   def follow_up_open?
-    kind.in?(KINDS) && created_at > WINDOW.ago && character_id.present? && campaign.present? && !campaign.archived? &&
+    kind.in?(KINDS) && created_at > WINDOW.ago && character_id.present? && campaign.present? && campaign.playable? &&
       character.rolls.where(kind: KINDS).recent.first == self
   end
 

@@ -30,6 +30,16 @@ module CampaignScoped
       end
     end
 
+    # On hold (Campaign::Hold): the controllers that play (sessions, scenes,
+    # rolls, roll calls, pools, montages, quarrels, rests, downtime) add this.
+    # Chat, settings, joining and sheets go on.
+    def refuse_when_on_hold
+      return if request.get? || request.head?
+      if Current.campaign&.on_hold?
+        redirect_back_or_to campaign_path(Current.campaign), status: :see_other, alert: Current.campaign.on_hold_message
+      end
+    end
+
     def gm?
       Current.membership&.gm?
     end
@@ -39,9 +49,9 @@ module CampaignScoped
     end
 
     # Where play happens for this viewer: the GM table, or the campaign page
-    # (for everyone, once the campaign is archived).
+    # (for everyone, once the campaign is archived or on hold).
     def table_path_for_viewer(anchor: nil)
-      gm? && !Current.campaign.archived? ? campaign_table_path(Current.campaign, anchor: anchor) : campaign_path(Current.campaign, anchor: anchor)
+      gm? && Current.campaign.playable? ? campaign_table_path(Current.campaign, anchor: anchor) : campaign_path(Current.campaign, anchor: anchor)
     end
 
     # Back where play happens; a player who rolled from their sheet (it holds

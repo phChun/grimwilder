@@ -4,6 +4,7 @@ module PoolScoped
 
   included do
     include CampaignScoped
+    before_action :refuse_when_on_hold
     before_action :set_pool
   end
 

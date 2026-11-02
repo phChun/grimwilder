@@ -2,6 +2,7 @@
 # after a major group arc, the party levels up. GM only.
 class Campaigns::MilestonesController < ApplicationController
   include CampaignScoped
+  before_action :refuse_when_on_hold
 
   before_action :require_gm
 

@@ -67,7 +67,7 @@ class Pool < ApplicationRecord
   end
 
   def rollable?
-    !depleted? && !held_by_gone_character? && !campaign.archived?
+    !depleted? && !held_by_gone_character? && campaign.playable?
   end
 
   # A talent pool whose character has fallen or retired waits for them to return.
@@ -85,7 +85,7 @@ class Pool < ApplicationRecord
     raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
     return tick!(by: by) if tick?
     raise ArgumentError, "#{self.character.name} is #{self.character.status}; return them to play to roll." if held_by_gone_character?
-    raise ArgumentError, "#{campaign.name} is archived." if campaign.archived?
+    campaign.refuse_play!
     check_action_roll!(drop_first:, as_action:, thorns:, character:, spend_spark:)
 
     before = size
@@ -108,7 +108,7 @@ class Pool < ApplicationRecord
   def roll_into!(by:, random: Random)
     raise ArgumentError, "#{name} is at 0d and can't be rolled" if depleted?
     raise ArgumentError, "#{character.name} is #{character.status}; return them to play to roll." if held_by_gone_character?
-    raise ArgumentError, "#{campaign.name} is archived." if campaign.archived?
+    campaign.refuse_play!
 
     dice = Array.new(size) { random.rand(1..6) }
     kept = dice.count { |die| die >= 4 }
@@ -155,7 +155,7 @@ class Pool < ApplicationRecord
 
   # A task pool roll that dropped nothing: the player takes a mark to drop 1d anyway.
   def pushable?
-    task? && last_action == "rolled" && last_dropped == 0 && !depleted? && !held_by_gone_character? && !campaign.archived?
+    task? && last_action == "rolled" && last_dropped == 0 && !depleted? && !held_by_gone_character? && campaign.playable?
   end
 
   def push!(by:)
@@ -169,7 +169,7 @@ class Pool < ApplicationRecord
   # its last phase.
   def deplete!(by:)
     raise ArgumentError, "#{name} is at 0d" if depleted?
-    raise ArgumentError, "#{campaign.name} is archived." if campaign.archived?
+    campaign.refuse_play!
 
     assign_attributes(phase: phases.size - 1, starting_size: phases.last["size"]) if linked?
     record!(size: 0, dice: [], dropped: size, action: "depleted", by: by)
@@ -179,7 +179,7 @@ class Pool < ApplicationRecord
   # triggered, exactly 1d drops.
   def tick!(by:)
     raise ArgumentError, "#{name} is at 0d" if depleted?
-    raise ArgumentError, "#{campaign.name} is archived." if campaign.archived?
+    campaign.refuse_play!
 
     record!(size: size - 1, dice: [], dropped: 1, action: "ticked", by: by)
   end

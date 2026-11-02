@@ -22,11 +22,13 @@ class Admin::IdentitiesController < Admin::BaseController
     end
   end
 
-  # A smaller plan closes nothing: someone over its limit keeps their
-  # campaigns, and can't start or join another until they're under it.
+  # Through Identity#apply_plan!: a smaller plan puts the campaigns past its
+  # limit on hold (the GM picks which to play), and a bigger one lifts holds.
   def update
     identity = Identity.find(params[:id])
-    identity.update!(plan: params.expect(identity: [ :plan ])[:plan])
+    plan = params.expect(identity: [ :plan ])[:plan]
+    return redirect_to(admin_identities_path, alert: "There's no #{plan} plan.") unless Plan.keys.include?(plan)
+    identity.apply_plan!(plan)
     redirect_to admin_identities_path, notice: "#{identity.display_name} is on the #{identity.current_plan.name} plan."
   end
 

@@ -39,8 +39,8 @@
               <%= form.select :plan, Plan.all.map { [ _1.name, _1.key ] }, {}, class: "field__input", id: "identity_#{identity.id}_plan" %>
               <%= form.submit "Save", class: "button button--small" %>
             <% end %>
-            <% identity.over_plan.each do |role, count| %>
-              <small class="admin-plan__over">Over: <%= role == "gm" ? "runs" : "plays in" %> <%= count %> active</small>
+            <% if (held = identity.held_memberships.count).positive? %>
+              <small class="admin-plan__over"><%= held %> on hold</small>
             <% end %>
           </td>
           <td><%= identity.memberships.map { "#{_1.campaign.name} (#{_1.gm? ? "GM" : "player"})" }.to_sentence.presence || "None" %></td>

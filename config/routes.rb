@@ -116,6 +116,7 @@ Rails.application.routes.draw do
       resource :rest_reset, only: %i[ new create ]
       resource :milestone, only: :create
       resource :archive, only: %i[ create destroy ] # the GM archives the campaign, or unarchives it
+      resource :hold, only: :destroy # "Play this one": the GM lifts their plan hold, holding another if need be
       resource :reset, only: :create # the GM clears sessions and the roll log
       resource :downtime, only: %i[ new create ]
       resource :brief, only: :show

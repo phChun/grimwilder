@@ -1,6 +1,8 @@
 # Rolling at a roll call: a player rolls their own character's dice with the
 # spark they pick, or the GM rolls for one character, or for everyone left.
 class Campaigns::RollCalls::RollsController < Campaigns::RollCallsController
+  before_action :refuse_when_on_hold # rolling waits on hold; calling one off (destroy, above) doesn't
+
   def create
     call = Current.campaign.roll_calls.open.find(params[:roll_call_id])
     if params[:everyone] == "1"

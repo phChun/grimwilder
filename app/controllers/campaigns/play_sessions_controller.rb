@@ -2,6 +2,7 @@
 # (who's here, "Previously on…") and editing the recap afterwards, for the GM.
 class Campaigns::PlaySessionsController < ApplicationController
   include CampaignScoped
+  before_action :refuse_when_on_hold, only: %i[ new create ] # editing a recap or notes is fine
 
   before_action :require_gm, except: %i[ index show ]
   before_action :set_form, only: %i[ new create ]

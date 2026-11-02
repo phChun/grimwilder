@@ -2,6 +2,7 @@
 # the GM calls it; then each player rolls their own side or assist (RollCall).
 class Campaigns::QuarrelsController < ApplicationController
   include CampaignScoped
+  before_action :refuse_when_on_hold
 
   before_action :require_gm
   before_action :set_characters
