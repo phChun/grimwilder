@@ -2,6 +2,10 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-02
+
+- **Switching backgrounds swaps their wises**: picking another common background replaces the wises the last one filled in, and keeps any you wrote. ([#82](https://github.com/phChun/grimwilder/pull/82))
+
 ## 2026-10-30
 
 - **Copy for an AI** includes characters up for grabs. ([#78](https://github.com/phChun/grimwilder/pull/78))

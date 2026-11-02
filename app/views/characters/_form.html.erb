@@ -104,7 +104,7 @@
         <% background = character.backgrounds[i] || {} %>
         <fieldset class="fieldset">
           <legend class="field__label">Background <%= i + 1 %></legend>
-          <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[backgrounds][<%= i %>][name]" value="<%= background["name"] %>" list="backgrounds-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Background <%= i + 1 %> name" data-action="change->background#fill" data-index="<%= i %>">
+          <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[backgrounds][<%= i %>][name]" value="<%= background["name"] %>" list="backgrounds-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Background <%= i + 1 %> name" data-action="change->background#fill" data-background-target="name" data-index="<%= i %>">
           <% 3.times do |w| %>
             <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[backgrounds][<%= i %>][wises][]" value="<%= background.fetch("wises", [])[w] %>" placeholder="Wise" autocomplete="off" class="field__input field__input--small" aria-label="Background <%= i + 1 %> wise <%= w + 1 %>" data-background-target="wise" data-index="<%= i %>">
           <% end %>
