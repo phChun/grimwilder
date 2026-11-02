@@ -1,4 +1,9 @@
 module CampaignsHelper
+  # The confirm on Archive, in settings and on the campaigns list.
+  def archive_confirmation(campaign)
+    "Archive #{campaign.name}? Everyone can still read it, but nothing new is played there. You can unarchive it."
+  end
+
   # What a character still has to pick, for the GM table's party card: "Picks
   # to make: 1 talent, 2 skills (Expertise)". Nil when there's nothing.
   def picks_to_make_line(character)

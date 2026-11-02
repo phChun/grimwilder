@@ -3,7 +3,7 @@
 class Characters::GoalsController < ApplicationController
   include TendedCharacter
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def destroy
     goal = @character.goal_pools.find(params[:id])

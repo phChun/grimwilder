@@ -32,7 +32,7 @@
           <td><%= @character_counts.fetch(campaign.id, 0) %></td>
           <td><%= @session_counts.fetch(campaign.id, 0) %></td>
           <td><%= (rolled = @last_rolls[campaign.id]) ? "#{time_ago_in_words(rolled)} ago" : "None" %></td>
-          <td><%= campaign.done? ? "Done #{l(campaign.done_at.to_date, format: :long)}" : "Active" %></td>
+          <td><%= campaign.archived? ? "Archived #{l(campaign.archived_at.to_date, format: :long)}" : "Active" %></td>
         </tr>
       <% end %>
     </tbody>

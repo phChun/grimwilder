@@ -13,7 +13,7 @@
 <div class="fluid campaign-page" data-controller="details-memory" data-details-memory-campaign-value="<%= campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
   <div class="fluid__main campaign-page__main">
     <section class="campaign-hero" aria-labelledby="campaign-name">
-      <p class="eyebrow">Campaign<% if campaign.done? %> · Done <%= l(campaign.done_at.to_date, format: :long) %><% end %> · <%= gm ? "You're the GM" : "GM #{gms.to_sentence}" %><% if !gm && @mine %> · Playing <%= @mine_all.map(&:short_name).to_sentence %><% end %></p>
+      <p class="eyebrow">Campaign<% if campaign.archived? %> · Archived <%= l(campaign.archived_at.to_date, format: :long) %><% end %> · <%= gm ? "You're the GM" : "GM #{gms.to_sentence}" %><% if !gm && @mine %> · Playing <%= @mine_all.map(&:short_name).to_sentence %><% end %></p>
       <h1 id="campaign-name" class="campaign-hero__title"><%= campaign.name %></h1>
       <% if campaign.pitch.present? %>
         <p class="campaign-hero__pitch"><%= campaign.pitch %></p>
@@ -37,12 +37,12 @@
         </p>
       <% end %>
 
-      <%# What to do here: the GM's table, invite link and settings, or a player's character. Campaign::Done: a read-only archive; the history is the way back in, and the GM reopens it from settings. %>
+      <%# What to do here: the GM's table, invite link and settings, or a player's character. Campaign::Archive: a read-only archive; the history is the way back in, and the GM unarchives it from settings. %>
       <div class="campaign-actions" aria-label="Campaign actions" role="group">
-        <% if campaign.done? %>
+        <% if campaign.archived? %>
           <%= link_to "Read the history", campaign_play_sessions_path(campaign), class: "button button--primary" %>
           <% if gm %>
-            <%= link_to "Reopen it", edit_campaign_path(campaign, anchor: "done"), class: "button" %>
+            <%= link_to "Unarchive it", edit_campaign_path(campaign, anchor: "archive"), class: "button" %>
           <% end %>
         <% elsif gm %>
           <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary" %>
@@ -76,7 +76,7 @@
           <%= button_to "Leave campaign", campaign_membership_path(campaign, Current.membership), method: :delete, class: "button button--ghost", form: { class: "campaign-actions__end", data: { turbo_confirm: "Leave #{campaign.name}? Your characters stay yours, unseated." } } %>
         <% end %>
       </div>
-      <% if campaign.done? %>
+      <% if campaign.archived? %>
         <p class="campaign-actions__hint"><em class="campaign-actions__done">The story's told.</em> Everything here stays to look back on.<% if @mine %> Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.<% end %></p>
       <% elsif !gm && !@mine %>
         <p class="campaign-actions__hint">Seat them in <%= campaign.name %> and they'll join the party.<% if @up_for_grabs.any? %> Or <a href="#up-for-grabs">pick one that's up for grabs</a>.<% end %></p>
@@ -127,7 +127,7 @@
             <% end %>
           <% end %>
           <%# The last card makes a character for the table, up for grabs until a player picks it. %>
-          <% if gm && !campaign.done? %>
+          <% if gm && !campaign.archived? %>
             <%= link_to new_character_path(campaign_id: campaign.id, up_for_grabs: 1), class: "hero-card hero-card--empty add-card--link" do %>
               <span class="hero-card__name">Create new character</span>
               <span class="hero-card__meta">For the table: up for grabs until a player picks it</span>
@@ -171,9 +171,9 @@
       <section id="pools" class="gm-section" aria-labelledby="pools-title">
         <div class="gm-section__head">
           <h2 id="pools-title" class="gm-section__title">What looms</h2>
-          <% if gm && !campaign.done? %>
+          <% if gm && !campaign.archived? %>
             <%= link_to "Pools at the table", campaign_table_path(campaign, anchor: "pools"), class: "button button--ghost button--small" %>
-          <% elsif @mine && !campaign.done? %>
+          <% elsif @mine && !campaign.archived? %>
             <%= link_to "Roll from your sheet", character_path(@mine, anchor: "table-rolls"), class: "button button--ghost button--small" %>
           <% end %>
         </div>

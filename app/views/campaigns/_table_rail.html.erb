@@ -8,7 +8,7 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.done?, "table-rail--open": !campaign.done?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-side-value="<%= gm ? "gm" : membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
+<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.archived?, "table-rail--open": !campaign.archived?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-side-value="<%= gm ? "gm" : membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>
@@ -50,9 +50,9 @@
     </button>
   </div>
 
-  <%# A done campaign's log is for reading (Campaign::Done). %>
-  <% if campaign.done? %>
-    <p class="table-rail__done"><%= campaign.name %> is done. The log stays here to read.</p>
+  <%# An archived campaign's log is for reading (Campaign::Archive). %>
+  <% if campaign.archived? %>
+    <p class="table-rail__archived"><%= campaign.name %> is archived. The log stays here to read.</p>
   <% else %>
     <%# No picker for where it goes: Show decides (the GM may still voice an NPC in the story views, and a player with more than one character here picks which speaks). %>
     <%= form_with url: campaign_messages_path(campaign), id: "#{prefix}_composer", class: class_names("composer", "composer--no-character": !gm && speakers.none?), data: { controller: "chat-form", action: "turbo:submit-end->chat-form#sent keydown->chat-form#keydown" } do %>

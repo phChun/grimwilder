@@ -6,15 +6,33 @@
   <p class="page-header__lede">Start a campaign to run it as GM, or open a join link from your GM to play in theirs.</p>
 </header>
 
-<%# Active campaigns lead, done ones follow, and the last card starts a new one, or says why the plan has no room (Identity::Plans). %>
-<% active, done = @memberships.partition { !_1.campaign.done? } %>
+<%# Active campaigns lead, archived ones follow, and the last card starts a new one, or says why the plan has no room (Identity::Plans). %>
+<% active, archived = @memberships.partition { !_1.campaign.archived? } %>
 <ul class="tool-grid__list" aria-label="Your campaigns">
-  <% (active + done).each do |membership| %>
-    <li>
-      <%# Straight to where you play: the GM table, or your character's sheet (Campaigns::PlaysController); a done campaign opens its page. %>
-      <%= link_to (membership.campaign.done? ? campaign_path(membership.campaign) : campaign_play_path(membership.campaign)), class: class_names("tool-card", "tool-card--ready": !membership.campaign.done?) do %>
-        <span class="tool-card__name"><%= membership.campaign.name %></span>
-        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if membership.campaign.done? %> · done <%= l(membership.campaign.done_at.to_date, format: :long) %><% end %></span>
+  <% (active + archived).each do |membership| %>
+    <% campaign = membership.campaign %>
+    <li class="campaign-card">
+      <%# Straight to where you play: the GM table, or your character's sheet (Campaigns::PlaysController); an archived campaign opens its page. %>
+      <%= link_to (campaign.archived? ? campaign_path(campaign) : campaign_play_path(campaign)), class: class_names("tool-card", "tool-card--ready": !campaign.archived?) do %>
+        <span class="tool-card__name"><%= campaign.name %></span>
+        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if campaign.archived? %> · archived <%= l(campaign.archived_at.to_date, format: :long) %><% end %></span>
+      <% end %>
+      <%# The GM's ⋯: archive or unarchive from here (Campaigns::ArchivesController, back to this list). Players leave from the campaign page. %>
+      <% if membership.gm? %>
+        <details id="<%= dom_id(campaign, :more) %>" class="campaign-card__more" data-controller="menu" data-action="toggle->menu#place">
+          <summary class="button campaign-card__toggle" aria-label="More for <%= campaign.name %>"><%= icon(:more, size: 18) %></summary>
+          <div class="campaign-card__menu" data-menu-target="panel">
+            <%= render "shared/popover_head", title: campaign.name %>
+            <% if campaign.archived? %>
+              <%= button_to "Unarchive", campaign_archive_path(campaign), method: :delete, params: { return_to: "campaigns" }, class: "button button--small" %>
+            <% elsif campaign.current_session %>
+              <button type="button" class="button button--small" disabled>Archive</button>
+              <p class="field__hint">End the session first.</p>
+            <% else %>
+              <%= button_to "Archive", campaign_archive_path(campaign), params: { return_to: "campaigns" }, class: "button button--small", form: { data: { turbo_confirm: archive_confirmation(campaign) } } %>
+            <% end %>
+          </div>
+        </details>
       <% end %>
     </li>
   <% end %>

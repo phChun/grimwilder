@@ -24,9 +24,9 @@ module Character::Farewell
   end
 
   # Still playing, at a table that's still playing (or at none): rolls, pushes
-  # and talent rolls show only then. A done campaign's sheets are for reading.
+  # and talent rolls show only then. An archived campaign's sheets are for reading.
   def in_play?
-    active? && !campaign&.done?
+    active? && !campaign&.archived?
   end
 
   # status: "fallen" or "retired".

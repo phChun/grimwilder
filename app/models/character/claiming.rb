@@ -16,12 +16,12 @@ module Character::Claiming
 
   # Anyone at the table may pick one while it's up for grabs.
   def claimable_by?(identity)
-    (up_for_grabs? && campaign && !campaign.done? && identity&.membership_in(campaign).present?) || false
+    (up_for_grabs? && campaign && !campaign.archived? && identity&.membership_in(campaign).present?) || false
   end
 
   # The campaign's GM, or the player who has it, while they're still playing.
   def releasable_by?(identity)
-    (campaign.present? && !campaign.done? && !up_for_grabs? && active? && tended_by?(identity)) || false
+    (campaign.present? && !campaign.archived? && !up_for_grabs? && active? && tended_by?(identity)) || false
   end
 
   def claim!(by:)

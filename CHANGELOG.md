@@ -4,6 +4,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-02
 
+- **Done is now Archived**: an archived campaign stays to read, and nothing new is played there. ([#80](https://github.com/phChun/grimwilder/pull/80))
+- **Archive from the campaigns list**: each campaign you run has a ⋯ menu to archive or unarchive it. ([#80](https://github.com/phChun/grimwilder/pull/80))
 - **Switching backgrounds swaps their wises**: picking another common background replaces the wises the last one filled in, and keeps any you wrote. A filled-in background box offers the whole list again, not just the one already there. ([#79](https://github.com/phChun/grimwilder/pull/79))
 
 ## 2026-10-30

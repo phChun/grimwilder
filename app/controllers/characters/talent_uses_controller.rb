@@ -4,7 +4,7 @@ class Characters::TalentUsesController < ApplicationController
   require_authentication
 
   before_action :set_character
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   # spent: how many are spent, or for a named use (Hidden Magic's words),
   # name: the box to burn or restore.

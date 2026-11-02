@@ -5,7 +5,7 @@ module Character::BondSpark
   extend ActiveSupport::Concern
 
   included do
-    after_update :give_spark_for_changed_bonds, if: -> { saved_change_to_bonds? && campaign && !campaign.done? }
+    after_update :give_spark_for_changed_bonds, if: -> { saved_change_to_bonds? && campaign && !campaign.archived? }
   end
 
   private

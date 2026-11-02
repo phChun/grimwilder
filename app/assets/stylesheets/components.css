@@ -258,6 +258,17 @@
 .tool-card__name { font-family: var(--font-display); font-size: 1.4rem; color: var(--text); }
 .tool-card__desc { font-size: 0.95rem; }
 
+/* A campaign on the campaigns list: the card links in, and the GM's ⋯ (archive or unarchive) sits in its top right corner, outside the link. */
+.campaign-card { position: relative; }
+.campaign-card .tool-card { padding-right: calc(var(--tap) + var(--space-4)); }
+.campaign-card__more { position: absolute; top: var(--space-3); right: var(--space-3); }
+.campaign-card__toggle { width: var(--tap); padding: 0; list-style: none; }
+.campaign-card__toggle::-webkit-details-marker { display: none; }
+.campaign-card__menu { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); display: grid; gap: var(--space-2); width: min(16rem, calc(100vw - 2rem)); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: var(--shadow); }
+.campaign-card__menu .button_to,
+.campaign-card__menu .button { width: 100%; }
+.campaign-card__menu .field__hint { margin: 0; }
+
 /* The last card in a list makes a new one ("Create new …"): dashed, like an empty seat, and ember on hover when it's a link. */
 .add-card { justify-content: flex-start; }
 .add-card h2 { margin: 0; }
@@ -2615,7 +2626,7 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 
 /* Chat lines, by kind */
 .chat-line { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
-/* The delete button on each chat line: on every line in the GM's rail, and on your own (marked by feed_controller.js) in anyone's, until the campaign is done; quiet until the line is hovered or the button focused. */
+/* The delete button on each chat line: on every line in the GM's rail, and on your own (marked by feed_controller.js) in anyone's, until the campaign is archived; quiet until the line is hovered or the button focused. */
 .chat-line__delete-form { display: none; }
 .table-rail--gm .chat-line, .table-rail--open .chat-line--mine { position: relative; padding-right: 36px; }
 .table-rail--gm .chat-line__delete-form, .table-rail--open .chat-line--mine .chat-line__delete-form { display: block; position: absolute; top: -8px; right: -6px; margin: 0; }
@@ -2670,8 +2681,8 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .table-rail:has(.feed__filter option[value^="private-"]:checked) .composer__input { border-style: dashed; border-color: var(--suspense-line); background: var(--suspense-bg); }
 .table-rail:has(.feed__filter option[value^="private-"]:checked) .composer__to { color: var(--suspense-text); }
 
-/* A done campaign: no composer, just this. */
-.table-rail__done { margin: 0; padding: 14px; border-top: 1px solid var(--line-soft); font-size: 0.87rem; color: var(--muted); }
+/* An archived campaign: no composer, just this. */
+.table-rail__archived { margin: 0; padding: 14px; border-top: 1px solid var(--line-soft); font-size: 0.87rem; color: var(--muted); }
 
 /* ---------- Interaction states ----------
    Every clickable control says so: hover adds a ring (where there's a pointer,

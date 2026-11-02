@@ -11,13 +11,13 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::ParameterMissing, with: :not_saved
 
   private
-    # A done campaign (Campaign::Done) is read-only, and that includes play on
+    # An archived campaign (Campaign::Archive) is read-only, and that includes play on
     # its characters' sheets: harm, conditions, talent uses, pushes, talent
     # rolls. Character controllers aren't CampaignScoped, so they add this
     # after loading @character.
-    def refuse_when_campaign_done
-      if (campaign = @character&.campaign)&.done?
-        redirect_back_or_to helpers.character_path(@character), status: :see_other, alert: "#{campaign.name} is done. The GM can reopen it to play."
+    def refuse_when_campaign_archived
+      if (campaign = @character&.campaign)&.archived?
+        redirect_back_or_to helpers.character_path(@character), status: :see_other, alert: "#{campaign.name} is archived. The GM can unarchive it to play."
       end
     end
 

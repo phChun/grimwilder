@@ -3,7 +3,7 @@
 class Characters::TalentPushesController < ApplicationController
   include CharacterScoped
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def create
     took = @character.push!(params.expect(:stat), talent_key: params[:talent_id], by: Current.identity)

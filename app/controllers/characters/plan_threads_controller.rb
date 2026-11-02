@@ -3,7 +3,7 @@
 class Characters::PlanThreadsController < ApplicationController
   include TendedCharacter
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def destroy
     @character.spend_plan_thread!(by: Current.identity)

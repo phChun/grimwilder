@@ -24,14 +24,14 @@ class IdentityPlansTest < ActiveSupport::TestCase
     assert_not identity.update(plan: "gold")
   end
 
-  test "free runs one active campaign; done ones don't count" do
+  test "free runs one active campaign; archived ones don't count" do
     gwen = identities(:gwen)
     assert_not gwen.room_to_run?
     assert gwen.room_to_play?
     error = assert_raises(ActiveRecord::RecordInvalid) { Campaign.create_with_gm!(name: "Elsewhere", gm: gwen) }
     assert_match "You run The Bramblewood Accord. On the Free plan, you can run 1 active campaign at a time, and play in as many as you like.", error.message
 
-    campaigns(:bramblewood).update!(done_at: Time.current)
+    campaigns(:bramblewood).update!(archived_at: Time.current)
     assert gwen.room_to_run?
     assert Campaign.create_with_gm!(name: "Elsewhere", gm: gwen)
   end
@@ -50,7 +50,7 @@ class IdentityPlansTest < ActiveSupport::TestCase
 
     membership = elsewhere.memberships.build(identity: pip)
     assert_not membership.valid?
-    assert_equal [ "You play in The Bramblewood Accord. On the Tiny plan, you can play in 1 active campaign at a time. To join another, leave one or wait for its GM to mark it done." ],
+    assert_equal [ "You play in The Bramblewood Accord. On the Tiny plan, you can play in 1 active campaign at a time. To join another, leave one or wait for its GM to archive it." ],
       membership.errors.full_messages
   end
 

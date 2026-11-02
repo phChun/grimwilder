@@ -6,7 +6,7 @@ module Character::Seating
 
   included do
     after_update :follow_with_talent_pools, if: :saved_change_to_campaign_id?
-    validate :not_into_a_done_campaign, if: :will_save_change_to_campaign_id?
+    validate :not_into_an_archived_campaign, if: :will_save_change_to_campaign_id?
   end
 
   # The owner, unless the character is up for grabs (a GM holds those for the table).
@@ -31,8 +31,8 @@ module Character::Seating
   end
 
   private
-    def not_into_a_done_campaign
-      errors.add(:campaign, "is done; seat #{name} somewhere still playing") if campaign&.done?
+    def not_into_an_archived_campaign
+      errors.add(:campaign, "is archived; seat #{name} somewhere still playing") if campaign&.archived?
     end
 
     def follow_with_talent_pools

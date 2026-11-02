@@ -115,7 +115,7 @@ Rails.application.routes.draw do
       resource :rest, only: :create
       resource :rest_reset, only: %i[ new create ]
       resource :milestone, only: :create
-      resource :done, only: %i[ create destroy ] # the GM marks the campaign done, or reopens it
+      resource :archive, only: %i[ create destroy ] # the GM archives the campaign, or unarchives it
       resource :reset, only: :create # the GM clears sessions and the roll log
       resource :downtime, only: %i[ new create ]
       resource :brief, only: :show

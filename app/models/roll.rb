@@ -40,10 +40,10 @@ class Roll < ApplicationRecord
   after_update_commit :broadcast_change_to_table, if: :campaign
 
   # A short line in the log, by someone at the table or about a character.
-  # A done campaign's log stays as it was: a sheet can still change (moving the
+  # An archived campaign's log stays as it was: a sheet can still change (moving the
   # character to a new table, marking them fallen), but nothing is noted there.
   def self.note!(campaign:, by:, text:, character: nil)
-    return if campaign&.done?
+    return if campaign&.archived?
 
     create!(campaign: campaign, identity: by, kind: "note", character: character,
       name: character&.name || by.display_name, question: text.to_s.squish.first(200))

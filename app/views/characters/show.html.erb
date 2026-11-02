@@ -65,10 +65,10 @@
       </div>
     </section>
 
-    <%# A done campaign's sheet is for reading (Character#in_play?); the owner can seat them somewhere new. %>
-    <% if campaign&.done? && @character.active? %>
+    <%# An archived campaign's sheet is for reading (Character#in_play?); the owner can seat them somewhere new. %>
+    <% if campaign&.archived? && @character.active? %>
       <div class="claim-bar">
-        <p class="claim-bar__text"><strong><%= campaign.name %> is done.</strong> <%= editable ? "Seat #{short} somewhere new to play them again." : "This sheet is for reading now." %></p>
+        <p class="claim-bar__text"><strong><%= campaign.name %> is archived.</strong> <%= editable ? "Seat #{short} somewhere new to play them again." : "This sheet is for reading now." %></p>
         <% if editable %>
           <%= link_to "Move #{short}", edit_character_path(@character, anchor: "at-the-table"), class: "button button--ghost button--small" %>
         <% end %>

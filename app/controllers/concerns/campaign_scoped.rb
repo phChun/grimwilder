@@ -7,7 +7,7 @@ module CampaignScoped
   included do
     require_authentication
     before_action :set_campaign
-    before_action :refuse_when_done, unless: -> { request.get? || request.head? }
+    before_action :refuse_when_archived, unless: -> { request.get? || request.head? }
     helper_method :gm?, :table_path_for_viewer
   end
 
@@ -21,12 +21,12 @@ module CampaignScoped
       params[:campaign_id]
     end
 
-    # A done campaign (Campaign::Done) is read-only: reading works, changing
+    # An archived campaign (Campaign::Archive) is read-only: reading works, changing
     # doesn't. Controllers that may still change one (settings, leaving,
-    # reopening) skip this.
-    def refuse_when_done
-      if Current.campaign&.done?
-        redirect_back_or_to campaign_path(Current.campaign), status: :see_other, alert: "#{Current.campaign.name} is done. The GM can reopen it to play."
+    # unarchiving) skip this.
+    def refuse_when_archived
+      if Current.campaign&.archived?
+        redirect_back_or_to campaign_path(Current.campaign), status: :see_other, alert: "#{Current.campaign.name} is archived. The GM can unarchive it to play."
       end
     end
 
@@ -39,9 +39,9 @@ module CampaignScoped
     end
 
     # Where play happens for this viewer: the GM table, or the campaign page
-    # (for everyone, once the campaign is done).
+    # (for everyone, once the campaign is archived).
     def table_path_for_viewer(anchor: nil)
-      gm? && !Current.campaign.done? ? campaign_table_path(Current.campaign, anchor: anchor) : campaign_path(Current.campaign, anchor: anchor)
+      gm? && !Current.campaign.archived? ? campaign_table_path(Current.campaign, anchor: anchor) : campaign_path(Current.campaign, anchor: anchor)
     end
 
     # Back where play happens; a player who rolled from their sheet (it holds

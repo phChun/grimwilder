@@ -82,8 +82,8 @@ class Membership < ApplicationRecord
     # Each account runs and plays in as many active campaigns as its plan
     # allows (Identity::Plans).
     def within_plan
-      if campaign&.done?
-        errors.add(:base, "#{campaign.name} is done, so no one can join it.")
+      if campaign&.archived?
+        errors.add(:base, "#{campaign.name} is archived, so no one can join it.")
       elsif identity && !identity.room_for?(role, except: campaign_id)
         errors.add(:base, identity.plan_limit_message(role))
       end
