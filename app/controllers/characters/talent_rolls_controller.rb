@@ -4,7 +4,7 @@
 class Characters::TalentRollsController < ApplicationController
   include CharacterScoped
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def create
     @character.call_talent_roll!(params[:talent_id], params[:index], by: Current.identity)

@@ -1,7 +1,7 @@
 # The plan an account is on (Plan, config/plans.yml) and what it allows: how
-# many active campaigns it may run as GM and play in. Done campaigns don't
+# many active campaigns it may run as GM and play in. Archived campaigns don't
 # count. Membership checks this on joining or starting a campaign, and
-# Campaign::Done on reopening one. Changing someone's plan never closes a
+# Campaign::Archive on unarchiving one. Changing someone's plan never closes a
 # campaign: an account over its limit just can't start or join another.
 module Identity::Plans
   extend ActiveSupport::Concern
@@ -54,9 +54,9 @@ module Identity::Plans
 
     if role.to_s == "gm"
       playing = plan.playing ? "" : ", and play in as many as you like"
-      "You run #{names}. On the #{plan.name} plan, you can run #{allowed} at a time#{playing}. To start another, mark one done in its settings."
+      "You run #{names}. On the #{plan.name} plan, you can run #{allowed} at a time#{playing}. To start another, archive one."
     else
-      "You play in #{names}. On the #{plan.name} plan, you can play in #{allowed} at a time. To join another, leave one or wait for its GM to mark it done."
+      "You play in #{names}. On the #{plan.name} plan, you can play in #{allowed} at a time. To join another, leave one or wait for its GM to archive it."
     end
   end
 end

@@ -2,7 +2,7 @@
 # members of; this is only the overview.
 class Admin::CampaignsController < Admin::BaseController
   def index
-    campaigns = search(Campaign.order(Arel.sql("done_at IS NOT NULL"), created_at: :desc), "name")
+    campaigns = search(Campaign.order(Arel.sql("archived_at IS NOT NULL"), created_at: :desc), "name")
     @pagy, page = pagy(:offset, campaigns, limit: PER_PAGE)
     @campaigns = page.includes(memberships: :identity).to_a
     ids = @campaigns.map(&:id)

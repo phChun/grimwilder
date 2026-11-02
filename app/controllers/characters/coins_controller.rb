@@ -3,7 +3,7 @@
 class Characters::CoinsController < ApplicationController
   include TendedCharacter
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def create
     @character.add_coins!(by: Current.identity)

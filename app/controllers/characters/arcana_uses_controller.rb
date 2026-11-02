@@ -3,7 +3,7 @@
 class Characters::ArcanaUsesController < ApplicationController
   include TendedCharacter
 
-  before_action :refuse_when_campaign_done, :set_arcanum
+  before_action :refuse_when_campaign_archived, :set_arcanum
 
   def create
     @arcanum.use_up!

@@ -5,7 +5,7 @@
 class Characters::TalentStatesController < ApplicationController
   include CharacterScoped
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def update
     case params.expect(:change)

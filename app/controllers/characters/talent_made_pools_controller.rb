@@ -4,7 +4,7 @@
 class Characters::TalentMadePoolsController < ApplicationController
   include CharacterScoped
 
-  before_action :refuse_when_campaign_done
+  before_action :refuse_when_campaign_archived
 
   def create
     pool = @character.make_talent_pool!(params[:talent_id], params.expect(:made), by: Current.identity, name: params[:name])

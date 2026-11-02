@@ -3,7 +3,7 @@
 class Campaigns::BlocksController < ApplicationController
   include CampaignScoped
 
-  skip_before_action :refuse_when_done # like removing someone, fine once done
+  skip_before_action :refuse_when_archived # like removing someone, fine once archived
   before_action :require_gm
 
   def create

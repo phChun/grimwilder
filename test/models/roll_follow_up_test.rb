@@ -122,13 +122,13 @@ class RollFollowUpTest < ActiveSupport::TestCase
     assert_empty second.follow_ups_for([ @tibbs ]), "Luck is at 0d"
   end
 
-  test "strangers' characters and done campaigns can't follow up" do
+  test "strangers' characters and archived campaigns can't follow up" do
     roll = @tibbs.roll!("agility", by: @pip, random: FixedDice.new([ 3, 2, 1 ]))
     loner = characters(:loner)
     loner.update!(path: "Bard")
     assert_empty roll.follow_ups_for([ loner ])
 
-    @campaign.update!(done_at: Time.current)
+    @campaign.update!(archived_at: Time.current)
     refute roll.reload.follow_up_open?
   end
 end

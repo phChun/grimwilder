@@ -2,7 +2,7 @@
 class Campaigns::MembershipsController < ApplicationController
   include CampaignScoped
 
-  skip_before_action :refuse_when_done # leaving a done campaign is fine
+  skip_before_action :refuse_when_archived # leaving an archived campaign is fine
 
   def destroy
     membership = Current.campaign.memberships.find(params[:id])

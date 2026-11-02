@@ -3,7 +3,7 @@
 class Characters::MagnumOpusesController < ApplicationController
   include TendedCharacter
 
-  before_action :refuse_when_campaign_done, :set_arcanum
+  before_action :refuse_when_campaign_archived, :set_arcanum
 
   rescue_from ArgumentError do |error|
     redirect_to character_path(@character, anchor: "arcanum-#{@arcanum.id}"), alert: error.message

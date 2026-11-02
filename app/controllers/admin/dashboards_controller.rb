@@ -7,7 +7,7 @@ class Admin::DashboardsController < Admin::BaseController
       "Accounts" => Identity.count,
       **Plan.all.to_h { |plan| [ "On #{plan.name}", Identity.where(plan: plan.key).count ] },
       "Active campaigns" => Campaign.active.count,
-      "Done campaigns" => Campaign.done.count,
+      "Archived campaigns" => Campaign.archived.count,
       "Characters" => Character.count,
       "Sessions open now" => PlaySession.open.count,
       "Rolls this week" => Roll.where(created_at: week).count,
