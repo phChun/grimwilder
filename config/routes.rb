@@ -117,6 +117,8 @@ Rails.application.routes.draw do
       resource :milestone, only: :create
       resource :archive, only: %i[ create destroy ] # the GM archives the campaign, or unarchives it
       resource :hold, only: :destroy # "Play this one": the GM lifts their plan hold, holding another if need be
+      resource :schedule, only: :update # Settings › Schedule
+      resources :game_dates, only: %i[ create update destroy ] # a rule date by its date (2026-11-07), an extra by id
       resource :reset, only: :create # the GM clears sessions and the roll log
       resource :downtime, only: %i[ new create ]
       resource :brief, only: :show

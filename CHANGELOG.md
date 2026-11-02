@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-02
 
+- **Game schedules**: set when your table plays (every week or few, or monthly like "first Saturday"), skip or move a date, add one-offs, and everyone sees the next game on the campaigns list, the campaign page and the GM table, in their own time zone. ([#82](https://github.com/phChun/grimwilder/pull/82))
 - **On hold**: when a plan runs fewer campaigns than you have, the most recently played keeps going and the rest wait, with chat and sheets still open. Choose which to play from the campaigns list. ([#81](https://github.com/phChun/grimwilder/pull/81))
 - **Done is now Archived**: an archived campaign stays to read, and nothing new is played there. ([#80](https://github.com/phChun/grimwilder/pull/80))
 - **Archive from the campaigns list**: each campaign you run has a ⋯ menu to archive or unarchive it. ([#80](https://github.com/phChun/grimwilder/pull/80))

@@ -34,6 +34,13 @@
           <div><dt>Setting</dt><dd><%= campaign.setting || "—" %></dd></div>
         </dl>
       <% end %>
+      <%# The next game (Campaign::Schedule), then Coming up. %>
+      <% if campaign.playable? && (next_game = campaign.schedule&.next_game) %>
+        <dl class="campaign-hero__facts campaign-hero__next">
+          <div><dt>Next game</dt><dd><%= game_time_tag(next_game.starts_at, style: :full) %> <span class="campaign-hero__soon">(<%= game_time_tag(next_game.starts_at, style: :relative) %>)</span></dd></div>
+        </dl>
+      <% end %>
+      <%= render "campaigns/coming_up", campaign: campaign, gm: gm %>
       <%# The table's optional rules, one quiet line; each says what it does on hover or focus. %>
       <% if campaign.rules_in_play.any? %>
         <p class="campaign-hero__rules"><span class="campaign-hero__rules-label">Optional rules</span>

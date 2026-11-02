@@ -8,7 +8,7 @@ class CampaignsController < ApplicationController
   before_action :require_gm, only: %i[ edit update destroy ]
 
   def index
-    @memberships = Current.identity.memberships.includes(:campaign).order(created_at: :desc)
+    @memberships = Current.identity.memberships.includes(campaign: :schedule).order(created_at: :desc)
     @campaign = Campaign.new
   end
 

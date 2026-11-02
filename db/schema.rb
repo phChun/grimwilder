@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_01_100000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_01_110000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -41,6 +41,21 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_01_100000) do
     t.index ["campaign_id", "identity_id"], name: "index_campaign_blocks_on_campaign_id_and_identity_id", unique: true
     t.index ["campaign_id"], name: "index_campaign_blocks_on_campaign_id"
     t.index ["identity_id"], name: "index_campaign_blocks_on_identity_id"
+  end
+
+  create_table "campaign_schedules", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.string "cadence"
+    t.integer "interval_weeks", default: 1, null: false
+    t.integer "weekday", default: 6, null: false
+    t.integer "week_of_month"
+    t.date "starts_on"
+    t.string "start_time", default: "19:00", null: false
+    t.string "time_zone", default: "UTC", null: false
+    t.boolean "paused", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_campaign_schedules_on_campaign_id", unique: true
   end
 
   create_table "campaigns", force: :cascade do |t|
@@ -125,6 +140,18 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_01_100000) do
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"
+  end
+
+  create_table "game_dates", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.date "occurs_on"
+    t.datetime "starts_at"
+    t.string "status", null: false
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "occurs_on"], name: "index_game_dates_on_campaign_id_and_occurs_on", unique: true, where: "occurs_on IS NOT NULL"
+    t.index ["campaign_id"], name: "index_game_dates_on_campaign_id"
   end
 
   create_table "identities", force: :cascade do |t|
@@ -370,9 +397,11 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_01_100000) do
   add_foreign_key "campaign_blocks", "campaigns", on_delete: :cascade
   add_foreign_key "campaign_blocks", "identities", column: "blocked_by_id", on_delete: :nullify
   add_foreign_key "campaign_blocks", "identities", on_delete: :cascade
+  add_foreign_key "campaign_schedules", "campaigns", on_delete: :cascade
   add_foreign_key "characters", "campaigns"
   add_foreign_key "characters", "identities"
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify
+  add_foreign_key "game_dates", "campaigns", on_delete: :cascade
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"
   add_foreign_key "messages", "campaigns", on_delete: :cascade

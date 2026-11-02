@@ -1,0 +1,96 @@
+<%# locals: (campaign:, gm:) %>
+<%# Coming up (Campaign::Schedule): the next dates, skipped ones struck through with their note, moved ones saying from when. The GM's ⋯ on each skips, moves or undoes it (Campaigns::GameDatesController), and Add a date makes an extra. Nothing while archived or on hold. %>
+<% schedule = campaign.schedule %>
+<% dates = schedule && campaign.playable? ? schedule.upcoming(limit: 6) : [] %>
+<% if dates.any? || (gm && campaign.playable?) %>
+  <section id="coming-up" class="coming-up" aria-labelledby="coming-up-title">
+    <h2 id="coming-up-title" class="coming-up__title">Coming up</h2>
+    <% if dates.any? %>
+      <ol class="coming-up__list">
+        <% dates.each do |date| %>
+          <li class="<%= class_names("coming-up__date", "coming-up__date--skipped": date.skipped?) %>">
+            <span class="coming-up__when">
+              <%= game_time_tag(date.starts_at, style: :date) %>
+              <% if date.skipped? %><span class="coming-up__tag">Skipped</span><% end %>
+              <% if date.moved? %><span class="coming-up__tag">moved from <%= date.occurs_on.strftime("%a %b %-d") %></span><% end %>
+              <% if date.extra? %><span class="coming-up__tag">extra</span><% end %>
+            </span>
+            <% if date.note %><span class="coming-up__note"><%= date.note %></span><% end %>
+            <% if gm %>
+              <details id="coming-up-<%= date.key %>" class="coming-up__more" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
+                <summary class="button coming-up__toggle" aria-label="Change <%= date.starts_at.strftime("%a %b %-d") %>"><%= icon(:more, size: 18) %></summary>
+                <div class="coming-up__menu" data-menu-target="panel">
+                  <%= render "shared/popover_head", title: date.starts_at.strftime("%A, %B %-d") %>
+                  <% if date.changed? %>
+                    <%= button_to (date.skipped? ? "Undo skip" : "Undo move"), campaign_game_date_path(campaign, date.key), method: :delete, class: "button button--small" %>
+                  <% elsif !date.extra? %>
+                    <%= form_with url: campaign_game_date_path(campaign, date.key), method: :patch, class: "stack coming-up__form" do |form| %>
+                      <%= form.hidden_field :change, value: "skip", id: "skip-change-#{date.key}" %>
+                      <div class="field">
+                        <%= form.label :note, "Why (optional)", for: "skip-note-#{date.key}", class: "field__label" %>
+                        <%= form.text_field :note, id: "skip-note-#{date.key}", maxlength: GameDate::NOTE_LIMIT, placeholder: "Gwen's away", class: "field__input" %>
+                      </div>
+                      <%= form.submit "Skip this date", class: "button button--small" %>
+                    <% end %>
+                  <% end %>
+                  <% unless date.skipped? %>
+                    <%= form_with url: campaign_game_date_path(campaign, date.key), method: :patch, class: "stack coming-up__form" do |form| %>
+                      <%= form.hidden_field :change, value: "move", id: "move-change-#{date.key}" %>
+                      <div class="coming-up__fields">
+                        <div class="field">
+                          <%= form.label :date, "Date", for: "move-date-#{date.key}", class: "field__label" %>
+                          <%= form.date_field :date, value: date.starts_at.to_date, id: "move-date-#{date.key}", required: true, class: "field__input" %>
+                        </div>
+                        <div class="field">
+                          <%= form.label :time, "Time", for: "move-time-#{date.key}", class: "field__label" %>
+                          <%= form.time_field :time, value: date.starts_at.strftime("%H:%M"), id: "move-time-#{date.key}", class: "field__input" %>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <%= form.label :note, "Note (optional)", for: "move-note-#{date.key}", class: "field__label" %>
+                        <%= form.text_field :note, value: date.note, id: "move-note-#{date.key}", maxlength: GameDate::NOTE_LIMIT, class: "field__input" %>
+                      </div>
+                      <%= form.submit "Move", class: "button button--small" %>
+                    <% end %>
+                  <% end %>
+                  <% if date.extra? %>
+                    <%= button_to "Remove this date", campaign_game_date_path(campaign, date.key), method: :delete, class: "button button--small button--danger-text" %>
+                  <% end %>
+                </div>
+              </details>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    <% elsif schedule.nil? %>
+      <p class="field__hint">No schedule yet. <%= link_to "Set one in settings", edit_campaign_path(campaign, anchor: "settings-schedule") %>, so everyone can see when you play.</p>
+    <% else %>
+      <p class="field__hint"><%= schedule.paused? ? "The schedule's paused." : "Nothing on the schedule." %> <%= link_to "Schedule settings", edit_campaign_path(campaign, anchor: "settings-schedule") %></p>
+    <% end %>
+    <% if gm && schedule && !schedule.paused? %>
+      <details id="coming-up-add" class="coming-up__more coming-up__add" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
+        <summary class="button button--ghost button--small coming-up__add-toggle">Add a date</summary>
+        <div class="coming-up__menu" data-menu-target="panel">
+          <%= render "shared/popover_head", title: "Add a date" %>
+          <%= form_with url: campaign_game_dates_path(campaign), class: "stack coming-up__form" do |form| %>
+            <div class="coming-up__fields">
+              <div class="field">
+                <%= form.label :date, "Date", for: "add-date", class: "field__label" %>
+                <%= form.date_field :date, id: "add-date", required: true, min: Time.current.in_time_zone(schedule.zone).to_date, class: "field__input" %>
+              </div>
+              <div class="field">
+                <%= form.label :time, "Time", for: "add-time", class: "field__label" %>
+                <%= form.time_field :time, value: schedule.start_time, id: "add-time", class: "field__input" %>
+              </div>
+            </div>
+            <div class="field">
+              <%= form.label :note, "Note (optional)", for: "add-note", class: "field__label" %>
+              <%= form.text_field :note, id: "add-note", maxlength: GameDate::NOTE_LIMIT, placeholder: "Bonus session", class: "field__input" %>
+            </div>
+            <%= form.submit "Add date", class: "button button--primary button--small" %>
+          <% end %>
+        </div>
+      </details>
+    <% end %>
+  </section>
+<% end %>
