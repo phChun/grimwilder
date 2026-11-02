@@ -4,7 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-02
 
-- **Switching backgrounds swaps their wises**: picking another common background replaces the wises the last one filled in, and keeps any you wrote. ([#82](https://github.com/phChun/grimwilder/pull/82))
+- **Switching backgrounds swaps their wises**: picking another common background replaces the wises the last one filled in, and keeps any you wrote. A filled-in background box offers the whole list again, not just the one already there. ([#82](https://github.com/phChun/grimwilder/pull/82))
 
 ## 2026-10-30
 
