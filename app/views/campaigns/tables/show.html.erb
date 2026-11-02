@@ -20,7 +20,7 @@
             <span class="live-banner__dot" aria-hidden="true"></span>
             <%= @session.title %> · live <%= running_for(@session.started_at) %><% if scene %> · Scene <%= scene.number %> of <%= @session.scenes.size %><% end %>
           <% else %>
-            Between sessions
+            Between sessions<% if (next_game = campaign.schedule&.next_game) %> · next game <%= game_time_tag(next_game.starts_at, style: :short) %><% end %>
           <% end %>
           · <%= link_to "History", campaign_play_sessions_path(campaign) %> · <%= link_to "Campaign page", campaign_path(campaign) %>
         </p>
@@ -167,5 +167,6 @@
   <aside class="fluid__rail gm-view__side" aria-label="The table">
     <%= render "campaigns/table_rail", campaign: campaign, membership: Current.membership, feed: @feed, speakers: [] %>
     <%= render "campaigns/kept_crucibles" %>
+    <%= render "campaigns/coming_up", campaign: campaign, gm: true %>
   </aside>
 </div>

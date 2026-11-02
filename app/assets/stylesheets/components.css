@@ -2996,3 +2996,38 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 /* "Copy for an AI" (campaigns/briefs/show): the party as Markdown in an editable box. */
 .brief__text { min-height: 18rem; font-family: var(--font-dice); font-size: 0.85rem; line-height: 1.5; resize: vertical; }
 .brief__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+
+/* Settings › Schedule: the rule's fields show for the cadence picked ("Which week" only monthly; none for only dates I add). */
+.schedule-form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--space-3) var(--space-4); }
+.schedule-form__week { display: none; }
+.schedule-form:has(option[value="monthly"]:checked) .schedule-form__week { display: grid; }
+.schedule-form:has(option[value="dates"]:checked) .schedule-form__rule { display: none; }
+
+/* Coming up (campaigns/_coming_up): the next dates, skipped ones struck through, the GM's ⋯ on each. */
+.coming-up { display: grid; gap: var(--space-2); }
+.coming-up__title { margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.coming-up__list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.coming-up__date { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); min-height: var(--tap); padding: 0 0 0 var(--space-3); border-left: 2px solid var(--line); }
+.coming-up__date--skipped { border-left-style: dashed; color: var(--dim); }
+.coming-up__date--skipped .game-time { text-decoration: line-through; }
+.coming-up__when { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); font-weight: 600; }
+.coming-up__tag { font-size: 0.8rem; font-weight: 500; color: var(--dim); }
+.coming-up__note { flex-basis: 100%; margin-top: -6px; font-size: 0.85rem; font-style: italic; color: var(--muted); }
+.coming-up__more { position: relative; margin-left: auto; }
+.coming-up__add { margin-left: 0; justify-self: start; }
+.coming-up__toggle { width: var(--tap); padding: 0; list-style: none; }
+.coming-up__toggle::-webkit-details-marker,
+.coming-up__add-toggle::-webkit-details-marker { display: none; }
+.coming-up__add-toggle { list-style: none; }
+.coming-up__menu { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); display: grid; gap: var(--space-3); width: min(20rem, calc(100vw - 2rem)); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: var(--shadow); }
+.coming-up__add .coming-up__menu { right: auto; left: 0; }
+.coming-up__menu .button_to,
+.coming-up__menu .button { width: 100%; }
+.coming-up__form + .coming-up__form { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
+.coming-up__fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+.gm-view__side .coming-up { padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); }
+
+/* The next game: on the campaigns list's cards, and in the campaign page's hero. */
+.next-game { font-size: 0.9rem; font-weight: 600; color: var(--ember); }
+.next-game--skipped { color: var(--muted); font-weight: 500; }
+.campaign-hero__soon { font-weight: 400; color: var(--muted); }

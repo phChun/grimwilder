@@ -108,6 +108,52 @@
     </section>
   <% end %>
 
+  <%# When the table plays (Campaign::Schedule), shown as Coming up and the next game. The time zone fills in from the browser the first time (time_zone_controller.js). %>
+  <% if gm? && !campaign.archived? %>
+    <% schedule = campaign.schedule || campaign.build_schedule(starts_on: Date.current) %>
+    <% changes = schedule.persisted? ? schedule.upcoming_changes.count : 0 %>
+    <section id="settings-schedule" class="card stack" aria-labelledby="settings-schedule-title">
+      <h2 id="settings-schedule-title" class="card__title">Schedule</h2>
+      <p class="field__hint">Everyone at the table sees the next game and what's coming up. Skip, move or add a date from Coming up on the campaign page or the GM table.</p>
+      <%= form_with model: schedule, scope: :schedule, url: campaign_schedule_path(campaign), method: :patch, class: "stack settings-form schedule-form", data: ({ turbo_confirm: "#{pluralize(changes, "skipped or moved date")} still to come. Any that aren't on the new schedule are dropped. Save?" } if changes.positive?) do |form| %>
+        <div class="schedule-form__grid">
+          <div class="field">
+            <%= form.label :how_often, "How often", class: "field__label" %>
+            <%= form.select :how_often, SchedulesHelper::HOW_OFTEN, {}, class: "field__input" %>
+          </div>
+          <div class="field schedule-form__rule schedule-form__week">
+            <%= form.label :week_of_month, "Which week", class: "field__label" %>
+            <%= form.select :week_of_month, SchedulesHelper::WEEKS_OF_MONTH, { selected: schedule.week_of_month || 1 }, class: "field__input" %>
+          </div>
+          <div class="field schedule-form__rule">
+            <%= form.label :weekday, "Day", class: "field__label" %>
+            <%= form.select :weekday, SchedulesHelper::WEEKDAYS, {}, class: "field__input" %>
+          </div>
+          <div class="field schedule-form__rule">
+            <%= form.label :starts_on, "First game", class: "field__label" %>
+            <%= form.date_field :starts_on, class: "field__input" %>
+          </div>
+          <div class="field">
+            <%= form.label :start_time, "Time", class: "field__label" %>
+            <%= form.time_field :start_time, required: true, class: "field__input" %>
+          </div>
+          <div class="field">
+            <%= form.label :time_zone, "Time zone", class: "field__label" %>
+            <%= form.select :time_zone, schedule_time_zones(schedule.time_zone), {}, class: "field__input", data: { controller: "time-zone", time_zone_fill_value: schedule.new_record? } %>
+          </div>
+        </div>
+        <label class="check">
+          <%= form.check_box :paused %>
+          <span><strong>On a break.</strong> Keeps the schedule but shows no dates until you untick it.</span>
+        </label>
+        <% if changes.positive? %>
+          <p class="field__hint">You've skipped or moved <%= pluralize(changes, "date") %> still to come. Changing how often, the day or the first game drops any that aren't on the new schedule.</p>
+        <% end %>
+        <%= form.submit "Save", class: "button button--primary" %>
+      <% end %>
+    </section>
+  <% end %>
+
   <section id="settings" class="card stack" aria-label="Invite and members">
     <%= render "campaigns/settings", memberships: @memberships, blocks: @blocks, gm: gm? %>
   </section>

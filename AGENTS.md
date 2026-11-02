@@ -8,7 +8,7 @@ Guidance for AI coding agents (and humans) working in this repo. Read this befor
 It is **not** a rules reference/SRD. Each tool should quote only as much rule text as a player needs at the table.
 
 Current state:
-- Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`, with talent dice), passwordless accounts (email code + passkeys) with plans, campaigns with join links, pools, crucibles, character sheets and the talent catalog (Community Edition), the GM table and campaign page, table chat, sessions and scenes, optional rules, and the table log (server-rolled rolls that spend and award spark, live on the campaign page).
+- Done: site layout (header nav, footer), home page (`/`), action roller (`/roll`, with talent dice), passwordless accounts (email code + passkeys) with plans (and campaigns on hold past them), campaigns with join links, archiving and game schedules, pools, crucibles, character sheets and the talent catalog (Community Edition), the GM table and campaign page, table chat, sessions and scenes, optional rules, and the table log (server-rolled rolls that spend and award spark, live on the campaign page).
 - Next: nothing scheduled; see *Roadmap* for what's set aside.
 
 Source rulebook: *Grimwild: Community Edition* (not in the repo; the edition is `Grimwild::EDITION`, shown in the footer). The app moved from Preview 6 to the Community Edition on 2026-10-29. Page numbers are still Preview 6's (`GWCE P6 Pages.pdf`, checked against its text on 2026-10-27): the CE text we have has no page breaks, and the three page cross-references in it (pg. 25, 52, 175) match Preview 6's, so re-check them against the CE PDF once there is one.
@@ -268,6 +268,14 @@ Built in steps from a design brief: (1) sessions, (2) scenes, (3) talent uses, (
 - **Reset** (`Campaign::Reset`, POST `campaigns/:id/reset`, from settings; GM only, not once archived): deletes every session (scenes and attendance cascade), the whole roll log and any roll call, so play starts again at Session 1. Open roll calls are called off first, so spark spent into them goes back. Chat, pools, suspense and characters (XP, levels) stay.
 - All boundary actions are GM-only (`require_gm`), and their reset logic lives in the models.
 
+## Schedules (built 2026-11-01)
+
+- **`Campaign::Schedule`** (table `campaign_schedules`, `Campaign has_one :schedule`): a rule, `cadence` `weekly` (every `interval_weeks`, 1–8) or `monthly` (`week_of_month` 1–4 or -1 for the last), on a `weekday` (0 is Sunday), at `start_time` ("19:00") in `time_zone` (an IANA name), from `starts_on` (the first matching day on or after it is the first game, and every-N-weeks counts from there). No cadence means only the GM's extra dates; `paused` keeps the rule and shows nothing. The settings form's single "How often" select is `how_often` (`weekly-1`…`weekly-8`, `monthly`, `dates`).
+- The rule's dates are worked out (`rule_dates(from)`, an endless Enumerator; `on_rule?`), never stored; times come from `starts_at_on(date)` in the schedule's zone, so a daylight saving change keeps 7pm at 7pm. **`GameDate`** (table `game_dates`) holds only the exceptions and extras: `skipped` or `moved` (`occurs_on` is the rule date it changes, unique per campaign; a moved one has `starts_at`), and `extra` (`starts_at`, no `occurs_on`), each with an optional `note` (200 characters). `scheduled` is kept for RSVPs, later: a plain rule date gets its row lazily the first time something needs to point at it.
+- `upcoming(limit: 6, from:)` gives `Occurrence`s (a Data: `starts_at`, `occurs_on`, `status`, `note`, `game_date_id`; `skipped?`, `moved?`, `extra?`, `today?`, `tonight?` from 5pm, `played_by?(session)` within 12 hours, and `key`, the route id: the rule date, or the extra's id), skipped ones included, sorted, a game today listed all day; `next_game` is the first not skipped. Changing the rule (cadence, interval, day, week or first game) drops the skipped and moved rows no longer on it (`after_update`); the form counts `upcoming_changes` and confirms first.
+- **GM controls**: Settings › Schedule (`#settings-schedule`, PATCH `campaigns/:id/schedule`, `Campaigns::SchedulesController`; CSS `:has()` shows the fields the cadence needs; `time_zone_controller.js` fills the GM's browser zone the first time, adding it to the list if Rails doesn't name it). **Coming up** (`campaigns/_coming_up`, on the campaign page's hero for everyone and in the GM table's side column): each date's ⋯ (GM only) skips it with a note, moves it (date, time, note) or undoes either; extras move or are removed; "Add a date" makes an extra. `resources :game_dates` (`Campaigns::GameDatesController`, `require_gm`): a rule date by its ISO date, an extra by id (`skip!`, `move!`, `undo!`, `add!`, `move_extra!`).
+- **Who sees what** (`SchedulesHelper`): the campaigns list card's `next_game_line` ("Tonight, 7pm EST", "Tomorrow", "Sat" within 6 days, "Sat Nov 14", "Playing now" while a session started near it, or "No game this week · back Nov 21" with the skip's note as its title); the hero's Next game fact ("Saturday, November 14 · 7pm EST (in 3 days)"); the GM table's status line between sessions ("Between sessions · next game Sat, 7pm EST"). Archived or on hold, none of it shows (the schedule is kept). Times render in the schedule's zone with its abbreviation (`game_time_tag(starts_at, style:)`: `:short`, `:date`, `:full`, `:relative`), and `local_time_controller.js` rewrites them in the same words in the viewer's zone when theirs differs.
+
 ## Accounts & campaigns (passwordless)
 
 Modelled on Fizzy (github.com/basecamp/fizzy): no passwords, ever.
@@ -418,8 +426,10 @@ Updated 2026-10-29. The app follows the Community Edition (the P6 update brief's
 6. **Plans**, assigned by an admin (see *Plans* under Accounts).
 7. **Archiving** (renamed from Done), from settings or the campaigns list.
 8. **On hold**: a smaller plan holds the campaigns past its limit, and the GM picks which to play.
+9. **Schedules**: every N weeks or monthly by weekday, skips, moves and extra dates, and the next game where the table looks (see *Schedules*).
 
 **Set aside** (2026-10-27, at Shawn's request)
+- **RSVPs and game-day reminder emails** (2026-11-01; part 4 of `docs/design/holds-and-schedules/BRIEF.md`): `rsvps` on a `game_date` (the lazy `scheduled` row), a morning-of mail with signed one-click answers, a per-member opt-out.
 - **Payments**: each paid plan's Stripe price in `config/plans.yml`, `stripe_customer_id` on identities, Stripe Checkout and the Customer Portal, and a webhook that sets `identities.plan`. The webhook only moves accounts between Free and the paid plans and must never touch one on Tester, so testers aren't downgraded; a `plan_source` (admin or stripe) can come with it.
 
 **Not modelled** (the book gives no rules to build from)
