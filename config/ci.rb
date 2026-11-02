@@ -18,12 +18,12 @@ CI.run do
   end
 
   # Set a green "signoff" commit status on GitHub, which a pull request into
-  # main needs before it can merge; merging deploys (.github/workflows/deploy.yml).
+  # main needs before it can merge; publishing a release deploys (.github/workflows/deploy.yml).
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`; push
   # the branch first.
   if success?
-    step "Signoff: All systems go. Ready for merge and deploy.", "gh signoff"
+    step "Signoff: All systems go. Ready to merge.", "gh signoff"
   else
-    failure "Signoff: CI failed. Do not merge or deploy.", "Fix the issues and try again."
+    failure "Signoff: CI failed. Do not merge.", "Fix the issues and try again."
   end
 end

@@ -74,6 +74,8 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select ".feed__filter select[name=context][form=?]", "rail_#{@campaign.id}_composer"
     assert_select ".feed__filter option[value=private-gm][data-to=?][data-placeholder=?]", "Privately to the GM", "Only the GM and you see this…"
     assert_select ".table-rail__head .suspense-meter"
+    assert_select ".feed__filter option[value=talk][selected]", 1, "a sheet opens on table talk"
+    assert_select ".composer__to", "To the table, out of character"
 
     sign_out
     sign_in_as identities(:gwen)
@@ -83,7 +85,12 @@ class ChatTest < ActionDispatch::IntegrationTest
     assert_select ".composer input[type=radio][name=voice][value=narration][checked]"
     assert_select ".composer input[type=radio][name=voice][value=npc]"
     assert_select ".composer input[name=speaker_name]"
-    assert_select ".composer textarea[placeholder=?]", "Narrate the scene, or voice an NPC…"
+    assert_select ".feed__filter option[value=talk][selected]", 1, "the GM table opens on table talk"
+    assert_select ".composer textarea[placeholder=?]", "Talk to the table, out of character…"
+    assert_select ".feed__filter option[value=all][data-placeholder=?]", "Narrate the scene, or voice an NPC…"
+
+    get campaign_path(@campaign)
+    assert_select ".feed__filter option[value=all][selected]", 1, "the campaign page still opens on everything"
   end
 
   test "the GM whispers to one player, picked by their character" do

@@ -2827,6 +2827,9 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .admin-pages .series-nav a[aria-current="page"] { background: var(--ember); border-color: var(--ember); color: var(--ember-ink); font-weight: 600; }
 .admin-pages .series-nav a[aria-disabled="true"]:not([aria-current]) { color: var(--dim); border-style: dashed; }
 
+.admin-version { margin: 0 0 var(--space-3); color: var(--dim); }
+.admin-version strong { color: var(--text); font-family: var(--font-dice); font-weight: 500; }
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));

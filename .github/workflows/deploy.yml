@@ -1,6 +1,9 @@
-# Deploys main with Kamal on every push to it, or by hand from the Actions tab.
-# main only changes through pull requests, and the "Main" ruleset requires the
-# "signoff" status that bin/ci sets (`gh signoff`) on the branch first.
+# Deploys with Kamal when a release is published (`gh release create v1.4.0
+# --generate-notes`, or Releases on GitHub), or by hand from the Actions tab:
+# pick the release's tag under "Use workflow from". The tag is the version
+# /admin shows (APP_VERSION). main only changes through pull requests, and the
+# "Main" ruleset requires the "signoff" status that bin/ci sets (`gh signoff`)
+# on the branch first, so merging no longer deploys by itself.
 #
 # Secrets, in the "production" environment (Settings → Environments):
 #   RAILS_MASTER_KEY         contents of config/master.key
@@ -15,8 +18,8 @@
 name: Deploy
 
 on:
-  push:
-    branches: [ main ]
+  release:
+    types: [ published ]
   workflow_dispatch:
 
 concurrency: deploy
@@ -34,6 +37,8 @@ jobs:
       # and the droplet pulls with it during the deploy. Deploys from the Mac use
       # a personal access token instead (config/deploy.yml, registry).
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      # The release's tag (or the branch or tag picked for a run by hand).
+      APP_VERSION: ${{ github.event.release.tag_name || github.ref_name }}
 
     steps:
       - name: Checkout
