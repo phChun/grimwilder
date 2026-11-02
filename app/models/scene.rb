@@ -21,6 +21,7 @@ class Scene < ApplicationRecord
   # opening: story roll arguments (Roll.story!) to open with, or nil.
   # plan: the ScenePlan it was started from, which then belongs to it.
   def self.start!(session, title:, by:, opening: nil, notes: nil, plan: nil)
+    session.campaign.refuse_play!
     raise ArgumentError, "#{session.title} has ended." unless session.open?
     raise ArgumentError, "#{session.current_scene.heading} is still going." if session.current_scene
 

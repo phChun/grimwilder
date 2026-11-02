@@ -15,6 +15,12 @@
     <section class="campaign-hero" aria-labelledby="campaign-name">
       <p class="eyebrow">Campaign<% if campaign.archived? %> · Archived <%= l(campaign.archived_at.to_date, format: :long) %><% end %> · <%= gm ? "You're the GM" : "GM #{gms.to_sentence}" %><% if !gm && @mine %> · Playing <%= @mine_all.map(&:short_name).to_sentence %><% end %></p>
       <h1 id="campaign-name" class="campaign-hero__title"><%= campaign.name %></h1>
+      <%# Campaign::Hold: the GM's plan runs fewer campaigns; chat and sheets go on. %>
+      <% if campaign.on_hold? %>
+        <p class="campaign-hero__hold"><span class="campaign-hero__hold-chip">On hold</span>
+          <% if gm %>Your plan has <%= campaign.name %> on hold. Chat and sheets still work; <%= link_to "choose to play it", campaigns_path %> from the campaigns list.<% else %>Your GM's plan has this campaign on hold. Chat and sheets still work.<% end %>
+        </p>
+      <% end %>
       <% if campaign.pitch.present? %>
         <p class="campaign-hero__pitch"><%= campaign.pitch %></p>
       <% elsif gm %>
@@ -45,7 +51,11 @@
             <%= link_to "Unarchive it", edit_campaign_path(campaign, anchor: "archive"), class: "button" %>
           <% end %>
         <% elsif gm %>
-          <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary" %>
+          <% if campaign.on_hold? %>
+            <%= link_to "Choose what to play", campaigns_path, class: "button button--primary" %>
+          <% else %>
+            <%= link_to "Open the GM table", campaign_table_path(campaign), class: "button button--primary" %>
+          <% end %>
           <%= render "campaigns/copy_join_button", url: join_url(campaign.join_code) %>
         <% elsif @mine_all.many? %>
           <%# More than one character here: the button opens a menu of their sheets. %>

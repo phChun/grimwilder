@@ -18,6 +18,7 @@ class PlaySession < ApplicationRecord
   scope :ended, -> { where.not(ended_at: nil) }
 
   def self.start!(campaign, characters:, by:, recap: nil)
+    campaign.refuse_play!
     raise ArgumentError, "#{campaign.current_session.title} is still going." if campaign.current_session
     raise ArgumentError, "Everyone here must be seated in #{campaign.name}." unless characters.all? { _1.campaign_id == campaign.id }
 

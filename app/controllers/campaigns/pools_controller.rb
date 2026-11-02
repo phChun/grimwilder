@@ -3,6 +3,7 @@
 # visible ones; the GM creates, hides and deletes them.
 class Campaigns::PoolsController < ApplicationController
   include CampaignScoped, CampaignTable
+  before_action :refuse_when_on_hold
 
   before_action :require_gm, except: :index
   before_action :set_pool, only: %i[ update destroy ]

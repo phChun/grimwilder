@@ -8,14 +8,25 @@
 
 <%# Active campaigns lead, archived ones follow, and the last card starts a new one, or says why the plan has no room (Identity::Plans). %>
 <% active, archived = @memberships.partition { !_1.campaign.archived? } %>
+<%# Over the plan (Identity::Plans#apply_plan!): which are on hold, and how to choose. %>
+<% if (held = Current.identity.held_memberships.includes(:campaign).to_a).any? %>
+  <% swap = Current.identity.next_to_hold %>
+  <section class="hold-banner" aria-label="Campaigns on hold">
+    <p><%= plan_hold_message(Current.identity, held.map(&:campaign)) %></p>
+  </section>
+<% end %>
 <ul class="tool-grid__list" aria-label="Your campaigns">
   <% (active + archived).each do |membership| %>
     <% campaign = membership.campaign %>
-    <li class="campaign-card">
+    <li class="<%= class_names("campaign-card", "campaign-card--on-hold": campaign.on_hold?, "campaign-card--playable": membership.held? && !campaign.archived?) %>">
       <%# Straight to where you play: the GM table, or your character's sheet (Campaigns::PlaysController); an archived campaign opens its page. %>
       <%= link_to (campaign.archived? ? campaign_path(campaign) : campaign_play_path(campaign)), class: class_names("tool-card", "tool-card--ready": !campaign.archived?) do %>
         <span class="tool-card__name"><%= campaign.name %></span>
-        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if campaign.archived? %> · archived <%= l(campaign.archived_at.to_date, format: :long) %><% end %></span>
+        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if campaign.archived? %> · archived <%= l(campaign.archived_at.to_date, format: :long) %><% elsif campaign.on_hold? %> · On hold<% end %></span>
+      <% end %>
+      <%# A held GM seat (Identity::Plans#keep_playing!): play this one, putting the least recently played on hold if the plan has no room. %>
+      <% if membership.held? && !campaign.archived? %>
+        <%= button_to "Play this one", campaign_hold_path(campaign), method: :delete, class: "button button--small campaign-card__play", form: { data: { turbo_confirm: swap ? "Play #{campaign.name}? #{swap.campaign.name} goes on hold in its place." : "Play #{campaign.name} again?" } } %>
       <% end %>
       <%# The GM's ⋯: archive or unarchive from here (Campaigns::ArchivesController, back to this list). Players leave from the campaign page. %>
       <% if membership.gm? %>

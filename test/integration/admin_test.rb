@@ -45,7 +45,7 @@ class AdminTest < ActionDispatch::IntegrationTest
     get admin_identities_path
     assert_select "tr", text: /gwen@example.com/ do
       assert_select "select option[selected]", "Free"
-      assert_select ".admin-plan__over", "Over: runs 2 active"
+      assert_select ".admin-plan__over", "1 on hold"
     end
 
     post admin_identities_path, params: { identity: { email_address: "tester@example.com", plan: "tester" } }

@@ -1,4 +1,13 @@
 module CampaignsHelper
+  # The campaigns list's banner when a plan holds some of an account's
+  # campaigns (Identity::Plans#apply_plan!).
+  def plan_hold_message(identity, held)
+    plan = identity.current_plan
+    limit = plan.limit_for(:gm)
+    names = held.map(&:name).to_sentence
+    "You're on #{plan.name}, which runs #{pluralize(limit, "campaign")} at a time. #{names} #{held.many? ? "are" : "is"} on hold. Choose which to play, archive one, or upgrade."
+  end
+
   # The confirm on Archive, in settings and on the campaigns list.
   def archive_confirmation(campaign)
     "Archive #{campaign.name}? Everyone can still read it, but nothing new is played there. You can unarchive it."

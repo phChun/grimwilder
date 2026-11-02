@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_01_090000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_01_100000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -168,6 +168,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_01_090000) do
     t.datetime "updated_at", null: false
     t.datetime "seen_at"
     t.datetime "active_at"
+    t.datetime "held_at"
     t.index ["campaign_id", "identity_id"], name: "index_memberships_on_campaign_id_and_identity_id", unique: true
     t.index ["campaign_id"], name: "index_memberships_on_campaign_id"
     t.index ["identity_id"], name: "index_memberships_on_identity_id"

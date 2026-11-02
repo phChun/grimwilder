@@ -5,6 +5,7 @@
 # rolls; a player's talent rolls are their own (Characters::TalentRollsController).
 class Campaigns::StoryRollsController < ApplicationController
   include CampaignScoped, StoryRollParams
+  before_action :refuse_when_on_hold
 
   before_action :require_gm
 

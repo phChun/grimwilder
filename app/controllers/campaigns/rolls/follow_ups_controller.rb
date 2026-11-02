@@ -4,6 +4,7 @@
 # in the modal from the roll toast and the log.
 class Campaigns::Rolls::FollowUpsController < ApplicationController
   include CampaignScoped
+  before_action :refuse_when_on_hold
 
   before_action :set_roll
 
