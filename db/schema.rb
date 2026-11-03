@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_03_190000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -166,6 +166,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_190000) do
     t.string "vex_subject"
     t.string "prep_note"
     t.integer "prep_thread", default: 0, null: false
+    t.datetime "archived_at"
     t.index ["campaign_id"], name: "index_characters_on_campaign_id"
     t.index ["harm_changed_by_id"], name: "index_characters_on_harm_changed_by_id"
     t.index ["identity_id"], name: "index_characters_on_identity_id"

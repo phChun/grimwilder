@@ -26,7 +26,7 @@ module Character::Farewell
   # Still playing, at a table that's still playing (or at none): rolls, pushes
   # and talent rolls show only then. An archived campaign's sheets are for reading, and one on hold (Campaign::Hold) waits.
   def in_play?
-    active? && (campaign.nil? || campaign.playable?)
+    active? && !archived? && (campaign.nil? || campaign.playable?)
   end
 
   # status: "fallen" or "retired".

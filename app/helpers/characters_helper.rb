@@ -1,4 +1,10 @@
 module CharactersHelper
+  # Archiving (Character::Archive) takes a character still playing out of their table.
+  def archive_character_confirmation(character)
+    leaves = " #{character.short_name} leaves #{character.campaign.name}, so the party loses them." if character.active? && character.campaign
+    "Archive #{character.name}?#{leaves} You can unarchive them later."
+  end
+
   DAMAGE_SOURCES = { "marked" => "the mark", "bloodied" => "Bloodied", "rattled" => "Rattled", "desperate" => "Desperate", "flesh wound" => "a Flesh Wound" }.freeze
 
   # A character's owner and their campaign's GM can tick talent uses, and mark

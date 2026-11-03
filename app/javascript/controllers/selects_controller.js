@@ -140,6 +140,8 @@ class SelectMenu {
     const option = select.selectedOptions[0]
     const text = option ? optionText(option) : ""
     if (this.text.textContent !== text) this.text.textContent = text
+    // A narrow button cuts a long choice short (CSS); hovering shows it whole, as the open list does.
+    if (this.trigger.title !== text) this.trigger.title = text
     this.trigger.disabled = select.disabled
     this.trigger.hidden = select.hidden
     const name = select.getAttribute("aria-label") || [...(select.labels || [])].map((label) => label.textContent.trim()).join(" ")
@@ -367,7 +369,8 @@ class SelectMenu {
     const above = rect.top - gap - margin
     const style = this.panel.style
     style.minWidth = `${Math.max(rect.width, 192)}px`
-    style.maxWidth = `${window.innerWidth - margin * 2}px`
+    // Wide enough for a long choice, past a narrow button, but wrapping before it spans the screen.
+    style.maxWidth = `${Math.min(window.innerWidth - margin * 2, Math.max(rect.width, 448))}px`
     const natural = this.panel.scrollHeight
     const upward = natural > below && above > below
     style.maxHeight = `${Math.max(160, Math.min(400, upward ? above : below))}px`

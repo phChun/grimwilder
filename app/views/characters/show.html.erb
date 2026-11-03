@@ -81,6 +81,15 @@
       </div>
     <% end %>
 
+    <%# An archived character's sheet says so (Character::Archive); the owner can bring them back. %>
+    <% if @character.archived? %>
+      <div class="archived-banner">
+        <p class="archived-banner__text"><strong>Archived</strong> · <%= l(@character.archived_at.to_date, format: :long) %>. Out of play until unarchived.</p>
+        <% if @character.owned_by?(Current.identity) %>
+          <%= button_to "Unarchive", character_archive_path(@character), method: :delete, params: { return_to: "character" }, class: "button button--small" %>
+        <% end %>
+      </div>
+    <% end %>
     <%# A fallen or retired character's sheet says so, with the player's farewell; the owner can bring them back. %>
     <% if @character.gone? %>
       <div class="<%= class_names("farewell-banner", "farewell-banner--fallen": @character.fallen?) %>">

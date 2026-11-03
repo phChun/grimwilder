@@ -224,7 +224,7 @@
   gap: var(--space-4);
 }
 
-.tool-grid__list > li { display: flex; }
+.tool-grid__list > li { display: flex; min-width: 0; }
 
 .tool-card {
   flex: 1;
@@ -287,9 +287,26 @@
 .character-list__card .field__hint { margin: auto 0 0; }
 .character-list__link { display: flex; flex-direction: column; gap: var(--space-1); color: var(--muted); text-decoration: none; }
 .character-list__link:hover .tool-card__name { color: var(--ember); }
-.seat-form { display: grid; gap: var(--space-1); margin-top: auto; }
-.seat-form__row { display: flex; gap: var(--space-2); }
+.character-list__card { position: relative; min-width: 0; }
+.character-list__card > .character-list__link { padding-right: calc(var(--tap) + var(--space-2)); }
+/* A long campaign name truncates in the dropdown's button (the open list shows it whole):
+   min-width 0 down the chain, so the card doesn't grow to fit the name. */
+.seat-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-1); min-width: 0; margin-top: auto; }
+.seat-form__row { display: flex; gap: var(--space-2); min-width: 0; }
 .seat-form__row .field__input { flex: 1; min-width: 0; }
+.seat-form__row .button { flex: none; }
+
+.character-archive { display: grid; gap: var(--space-3); margin-top: var(--space-6); }
+.character-archive__list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.character-archive__item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); padding: 10px 14px; border: 1px dashed var(--line-strong); border-radius: var(--radius-card); }
+.character-archive__item .button_to { margin: 0; }
+.character-archive__who { display: grid; min-width: 0; }
+.character-archive__name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
+.character-archive__name:hover { color: var(--ember); }
+.character-archive__meta { color: var(--dim); font-size: 0.87rem; }
+.archived-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); padding: 12px 16px; border: 1px dashed var(--line-strong); border-radius: var(--radius-card); background: var(--surface); }
+.archived-banner__text { margin: 0; color: var(--muted); }
+.archived-banner .button_to { margin: 0; }
 
 /* ---------- Roller ---------- */
 

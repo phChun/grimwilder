@@ -53,6 +53,19 @@
   </section>
 <% end %>
 
+<% unless @character.up_for_grabs? %>
+  <section id="archive" class="panel stack character-danger" aria-labelledby="archive-character">
+    <h2 id="archive-character" class="panel__title"><%= @character.archived? ? "Archived" : "Archive" %></h2>
+    <% if @character.archived? %>
+      <p class="field__hint"><%= @character.short_name %> is put away, out of play. Bring them back to seat them at a table again.</p>
+      <%= button_to "Unarchive #{@character.short_name}", character_archive_path(@character), method: :delete, params: { return_to: "character" }, class: "button" %>
+    <% else %>
+      <p class="field__hint">Put <%= @character.short_name %> away at the foot of your Characters page<%= ", out of #{@character.campaign.name}" if @character.active? && @character.campaign %>. Nothing is lost, and you can unarchive them.</p>
+      <%= button_to "Archive #{@character.short_name}", character_archive_path(@character), class: "button", form: { data: { turbo_confirm: archive_character_confirmation(@character) } } %>
+    <% end %>
+  </section>
+<% end %>
+
 <section class="panel stack character-danger" aria-labelledby="delete-character">
   <h2 id="delete-character" class="panel__title">Delete</h2>
   <%= button_to "Delete #{@character.name}", character_path(@character), method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete #{@character.name} for good?" } } %>

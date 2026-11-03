@@ -1,6 +1,6 @@
 <%# locals: (character:, campaigns:) %>
-<%# Character::Seating: pick which of your campaigns the character plays in. An archived one is listed only while they're still seated there. %>
-<% campaigns = campaigns.reject { (_1.archived? || !_1.makes_characters?(character.identity)) && _1.id != character.campaign_id } %>
+<%# Character::Seating: pick which of your campaigns the character plays in. An archived one is listed only while they're still seated there, after the ones still playing. %>
+<% campaigns = campaigns.reject { (_1.archived? || !_1.makes_characters?(character.identity)) && _1.id != character.campaign_id }.partition { !_1.archived? }.sum([]) %>
 <%= form_with url: character_seat_path(character), method: :patch, class: "seat-form" do |form| %>
   <%= form.label :campaign_id, "Campaign", for: "seat_#{character.id}", class: "field__label" %>
   <div class="seat-form__row">
