@@ -42,7 +42,7 @@
               <% else %>
                 <%= form_with url: admin_interest_account_path(interest), class: "admin-plan" do |form| %>
                   <%= form.label "identity[plan]", "Plan for #{interest.email_address}", class: "visually-hidden", for: "interest_#{interest.id}_plan" %>
-                  <%= form.select "identity[plan]", Plan.all.map { [ _1.name, _1.key ] }, { selected: "free" }, class: "field__input", id: "interest_#{interest.id}_plan" %>
+                  <%= form.select "identity[plan]", Plan.all.map { [ _1.name, _1.key ] }, { selected: Identity.column_defaults["plan"] }, class: "field__input", id: "interest_#{interest.id}_plan" %>
                   <%= form.submit "Make account", class: "button button--small" %>
                 <% end %>
               <% end %>

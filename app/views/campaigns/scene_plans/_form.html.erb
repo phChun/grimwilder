@@ -1,4 +1,4 @@
-<%# locals: (plan:, framed: nil) %>
+<%# locals: (plan:, blocks:, framed: nil) %>
 <%# A prepared scene: a title, notes for the GM, and maybe an opening story roll, preloaded when a scene starts from it. framed: its own panel (the edit page); in the prep page's card it isn't. %>
 <%= form_with model: [ Current.campaign, plan ], class: class_names("stack scene-plan-form", "panel": framed) do |form| %>
   <% if plan.errors.any? %><p class="form-error"><%= plan.errors.full_messages.to_sentence %></p><% end %>
@@ -10,6 +10,12 @@
     <%= form.label :notes, "Notes", class: "field__label" %>
     <%= form.text_area :notes, rows: 4, maxlength: 2000, placeholder: "Who's there, what they want, what could go wrong…", class: "field__input" %>
   </div>
+  <% if blocks.any? %>
+    <div class="field">
+      <%= form.label :scene_block_id, "Block", class: "field__label" %>
+      <%= form.select :scene_block_id, blocks.map { [ _1.title, _1.id ] }, { include_blank: "No block" }, class: "field__input" %>
+    </div>
+  <% end %>
   <fieldset class="fieldset scene-plan-form__opening">
     <legend class="field__label">Open with a story roll <small>(optional)</small></legend>
     <div class="segmented segmented--auto scene-plan-form__odds">

@@ -298,7 +298,8 @@ small { font-size: 0.8em; color: var(--dim); }
 
 @media (min-width: 48rem) {
   .tabs { order: 3; flex: 1 1 auto; }
-  .reset-notice { order: 4; flex: none; }
+  /* It wraps onto two lines before it pushes the account button down a row. */
+  .reset-notice { order: 4; flex: 1 1 9rem; max-width: max-content; }
   .account { order: 4; }
 }
 

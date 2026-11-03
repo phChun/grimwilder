@@ -1,0 +1,14 @@
+<%# locals: (block:, framed: nil) %>
+<%# A block of prepared scenes: where the players might go, and notes for the GM. framed: its own panel (the edit page). %>
+<%= form_with model: [ Current.campaign, block ], class: class_names("stack scene-plan-form", "panel": framed) do |form| %>
+  <% if block.errors.any? %><p class="form-error"><%= block.errors.full_messages.to_sentence %></p><% end %>
+  <div class="field">
+    <%= form.label :title, "Where they might go", class: "field__label", for: "scene_block_title_#{block.id || "new"}" %>
+    <%= form.text_field :title, id: "scene_block_title_#{block.id || "new"}", required: true, maxlength: 120, autocomplete: "off", placeholder: "The castle", class: "field__input" %>
+  </div>
+  <div class="field">
+    <%= form.label :notes, "Notes", class: "field__label", for: "scene_block_notes_#{block.id || "new"}" %>
+    <%= form.text_area :notes, id: "scene_block_notes_#{block.id || "new"}", rows: 3, maxlength: 2000, placeholder: "Who holds it, what they know, what's changed…", class: "field__input" %>
+  </div>
+  <%= form.submit block.new_record? ? "Add block" : "Save", class: "button button--primary" %>
+<% end %>

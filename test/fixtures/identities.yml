@@ -1,19 +1,24 @@
+# Most are on Free, so the tests see its limits; new accounts start on Early access.
 gwen:
   email_address: gwen@example.com
   name: Gwen
+  plan: free
 
 pip:
   email_address: pip@example.com
   name: Pip
+  plan: free
 
 stranger:
   email_address: stranger@example.com
   name: Stranger
+  plan: free
 
 ada:
   email_address: ada@example.com
   name: Ada
   admin: true
+  plan: free
 
 tess:
   email_address: tess@example.com

@@ -45,7 +45,7 @@ class InterestsTest < ActionDispatch::IntegrationTest
     identities(:gwen).update!(admin: true)
 
     get admin_interests_path
-    assert_select "option[selected][value=free]", 1, "Free unless the admin picks another plan"
+    assert_select "option[selected][value=early_access]", 1, "Early access unless the admin picks another plan"
     assert_select "td", /ana@example.com/
     assert_select "td", "Mostly play"
 

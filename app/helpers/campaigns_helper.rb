@@ -43,10 +43,19 @@ module CampaignsHelper
   end
 
   # "1h 12m", "8m": how long something has been going.
-  def running_for(time)
-    hours, minutes = ((Time.current - time) / 60).floor.divmod(60)
-    hours.positive? ? "#{hours}h #{minutes}m" : "#{minutes}m"
+  # The GM table's running clock (clock_controller.js counts on from here):
+  # "12:34", or "1:12:05" past an hour.
+  def clock_tag(since, label:)
+    elapsed = [ (Time.current - since).floor, 0 ].max
+    hours, rest = elapsed.divmod(3600)
+    minutes, seconds = rest.divmod(60)
+    text = hours.positive? ? format("%d:%02d:%02d", hours, minutes, seconds) : format("%d:%02d", minutes, seconds)
+    tag.span(class: "scene-clock__item") do
+      tag.span(label, class: "scene-clock__label") +
+        tag.span(text, class: "scene-clock__time", role: "timer", "aria-label": "#{label} running", data: { controller: "clock", clock_elapsed_value: elapsed })
+    end
   end
+
 
   # A party card's harm line: "Bloodied · Agility marked · 4d poisoned", or "No harm".
   def harm_line(character)

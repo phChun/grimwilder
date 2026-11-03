@@ -1,37 +1,44 @@
 <% content_for :title, "Scene prep · #{Current.campaign.name}" %>
 
-<%# The GM's prepared scenes (ScenePlan): the ones still to play, then a few that have been. Starting a scene offers the ones to play. %>
+<%# The GM's prep: blocks of scenes for where the players might go (SceneBlock), each with its scenes still to play, then the scenes in no block, then a few that have been played. Starting a session picks a block; starting a scene offers its scenes first, and any other. %>
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_table_path(Current.campaign) %></p>
   <h1>Scene prep</h1>
-  <p class="page-header__lede">Write scenes ahead of play. When you start a scene, pick one to fill in its title, notes and opening story roll.</p>
+  <p class="page-header__lede">Write scenes ahead of play, grouped in blocks for where the players might go. When they head for the castle, start the session on that block and its scenes come first. Any scene can still be pulled into any session.</p>
 </header>
 
 <div class="fluid">
   <div class="fluid__main stack">
+    <% @blocks.each do |block| %>
+      <% plans = block.scene_plans.select { _1.scene_id.nil? }.sort_by { [ _1.position, _1.created_at ] } %>
+      <section id="<%= dom_id(block) %>" class="card stack scene-block" aria-labelledby="<%= dom_id(block, :title) %>">
+        <div class="scene-block__head">
+          <h2 id="<%= dom_id(block, :title) %>" class="card__title"><%= block.title %> <small class="field__hint"><%= pluralize(plans.size, "scene") %> to play</small></h2>
+          <div class="scene-plans__actions">
+            <%= link_to "Edit", edit_campaign_scene_block_path(Current.campaign, block), class: "button button--small" %>
+            <%= button_to "Remove", campaign_scene_block_path(Current.campaign, block), method: :delete, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_confirm: "Remove #{block.title}? Its scenes stay in your prep, in no block." } } %>
+          </div>
+        </div>
+        <% if block.notes %><p class="scene-plans__notes"><%= block.notes %></p><% end %>
+        <% if plans.any? %>
+          <ol class="scene-plans">
+            <%= render partial: "campaigns/scene_plans/plan", collection: plans, as: :plan, locals: { blocks: @blocks } %>
+          </ol>
+        <% else %>
+          <p class="field__hint">No scenes left to play here.</p>
+        <% end %>
+        <p><%= link_to "Add a scene to #{block.title}", campaign_scene_plans_path(Current.campaign, block: block.id, anchor: "new-plan-title"), class: "button button--small button--ghost" %></p>
+      </section>
+    <% end %>
+
     <section class="card stack" aria-labelledby="plans-title">
-      <h2 id="plans-title" class="card__title">To play</h2>
-      <% if @plans.any? %>
+      <h2 id="plans-title" class="card__title"><%= @blocks.any? ? "In no block" : "To play" %></h2>
+      <% if @loose.any? %>
         <ol class="scene-plans">
-          <% @plans.each do |plan| %>
-            <li id="<%= dom_id(plan) %>" class="scene-plans__item">
-              <div class="scene-plans__main">
-                <strong class="scene-plans__title"><%= plan.title %></strong>
-                <% if plan.opening? %><span class="field__hint">Opens with a <%= plan.opening_odds %>d story roll<%= ": #{plan.opening_question}" if plan.opening_question %></span><% end %>
-                <% if plan.notes %><p class="scene-plans__notes"><%= plan.notes %></p><% end %>
-              </div>
-              <div class="scene-plans__actions">
-                <% if Current.campaign.current_session && !Current.campaign.current_scene %>
-                  <%= link_to "Start it", new_campaign_scene_path(Current.campaign, plan: plan.id), class: "button button--small button--primary" %>
-                <% end %>
-                <%= link_to "Edit", edit_campaign_scene_plan_path(Current.campaign, plan), class: "button button--small" %>
-                <%= button_to "Remove", campaign_scene_plan_path(Current.campaign, plan), method: :delete, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_confirm: "Remove #{plan.title}?" } } %>
-              </div>
-            </li>
-          <% end %>
+          <%= render partial: "campaigns/scene_plans/plan", collection: @loose, as: :plan, locals: { blocks: @blocks } %>
         </ol>
       <% else %>
-        <p class="field__hint">Nothing prepared yet.</p>
+        <p class="field__hint"><%= @blocks.any? ? "Every scene to play is in a block." : "Nothing prepared yet." %></p>
       <% end %>
     </section>
 
@@ -47,10 +54,15 @@
     <% end %>
   </div>
 
-  <aside class="fluid__rail">
+  <aside class="fluid__rail stack">
     <section class="card stack" aria-labelledby="new-plan-title">
       <h2 id="new-plan-title" class="card__title">Prepare a scene</h2>
-      <%= render "campaigns/scene_plans/form", plan: @plan %>
+      <%= render "campaigns/scene_plans/form", plan: @plan, blocks: @blocks %>
+    </section>
+    <section class="card stack" aria-labelledby="new-block-title">
+      <h2 id="new-block-title" class="card__title">New block</h2>
+      <p class="field__hint">A place or thread the players might follow, to gather its scenes under.</p>
+      <%= render "campaigns/scene_blocks/form", block: Current.campaign.scene_blocks.new %>
     </section>
   </aside>
 </div>

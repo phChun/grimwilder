@@ -18,13 +18,33 @@
         <p class="scene-bar__status">
           <% if @session %>
             <span class="live-banner__dot" aria-hidden="true"></span>
-            <%= @session.title %> · live <%= running_for(@session.started_at) %><% if scene %> · Scene <%= scene.number %> of <%= @session.scenes.size %><% end %>
+            <%= @session.title %> · live<% if scene %> · Scene <%= scene.number %> of <%= @session.scenes.size %><% end %>
           <% else %>
             Between sessions<% if (next_game = campaign.schedule&.next_game) %> · next game <%= game_time_tag(next_game.starts_at, style: :short) %><% end %>
           <% end %>
           · <%= link_to "History", campaign_play_sessions_path(campaign) %> · <%= link_to "Campaign page", campaign_path(campaign) %>
         </p>
-        <h1 id="scene-title" class="scene-bar__title"><%= scene&.title || (@session ? "Between scenes" : campaign.name) %></h1>
+        <div class="scene-bar__heading">
+          <h1 id="scene-title" class="scene-bar__title"><%= scene&.title || (@session ? "Between scenes" : campaign.name) %></h1>
+          <%# How long the session and the scene have run, ticking (clock_controller.js). %>
+          <% if @session %>
+            <p class="scene-clock">
+              <%= clock_tag(@session.started_at, label: "Session") %>
+              <% if scene %><%= clock_tag(scene.started_at, label: "Scene") %><% end %>
+            </p>
+          <% end %>
+        </div>
+        <%# The GM's notes while the scene is on (from its prep, or the new-scene form), and the block the session is playing. details-memory keeps it open or shut. %>
+        <% block = @session&.scene_block %>
+        <% if scene&.notes.present? || block&.notes.present? %>
+          <details class="fold scene-bar__notes" id="scene-notes" data-details-memory-target="section" data-section="scene-notes" open>
+            <summary class="fold__summary"><span class="scene-bar__notes-title">Your notes<%= " · #{block.title}" if block %></span></summary>
+            <% if scene&.notes.present? %><p class="scene-plans__notes"><%= scene.notes %></p><% end %>
+            <% if block&.notes.present? %>
+              <p class="scene-plans__notes"><% if scene&.notes.present? %><strong><%= block.title %>:</strong> <% end %><%= block.notes %></p>
+            <% end %>
+          </details>
+        <% end %>
 
         <%# Suspense, then the scene, the session and a break, spaced evenly across the bar, in the order the GM reaches for them. %>
         <div class="scene-bar__actions">
@@ -32,7 +52,7 @@
           <% if scene %>
             <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost" %>
           <% elsif @session %>
-            <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--ghost" %>
+            <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--ghost", data: { turbo_frame: "modal" } %>
           <% end %>
           <%= link_to campaign_scene_plans_path(campaign), class: "button button--ghost" do %>Scene prep<% if (prepared = campaign.scene_plans.unplayed.count).positive? %> <small>(<%= prepared %>)</small><% end %><% end %>
           <% if @session %>

@@ -109,6 +109,10 @@ Rails.application.routes.draw do
       resource :suspense, only: :update
 
       resources :scene_plans, only: %i[ index create edit update destroy ]
+      resources :scene_blocks, only: %i[ create edit update destroy ]
+      resources :journals, only: %i[ index show update ] do # by membership: a player's journal
+        resources :pages, only: %i[ edit update ], module: :journals # by key: session-4, after-4, before
+      end
       resources :scenes, only: %i[ new create update ] do
         resource :ending, only: %i[ new create ], module: :scenes
       end

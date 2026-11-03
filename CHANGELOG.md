@@ -2,6 +2,15 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-03
+
+- **Early access**: new accounts start on the Early access plan, with no limits on how many campaigns they run or play in. ([#85](https://github.com/phChun/grimwilder/pull/85))
+- **Scene blocks**: group your prepared scenes by where the players might go ("The castle"), each block with its own notes. Start a session on a block and its scenes come first; any prepared scene can still be pulled into any session. ([#85](https://github.com/phChun/grimwilder/pull/85))
+- **A new way to start a scene**: from the GM table, a modal lists this session's block, the loose scenes and the other blocks; start one as written in one tap, adjust it first, or make a new one. ([#85](https://github.com/phChun/grimwilder/pull/85))
+- **Running clocks** on the GM table: how long the session and the current scene have run, ticking beside the scene's title. ([#85](https://github.com/phChun/grimwilder/pull/85))
+- **Scene notes at the table**: while a scene is on, its notes (and its block's) show in the GM table's scene bar. ([#85](https://github.com/phChun/grimwilder/pull/85))
+- **Journals**: each player keeps a journal at a campaign, a page per session or for the stretch between, with *italics* and **bold** as in the chat. The GM can read it unless the player keeps it private. ([#85](https://github.com/phChun/grimwilder/pull/85))
+
 ## 2026-11-02
 
 - **Chat opens on Table talk** on the GM table and on character sheets; the campaign page still shows everything. ([#84](https://github.com/phChun/grimwilder/pull/84))

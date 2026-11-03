@@ -76,6 +76,7 @@ module ApplicationHelper
         all_campaigns_tab,
         this_one,
         ([ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ] if campaign.playable?),
+        [ "Journals", campaign_journals_path(campaign), controller_path.start_with?("campaigns/journals") ],
         log
       ].compact
     else
@@ -86,7 +87,8 @@ module ApplicationHelper
         when 1 then [ "My character", sheets.first[1], sheets.first[2] ]
         else [ "My characters", sheets, sheets.any?(&:last) ]
         end
-      [ all_campaigns_tab, this_one, mine, log ].compact
+      journal = [ "Journal", campaign_journal_path(campaign, membership), controller_path.start_with?("campaigns/journals") ]
+      [ all_campaigns_tab, this_one, mine, journal, log ].compact
     end
   end
 

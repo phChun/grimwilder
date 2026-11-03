@@ -3,6 +3,13 @@
 # assigns plans for now (/admin/accounts). Later, Stripe sets free and the
 # paid plans (patron, and any tiers added later, e.g. a duet that runs 2);
 # tester is only ever given by the admin, and Stripe must leave it alone.
+# early_access is where new accounts start (the column's default) until paid
+# plans begin: no limits, and no end date. When charging starts, the admin
+# (or a one-off task) moves those accounts to free or a paid plan.
+- key: early_access
+  name: Early access
+  running:
+  playing:
 - key: free
   name: Free
   running: 1

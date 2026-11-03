@@ -27,7 +27,10 @@ class ScenesTest < ActionDispatch::IntegrationTest
     assert scene.opening_roll.story?
 
     follow_redirect!
-    assert_select ".scene-bar__status", /Session 1 · live \d+m · Scene 1 of 1/
+    assert_select ".scene-bar__status", /Session 1 · live · Scene 1 of 1/
+    assert_select ".scene-clock [data-controller=clock][role=timer]", 2
+    assert_select ".scene-clock__item", text: /Session\s*\d+:\d\d/
+    assert_select ".scene-clock__item", text: /Scene\s*\d+:\d\d/
     assert_select ".scene-bar__title", "The bridge at Mirefall"
     assert_select ".scene-bar a[href=?]", new_campaign_scene_ending_path(@campaign, scene, then: "new_scene"), text: "Cut to new scene"
 

@@ -1,0 +1,25 @@
+<%# locals: (journal:, page:, writable:) %>
+<%# One page of a journal: its session (or the stretch after it) and what was written. The player writes the current page here, and any other in the modal. %>
+<article id="page-<%= page.key %>" class="<%= class_names("card stack journal-page", "journal-page--current": page.current, "journal-page--empty": !page.written?) %>">
+  <header class="journal-page__head">
+    <h2 class="journal-page__title"><%= page.title %></h2>
+    <% if page.current %><span class="journal-page__now"><%= page.between ? "Now" : "Live now" %></span><% end %>
+    <% if page.entry %><span class="field__hint">written <%= time_ago_in_words(page.entry.updated_at) %> ago</span><% end %>
+  </header>
+
+  <% if writable && page.current %>
+    <%= form_with model: page.entry || JournalEntry.new, scope: :journal_entry, url: campaign_journal_page_path(Current.campaign, journal.membership, page.key), method: :patch, class: "stack" do |form| %>
+      <%= form.label :body, "What happened, as you saw it", class: "visually-hidden", for: "journal_body_#{page.key}" %>
+      <%= form.text_area :body, id: "journal_body_#{page.key}", rows: 8, maxlength: JournalEntry::BODY_LIMIT, placeholder: "What happened, who you met, what you're afraid of…", class: "field__input journal-page__body", "aria-describedby": "journal_format_#{page.key}" %>
+      <p id="journal_format_<%= page.key %>" class="field__hint">*italics* **bold**, as in the chat</p>
+      <%= form.submit "Save", class: "button button--primary journal-page__save" %>
+    <% end %>
+  <% elsif page.written? %>
+    <p class="journal-page__text"><%= chat_format(page.body) %></p>
+    <% if writable %>
+      <p><%= link_to "Edit", edit_campaign_journal_page_path(Current.campaign, journal.membership, page.key), class: "button button--small", data: { turbo_frame: "modal" }, "aria-label": "Edit #{page.title}" %></p>
+    <% end %>
+  <% elsif writable %>
+    <p><%= link_to "Write about #{page.title.downcase.sub("session", "Session")}", edit_campaign_journal_page_path(Current.campaign, journal.membership, page.key), class: "button button--small button--ghost", data: { turbo_frame: "modal" } %></p>
+  <% end %>
+</article>

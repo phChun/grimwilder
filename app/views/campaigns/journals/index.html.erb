@@ -1,0 +1,29 @@
+<% content_for :title, "Journals · #{Current.campaign.name}" %>
+
+<%# The GM's list of the players' journals: the shared ones to read, and who keeps theirs private. %>
+<header class="page-header">
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+  <h1>Journals</h1>
+  <p class="page-header__lede">Each player keeps a journal, a page per session. You can read the ones they share with you.</p>
+</header>
+
+<% if @players.any? %>
+  <ul class="journal-list">
+    <% @players.each do |player| %>
+      <% written = player.journal_entries %>
+      <li class="card journal-list__item">
+        <span class="journal-list__name"><%= player.identity.display_name %></span>
+        <% if !player.journal_shared? %>
+          <span class="field__hint">Kept private</span>
+        <% elsif written.empty? %>
+          <span class="field__hint">Nothing written yet</span>
+        <% else %>
+          <span class="field__hint"><%= pluralize(written.size, "page") %> · last written <%= time_ago_in_words(written.map(&:updated_at).max) %> ago</span>
+          <%= link_to "Read", campaign_journal_path(Current.campaign, player), class: "button button--small", "aria-label": "Read #{player.identity.display_name}'s journal" %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="field__hint">No players have joined yet.</p>
+<% end %>
