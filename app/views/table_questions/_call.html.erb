@@ -1,0 +1,52 @@
+<%# locals: (answer:, error: nil) %>
+<%# A poll the GM sent this player, as a modal: the question, the GM's choices (if any) and a box for their own words. Only the GM sees the answer, and it can change until the GM closes the question. Hiding it leaves a pill to bring it back (roll_call_controller.js, which keys what's hidden by the question and whether it's answered). Rendered per viewer, never in a broadcast. %>
+<% question = answer.table_question %>
+<% campaign = question.campaign %>
+<% title_id = "table-question-title-#{question.id}" %>
+<div class="roll-call table-question" data-controller="roll-call" data-roll-call-key-value="table-question-<%= question.id %>-<%= answer.answered? ? "answered" : "waiting" %>">
+  <dialog class="roll-call__dialog" aria-labelledby="<%= title_id %>" data-roll-call-target="dialog" data-action="cancel->roll-call#hide">
+    <div class="roll-call__head">
+      <div>
+        <h2 id="<%= title_id %>" class="roll-call__title"><%= question.asked_by %> asks</h2>
+        <p class="roll-call__by">Only the GM sees your answer</p>
+      </div>
+      <button type="button" class="roll-call__close" aria-label="Hide for now" data-action="roll-call#hide"><%= icon(:close, size: 18) %></button>
+    </div>
+
+    <p class="roll-call__question table-question__body"><%= question.body %></p>
+    <% if error %>
+      <p class="roll-call__error" role="alert"><%= error %></p>
+    <% end %>
+    <% if answer.answered? && !error %>
+      <p class="table-question__sent" aria-live="polite"><%= icon(:check) %> Sent to the GM. You can change it until they close the question.</p>
+    <% end %>
+
+    <%= form_with url: campaign_question_answer_path(campaign, question), method: :patch, class: "table-question__form" do %>
+      <% if question.choices.any? %>
+        <fieldset class="table-question__choices">
+          <legend class="visually-hidden">Pick one</legend>
+          <% question.choices.each_with_index do |choice, index| %>
+            <label class="check table-question__choice">
+              <%= tag.input type: "radio", name: "choice", value: choice, checked: answer.choice == choice, id: "table_question_#{question.id}_choice_#{index}" %>
+              <span><%= choice %></span>
+            </label>
+          <% end %>
+        </fieldset>
+      <% end %>
+      <label class="field">
+        <span class="field__label"><%= question.choices.any? ? "Anything to add? (optional)" : "Your answer" %></span>
+        <textarea name="body" class="field__input" rows="3" maxlength="<%= TableQuestion::MAX_LENGTH %>"><%= answer.body %></textarea>
+      </label>
+      <div class="roll-call__actions">
+        <% if answer.answered? %>
+          <button type="button" class="button button--ghost" data-action="roll-call#hide">Done</button>
+        <% end %>
+        <button type="submit" class="button button--primary"><%= answer.answered? ? "Change my answer" : "Send to the GM" %></button>
+      </div>
+    <% end %>
+  </dialog>
+
+  <button type="button" class="roll-call__pill table-question__pill" hidden data-roll-call-target="pill" data-action="roll-call#reopen">
+    <%= icon(:message, size: 18) %> <%= question.asked_by %> asks · <%= answer.answered? ? "your answer" : "answer" %>
+  </button>
+</div>

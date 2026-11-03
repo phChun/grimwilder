@@ -1,0 +1,59 @@
+<%# locals: (campaign:, questions:, players:) %>
+<%# The GM table's Share fold: a poll or a handout, picked with the segmented control (CSS :has shows that form). A poll is a question, maybe with choices, for the players ticked; only the GM sees the answers, listed below as they come in. A handout is an image with an optional caption, posted to the whole table in the chat. %>
+<%= turbo_stream_from campaign, :questions %>
+<div class="share">
+  <%= render "shared/segmented", name: "share_kind", legend: "What to share", options: [ %w[ poll Poll ], %w[ handout Handout ] ], checked: "poll", classes: "segmented--auto share__kinds" %>
+
+  <div class="share__panel share__panel--poll">
+    <% if players.any? %>
+      <p class="field__hint">Ask the players something. Each answers on their own screen, and only you see the answers.</p>
+      <%= form_with url: campaign_questions_path(campaign), class: "share__form" do %>
+        <label class="field">
+          <span class="field__label">Question</span>
+          <textarea name="body" class="field__input" rows="2" required maxlength="<%= TableQuestion::MAX_LENGTH %>" placeholder="Where do you sleep tonight?"></textarea>
+        </label>
+        <label class="field">
+          <span class="field__label">Choices (optional)</span>
+          <textarea name="choices" class="field__input" rows="3" placeholder="One per line, up to <%= TableQuestion::MAX_CHOICES %>"></textarea>
+          <span class="field__hint">Leave empty for written answers. With choices, players can still add a line of their own.</span>
+        </label>
+        <fieldset class="field share__who">
+          <legend class="field__label">Ask</legend>
+          <% players.each do |membership| %>
+            <label class="check">
+              <%= tag.input type: "checkbox", name: "members[]", value: membership.id, checked: true, id: "poll_member_#{membership.id}" %>
+              <span><%= membership.identity.display_name %><% if (names = membership.seated_characters.map(&:short_name)).any? %> <small>(<%= names.to_sentence %>)</small><% end %></span>
+            </label>
+          <% end %>
+        </fieldset>
+        <div class="share__submit">
+          <button type="submit" class="button button--primary">Send poll</button>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="empty">No players here yet. Share the invite link, then poll away.</p>
+    <% end %>
+
+    <div id="table_questions" class="share__polls">
+      <%= render partial: "table_questions/question", collection: questions, as: :table_question %>
+    </div>
+  </div>
+
+  <div class="share__panel share__panel--handout">
+    <p class="field__hint">Show the table a map, a letter, a diagram. It goes in the chat for everyone here, and only this table can see it.</p>
+    <%= form_with url: campaign_handouts_path(campaign), multipart: true, class: "share__form" do %>
+      <label class="field">
+        <span class="field__label">Image</span>
+        <input type="file" name="image" class="field__input" required accept="<%= Message::IMAGE_TYPES.join(",") %>">
+        <span class="field__hint">PNG, JPEG, WebP or GIF, up to <%= Message::IMAGE_SIZE / 1.megabyte %> MB.</span>
+      </label>
+      <label class="field">
+        <span class="field__label">Caption (optional)</span>
+        <input type="text" name="caption" class="field__input" maxlength="<%= Message::MAX_LENGTH %>" placeholder="The map Hode dropped">
+      </label>
+      <div class="share__submit">
+        <button type="submit" class="button button--primary">Share handout</button>
+      </div>
+    <% end %>
+  </div>
+</div>

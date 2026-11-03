@@ -27,7 +27,7 @@ class TableLogTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
     assert_select "#table_feed > li", 1
-    assert_select "turbo-cable-stream-source", 7, "pool and table refreshes, the live banner, both logs, the chat and the GM's stream"
+    assert_select "turbo-cable-stream-source", 8, "pool and table refreshes, the live banner, both logs, the chat, the GM's stream and the polls"
   end
 
   test "the rail shows the newest #{TableFeed::PAGE} lines, and scrolling back loads the rest" do

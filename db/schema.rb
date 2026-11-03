@@ -10,7 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_03_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_03_190000) do
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -433,6 +461,34 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_120000) do
     t.index ["identity_id"], name: "index_sessions_on_identity_id"
   end
 
+  create_table "table_answers", force: :cascade do |t|
+    t.integer "table_question_id", null: false
+    t.integer "membership_id", null: false
+    t.string "name", null: false
+    t.string "choice"
+    t.text "body"
+    t.datetime "answered_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["membership_id"], name: "index_table_answers_on_membership_id"
+    t.index ["table_question_id", "membership_id"], name: "index_table_answers_on_table_question_id_and_membership_id", unique: true
+    t.index ["table_question_id"], name: "index_table_answers_on_table_question_id"
+  end
+
+  create_table "table_questions", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.integer "identity_id", null: false
+    t.text "body"
+    t.json "choices", default: [], null: false
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_table_questions_on_campaign_id"
+    t.index ["identity_id"], name: "index_table_questions_on_identity_id"
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "arcana", "characters", on_delete: :cascade
   add_foreign_key "campaign_blocks", "campaigns", on_delete: :cascade
   add_foreign_key "campaign_blocks", "identities", column: "blocked_by_id", on_delete: :nullify
@@ -477,4 +533,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_120000) do
   add_foreign_key "scenes", "rolls", column: "closing_roll_id", on_delete: :nullify
   add_foreign_key "scenes", "rolls", column: "opening_roll_id", on_delete: :nullify
   add_foreign_key "sessions", "identities"
+  add_foreign_key "table_answers", "memberships", on_delete: :cascade
+  add_foreign_key "table_answers", "table_questions", on_delete: :cascade
+  add_foreign_key "table_questions", "campaigns"
+  add_foreign_key "table_questions", "identities"
 end

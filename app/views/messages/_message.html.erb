@@ -1,7 +1,7 @@
 <%# locals: (message:) %>
 <%# One chat line in the table's rail, by kind. It renders once for everyone (in a broadcast), so it reads nothing per viewer: feed_controller.js puts your own lines on the right, and the delete button shows on every line in the GM's rail and on your own lines in anyone's (CSS, not once the campaign is archived; the server checks too). Other copies carry it hidden: a broadcast can't tell who's watching. %>
 <% time = capture do %><time class="feed-item__time" datetime="<%= message.created_at.iso8601 %>" data-controller="local-time" data-action="turbo:morph@document->local-time#render"><%= message.created_at.utc.strftime("%H:%M UTC") %></time><% end %>
-<li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": message.table_talk?, "feed-item--private": message.whisper?) %>" data-identity="<%= message.identity_id %>" data-kind="<%= message.kind %>" data-from="<%= message.from_side %>" data-to="<%= message.to_side %>">
+<li id="<%= dom_id(message) %>" class="<%= class_names("feed-item", "chat-line", "chat-line--#{message.kind.dasherize}", "feed-item--story": message.story?, "feed-item--talk": message.talk?, "feed-item--private": message.whisper?) %>" data-identity="<%= message.identity_id %>" data-kind="<%= message.kind %>" data-from="<%= message.from_side %>" data-to="<%= message.to_side %>">
   <% case message.kind %>
   <% when "narration" %>
     <div class="chat-line__card chat-line__card--narration">
@@ -14,6 +14,16 @@
   <% when "in_character" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--character"><%= message.name %></strong> <span class="chat-line__note">in character · <%= message.identity.display_name %></span> <%= time %></p>
     <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
+  <% when "handout" %>
+    <div class="chat-line__card chat-line__card--handout">
+      <p class="chat-line__label">GM · Handout <%= time %></p>
+      <% if message.image.attached? %>
+        <a class="chat-line__handout" href="<%= campaign_message_image_path(message.campaign_id, message) %>" target="_blank" rel="noopener">
+          <img src="<%= campaign_message_image_path(message.campaign_id, message) %>" alt="<%= message.body.presence || "The GM's handout" %> (opens full size)" loading="lazy">
+        </a>
+      <% end %>
+      <% if message.body.present? %><p class="chat-line__body"><%= chat_format(message.body) %></p><% end %>
+    </div>
   <% when "whisper" %>
     <%# Only ever shown inside its own conversation, so it's just the words and the time; the label is for screen readers. %>
     <div class="chat-line__card chat-line__card--whisper">

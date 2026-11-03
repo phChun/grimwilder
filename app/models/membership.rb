@@ -3,6 +3,7 @@ class Membership < ApplicationRecord
   belongs_to :campaign
   belongs_to :identity
   has_many :journal_entries, dependent: :delete_all
+  has_many :table_answers, dependent: :delete_all
 
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
 

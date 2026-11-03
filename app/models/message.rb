@@ -7,6 +7,10 @@
 # - in_character: a player as their active character seated here (the GM may
 #   speak as any of them).
 # - table_talk: anyone, as themselves.
+# - handout: the GM shares an image (a map, a letter, a diagram) with the
+#   whole table, with an optional caption in body. Shown only to the table
+#   (Campaigns::Messages::ImagesController), and only as the raster types in
+#   IMAGE_TYPES: never SVG, which can carry script.
 # - whisper: private, between two people. A player's goes to the GM (no
 #   recipient) or to another player; the GM's to a player. A player is picked
 #   by their character (to_character: sets recipient and copies the
@@ -20,23 +24,28 @@
 class Message < ApplicationRecord
   MAX_LENGTH = 500
   CHAT_SIZE = 40
-  GM_KINDS = %w[ narration npc ].freeze
+  GM_KINDS = %w[ narration npc handout ].freeze
+  IMAGE_TYPES = %w[ image/png image/jpeg image/webp image/gif ].freeze
+  IMAGE_SIZE = 5.megabytes
 
   belongs_to :campaign
   belongs_to :identity
   belongs_to :character, optional: true
   belongs_to :recipient, class_name: "Identity", optional: true
+  has_one_attached :image
 
   # The GM's whisper names a character; it reaches that character's player.
   attr_reader :to_character
 
-  enum :kind, %w[ narration npc in_character table_talk whisper ].index_by(&:itself), default: "table_talk", validate: true
+  enum :kind, %w[ narration npc in_character table_talk whisper handout ].index_by(&:itself), default: "table_talk", validate: true
 
   normalizes :body, with: ->(body) { body.strip }
   normalizes :speaker_name, with: ->(name) { name.squish.presence }
 
   validates :name, presence: true
-  validates :body, presence: true, length: { maximum: MAX_LENGTH }
+  validates :body, presence: true, unless: :handout?
+  validates :body, length: { maximum: MAX_LENGTH }
+  validate :image_fits
   validates :speaker_name, presence: true, length: { maximum: 60 }, if: :npc?
   validate :sender_may_speak_this_way
   validate(on: :create) { campaign&.refuse_new_play(self) }
@@ -70,6 +79,12 @@ class Message < ApplicationRecord
 
   def story?
     !whisper? && !table_talk?
+  end
+
+  # A handout shows in every view but Dice and the private ones, so a player
+  # on Table talk still sees it arrive.
+  def talk?
+    table_talk? || handout?
   end
 
   # A whisper's two sides, for feed_controller.js to find a conversation's
@@ -110,6 +125,17 @@ class Message < ApplicationRecord
         speaks_as_an_active_character(membership)
       elsif character
         errors.add(:character, "only speaks in character")
+      end
+    end
+
+    # The type is what Active Storage found in the file itself, not its name.
+    def image_fits
+      if handout? && !image.attached?
+        errors.add(:image, "is needed for a handout")
+      elsif image.attached?
+        errors.add(:image, "only goes on a handout") unless handout?
+        errors.add(:image, "must be a PNG, JPEG, WebP or GIF") unless image.blob.content_type.in?(IMAGE_TYPES)
+        errors.add(:image, "must be #{IMAGE_SIZE / 1.megabyte} MB or smaller") if image.blob.byte_size > IMAGE_SIZE
       end
     end
 
