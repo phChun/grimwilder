@@ -8,7 +8,9 @@
 <% gm = membership.gm? %>
 <% prefix = "rail_#{campaign.id}" %>
 
-<section class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.archived?, "table-rail--open": !campaign.archived?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-side-value="<%= gm ? "gm" : membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
+<%# On a phone the rail drops below the page: a button to jump down to it, shown only while it's stacked below and out of view (chat_jump_controller.js). %>
+<a href="#<%= prefix %>_rail" class="chat-jump" hidden data-controller="chat-jump" data-chat-jump-rail-value="<%= prefix %>_rail"><%= icon(:message, size: 18) %> Chat</a>
+<section id="<%= prefix %>_rail" class="<%= class_names("table-rail", classes, "table-rail--gm": gm && !campaign.archived?, "table-rail--open": !campaign.archived?) %>" aria-labelledby="<%= prefix %>_title" data-controller="feed presence" data-presence-campaign-value="<%= campaign.id %>" data-action="turbo:morph@document->feed#render" data-feed-viewer-value="<%= membership.identity_id %>" data-feed-side-value="<%= gm ? "gm" : membership.identity_id %>" data-feed-before-value="<%= feed.oldest_at&.iso8601(6) %>" data-feed-more-value="<%= feed.more? %>" data-feed-older-url-value="<%= campaign_feed_path(campaign) %>">
   <div class="table-rail__head">
     <div class="table-rail__titles">
       <h2 id="<%= prefix %>_title" class="table-rail__title">The table</h2>

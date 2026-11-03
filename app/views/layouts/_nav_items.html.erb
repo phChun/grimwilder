@@ -1,0 +1,44 @@
+<%# locals: (membership:, menu: nil) %>
+<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true): the campaign's tabs inside one, else the toolkit's, then Characters and Admin. In the menu, "My characters" lists each sheet under its heading instead of folding them into a dropdown. %>
+<% link_class = menu ? "nav-menu__link" : "tabs__link" %>
+<% items = [] %>
+<% if membership %>
+  <% items.concat(campaign_tabs(membership)) %>
+<% else %>
+  <% items << all_campaigns_tab if authenticated? %>
+  <% toolkit_nav.each do |item| %>
+    <% if item[:ready] %>
+      <% path = public_send(item[:path]) %>
+      <% items << [ item[:label], path, current_page?(path) ] %>
+    <% else %>
+      <% items << [ item[:label], nil, false ] %>
+    <% end %>
+  <% end %>
+<% end %>
+<% if authenticated? %>
+  <% items << characters_tab %>
+  <% items << admin_tab if admin_tab %>
+<% end %>
+<% items.each do |text, path, current| %>
+  <% if path.nil? %>
+    <span class="<%= link_class %> <%= link_class %>--soon" title="Coming soon"><%= text %></span>
+  <% elsif path.is_a?(Array) && menu %>
+    <span class="nav-menu__heading"><%= text %></span>
+    <% path.each do |name, sheet_path, open| %>
+      <%= link_to name, sheet_path, class: "nav-menu__link nav-menu__link--sub", "aria-current": (open ? "page" : nil) %>
+    <% end %>
+  <% elsif path.is_a?(Array) %>
+    <%# More than one character seated here: a menu of their sheets. %>
+    <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
+      <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
+      <ul class="tab-menu__menu" data-menu-target="panel">
+        <%= render "shared/popover_head", title: text, list: true %>
+        <% path.each do |name, sheet_path, open| %>
+          <li><%= link_to name, sheet_path, "aria-current": (open ? "page" : nil) %></li>
+        <% end %>
+      </ul>
+    </details>
+  <% else %>
+    <%= link_to text, path, class: link_class, "aria-current": (current ? "page" : nil) %>
+  <% end %>
+<% end %>

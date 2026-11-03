@@ -46,6 +46,31 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer__tools a", text: "Characters", count: 0
   end
 
+  test "on a phone the tabs, feedback and account fold into the menu, with the same links" do
+    identities(:gwen).update!(feedback_enabled: true)
+    sign_in_as identities(:gwen)
+    get campaign_path(@campaign)
+
+    row = css_select("nav.tabs .tabs__link").map { _1["href"] }
+    menu = css_select(".nav-menu nav .nav-menu__link").map { _1["href"] }
+    assert_equal row, menu
+    assert_select ".nav-menu .nav-menu__link[aria-current=page]", @campaign.name
+    assert_select ".nav-menu .nav-menu__links--account a[href^=?]", new_feedback_path, /Send feedback/
+    assert_select ".nav-menu .nav-menu__links--account a[href=?]", profile_path, /Account · Gwen/
+
+    sign_out
+    get root_path
+    assert_select ".nav-menu .nav-menu__links--account a[href=?]", new_session_path, "Sign in"
+  end
+
+  test "a player with two characters gets each sheet under My characters in the menu" do
+    identities(:pip).characters.create!(name: "Moss", path: "Druid", brawn: 1, agility: 2, wits: 2, presence: 3, campaign: @campaign)
+    sign_in_as identities(:pip)
+    get campaign_path(@campaign)
+    assert_select ".nav-menu .nav-menu__heading", "My characters"
+    assert_select ".nav-menu .nav-menu__link--sub", 2
+  end
+
   test "making a character needs an account" do
     get new_character_path
     assert_redirected_to new_session_path

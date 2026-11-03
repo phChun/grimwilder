@@ -483,6 +483,62 @@ small { font-size: 0.8em; color: var(--dim); }
 .tabs__link--soon { color: var(--dim); cursor: default; }
 .tabs__link--soon:hover { color: var(--dim); }
 
+/* Phones: the wordmark and ☰, then the beta's warning as a plain line; the
+   tabs, Feedback and the account live in the menu (layouts/_app_header). */
+.nav-menu { position: relative; order: 2; margin-left: auto; }
+.nav-menu__toggle { width: var(--tap); padding: 0; list-style: none; }
+.nav-menu__toggle::-webkit-details-marker { display: none; }
+.nav-menu[open] > .nav-menu__toggle { background: var(--surface-2); }
+.nav-menu__panel {
+  position: absolute;
+  z-index: 25;
+  right: 0;
+  top: calc(100% + 4px);
+  display: grid;
+  gap: var(--space-2);
+  width: min(20rem, calc(100vw - 2rem));
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+}
+.nav-menu__links { display: grid; }
+.nav-menu__links--account { padding-top: var(--space-2); border-top: 1px solid var(--line-soft); }
+.nav-menu__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft, var(--text));
+  font-weight: 500;
+  text-decoration: none;
+}
+.nav-menu__link:hover { background: var(--surface-2); color: var(--text); }
+.nav-menu__link[aria-current="page"] { color: var(--text); font-weight: 600; box-shadow: inset 3px 0 0 var(--ember); }
+.nav-menu__link--sub { padding-left: var(--space-5); }
+.nav-menu__link--soon { color: var(--dim); }
+.nav-menu__heading { padding: var(--space-2) var(--space-3) 0; color: var(--dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.nav-menu__account .account--inline { order: 0; width: 2rem; height: 2rem; margin-left: 0; font-size: 0.85rem; }
+
+@media (max-width: 47.99rem) {
+  .app-header > .tabs,
+  .app-header > .account,
+  .app-header > .feedback-button { display: none; }
+  .reset-notice { padding: 0; border: 0; background: none; font-size: 12px; font-weight: 500; }
+  .app-header { column-gap: var(--space-2); }
+}
+/* The smallest phones: the wordmark and ☰ only just fit, and the line under them already says it's in beta. */
+@media (max-width: 22.49rem) {
+  .brand__beta { display: none; }
+}
+@media (min-width: 48rem) {
+  .nav-menu { display: none; }
+}
+
 .account {
   display: grid;
   place-items: center;
@@ -565,7 +621,13 @@ small { font-size: 0.8em; color: var(--dim); }
 .fluid__main { flex: 999 1 640px; min-width: 0; }
 .fluid__rail { flex: 1 1 340px; max-width: 420px; min-width: 0; }
 
-@media (max-width: 47.99rem) {
+/* Once the rail can't fit beside the main column (640px + 340px + the gap),
+   it wraps below the page and takes its full width. A container query, so it
+   follows the layout's own width rather than guessing from the screen's. */
+.fluid { container-type: inline-size; }
+/* Turbo's stream connectors render inside the layout; as flex items they'd each add a gap and wrap the rail early. */
+turbo-cable-stream-source { display: none; }
+@container (max-width: 1003.98px) {
   .fluid__rail { max-width: none; }
 }
 
