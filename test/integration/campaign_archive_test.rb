@@ -153,8 +153,9 @@ class CampaignArchiveTest < ActionDispatch::IntegrationTest
     assert_redirected_to campaigns_path
     assert @campaign.reload.archived?
     follow_redirect!
-    assert_select "##{dom_id(@campaign, :more)} form[action=?] button", campaign_archive_path(@campaign), "Unarchive"
-    assert_select ".campaign-card .tool-card__desc", /archived/
+    assert_select "##{dom_id(@campaign, :more)}", 0, "out of the grid"
+    assert_select ".archive-list ##{dom_id(@campaign, :archived)} .archive-list__meta", /archived/
+    assert_select "##{dom_id(@campaign, :archived)} form[action=?] button", campaign_archive_path(@campaign), "Unarchive"
 
     delete campaign_archive_path(@campaign), params: { return_to: "campaigns" }
     assert_redirected_to campaigns_path

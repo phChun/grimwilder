@@ -11,12 +11,13 @@ module Character::Seating
 
   # The owner, unless the character is up for grabs (a GM holds those for the table).
   def seatable_by?(identity)
-    owned_by?(identity) && !up_for_grabs?
+    owned_by?(identity) && !up_for_grabs? && !archived?
   end
 
   # campaign: one of the owner's campaigns, or nil to leave the table.
   def seat!(campaign, by:)
-    raise ArgumentError, "#{name} isn't yours to move." unless seatable_by?(by)
+    raise ArgumentError, "#{name} is archived; unarchive them to seat them." if archived? && campaign
+    raise ArgumentError, "#{name} isn't yours to move." unless owned_by?(by) && !up_for_grabs?
 
     left = self.campaign
     return if left == campaign

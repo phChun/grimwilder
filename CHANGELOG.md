@@ -4,6 +4,10 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-03
 
+- **Archive a character**: put a character away from the ⋯ on their card or their edit page. They move to an Archived list at the foot of your Characters page, out of play (and out of any table they were playing at) until you unarchive them. ([#89](https://github.com/phChun/grimwilder/pull/89))
+- **Archived campaigns get their own list** at the foot of the Campaigns page, with Unarchive for the GM, instead of sitting among the ones still playing. ([#89](https://github.com/phChun/grimwilder/pull/89))
+- **Campaigns still playing come first** in a character's campaign dropdown, before archived ones. ([#89](https://github.com/phChun/grimwilder/pull/89))
+- **Long campaign names fit**: the campaign dropdown on a character's card no longer runs outside the card; a long name is cut short on the button and shown whole when the list opens or on hover. ([#89](https://github.com/phChun/grimwilder/pull/89))
 - **Polls**: from the GM table's new "Share with the table" fold, the GM asks the players a question, written answers or a set of choices. Each player answers in a pop-up on whatever campaign page they're on, and only the GM sees the answers, live, until the poll is closed. ([#88](https://github.com/phChun/grimwilder/pull/88))
 - **Handouts**: the GM shares an image (a map, a letter, a diagram) with an optional caption. It lands in the table chat, and only people at that table can open it. ([#88](https://github.com/phChun/grimwilder/pull/88))
 - **Feedback**: an admin can turn on a Feedback button for an account; it sends what they think along with the page they were on. Admins read it under Admin › Feedback and can copy it all as Markdown for an AI. ([#87](https://github.com/phChun/grimwilder/pull/87))

@@ -6,7 +6,7 @@
   <p class="page-header__lede">Start a campaign to run it as GM, or open a join link from your GM to play in theirs.</p>
 </header>
 
-<%# Active campaigns lead, archived ones follow, and the last card starts a new one, or says why the plan has no room (Identity::Plans). %>
+<%# Active campaigns in the grid, the last card starting a new one, or saying why the plan has no room (Identity::Plans); archived ones are listed at the foot. %>
 <% active, archived = @memberships.partition { !_1.campaign.archived? } %>
 <%# Over the plan (Identity::Plans#apply_plan!): which are on hold, and how to choose. %>
 <% if (held = Current.identity.held_memberships.includes(:campaign).to_a).any? %>
@@ -16,28 +16,26 @@
   </section>
 <% end %>
 <ul class="tool-grid__list" aria-label="Your campaigns">
-  <% (active + archived).each do |membership| %>
+  <% active.each do |membership| %>
     <% campaign = membership.campaign %>
     <li class="<%= class_names("campaign-card", "campaign-card--on-hold": campaign.on_hold?, "campaign-card--playable": membership.held? && !campaign.archived?) %>">
       <%# Straight to where you play: the GM table, or your character's sheet (Campaigns::PlaysController); an archived campaign opens its page. %>
-      <%= link_to (campaign.archived? ? campaign_path(campaign) : campaign_play_path(campaign)), class: class_names("tool-card", "tool-card--ready": !campaign.archived?) do %>
+      <%= link_to campaign_play_path(campaign), class: "tool-card tool-card--ready" do %>
         <span class="tool-card__name"><%= campaign.name %></span>
-        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if campaign.archived? %> · archived <%= l(campaign.archived_at.to_date, format: :long) %><% elsif campaign.on_hold? %> · On hold<% end %></span>
+        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if campaign.on_hold? %> · On hold<% end %></span>
         <%= next_game_line(campaign) %>
       <% end %>
       <%# A held GM seat (Identity::Plans#keep_playing!): play this one, putting the least recently played on hold if the plan has no room. %>
-      <% if membership.held? && !campaign.archived? %>
+      <% if membership.held? %>
         <%= button_to "Play this one", campaign_hold_path(campaign), method: :delete, class: "button button--small campaign-card__play", form: { data: { turbo_confirm: swap ? "Play #{campaign.name}? #{swap.campaign.name} goes on hold in its place." : "Play #{campaign.name} again?" } } %>
       <% end %>
-      <%# The GM's ⋯: archive or unarchive from here (Campaigns::ArchivesController, back to this list). Players leave from the campaign page. %>
+      <%# The GM's ⋯: archive from here (Campaigns::ArchivesController, back to this list). Players leave from the campaign page. %>
       <% if membership.gm? %>
         <details id="<%= dom_id(campaign, :more) %>" class="campaign-card__more" data-controller="menu" data-action="toggle->menu#place">
           <summary class="button campaign-card__toggle" aria-label="More for <%= campaign.name %>"><%= icon(:more, size: 18) %></summary>
           <div class="campaign-card__menu" data-menu-target="panel">
             <%= render "shared/popover_head", title: campaign.name %>
-            <% if campaign.archived? %>
-              <%= button_to "Unarchive", campaign_archive_path(campaign), method: :delete, params: { return_to: "campaigns" }, class: "button button--small" %>
-            <% elsif campaign.current_session %>
+            <% if campaign.current_session %>
               <button type="button" class="button button--small" disabled>Archive</button>
               <p class="field__hint">End the session first.</p>
             <% else %>
@@ -69,3 +67,24 @@
     </section>
   </li>
 </ul>
+
+<%# Archived campaigns (Campaign::Archive): read-only, each opening its page; the GM can unarchive from here. %>
+<% if archived.any? %>
+  <section class="archive-list" aria-labelledby="campaigns-archived">
+    <h2 id="campaigns-archived" class="farewells__title">Archived</h2>
+    <ul class="archive-list__list">
+      <% archived.sort_by { _1.campaign.archived_at }.reverse_each do |membership| %>
+        <% campaign = membership.campaign %>
+        <li id="<%= dom_id(campaign, :archived) %>" class="archive-list__item">
+          <div class="archive-list__who">
+            <%= link_to campaign.name, campaign_path(campaign), class: "archive-list__name" %>
+            <span class="archive-list__meta"><%= membership.gm? ? "You're the GM" : "You're a player" %> · archived <%= l(campaign.archived_at.to_date, format: :long) %></span>
+          </div>
+          <% if membership.gm? %>
+            <%= button_to "Unarchive", campaign_archive_path(campaign), method: :delete, params: { return_to: "campaigns" }, class: "button button--small", "aria-label": "Unarchive #{campaign.name}" %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

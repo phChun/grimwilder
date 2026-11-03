@@ -6,11 +6,23 @@
   <p class="page-header__lede">Keep your sheets here, and seat each character in one of your campaigns to play them at that table.</p>
 </header>
 
-<% playing, gone = @characters.partition(&:active?) %>
+<%# Playing first, then fallen and retired, then the archived ones (Character::Archive) at the foot. %>
+<% archived, kept = @characters.partition(&:archived?) %>
+<% playing, gone = kept.partition(&:active?) %>
 <%# The last card makes a new one. %>
 <ul class="tool-grid__list character-list" aria-label="Your characters">
   <% playing.each do |character| %>
     <li class="card character-list__card">
+      <%# The ⋯: archive (Character::Archive), which takes them out of a table first. %>
+      <% unless character.up_for_grabs? %>
+        <details id="<%= dom_id(character, :more) %>" class="campaign-card__more" data-controller="menu" data-action="toggle->menu#place">
+          <summary class="button campaign-card__toggle" aria-label="More for <%= character.name %>"><%= icon(:more, size: 18) %></summary>
+          <div class="campaign-card__menu" data-menu-target="panel">
+            <%= render "shared/popover_head", title: character.short_name %>
+            <%= button_to "Archive", character_archive_path(character), class: "button button--small", form: { data: { turbo_confirm: archive_character_confirmation(character) } } %>
+          </div>
+        </details>
+      <% end %>
       <%= link_to character_path(character), class: "character-list__link" do %>
         <span class="tool-card__name"><%= character.name %></span>
         <span class="tool-card__desc"><%= character.path %> · level <%= character.level %></span>
@@ -41,5 +53,23 @@
         <%= render "characters/farewell_card", character: character %>
       <% end %>
     </div>
+  </section>
+<% end %>
+
+<%# Put away (Character::Archive): out of play until unarchived. %>
+<% if archived.any? %>
+  <section class="archive-list" aria-labelledby="characters-archived">
+    <h2 id="characters-archived" class="farewells__title">Archived</h2>
+    <ul class="archive-list__list">
+      <% archived.sort_by(&:archived_at).reverse_each do |character| %>
+        <li class="archive-list__item">
+          <div class="archive-list__who">
+            <%= link_to character.name, character_path(character), class: "archive-list__name" %>
+            <span class="archive-list__meta"><%= character.path %> <%= character.level %><% if character.gone? %> · <%= character.status %><% end %> · archived <%= l(character.archived_at.to_date, format: :long) %></span>
+          </div>
+          <%= button_to "Unarchive", character_archive_path(character), method: :delete, class: "button button--small" %>
+        </li>
+      <% end %>
+    </ul>
   </section>
 <% end %>

@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       resource :claim, only: %i[ create destroy ]
       resource :seat, only: :update
       resource :story_end, only: %i[ create destroy ]
+      resource :archive, only: %i[ create destroy ] # the owner puts a character away (Character::Archive), or back
       resource :stat_progression, only: %i[ create destroy ]
       resource :stat_point, only: :create
       resource :oath, only: %i[ create destroy ]

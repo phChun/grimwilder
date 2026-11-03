@@ -274,6 +274,7 @@ select:disabled { opacity: 0.6; cursor: not-allowed; }
 .select-menu__option {
   display: flex;
   align-items: center;
+  overflow-wrap: anywhere;
   min-height: 40px;
   padding: var(--space-1) var(--space-3) var(--space-1) 2rem;
   border-radius: var(--radius-sm);
