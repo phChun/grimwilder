@@ -133,8 +133,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 - **Admin:** an admin flag and an admin area at /admin. ([#9](https://github.com/phChun/grimwilder/pull/9))
 - The trait and desire you aren't are set apart in a muted rose. ([#8](https://github.com/phChun/grimwilder/pull/8))
 - Production errors are emailed, and how production works is written down. ([#7](https://github.com/phChun/grimwilder/pull/7))
-- Mail goes to Resend on port 2587. ([#6](https://github.com/phChun/grimwilder/pull/6))
-- Sign-in codes are sent through Resend. ([#5](https://github.com/phChun/grimwilder/pull/5))
+- Mail goes to the SMTP provider on port 2587. ([#6](https://github.com/phChun/grimwilder/pull/6))
+- Sign-in codes are sent through an SMTP provider. ([#5](https://github.com/phChun/grimwilder/pull/5))
 - New emails are told sign-ups are closed. ([#4](https://github.com/phChun/grimwilder/pull/4))
 - **Live at grimwilder.com:** ready to deploy. ([#3](https://github.com/phChun/grimwilder/pull/3))
 

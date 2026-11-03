@@ -65,7 +65,7 @@ env:
     ALLOW_SIGNUPS: false
 
     # Who sign-in code emails come from (app/mailers/application_mailer.rb). The
-    # mail. subdomain is the domain verified in Resend, so sending can't hurt
+    # mail. subdomain is the domain verified with the SMTP provider, so sending can't hurt
     # grimwilder.com's own reputation.
     MAILER_FROM: Grimwilder <no-reply@mail.grimwilder.com>
 

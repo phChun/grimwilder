@@ -64,17 +64,17 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "grimwilder.com", protocol: "https" }
 
-  # Outgoing email: sign-in codes go out through Resend, with its SMTP details
+  # Outgoing email: sign-in codes go out through the SMTP provider, with its details
   # in the credentials (`bin/rails credentials:edit`):
   #
   #   smtp:
-  #     address: smtp.resend.com
+  #     address: smtp.example.com
   #     port: 2587
-  #     user_name: resend
-  #     password: re_...
+  #     user_name: ...
+  #     password: ...
   #
   # Port 2587, not 587: DigitalOcean blocks outgoing 25, 465 and 587 on the
-  # droplet. Resend takes STARTTLS on 2587 too.
+  # droplet. The provider takes STARTTLS on 2587 too.
   if (smtp = Rails.application.credentials.smtp)
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {

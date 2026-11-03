@@ -5,7 +5,8 @@
 # "Main" ruleset requires the "signoff" status that bin/ci sets (`gh signoff`)
 # on the branch first, so merging no longer deploys by itself.
 # The production environment takes only v* tags, and the "Release tags"
-# ruleset lets only admins make them, so only an admin can deploy.
+# ruleset lets only admins make them, so only an admin can deploy. Each run
+# waits for the environment's required reviewer to approve it.
 #
 # Secrets, in the "production" environment (Settings → Environments):
 #   RAILS_MASTER_KEY         contents of config/master.key
