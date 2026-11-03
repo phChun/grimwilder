@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-03
 
+- **Safer deploys**: only a release made by the site's admin can deploy, and the deploy's GitHub Actions are pinned to exact versions. ([#92](https://github.com/phChun/grimwilder/pull/92))
 - **Tidier sheet controls**: spark, thread and XP are the same width on your character sheet, and Edit sheet is an outlined button. ([#91](https://github.com/phChun/grimwilder/pull/91))
 - **A menu on phones**: below tablet width the header is just the wordmark and a ☰ menu holding the tabs, Feedback and your account, so pages start higher up the screen. ([#90](https://github.com/phChun/grimwilder/pull/90))
 - **The chat fills the width** whenever it sits below the page (phones, tablets, narrow windows), instead of staying a narrow column. ([#90](https://github.com/phChun/grimwilder/pull/90))
