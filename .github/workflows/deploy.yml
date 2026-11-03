@@ -4,6 +4,8 @@
 # /admin shows (APP_VERSION). main only changes through pull requests, and the
 # "Main" ruleset requires the "signoff" status that bin/ci sets (`gh signoff`)
 # on the branch first, so merging no longer deploys by itself.
+# The production environment takes only v* tags, and the "Release tags"
+# ruleset lets only admins make them, so only an admin can deploy.
 #
 # Secrets, in the "production" environment (Settings → Environments):
 #   RAILS_MASTER_KEY         contents of config/master.key
@@ -15,6 +17,9 @@
 #   PRIVATE_KEY_PEM          its private key (PEM)
 #   DROPLET_IP               the droplet's Reserved IP (config/deploy.yml servers)
 #   ERROR_EMAIL_TO           where production error emails go
+#
+# Actions are pinned to commit SHAs, since this job holds every secret above;
+# Dependabot bumps the SHA and the version comment beside it.
 name: Deploy
 
 on:
@@ -42,25 +47,25 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94 # v1.336.0
         with:
           bundler-cache: true
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Log in to Docker Hardened Images
-        uses: docker/login-action@v4
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: dhi.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Load the deploy SSH key
-        uses: webfactory/ssh-agent@v0.10.0
+        uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555 # v0.10.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
