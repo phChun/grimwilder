@@ -1,0 +1,11 @@
+<%# locals: (campaign:, answer: nil, version: nil, error: nil) %>
+<%# The question waiting on this player (TableQuestion), in the layout's permanent slot on every campaign page and as Campaigns::AskedQuestionsController#show. Like roll_calls/_frame: a broadcast updates the slot with this frame, empty and with a versioned src, so each player loads their own copy. Written by hand, as turbo_frame_tag with a record breaks under Herb. %>
+<% if version %>
+  <turbo-frame id="<%= campaign.question_frame_id %>" src="<%= campaign_asked_question_path(campaign, v: version) %>"></turbo-frame>
+<% else %>
+  <turbo-frame id="<%= campaign.question_frame_id %>">
+    <% if answer %>
+      <%= render "table_questions/call", answer: answer, error: error %>
+    <% end %>
+  </turbo-frame>
+<% end %>

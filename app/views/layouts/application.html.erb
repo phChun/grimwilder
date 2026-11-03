@@ -45,6 +45,10 @@
       <div id="<%= membership.campaign.roll_call_slot_id %>" data-turbo-permanent>
         <%= render "roll_calls/frame", campaign: membership.campaign, call: RollCall.showing_for(membership.campaign, membership) %>
       </div>
+      <%# The GM's question waiting on this player (TableQuestion), permanent for the same reason. %>
+      <div id="<%= membership.campaign.question_slot_id %>" data-turbo-permanent>
+        <%= render "table_questions/frame", campaign: membership.campaign, answer: TableQuestion.showing_for(membership.campaign, membership) %>
+      </div>
     <% end %>
     <%= render "shared/toasts" %>
     <%= render "shared/confirm" %>

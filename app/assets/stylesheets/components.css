@@ -1738,6 +1738,46 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 }
 
 .roll-call__pill[hidden] { display: none; }
+
+/* Share with the table: polls (TableQuestion) and handouts. The player's poll
+   modal reuses the roll call's dialog; its pill sits above the roll call's
+   when both are hidden. The GM's fold lists each poll with its answers. */
+body:has(.roll-call__pill:not(.table-question__pill):not([hidden])) .table-question__pill { bottom: 72px; }
+.table-question__body { white-space: pre-line; }
+.table-question__sent { display: flex; align-items: center; gap: var(--space-2); margin: 0; color: var(--perfect); font-size: 0.9rem; }
+.table-question__form { display: grid; gap: 12px; }
+.table-question__choices { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; }
+.table-question__choice { min-height: var(--tap); padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-control); }
+.table-question__choice:has(input:checked) { border-color: var(--ember); background: var(--surface-2); }
+
+.gm-fold__count { color: var(--ember); font: 600 0.85rem var(--font-ui); }
+.share { display: grid; gap: var(--space-4); }
+.share__panel { display: grid; gap: var(--space-3); }
+.share__panel > .field__hint { margin: 0; }
+.share:has(.share__kinds input[value=poll]:checked) .share__panel:not(.share__panel--poll),
+.share:has(.share__kinds input[value=handout]:checked) .share__panel:not(.share__panel--handout) { display: none; }
+.share__form { display: grid; gap: 12px; }
+.share__who { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; border: 0; }
+.share__who .field__label { flex-basis: 100%; }
+.share__who small { color: var(--dim); }
+.share__submit { display: flex; justify-content: flex-end; }
+.share__polls { display: grid; gap: 12px; }
+.table-question-card { display: grid; gap: 12px; }
+.table-question-card--closed { opacity: 0.8; }
+.table-question-card__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.table-question-card__meta { margin: 0; color: var(--dim); font-size: 0.85rem; }
+.table-question-card__actions { display: flex; gap: var(--space-2); }
+.table-question-card__actions .button_to { margin: 0; }
+.table-question-card__body { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.35; white-space: pre-line; }
+.table-question-card__choices { margin: 4px 0 0; color: var(--muted); font-size: 0.87rem; }
+.table-question-card__answers { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.table-answer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px var(--space-3); padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.table-answer--waiting { background: none; }
+.table-answer__who small { color: var(--dim); }
+.table-answer__said { display: grid; justify-items: end; gap: 2px; min-width: 0; text-align: right; }
+.table-answer__choice { color: var(--ember); font-weight: 600; }
+.table-answer__body { white-space: pre-line; overflow-wrap: anywhere; }
+.table-answer__waiting { color: var(--muted); font-size: 0.9rem; font-style: italic; }
 .roll-call__pill .icon { color: var(--ember); }
 .roll-call__pill:hover { background: var(--surface-2); }
 
@@ -2672,6 +2712,9 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__card { align-self: stretch; display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; }
 .chat-line__card--narration { background: var(--surface-2); }
 .chat-line__card--narration .chat-line__body { font-size: 18px; }
+.chat-line__card--handout { display: grid; gap: var(--space-2); background: var(--surface-2); }
+.chat-line__handout { display: block; border-radius: var(--radius-control); overflow: hidden; background: var(--surface); }
+.chat-line__handout img { display: block; width: 100%; max-height: 360px; object-fit: contain; }
 .chat-line__card--whisper { align-self: auto; max-width: 85%; border: 1px dashed var(--suspense-line); }
 .chat-line--mine .chat-line__card--whisper { background: var(--mine-bg); }
 .chat-line__label { flex-wrap: wrap; }

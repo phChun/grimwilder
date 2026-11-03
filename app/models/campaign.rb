@@ -9,8 +9,10 @@ class Campaign < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :identities, through: :memberships
   has_many :roll_calls, dependent: :delete_all
+  has_many :table_questions, dependent: :delete_all
   has_many :rolls, dependent: :delete_all
   has_many :messages, dependent: :delete_all
+  before_destroy(prepend: true) { messages.handout.includes(image_attachment: :blob).each { _1.image.purge_later } }
   has_many :play_sessions, dependent: :destroy
   has_many :scenes
   has_many :scene_plans, dependent: :delete_all
@@ -97,6 +99,15 @@ class Campaign < ApplicationRecord
 
   def roll_call_slot_id
     ActionView::RecordIdentifier.dom_id(self, :roll_call_slot)
+  end
+
+  # The asked question's frame, and the permanent slot around it (table_questions/_frame).
+  def question_frame_id
+    ActionView::RecordIdentifier.dom_id(self, :question)
+  end
+
+  def question_slot_id
+    ActionView::RecordIdentifier.dom_id(self, :question_slot)
   end
 
   def suspense_meter_id

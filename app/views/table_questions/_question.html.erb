@@ -1,0 +1,39 @@
+<%# locals: (table_question:) %>
+<%# A poll in the GM table's Share fold, with every answer so far. Replaced live over [campaign, :questions] as answers come in, so it renders in a job: no Current. Only GMs see it. The local is named after the model because Turbo's broadcasts always pass it that way. %>
+<% question = table_question %>
+<% campaign = question.campaign %>
+<article id="<%= dom_id(question) %>" class="<%= class_names("card table-question-card", "table-question-card--closed": !question.open?) %>">
+  <div class="table-question-card__head">
+    <p class="table-question-card__meta">
+      <%= question.open? ? "Open" : "Closed" %> · <%= question.answered.size %> of <%= question.answers.size %> answered ·
+      <%= tag.time time_ago_in_words(question.created_at) + " ago", datetime: question.created_at.iso8601 %>
+    </p>
+    <div class="table-question-card__actions">
+      <% if question.open? %>
+        <%= button_to "Close", campaign_question_closing_path(campaign, question), class: "button button--small", form: { data: { turbo_confirm: "Close this poll? It leaves the players' screens and takes no more answers." } } %>
+      <% end %>
+      <%= button_to "Delete", campaign_question_path(campaign, question), method: :delete, class: "button button--small button--ghost", form: { data: { turbo_confirm: "Delete this poll and its answers?" } } %>
+    </div>
+  </div>
+
+  <div>
+    <p class="table-question-card__body"><%= question.body %></p>
+    <% if question.choices.any? %><p class="table-question-card__choices">Choices: <%= question.choices.to_sentence(two_words_connector: " or ", last_word_connector: " or ") %></p><% end %>
+  </div>
+
+  <ul class="table-question-card__answers" aria-live="polite">
+    <% question.answers.each do |answer| %>
+      <li class="<%= class_names("table-answer", "table-answer--waiting": !answer.answered?) %>">
+        <span class="table-answer__who"><strong><%= answer.name %></strong><% if (names = answer.characters.map(&:short_name)).any? %> <small><%= names.to_sentence %></small><% end %></span>
+        <% if answer.answered? %>
+          <span class="table-answer__said">
+            <% if answer.choice %><span class="table-answer__choice"><%= answer.choice %></span><% end %>
+            <% if answer.body %><span class="table-answer__body"><%= answer.body %></span><% end %>
+          </span>
+        <% else %>
+          <span class="table-answer__waiting"><%= question.open? ? "Still thinking" : "Didn't answer" %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</article>

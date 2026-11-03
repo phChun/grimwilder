@@ -15,5 +15,7 @@ module CampaignTable
       @feed = TableFeed.new(Current.campaign, Current.membership)
       @crucible_groups = Crucible.grouped
       @session = Current.campaign.current_session
+      @questions = Current.campaign.table_questions.recent.limit(TableQuestion::RECENT).includes(:identity, answers: { membership: :identity })
+      @players = Current.campaign.memberships.player.includes(:identity).order(:created_at)
     end
 end

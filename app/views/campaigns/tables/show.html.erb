@@ -157,6 +157,11 @@
       <%= render "campaigns/rolls", characters: @characters, my_characters: @my_characters %>
     </details>
 
+    <details id="share" class="card gm-fold" data-details-memory-target="section" data-section="share">
+      <summary class="gm-fold__summary"><span class="gm-section__title">Share with the table<% if (waiting = @questions.count { _1.open? }).positive? %> <small class="gm-fold__count"><%= waiting %> open</small><% end %></span><%= icon(:chevron, size: 18) %></summary>
+      <%= render "table_questions/ask", campaign: campaign, questions: @questions, players: @players %>
+    </details>
+
     <%# Permanent, so a morph doesn't wipe a roll; details-memory remembers whether it's open. The frame is lazy, so a closed fold doesn't load its table. %>
     <details id="crucibles" class="card gm-fold crucible-row" data-details-memory-target="section" data-section="crucible" data-turbo-permanent data-controller="crucible-picker" data-crucible-picker-url-value="<%= crucible_path("__key__", embed: 1) %>">
       <summary class="gm-fold__summary"><span class="gm-section__title">Crucible</span><%= icon(:chevron, size: 18) %></summary>

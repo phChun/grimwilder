@@ -102,6 +102,14 @@ Rails.application.routes.draw do
       resource :roll_call, only: %i[ show destroy ] do
         resources :rolls, only: :create, module: :roll_calls
       end
+      # Polls (TableQuestion): the GM asks, each player answers, only the GM sees the answers
+      resource :asked_question, only: :show # the question waiting on this player, as a frame
+      resources :questions, only: %i[ create destroy ], controller: "table_questions" do
+        scope module: :table_questions do
+          resource :answer, only: :update
+          resource :closing, only: :create
+        end
+      end
       # Talents that change a roll after it's made (Roll::FollowUps)
       resources :rolls, only: [] do
         resource :follow_up, only: %i[ new create ], module: :rolls
@@ -122,7 +130,10 @@ Rails.application.routes.draw do
       resources :scenes, only: %i[ new create update ] do
         resource :ending, only: %i[ new create ], module: :scenes
       end
-      resources :messages, only: %i[ create destroy ]
+      resources :messages, only: %i[ create destroy ] do
+        resource :image, only: :show, module: :messages # a handout's image, only for the table
+      end
+      resources :handouts, only: :create # the GM shares an image in the chat (Message, kind handout)
       resource :rest, only: :create
       resource :rest_reset, only: %i[ new create ]
       resource :milestone, only: :create
