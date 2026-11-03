@@ -580,6 +580,9 @@ select.field__input { padding-right: 2.5rem; }
    without the outline, so it would lose its edge until it loses focus: keep
    the border and draw the ring as a shadow. */
 select.field__input:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
+/* A dropdown's button (selects_controller.js) takes the select's classes; its chevron is its own. */
+.select-trigger.field__input { display: flex; padding-right: var(--space-3); }
+.select-trigger.field__input:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
 
 .field__input--code {
   font-family: ui-monospace, Menlo, Consolas, monospace;
