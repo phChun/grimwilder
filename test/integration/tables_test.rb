@@ -57,6 +57,8 @@ class TablesTest < ActionDispatch::IntegrationTest
   end
 
   test "pools are cards: hidden ones are dashed purple with Reveal, and the last roll shows its dice" do
+    # The fixture's "5 minutes ago" is from when fixtures loaded, which can be over 30s ago by now.
+    pools(:brawl).update_columns(last_rolled_at: 5.minutes.ago)
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
 
