@@ -1541,6 +1541,9 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .identity__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) 20px; }
 /* The owner's spark, thread, XP and Edit sheet: a row of their own, spread evenly across it. */
 .identity__meta--controls { flex-basis: 100%; justify-content: space-between; gap: var(--space-2); }
+/* Spark, thread and XP the same width, wide enough for the longest ("3 of 3 thread"), the count centred between − and +. */
+.identity__meta--controls > .tally { flex: 0 0 13rem; }
+.identity__meta--controls > .tally .tally__count { flex: 1; justify-content: center; }
 
 .meter { display: grid; gap: 4px; }
 .meter__label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
