@@ -43,7 +43,7 @@
               down: { url: character_path(@character), method: :patch, params: { quick: 1, character: { xp: @character.xp - 1 } }, disabled: @character.xp.zero?, label: "Take back 1 XP" },
               up: { url: character_experience_path(@character), label: "Take 1 XP (#{@character.xp_to_next_level} fills level #{@character.level + 1})" } %>
           <% end %>
-          <%= link_to "Edit sheet", edit_character_path(@character), class: "button button--ghost" %>
+          <%= link_to "Edit sheet", edit_character_path(@character), class: "button" %>
         <% else %>
           <div class="meter">
             <span class="meter__label">Spark</span>
