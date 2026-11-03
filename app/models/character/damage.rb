@@ -55,7 +55,6 @@ module Character::Damage
   # Flesh Wounds (pg. 60): instead of bloodied, a condition that adds +1t to
   # every roll and clears when the scene ends.
   FLESH_WOUND = "Flesh Wound"
-  HARMS = %w[ bloodied rattled desperate ].freeze
   MARK_AND_HARMS = [ "marked", *HARMS ].freeze
 
   def flesh_wounds?
