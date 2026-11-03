@@ -21,8 +21,8 @@ class CharacterArchiveTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select ".character-list .tool-card__name", { text: @tibbs.name, count: 0 }
-    assert_select ".character-archive .character-archive__name", @tibbs.name
-    assert_select ".character-archive form[action=?] input[name=_method][value=delete]", character_archive_path(@tibbs)
+    assert_select ".archive-list .archive-list__name", @tibbs.name
+    assert_select ".archive-list form[action=?] input[name=_method][value=delete]", character_archive_path(@tibbs)
 
     get character_path(@tibbs)
     assert_select ".archived-banner", /Archived/

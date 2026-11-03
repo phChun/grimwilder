@@ -58,14 +58,14 @@
 
 <%# Put away (Character::Archive): out of play until unarchived. %>
 <% if archived.any? %>
-  <section class="character-archive" aria-labelledby="characters-archived">
+  <section class="archive-list" aria-labelledby="characters-archived">
     <h2 id="characters-archived" class="farewells__title">Archived</h2>
-    <ul class="character-archive__list">
+    <ul class="archive-list__list">
       <% archived.sort_by(&:archived_at).reverse_each do |character| %>
-        <li class="character-archive__item">
-          <div class="character-archive__who">
-            <%= link_to character.name, character_path(character), class: "character-archive__name" %>
-            <span class="character-archive__meta"><%= character.path %> <%= character.level %><% if character.gone? %> · <%= character.status %><% end %> · archived <%= l(character.archived_at.to_date, format: :long) %></span>
+        <li class="archive-list__item">
+          <div class="archive-list__who">
+            <%= link_to character.name, character_path(character), class: "archive-list__name" %>
+            <span class="archive-list__meta"><%= character.path %> <%= character.level %><% if character.gone? %> · <%= character.status %><% end %> · archived <%= l(character.archived_at.to_date, format: :long) %></span>
           </div>
           <%= button_to "Unarchive", character_archive_path(character), method: :delete, class: "button button--small" %>
         </li>
