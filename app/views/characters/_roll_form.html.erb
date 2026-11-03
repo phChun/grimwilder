@@ -98,7 +98,7 @@
       <% end %>
 
       <% if character.campaign %>
-        <label class="check stat-roll__secret"><%= check_box_tag :gm_only, "1", false, id: "#{prefix}_gm_only" %> Only the GM sees it <small class="field__hint">(kept out of the other players' log)</small></label>
+        <label class="check stat-roll__secret"><%= check_box_tag :gm_only, "1", false, id: "#{prefix}_gm_only" %> <span>Only the GM sees it <small class="field__hint">(kept out of the other players' log)</small></span></label>
       <% end %>
 
       <div class="stat-roll__actions">

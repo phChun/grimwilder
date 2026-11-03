@@ -4,6 +4,10 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-03
 
+- **A menu on phones**: below tablet width the header is just the wordmark and a ☰ menu holding the tabs, Feedback and your account, so pages start higher up the screen. (PR link to come)
+- **The chat fills the width** whenever it sits below the page (phones, tablets, narrow windows), instead of staying a narrow column. (PR link to come)
+- **Jump to the chat on a phone**: where the table chat sits below the page (the sheet, the GM table, the campaign page), a Chat button in the corner takes you straight to it, ready to type. It hides once the chat is on screen. (PR link to come)
+- **Easier to tap on a phone**: bigger, better-spaced talent tick boxes; full-height spark, thread, XP and suspense buttons; pool rows that keep Roll and ⋯ together when a long name wraps; and tidier lines on the GM table and the roll setup. (PR link to come)
 - **Archive a character**: put a character away from the ⋯ on their card or their edit page. They move to an Archived list at the foot of your Characters page, out of play (and out of any table they were playing at) until you unarchive them. ([#89](https://github.com/phChun/grimwilder/pull/89))
 - **Archived campaigns get their own list** at the foot of the Campaigns page, with Unarchive for the GM, instead of sitting among the ones still playing. ([#89](https://github.com/phChun/grimwilder/pull/89))
 - **Campaigns still playing come first** in a character's campaign dropdown, before archived ones. ([#89](https://github.com/phChun/grimwilder/pull/89))

@@ -1194,6 +1194,11 @@ form.button_to, .button_to { margin: 0; }
   scroll-margin-top: var(--space-6);
 }
 .pool-row:first-child { border-top: 0; }
+/* On a phone a long name wraps: keep the count, Roll and the ⋯ together at the top of the row. */
+@media (max-width: 40rem) {
+  .pool-row { align-items: start; }
+  .pool-row__stripe { align-self: stretch; }
+}
 .pool-row--depleted > :not(.pool-row__more):not(.pool-row__primary) { opacity: 0.7; }
 
 .pool-row__stripe { align-self: stretch; border-radius: 3px; background: var(--pool-color, var(--muted)); }
@@ -1342,7 +1347,14 @@ form.button_to, .button_to { margin: 0; }
   border-radius: 4px;
   background: var(--bg);
 }
-button.use-box { cursor: pointer; }
+button.use-box { position: relative; cursor: pointer; }
+/* On a touch screen: bigger boxes, further apart, each with a hit area reaching
+   halfway into the gaps (44px tall, the tap rule) so neighbours never overlap. */
+@media (pointer: coarse) {
+  .use-boxes { gap: 10px; }
+  .use-box { width: 2rem; height: 2rem; }
+  button.use-box::after { content: ""; position: absolute; inset: -6px -5px; }
+}
 button.use-box:hover { border-color: var(--ember); }
 button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .use-box--spent { border-color: var(--ember); background: var(--ember); }
@@ -1593,6 +1605,7 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .roll-dialog .roll-dialog__form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 16px 24px; align-items: start; }
 .roll-dialog .roll-dialog__form > .stat-roll__actions,
 .roll-dialog .roll-dialog__form > .stat-roll__secret { grid-column: 1 / -1; }
+.stat-roll__secret > span small { margin-left: 2px; }
 @media (max-width: 40rem) {
   .roll-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); padding: 14px 16px 16px; }
 }
@@ -2170,6 +2183,7 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .tally .button_to { display: flex; margin: 0; }
 .tally__step {
   min-width: var(--tap);
+  min-height: var(--tap);
   border: 0;
   background: none;
   color: inherit;
@@ -2316,6 +2330,7 @@ li.popover__head { margin: 0; padding-left: var(--space-3); }
 /* Folds on the GM table: Rolls and the crucible */
 .gm-fold__summary { display: flex; align-items: center; min-height: var(--tap); list-style: none; cursor: pointer; }
 .gm-fold__summary::-webkit-details-marker { display: none; }
+.scene-bar__link { white-space: nowrap; }
 .gm-fold[open] .gm-fold__summary { margin-bottom: var(--space-3); }
 
 /* Rolls: the segmented control picks which group roll's form shows. */
@@ -3164,3 +3179,25 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .admin-feedback__copy { margin-top: var(--space-3); }
 .admin-feedback__copy > .stack { margin-top: var(--space-3); }
 .admin-toggle--on { border-color: var(--perfect); color: var(--perfect); }
+
+/* Jump to the chat on a phone, where the rail sits below the page (chat_jump_controller.js). Bottom right, clear of the roll call and poll pills on the left. */
+.chat-jump {
+  position: fixed;
+  z-index: 30;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 0.9rem var(--font-ui);
+  text-decoration: none;
+  box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.85);
+}
+.chat-jump[hidden] { display: none; }
+.chat-jump:hover { border-color: var(--ember); }

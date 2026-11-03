@@ -22,7 +22,8 @@
           <% else %>
             Between sessions<% if (next_game = campaign.schedule&.next_game) %> · next game <%= game_time_tag(next_game.starts_at, style: :short) %><% end %>
           <% end %>
-          · <%= link_to "History", campaign_play_sessions_path(campaign) %> · <%= link_to "Campaign page", campaign_path(campaign) %>
+          <%# Each dot stays with its link, so a wrap on a phone doesn't leave one hanging. %>
+          <span class="scene-bar__link">· <%= link_to "History", campaign_play_sessions_path(campaign) %></span> <span class="scene-bar__link">· <%= link_to "Campaign page", campaign_path(campaign) %></span>
         </p>
         <div class="scene-bar__heading">
           <h1 id="scene-title" class="scene-bar__title"><%= scene&.title || (@session ? "Between scenes" : campaign.name) %></h1>

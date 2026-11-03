@@ -1,5 +1,5 @@
 <%# locals: (membership:) %>
-<%# The shell: wordmark, tabs (All campaigns first, signed in) and account. Inside a campaign the tabs are the campaign's; elsewhere they're the toolkit's. %>
+<%# The shell: wordmark, tabs (All campaigns first, signed in) and account. Inside a campaign the tabs are the campaign's; elsewhere they're the toolkit's (layouts/_nav_items). On a phone the tabs, Feedback and the account fold into the ☰ menu. %>
 <header class="app-header">
   <%= link_to root_path, class: "brand" do %>
     <%= brand_mark %>
@@ -7,55 +7,9 @@
     <span class="brand__beta">Beta</span>
   <% end %>
 
-  <% if membership %>
-    <nav class="tabs" aria-label="Campaign">
-      <% campaign_tabs(membership).each do |text, path, current| %>
-        <% if path.is_a?(Array) %>
-          <%# More than one character seated here: a menu of their sheets. %>
-          <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
-            <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
-            <ul class="tab-menu__menu" data-menu-target="panel">
-              <%= render "shared/popover_head", title: text, list: true %>
-              <% path.each do |name, sheet_path, open| %>
-                <li><%= link_to name, sheet_path, "aria-current": (open ? "page" : nil) %></li>
-              <% end %>
-            </ul>
-          </details>
-        <% else %>
-          <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
-        <% end %>
-      <% end %>
-      <% text, path, current = characters_tab %>
-      <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
-      <% if admin_tab %>
-        <% text, path, current = admin_tab %>
-        <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
-      <% end %>
-    </nav>
-  <% else %>
-    <nav class="tabs" aria-label="Toolkit">
-      <% if authenticated? %>
-        <% text, path, current = all_campaigns_tab %>
-        <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
-      <% end %>
-      <% toolkit_nav.each do |item| %>
-        <% if item[:ready] %>
-          <% path = public_send(item[:path]) %>
-          <%= link_to item[:label], path, class: "tabs__link", "aria-current": (current_page?(path) ? "page" : nil) %>
-        <% else %>
-          <span class="tabs__link tabs__link--soon" title="Coming soon"><%= item[:label] %></span>
-        <% end %>
-      <% end %>
-      <% if authenticated? %>
-        <% text, path, current = characters_tab %>
-        <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
-        <% if admin_tab %>
-          <% text, path, current = admin_tab %>
-          <%= link_to text, path, class: "tabs__link", "aria-current": (current ? "page" : nil) %>
-        <% end %>
-      <% end %>
-    </nav>
-  <% end %>
+  <nav class="tabs" aria-label="<%= membership ? "Campaign" : "Toolkit" %>">
+    <%= render "layouts/nav_items", membership: membership %>
+  </nav>
 
   <% if authenticated? %>
     <%# While it's in beta, anything saved may be wiped, so everyone with an account is told on every page. %>
@@ -69,4 +23,25 @@
   <% else %>
     <%= link_to "Sign in", new_session_path, class: "account account--signin" %>
   <% end %>
+
+  <%# Phones: everything above but the wordmark, in one menu. %>
+  <details class="nav-menu" data-controller="menu" data-action="toggle->menu#place">
+    <summary class="button nav-menu__toggle" aria-label="Menu"><%= icon(:menu, size: 20) %></summary>
+    <div class="nav-menu__panel" data-menu-target="panel">
+      <%= render "shared/popover_head", title: "Menu" %>
+      <nav class="nav-menu__links" aria-label="<%= membership ? "Campaign" : "Toolkit" %>">
+        <%= render "layouts/nav_items", membership: membership, menu: true %>
+      </nav>
+      <div class="nav-menu__links nav-menu__links--account">
+        <% if authenticated? %>
+          <% if Current.identity.feedback_enabled? %>
+            <%= link_to new_feedback_path(path: request.fullpath), class: "nav-menu__link", data: { turbo_frame: "modal" } do %><%= icon(:message, size: 16) %> Send feedback<% end %>
+          <% end %>
+          <a class="nav-menu__link nav-menu__account" href="<%= profile_path %>"><span class="account account--inline" aria-hidden="true"><%= initial(Current.identity.display_name) %></span> Account · <%= Current.identity.display_name %></a>
+        <% else %>
+          <%= link_to "Sign in", new_session_path, class: "nav-menu__link" %>
+        <% end %>
+      </div>
+    </div>
+  </details>
 </header>
