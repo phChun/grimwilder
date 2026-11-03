@@ -4,8 +4,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-03
 
-- **Polls**: from the GM table's new "Share with the table" fold, the GM asks the players a question, written answers or a set of choices. Each player answers in a pop-up on whatever campaign page they're on, and only the GM sees the answers, live, until the poll is closed. (PR link to come)
-- **Handouts**: the GM shares an image (a map, a letter, a diagram) with an optional caption. It lands in the table chat, and only people at that table can open it. (PR link to come)
+- **Polls**: from the GM table's new "Share with the table" fold, the GM asks the players a question, written answers or a set of choices. Each player answers in a pop-up on whatever campaign page they're on, and only the GM sees the answers, live, until the poll is closed. ([#88](https://github.com/phChun/grimwilder/pull/88))
+- **Handouts**: the GM shares an image (a map, a letter, a diagram) with an optional caption. It lands in the table chat, and only people at that table can open it. ([#88](https://github.com/phChun/grimwilder/pull/88))
 - **Feedback**: an admin can turn on a Feedback button for an account; it sends what they think along with the page they were on. Admins read it under Admin › Feedback and can copy it all as Markdown for an AI. ([#87](https://github.com/phChun/grimwilder/pull/87))
 - **Searchable dropdowns**: every dropdown is drawn in Grimwilder's own style, and long ones (time zones, paths, talents) have a search box. They work from the keyboard too. ([#86](https://github.com/phChun/grimwilder/pull/86))
 - **Early access**: new accounts start on the Early access plan, with no limits on how many campaigns they run or play in. ([#85](https://github.com/phChun/grimwilder/pull/85))
