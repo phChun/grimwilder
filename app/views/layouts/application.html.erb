@@ -23,7 +23,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <%# selects_controller.js draws every <select> as our own searchable dropdown. %>
+  <body data-controller="selects">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <% membership = context_membership %>

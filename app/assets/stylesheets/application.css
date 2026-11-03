@@ -189,6 +189,125 @@ select optgroup { background: var(--surface); color: var(--text); }
 select:focus-visible { --chevron: var(--text); }
 select:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* Our own dropdowns (selects_controller.js): the native select stays in the
+   form, hidden, and a button in its place opens a list in a popover, with a
+   search box once it's long. The button looks like the select did. */
+.select-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: var(--tap);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+
+.select-trigger__text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.select-trigger__chevron { flex: none; color: var(--muted); transition: transform 120ms; }
+.select-trigger[aria-expanded="true"] .select-trigger__chevron { transform: rotate(180deg); color: var(--text); }
+.select-trigger[aria-expanded="true"] { border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
+.select-trigger:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
+.select-trigger:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (hover: hover) {
+  .select-trigger:hover:not(:disabled) { border-color: var(--text-soft); box-shadow: inset 0 0 0 1px var(--text-soft); }
+  .select-trigger:hover:not(:disabled) .select-trigger__chevron { color: var(--text); }
+}
+
+/* The list: fixed beside its button (placed by the controller), in the top layer. */
+.select-menu {
+  position: fixed;
+  inset: auto;
+  display: none;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.select-menu:popover-open { display: flex; }
+
+.select-menu__search {
+  flex: none;
+  min-height: 40px;
+  margin: 0 0 var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.select-menu__search:focus-visible { outline: none; border-color: var(--focus); }
+
+.select-menu__list { flex: 1 1 auto; min-height: 0; margin: 0; padding: 0; overflow-y: auto; list-style: none; overscroll-behavior: contain; }
+.select-menu__list:focus-visible { outline: none; }
+
+.select-menu__option {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: var(--space-1) var(--space-3) var(--space-1) 2rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  position: relative;
+}
+
+.select-menu__option--active { background: var(--surface-2); }
+.select-menu__option[aria-selected="true"] { font-weight: 600; }
+.select-menu__option[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  border: solid var(--ember);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-60%) rotate(45deg);
+}
+.select-menu__option[aria-disabled="true"] { color: var(--dim); cursor: not-allowed; }
+.select-menu__option[hidden], .select-menu__group[hidden] { display: none; }
+
+.select-menu__group {
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.select-menu__empty { margin: 0; padding: var(--space-2) var(--space-3); color: var(--dim); }
+
 small { font-size: 0.8em; color: var(--dim); }
 
 .visually-hidden {
