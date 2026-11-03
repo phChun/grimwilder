@@ -4,7 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-03
 
-- **Tidier sheet controls**: spark, thread and XP are the same width on your character sheet, and Edit sheet is an outlined button. (PR link to come)
+- **Tidier sheet controls**: spark, thread and XP are the same width on your character sheet, and Edit sheet is an outlined button. ([#91](https://github.com/phChun/grimwilder/pull/91))
 - **A menu on phones**: below tablet width the header is just the wordmark and a ☰ menu holding the tabs, Feedback and your account, so pages start higher up the screen. ([#90](https://github.com/phChun/grimwilder/pull/90))
 - **The chat fills the width** whenever it sits below the page (phones, tablets, narrow windows), instead of staying a narrow column. ([#90](https://github.com/phChun/grimwilder/pull/90))
 - **Jump to the chat on a phone**: where the table chat sits below the page (the sheet, the GM table, the campaign page), a Chat button in the corner takes you straight to it, ready to type. It hides once the chat is on screen. ([#90](https://github.com/phChun/grimwilder/pull/90))
