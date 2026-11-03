@@ -1,0 +1,23 @@
+<% content_for :title, "Feedback" %>
+
+<%# Its own page, and from the header's Feedback button a modal (shared/_frame_modal). The form targets _top: saving goes back to the page it was sent from, with thanks. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <h1>Feedback</h1>
+    <p class="page-header__lede">Something broken, confusing or missing? Say what you were doing and what you expected.</p>
+  </header>
+
+  <%= form_with model: @feedback, url: feedbacks_path, class: "panel stack feedback-form", data: { turbo_frame: "_top" } do |form| %>
+    <% if @feedback.errors.any? %><p class="form-error"><%= @feedback.errors.full_messages.to_sentence %></p><% end %>
+    <%= form.hidden_field :path %>
+    <div class="field">
+      <span class="field__label">Page</span>
+      <code class="feedback-form__path"><%= @feedback.path %></code>
+    </div>
+    <div class="field">
+      <%= form.label :body, "Your feedback", class: "field__label" %>
+      <%= form.text_area :body, rows: 7, required: true, maxlength: Feedback::BODY_LIMIT, autofocus: true, placeholder: "I tried to… and expected… but…", class: "field__input" %>
+    </div>
+    <%= form.submit "Send feedback", class: "button button--primary" %>
+  <% end %>
+<% end %>

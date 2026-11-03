@@ -1,0 +1,57 @@
+<% content_for :title, "Feedback · Admin" %>
+
+<header class="page-header">
+  <p class="eyebrow">Admin</p>
+  <h1>Feedback</h1>
+  <p class="page-header__lede">
+    From the accounts with the Feedback button on, newest first.
+    <% if @senders.any? %>
+      On for <%= @senders.map(&:display_name).to_sentence %>.
+    <% else %>
+      Nobody has it on yet: turn it on for an account in <%= link_to "Accounts", admin_identities_path %>.
+    <% end %>
+  </p>
+  <%= render "admin/nav" %>
+</header>
+
+<%= render "admin/search", search_label: "Search feedback", placeholder: "Words, page or route" %>
+
+<% if @feedbacks.any? %>
+  <%# Everything found (not just this page, up to Admin::FeedbacksController::MARKDOWN_LIMIT), as Markdown to paste into an AI. %>
+  <details class="fold card admin-feedback__copy" data-controller="copy-text">
+    <summary class="fold__summary">
+      <span class="fold__title">Copy as Markdown</span>
+      <span class="field__hint"><%= search_query.present? ? "What's found" : "All of it" %>, for an AI to read</span>
+    </summary>
+    <div class="stack">
+      <label class="visually-hidden" for="feedback-markdown">Feedback as Markdown</label>
+      <textarea id="feedback-markdown" class="field__input brief__text" rows="14" readonly data-copy-text-target="source"><%= @markdown %></textarea>
+      <div class="brief__actions">
+        <button type="button" class="button button--primary" data-action="copy-text#copy">Copy Markdown</button>
+        <span class="field__hint" data-copy-text-target="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </details>
+
+  <ol class="admin-feedback">
+    <% @feedbacks.each do |feedback| %>
+      <li id="<%= dom_id(feedback) %>" class="card stack admin-feedback__item">
+        <div class="admin-feedback__head">
+          <strong><%= feedback.identity.display_name %></strong>
+          <span class="field__hint"><%= feedback.identity.email_address %></span>
+          <span class="field__hint"><%= time_ago_in_words(feedback.created_at) %> ago</span>
+          <%= button_to "Remove", admin_feedback_path(feedback, q: search_query.presence), method: :delete, class: "button button--small button--ghost button--danger-text", form: { class: "admin-feedback__remove", data: { turbo_confirm: "Remove this feedback from #{feedback.identity.display_name}?" } } %>
+        </div>
+        <p class="admin-feedback__where">
+          <%= link_to feedback.path, feedback.path, class: "admin-feedback__path" %>
+          <% if feedback.route %><code><%= feedback.route %></code><% end %>
+        </p>
+        <p class="admin-feedback__body"><%= feedback.body %></p>
+        <% if feedback.user_agent %><p class="field__hint admin-feedback__browser"><%= feedback.user_agent %></p><% end %>
+      </li>
+    <% end %>
+  </ol>
+  <%= render "admin/pages", pagy: @pagy, noun: "item" %>
+<% else %>
+  <p class="field__hint"><%= search_query.present? ? "No feedback matches that." : "No feedback yet." %></p>
+<% end %>

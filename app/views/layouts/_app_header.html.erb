@@ -60,6 +60,10 @@
   <% if authenticated? %>
     <%# While it's in beta, anything saved may be wiped, so everyone with an account is told on every page. %>
     <p class="reset-notice">While in beta, data may be reset any time</p>
+    <%# Accounts an admin turned feedback on for: a box for what they think, with this page's path (feedbacks/new, in the frame modal). %>
+    <% if Current.identity.feedback_enabled? %>
+      <%= link_to new_feedback_path(path: request.fullpath), class: "button button--small feedback-button", title: "Send feedback about this page", "aria-label": "Send feedback", data: { turbo_frame: "modal" } do %><%= icon(:message, size: 16) %><span>Feedback</span><% end %>
+    <% end %>
     <%# A hand-written <a> on purpose (the linter's link_to hint is wrong here): Herb compiles link_to statically and drops the quotes around an interpolated aria-label with a space, either way it's written. %>
     <a class="account" href="<%= profile_path %>" aria-label="Account: <%= Current.identity.display_name %>"><%= initial(Current.identity.display_name) %></a>
   <% else %>

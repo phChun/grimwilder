@@ -19,6 +19,7 @@
         <th scope="col">Last sign-in</th>
         <th scope="col">Passkeys</th>
         <th scope="col">Plan</th>
+        <th scope="col">Feedback</th>
         <th scope="col">Campaigns</th>
       </tr>
     </thead>
@@ -41,6 +42,14 @@
             <% end %>
             <% if (held = identity.held_memberships.count).positive? %>
               <small class="admin-plan__over"><%= held %> on hold</small>
+            <% end %>
+          </td>
+          <td>
+            <%# Whether the header shows them the Feedback button (Admin::Identities::FeedbackAccessesController). %>
+            <% if identity.feedback_enabled? %>
+              <%= button_to "On", admin_identity_feedback_access_path(identity), method: :delete, params: { q: search_query.presence, page: params[:page].presence }.compact, class: "button button--small admin-toggle admin-toggle--on", "aria-label": "Feedback is on for #{identity.display_name}: turn it off", title: "Turn feedback off" %>
+            <% else %>
+              <%= button_to "Off", admin_identity_feedback_access_path(identity), params: { q: search_query.presence, page: params[:page].presence }.compact, class: "button button--small button--ghost admin-toggle", "aria-label": "Feedback is off for #{identity.display_name}: turn it on", title: "Turn feedback on" %>
             <% end %>
           </td>
           <td><%= identity.memberships.map { "#{_1.campaign.name} (#{_1.gm? ? "GM" : "player"})" }.to_sentence.presence || "None" %></td>

@@ -62,7 +62,10 @@ Rails.application.routes.draw do
   # Admins only (identities.admin): site stats, accounts and their plans, campaigns
   namespace :admin do
     root "dashboards#show"
-    resources :identities, only: %i[ index create update ], path: "accounts"
+    resources :identities, only: %i[ index create update ], path: "accounts" do
+      resource :feedback_access, only: %i[ create destroy ], module: :identities # lets the account send feedback, or stops it
+    end
+    resources :feedbacks, only: %i[ index destroy ], path: "feedback"
     resources :campaigns, only: :index
     resources :interests, only: %i[ index destroy ] do
       resource :account, only: :create, module: :interests
@@ -70,6 +73,9 @@ Rails.application.routes.draw do
   end
 
   get "sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: "xml" }
+
+  # Feedback from the header's button, for accounts an admin turned it on for.
+  resources :feedbacks, only: %i[ new create ], path: "feedback"
 
   # "I'm interested", while sign-ups are closed: the form, then thanks.
   resource :interest, only: %i[ new create show ]

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_03_110000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_03_120000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -143,6 +143,18 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_110000) do
     t.index ["identity_id"], name: "index_characters_on_identity_id"
   end
 
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer "identity_id", null: false
+    t.string "path", null: false
+    t.string "route"
+    t.string "user_agent"
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_feedbacks_on_created_at"
+    t.index ["identity_id"], name: "index_feedbacks_on_identity_id"
+  end
+
   create_table "game_dates", force: :cascade do |t|
     t.integer "campaign_id", null: false
     t.date "occurs_on"
@@ -164,6 +176,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_110000) do
     t.boolean "admin", default: false, null: false
     t.datetime "last_signed_in_at"
     t.string "plan", default: "early_access", null: false
+    t.boolean "feedback_enabled", default: false, null: false
     t.index ["email_address"], name: "index_identities_on_email_address", unique: true
     t.index ["last_signed_in_at"], name: "index_identities_on_last_signed_in_at"
     t.index ["webauthn_user_handle"], name: "index_identities_on_webauthn_user_handle", unique: true
@@ -428,6 +441,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_110000) do
   add_foreign_key "characters", "campaigns"
   add_foreign_key "characters", "identities"
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify
+  add_foreign_key "feedbacks", "identities", on_delete: :cascade
   add_foreign_key "game_dates", "campaigns", on_delete: :cascade
   add_foreign_key "journal_entries", "memberships", on_delete: :cascade
   add_foreign_key "memberships", "campaigns"
