@@ -22,4 +22,11 @@ class ScenePlanTest < ActiveSupport::TestCase
     @campaign.reset!(by: identities(:gwen))
     assert_equal [ plan ], @campaign.scene_plans.unplayed.to_a, "its scene is gone, so it's back to play"
   end
+
+  test "a scene's block must be this campaign's" do
+    other = campaigns(:bramblewood).scene_blocks.create!(title: "The castle")
+    assert @campaign.scene_plans.new(title: "Gate", scene_block: other).valid?
+    elsewhere = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:tess)).scene_blocks.create!(title: "Docks")
+    assert_not @campaign.scene_plans.new(title: "Gate", scene_block: elsewhere).valid?
+  end
 end

@@ -28,7 +28,7 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select ".tabs__link[aria-current=page]", "Table"
     assert_select ".live-banner", 0, "already at the table"
 
-    assert_select ".scene-bar__status", /Session 1 · live \d+m · Scene 1 of 1/
+    assert_select ".scene-bar__status", /Session 1 · live · Scene 1 of 1/
     assert_select "h1.scene-bar__title", "The mill fire"
     assert_select ".scene-bar__actions a", text: /Story roll|Montage|Quarrel/, count: 0
     assert_select "details#rolls summary", "Rolls"
@@ -165,11 +165,13 @@ class TablesTest < ActionDispatch::IntegrationTest
 
     post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", opening_odds: "3", opening_question: "Is the bridge guarded?" } }
     plan = @campaign.scene_plans.sole
-    assert_redirected_to campaign_scene_plans_path(@campaign)
+    assert_redirected_to campaign_scene_plans_path(@campaign, anchor: "scene_plan_#{plan.id}")
 
     PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
     get new_campaign_scene_path(@campaign)
-    assert_select ".scene-prep-picks a[href=?]", new_campaign_scene_path(@campaign, plan: plan.id), "The bridge at Mirefall"
+    assert_select ".scene-picker .scene-plans__title", "The bridge at Mirefall"
+    assert_select ".scene-picker a[href=?]", new_campaign_scene_path(@campaign, plan: plan.id, anchor: "scene_title"), "Adjust first"
+    assert_select ".scene-picker a[aria-label=?]", "Adjust The bridge at Mirefall first"
 
     get new_campaign_scene_path(@campaign, plan: plan.id)
     assert_select "input#scene_title[value=?]", "The bridge at Mirefall"
@@ -184,6 +186,53 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_equal [ "The bridge at Mirefall", "Toll-keepers want a bribe.", scene ], [ scene.title, scene.notes, plan.reload.scene ]
     assert_equal [ 3, "Is the bridge guarded?" ], [ scene.opening_roll.stat_dice, scene.opening_roll.question ]
     assert_empty @campaign.scene_plans.unplayed, "a plan once played leaves the list"
+  end
+
+  test "the GM groups scenes in blocks, starts a session on one, and its scenes come first" do
+    sign_in_as identities(:gwen)
+    post campaign_scene_blocks_path(@campaign), params: { scene_block: { title: "The castle", notes: "The baron is away." } }
+    castle = @campaign.scene_blocks.sole
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The gatehouse", scene_block_id: castle.id, opening_odds: "1", opening_question: "Are they expected?" } }
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "A storm rolls in" } }
+    gatehouse, storm = @campaign.scene_plans.ordered.to_a
+    assert_equal [ castle, nil ], [ gatehouse.scene_block, storm.scene_block ]
+
+    get campaign_scene_plans_path(@campaign)
+    assert_select "#scene_block_#{castle.id} .scene-plans__title", "The gatehouse"
+
+    # Moving a scene sends only its block.
+    patch campaign_scene_plan_path(@campaign, storm), params: { scene_plan: { scene_block_id: castle.id } }
+    assert_equal [ castle, "A storm rolls in" ], [ storm.reload.scene_block, storm.title ]
+    patch campaign_scene_plan_path(@campaign, storm), params: { scene_plan: { scene_block_id: "" } }
+    assert_nil storm.reload.scene_block
+
+    get new_campaign_play_session_path(@campaign)
+    assert_select "input[name=scene_block_id][value='#{castle.id}']"
+    post campaign_play_sessions_path(@campaign), params: { character_ids: [ characters(:tibbs).id ], scene_block_id: castle.id }
+    session = @campaign.reload.current_session
+    assert_equal castle, session.scene_block
+    assert_equal [ [ castle, [ gatehouse ] ], [ nil, [ storm ] ] ], session.scene_choices
+
+    get new_campaign_scene_path(@campaign)
+    assert_select ".scene-picker__group[open] .fold__title", "The castle · this session"
+
+    # Started as written: its title, notes and opening.
+    post campaign_scenes_path(@campaign), params: { scene_plan_id: gatehouse.id, as_written: "1" }
+    scene = @campaign.reload.current_scene
+    assert_equal [ "The gatehouse", scene, 1, "Are they expected?" ], [ scene.title, gatehouse.reload.scene, scene.opening_roll.stat_dice, scene.opening_roll.question ]
+
+    get campaign_table_path(@campaign)
+    assert_select ".scene-bar__notes", /The baron is away/
+
+    # The players head elsewhere: the session plays no block, and any scene is still there.
+    patch campaign_play_session_path(@campaign, session), params: { play_session: { scene_block_id: "" } }
+    assert_redirected_to new_campaign_scene_path(@campaign)
+    assert_nil session.reload.scene_block
+    assert_equal [ [ nil, [ storm ] ] ], session.scene_choices
+
+    delete campaign_scene_block_path(@campaign, castle)
+    assert_nil storm.reload.scene_block_id
+    assert_equal 2, @campaign.scene_plans.count, "removing a block keeps its scenes"
   end
 
   test "only the GM preps scenes" do

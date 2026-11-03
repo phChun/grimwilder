@@ -1,0 +1,23 @@
+<%# locals: (plan:, blocks:) %>
+<%# One scene still to play on the prep page: what it is, then Start it (in a session, between scenes), Edit, Remove, and a select that moves it to another block. %>
+<li id="<%= dom_id(plan) %>" class="scene-plans__item">
+  <div class="scene-plans__main">
+    <strong class="scene-plans__title"><%= plan.title %></strong>
+    <% if plan.opening? %><span class="field__hint">Opens with a <%= plan.opening_odds %>d story roll<%= ": #{plan.opening_question}" if plan.opening_question %></span><% end %>
+    <% if plan.notes %><p class="scene-plans__notes"><%= plan.notes %></p><% end %>
+  </div>
+  <div class="scene-plans__actions">
+    <% if Current.campaign.current_session && !Current.campaign.current_scene %>
+      <%= button_to "Start it", campaign_scenes_path(Current.campaign), params: { scene_plan_id: plan.id, as_written: 1 }, class: "button button--small button--primary" %>
+    <% end %>
+    <%= link_to "Edit", edit_campaign_scene_plan_path(Current.campaign, plan), class: "button button--small" %>
+    <%= button_to "Remove", campaign_scene_plan_path(Current.campaign, plan), method: :delete, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_confirm: "Remove #{plan.title}?" } } %>
+    <% if blocks.any? %>
+      <%= form_with model: [ Current.campaign, plan ], class: "scene-plans__move", data: { controller: "auto-submit" } do |form| %>
+        <%= form.label :scene_block_id, "Block for #{plan.title}", class: "visually-hidden", for: "scene_plan_#{plan.id}_block" %>
+        <%= form.select :scene_block_id, blocks.map { [ _1.title, _1.id ] }, { include_blank: "No block" }, id: "scene_plan_#{plan.id}_block", class: "field__input field__input--small", data: { action: "change->auto-submit#submit" } %>
+        <noscript><%= form.submit "Move", class: "button button--small" %></noscript>
+      <% end %>
+    <% end %>
+  </div>
+</li>

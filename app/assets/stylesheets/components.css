@@ -2062,6 +2062,12 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 .scene-bar__scene { flex: 999 1 420px; min-width: 0; }
 .scene-bar__status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; font-size: 0.87rem; color: var(--muted); }
 .scene-bar__title { margin: var(--space-1) 0 var(--space-3); font-size: clamp(2rem, 5vw, 2.5rem); }
+/* The title, with the session's and scene's running clocks to its right (below it on a phone). */
+.scene-bar__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-4); }
+.scene-clock { display: flex; gap: var(--space-2); margin: 0 0 var(--space-3); }
+.scene-clock__item { display: grid; gap: 2px; min-width: 5.5rem; padding: var(--space-1) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.scene-clock__label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.scene-clock__time { font-family: var(--font-dice); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); }
 .scene-bar__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
 .scene-bar__actions .button_to { margin: 0; }
 .scene-bar .between-scenes { position: relative; }
@@ -2952,8 +2958,25 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-plans__notes { margin: var(--space-1) 0 0; color: var(--text-soft); white-space: pre-line; }
 .scene-plans__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__actions .button_to { margin: 0; }
-.scene-prep-picks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
-.scene-prep-picks .field__label { flex-basis: 100%; }
+/* Blocks of scenes on the prep page, and moving a scene between them. */
+.scene-block__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.scene-block__head .card__title { margin: 0; }
+.scene-plans__move { margin: 0; }
+.scene-plans__move .field__input { width: auto; max-width: 12rem; }
+/* Starting a scene (campaigns/scenes/new): the session's block, the prepared scenes in folds, then a new one. */
+.scene-picker__block { display: grid; gap: var(--space-1); margin-bottom: var(--space-3); max-width: 24rem; }
+.scene-picker { display: grid; gap: var(--space-3); margin-bottom: var(--space-3); }
+.scene-picker__group { display: grid; gap: var(--space-2); }
+.scene-picker__group > .scene-plans { margin-top: var(--space-2); }
+.scene-picker__new { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
+.scene-picker__new > .session-form { margin-top: var(--space-3); }
+.fold__meta { font-size: 0.87rem; color: var(--dim); }
+.scene-plans__item--picked { border-color: var(--ember); }
+.scene-plans__notes--short { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* The scene's notes in the GM table's scene bar, while it's on. */
+.scene-bar__notes { margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.scene-bar__notes-title { font-size: 0.87rem; font-weight: 600; color: var(--muted); }
+.scene-bar__notes .scene-plans__notes { margin-top: var(--space-2); }
 /* A fieldset won't shrink below its content unless told; the odds wrap in a narrow rail. */
 .scene-plan-form__opening { display: grid; gap: var(--space-2); min-width: 0; }
 .segmented--auto.scene-plan-form__odds { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr)); }
@@ -3034,3 +3057,21 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .next-game { font-size: 0.9rem; font-weight: 600; color: var(--ember); }
 .next-game--skipped { color: var(--muted); font-weight: 500; }
 .campaign-hero__soon { font-weight: 400; color: var(--muted); }
+
+/* A player's journal (campaigns/journals): a page per session, the current one to write in. */
+.journal { display: grid; gap: var(--space-3); max-width: 46rem; }
+.journal-share { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.journal-share .page-header__lede { margin: 0; }
+.journal-share .button_to { margin: 0; }
+.journal-page__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); }
+.journal-page__title { margin: 0; font-size: 1.3rem; }
+.journal-page__now { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ember); }
+.journal-page--current { border-color: var(--ember); }
+.journal-page--empty { padding-block: var(--space-2); }
+.journal-page--empty .journal-page__title { font-size: 1.05rem; color: var(--muted); }
+.journal-page__text { margin: 0; font-family: var(--font-display); white-space: pre-line; }
+.journal-page__body { font-family: var(--font-display); line-height: 1.6; resize: vertical; }
+.journal-page__save { justify-self: start; }
+.journal-list { display: grid; gap: var(--space-2); max-width: 46rem; margin: 0; padding: 0; list-style: none; }
+.journal-list__item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.journal-list__name { margin-right: auto; font-family: var(--font-display); font-size: 1.1rem; }

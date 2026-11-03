@@ -10,9 +10,11 @@ class PlanTest < ActiveSupport::TestCase
     end
   end
 
-  test "free runs one active campaign and plays in any number; patron and tester have no limits" do
+  test "free runs one active campaign and plays in any number; early access, patron and tester have no limits" do
     assert_equal 1, Plan.find(:free).limit_for(:gm)
     assert_nil Plan.find(:free).limit_for(:player)
+    assert_nil Plan.find(:early_access).limit_for(:gm)
+    assert_nil Plan.find(:early_access).limit_for(:player)
     assert_nil Plan.find(:patron).limit_for(:gm)
     assert_nil Plan.find(:tester).limit_for(:gm)
     assert_raises(ActiveRecord::RecordNotFound) { Plan.find(:gold) }

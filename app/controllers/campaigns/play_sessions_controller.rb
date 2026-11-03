@@ -25,15 +25,24 @@ class Campaigns::PlaySessionsController < ApplicationController
 
   def create
     characters = Current.campaign.characters.played.active.where(id: Array(params[:character_ids]).compact_blank).to_a
-    session = PlaySession.start!(Current.campaign, characters: characters, recap: params[:recap], by: Current.identity)
+    block = Current.campaign.scene_blocks.find_by(id: params[:scene_block_id])
+    session = PlaySession.start!(Current.campaign, characters: characters, recap: params[:recap], block: block, by: Current.identity)
     back_to_table(notice: "#{session.title} begins.")
   rescue ArgumentError => error
     flash.now[:alert] = error.message
     render :new, status: :unprocessable_entity
   end
 
+  # The recap and notes, from the session's page; or the block it's playing,
+  # from the new-scene picker (the players headed somewhere else), which it
+  # goes back to.
   def update
     session = Current.campaign.play_sessions.find(params[:id])
+    if params.dig(:play_session, :scene_block_id)
+      session.update!(scene_block: Current.campaign.scene_blocks.find_by(id: params[:play_session][:scene_block_id]))
+      return redirect_to(new_campaign_scene_path(Current.campaign))
+    end
+
     session.update!(params.expect(play_session: [ :recap, :notes ]))
     redirect_to campaign_play_session_path(Current.campaign, session), notice: "Saved."
   end
@@ -53,5 +62,6 @@ class Campaigns::PlaySessionsController < ApplicationController
       @characters = Current.campaign.characters.played.active.includes(:identity).ordered
       @previous = Current.campaign.play_sessions.includes(:scenes).ordered.last
       @number = @previous&.number.to_i + 1
+      @blocks = Current.campaign.scene_blocks.ordered.includes(:scene_plans)
     end
 end

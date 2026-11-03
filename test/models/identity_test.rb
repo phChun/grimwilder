@@ -17,10 +17,11 @@ class IdentityTest < ActiveSupport::TestCase
 end
 
 class IdentityPlansTest < ActiveSupport::TestCase
-  test "new accounts are on the free plan, and only known plans are allowed" do
+  test "new accounts are on early access, with no limits, and only known plans are allowed" do
     identity = Identity.create!(email_address: "new@example.com")
-    assert_equal "free", identity.plan
-    assert_equal "Free", identity.current_plan.name
+    assert_equal "early_access", identity.plan
+    assert_equal "Early access", identity.current_plan.name
+    assert identity.room_to_run?
     assert_not identity.update(plan: "gold")
   end
 

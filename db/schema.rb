@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_03_110000) do
   create_table "arcana", force: :cascade do |t|
     t.integer "character_id", null: false
     t.string "name", null: false
@@ -163,7 +163,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
     t.datetime "updated_at", null: false
     t.boolean "admin", default: false, null: false
     t.datetime "last_signed_in_at"
-    t.string "plan", default: "free", null: false
+    t.string "plan", default: "early_access", null: false
     t.index ["email_address"], name: "index_identities_on_email_address", unique: true
     t.index ["last_signed_in_at"], name: "index_identities_on_last_signed_in_at"
     t.index ["webauthn_user_handle"], name: "index_identities_on_webauthn_user_handle", unique: true
@@ -176,6 +176,17 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_interests_on_email_address", unique: true
+  end
+
+  create_table "journal_entries", force: :cascade do |t|
+    t.integer "membership_id", null: false
+    t.integer "session_number", null: false
+    t.boolean "between", default: false, null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["membership_id", "session_number", "between"], name: "index_journal_entries_on_page", unique: true
+    t.index ["membership_id"], name: "index_journal_entries_on_membership_id"
   end
 
   create_table "magic_links", force: :cascade do |t|
@@ -197,6 +208,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
     t.datetime "seen_at"
     t.datetime "active_at"
     t.datetime "held_at"
+    t.boolean "journal_shared", default: true, null: false
     t.index ["campaign_id", "identity_id"], name: "index_memberships_on_campaign_id_and_identity_id", unique: true
     t.index ["campaign_id"], name: "index_memberships_on_campaign_id"
     t.index ["identity_id"], name: "index_memberships_on_identity_id"
@@ -252,9 +264,11 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
     t.boolean "standout", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "scene_block_id"
     t.index ["campaign_id", "number"], name: "index_play_sessions_on_campaign_id_and_number", unique: true
     t.index ["campaign_id"], name: "index_play_sessions_on_campaign_id"
     t.index ["campaign_id"], name: "index_play_sessions_one_open_per_campaign", unique: true, where: "ended_at IS NULL"
+    t.index ["scene_block_id"], name: "index_play_sessions_on_scene_block_id"
   end
 
   create_table "pools", force: :cascade do |t|
@@ -351,6 +365,16 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
     t.index ["scene_id"], name: "index_rolls_on_scene_id"
   end
 
+  create_table "scene_blocks", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.string "title", null: false
+    t.text "notes"
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_scene_blocks_on_campaign_id"
+  end
+
   create_table "scene_plans", force: :cascade do |t|
     t.integer "campaign_id", null: false
     t.string "title", null: false
@@ -361,7 +385,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
     t.integer "scene_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "scene_block_id"
     t.index ["campaign_id"], name: "index_scene_plans_on_campaign_id"
+    t.index ["scene_block_id"], name: "index_scene_plans_on_scene_block_id"
     t.index ["scene_id"], name: "index_scene_plans_on_scene_id"
   end
 
@@ -403,6 +429,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
   add_foreign_key "characters", "identities"
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify
   add_foreign_key "game_dates", "campaigns", on_delete: :cascade
+  add_foreign_key "journal_entries", "memberships", on_delete: :cascade
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"
   add_foreign_key "messages", "campaigns", on_delete: :cascade
@@ -413,6 +440,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
+  add_foreign_key "play_sessions", "scene_blocks", on_delete: :nullify
   add_foreign_key "pools", "arcana", on_delete: :cascade
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade
@@ -426,7 +454,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_02_090000) do
   add_foreign_key "rolls", "play_sessions", on_delete: :nullify
   add_foreign_key "rolls", "pools", on_delete: :nullify
   add_foreign_key "rolls", "scenes", on_delete: :nullify
+  add_foreign_key "scene_blocks", "campaigns"
   add_foreign_key "scene_plans", "campaigns"
+  add_foreign_key "scene_plans", "scene_blocks", on_delete: :nullify
   add_foreign_key "scene_plans", "scenes", on_delete: :nullify
   add_foreign_key "scenes", "campaigns"
   add_foreign_key "scenes", "play_sessions", on_delete: :cascade

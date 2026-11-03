@@ -55,10 +55,11 @@ class AppShellTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 5
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 6
     assert_select "nav.tabs[aria-label=Campaign] .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
     assert_select ".tabs__link[aria-current=page][href=?] .tabs__name", campaign_path(@campaign), @campaign.name
     assert_select ".tabs__link[href=?]", campaign_table_path(@campaign), "Table"
+    assert_select ".tabs__link[href=?]", campaign_journals_path(@campaign), "Journals"
     assert_select ".tabs__link[href=?]", campaign_play_sessions_path(@campaign), "Log"
     assert_select ".tabs__link[href=?]", characters_path, "Characters"
     assert_select "a.account[aria-label=?]", "Account: Gwen", "G"
@@ -78,7 +79,8 @@ class AppShellTest < ActionDispatch::IntegrationTest
     get character_path(characters(:tibbs))
 
     assert_select ".tabs__link[aria-current=page][href=?]", character_path(characters(:tibbs)), "My character"
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 5
+    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 6
+    assert_select ".tabs__link[href=?]", campaign_journal_path(@campaign, memberships(:pip_player)), "Journal"
     assert_select ".tabs__link", text: "Party", count: 0
   end
 
