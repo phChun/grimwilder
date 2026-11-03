@@ -10,6 +10,7 @@ module IconsHelper
     more: '<circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/>',
     close: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>',
     check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+    message: '<path d="M20 14a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
     list: '<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4.5 6h.01"/><path d="M4.5 12h.01"/><path d="M4.5 18h.01"/>'
   }.freeze
 

@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-03
 
+- **Feedback**: an admin can turn on a Feedback button for an account; it sends what they think along with the page they were on. Admins read it under Admin › Feedback and can copy it all as Markdown for an AI. ([#87](https://github.com/phChun/grimwilder/pull/87))
 - **Searchable dropdowns**: every dropdown is drawn in Grimwilder's own style, and long ones (time zones, paths, talents) have a search box. They work from the keyboard too. ([#86](https://github.com/phChun/grimwilder/pull/86))
 - **Early access**: new accounts start on the Early access plan, with no limits on how many campaigns they run or play in. ([#85](https://github.com/phChun/grimwilder/pull/85))
 - **Scene blocks**: group your prepared scenes by where the players might go ("The castle"), each block with its own notes. Start a session on a block and its scenes come first; any prepared scene can still be pulled into any session. ([#85](https://github.com/phChun/grimwilder/pull/85))

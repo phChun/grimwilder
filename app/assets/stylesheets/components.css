@@ -3078,3 +3078,28 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .journal-list { display: grid; gap: var(--space-2); max-width: 46rem; margin: 0; padding: 0; list-style: none; }
 .journal-list__item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 .journal-list__name { margin-right: auto; font-family: var(--font-display); font-size: 1.1rem; }
+
+/* The header's Feedback button (feedbacks/new), for accounts an admin turned it on for: beside the account button. */
+.feedback-button { order: 2; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); width: var(--tap); padding: 0; margin-left: auto; margin-right: calc(var(--space-2) - var(--space-5)); }
+.feedback-button ~ .account { margin-left: 0; }
+/* Just the icon until there's room for the word (its aria-label says it either way). */
+.feedback-button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (min-width: 48rem) { .feedback-button { order: 4; margin-left: 0; } }
+@media (min-width: 90rem) {
+  .feedback-button { width: auto; padding: 0 var(--space-3); }
+  .feedback-button span { position: static; width: auto; height: auto; clip-path: none; }
+}
+.feedback-form__path { display: block; padding: var(--space-2) var(--space-3); border-radius: var(--radius-control); background: var(--surface-2); font-family: var(--font-dice); font-size: 0.87rem; overflow-wrap: anywhere; }
+
+/* Admin › Feedback: each item, and the Markdown to copy for an AI. */
+.admin-feedback { display: grid; gap: var(--space-3); margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.admin-feedback__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); }
+.admin-feedback__remove { margin: 0 0 0 auto; }
+.admin-feedback__where { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: 0; font-size: 0.87rem; }
+.admin-feedback__path { font-family: var(--font-dice); overflow-wrap: anywhere; }
+.admin-feedback__where code { color: var(--dim); font-family: var(--font-dice); }
+.admin-feedback__body { margin: 0; white-space: pre-line; }
+.admin-feedback__browser { margin: 0; font-size: 0.8rem; overflow-wrap: anywhere; }
+.admin-feedback__copy { margin-top: var(--space-3); }
+.admin-feedback__copy > .stack { margin-top: var(--space-3); }
+.admin-toggle--on { border-color: var(--perfect); color: var(--perfect); }
