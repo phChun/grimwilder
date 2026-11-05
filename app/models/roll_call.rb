@@ -14,7 +14,7 @@
 # is nil until that seat rolls.
 class RollCall < ApplicationRecord
   belongs_to :campaign
-  belongs_to :identity
+  include OutlivesItsAccount
   belongs_to :roll, optional: true
 
   enum :kind, %w[ story montage quarrel ].index_by(&:itself), validate: true

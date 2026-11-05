@@ -11,7 +11,7 @@ class Roll < ApplicationRecord
   include Story, Quarrel, Montage, FollowUps
 
   belongs_to :campaign, optional: true
-  belongs_to :identity
+  include OutlivesItsAccount
   belongs_to :character, optional: true
   belongs_to :pool, optional: true
   belongs_to :play_session, optional: true

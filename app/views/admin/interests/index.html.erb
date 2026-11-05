@@ -3,7 +3,7 @@
 <header class="page-header">
   <p class="eyebrow">Admin</p>
   <h1>Interested</h1>
-  <p class="page-header__lede">People who asked to try Grimwilder, newest first. Make an account and let them know they can sign in.</p>
+  <p class="page-header__lede">People who asked to try Grimwilder, newest first. Make an account and they get a welcome email, once.</p>
   <%= render "admin/nav" %>
 </header>
 
@@ -38,7 +38,7 @@
             </td>
             <td>
               <% if (account = @accounts[interest.email_address]) %>
-                Has one, on <%= account.current_plan.name %>
+                Has one, on <%= account.current_plan.name %><% if interest.welcomed? %> · welcomed<% end %>
               <% else %>
                 <%= form_with url: admin_interest_account_path(interest), class: "admin-plan" do |form| %>
                   <%= form.label "identity[plan]", "Plan for #{interest.email_address}", class: "visually-hidden", for: "interest_#{interest.id}_plan" %>

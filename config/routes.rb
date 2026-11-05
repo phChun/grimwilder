@@ -63,7 +63,7 @@ Rails.application.routes.draw do
   # Admins only (identities.admin): site stats, accounts and their plans, campaigns
   namespace :admin do
     root "dashboards#show"
-    resources :identities, only: %i[ index create update ], path: "accounts" do
+    resources :identities, only: %i[ index create update destroy ], path: "accounts" do
       resource :feedback_access, only: %i[ create destroy ], module: :identities # lets the account send feedback, or stops it
     end
     resources :feedbacks, only: %i[ index destroy ], path: "feedback"

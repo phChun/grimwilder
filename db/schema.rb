@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_04_120100) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -217,6 +217,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
     t.text "note"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "welcomed_at"
     t.index ["email_address"], name: "index_interests_on_email_address", unique: true
   end
 
@@ -258,7 +259,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
 
   create_table "messages", force: :cascade do |t|
     t.integer "campaign_id", null: false
-    t.integer "identity_id", null: false
+    t.integer "identity_id"
     t.integer "character_id"
     t.string "name", null: false
     t.text "body", null: false
@@ -346,7 +347,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
 
   create_table "roll_calls", force: :cascade do |t|
     t.integer "campaign_id", null: false
-    t.integer "identity_id", null: false
+    t.integer "identity_id"
     t.integer "roll_id"
     t.string "kind", null: false
     t.string "status", default: "open", null: false
@@ -364,7 +365,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
 
   create_table "rolls", force: :cascade do |t|
     t.integer "campaign_id"
-    t.integer "identity_id", null: false
+    t.integer "identity_id"
     t.integer "character_id"
     t.integer "pool_id"
     t.string "kind", null: false
@@ -478,7 +479,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_03_200000) do
 
   create_table "table_questions", force: :cascade do |t|
     t.integer "campaign_id", null: false
-    t.integer "identity_id", null: false
+    t.integer "identity_id"
     t.text "body"
     t.json "choices", default: [], null: false
     t.datetime "closed_at"

@@ -1,5 +1,5 @@
-# Every account, searchable by email or name, 50 a page; making one by hand while sign-ups are closed, and choosing
-# each one's plan (Identity::Plans). A new account signs in like any other,
+# Every account, searchable by email or name, 50 a page; making one by hand while sign-ups are closed, choosing
+# each one's plan (Identity::Plans), and removing one (Identity::Removal). A new account signs in like any other,
 # with an emailed code.
 class Admin::IdentitiesController < Admin::BaseController
   def index
@@ -30,6 +30,17 @@ class Admin::IdentitiesController < Admin::BaseController
     return redirect_to(admin_identities_path, alert: "There's no #{plan} plan.") unless Plan.keys.include?(plan)
     identity.apply_plan!(plan)
     redirect_to admin_identities_path, notice: "#{identity.display_name} is on the #{identity.current_plan.name} plan."
+  end
+
+  # Not your own account, nor one that's the only GM of a campaign others are in.
+  def destroy
+    identity = Identity.find(params[:id])
+    back = admin_identities_path(q: params[:q].presence, page: params[:page].presence)
+    return redirect_to(back, alert: "You can't remove your own account.") if identity == Current.identity
+    return redirect_to(back, alert: identity.removal_blocked_by) if identity.removal_blocked_by
+
+    identity.remove!
+    redirect_to back, notice: "#{identity.email_address} removed."
   end
 
   private

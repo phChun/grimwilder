@@ -187,7 +187,7 @@ Two pure implementations (no DOM, no DB, randomness injected): `app/javascript/g
 
 ## Admin
 
-`identities.admin` is set only from the console (`bin/kamal console`). `/admin` (`Admin::BaseController`; 404 for non-admins) has Stats, Interested, Accounts (plans via `apply_plan!`, Feedback access) and Campaigns (read-only), searchable (`AdminSearch`) and paged with pagy. Admins get no way into campaigns they aren't in. Last sign-in is `identities.last_signed_in_at` (not `sessions`, which sign-out deletes). **Feedback** (`Feedback`) is per-account opt-in and exports to Markdown without emails.
+`identities.admin` is set only from the console (`bin/kamal console`). `/admin` (`Admin::BaseController`; 404 for non-admins) has Stats, Interested, Accounts (plans via `apply_plan!`, Feedback access) and Campaigns (read-only), searchable (`AdminSearch`) and paged with pagy. Admins get no way into campaigns they aren't in. Last sign-in is `identities.last_signed_in_at` (not `sessions`, which sign-out deletes). **Removing an account** (`Identity::Removal`) deletes campaigns it's alone in and refuses while it's a campaign's only GM; its rolls, chat, roll calls and polls stay with `identity_id` nil (`OutlivesItsAccount` reads them as `Identity.removed`), and whispers to it are deleted. **Welcome emails** (`Interest#welcome!`, `WelcomeMailer`) go once (`interests.welcomed_at`) when an interest's email gets an account, on creation and in an hourly `Interest.welcome_all` sweep. **Feedback** (`Feedback`) is per-account opt-in and exports to Markdown without emails.
 
 ## Pools
 
