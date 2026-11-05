@@ -4,8 +4,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-05
 
-- **Admins can remove an account** from Admin › Accounts. Its characters go, and so does any campaign it was alone in; its rolls and chat stay in the log as a removed account's. It can't be your own account, or the only GM of a campaign others are in. ([#NN](https://github.com/phChun/grimwilder/pull/NN))
-- **A welcome email for the interest list**: once someone who asked to try Grimwilder has an account, they're emailed once to say it's ready and how to sign in. People given accounts before now get theirs too. ([#NN](https://github.com/phChun/grimwilder/pull/NN))
+- **Admins can remove an account** from Admin › Accounts. Its characters go, and so does any campaign it was alone in; its rolls and chat stay in the log as a removed account's. It can't be your own account, or the only GM of a campaign others are in. ([#96](https://github.com/phChun/grimwilder/pull/96))
+- **A welcome email for the interest list**: once someone who asked to try Grimwilder has an account, they're emailed once to say it's ready and how to sign in. People given accounts before now get theirs too. ([#96](https://github.com/phChun/grimwilder/pull/96))
 
 ## 2026-11-03
 
