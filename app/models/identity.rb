@@ -2,7 +2,7 @@
 # there are no passwords. Joins campaigns through memberships, as many as
 # their plan allows (Identity::Plans).
 class Identity < ApplicationRecord
-  include Plans
+  include Plans, Removal
 
   has_many :sessions, dependent: :destroy
   has_many :passkeys, dependent: :destroy
@@ -17,6 +17,9 @@ class Identity < ApplicationRecord
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, length: { maximum: 80 }
   validates :name, presence: true, on: :profile
+
+  # Someone on the interest list who now has an account hears so, once (Interest#welcome!).
+  after_create_commit { Interest.find_by(email_address: email_address)&.welcome! }
 
   def self.find_or_create_for_sign_in!(email_address)
     find_or_create_by!(email_address: email_address)

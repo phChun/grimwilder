@@ -22,3 +22,6 @@ production:
   snapshot_database:
     command: "DatabaseSnapshot.take"
     schedule: every day at 4am
+  welcome_new_accounts:
+    command: "Interest.welcome_all"
+    schedule: every hour at minute 7

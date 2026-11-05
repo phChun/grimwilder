@@ -1,0 +1,49 @@
+<%# The night-table look for emails (WelcomeMailer): the site's colors (application.css :root) written inline, in tables, since mail clients drop stylesheets and most of CSS. Dark only, like the site; color-scheme asks clients not to invert it. No web fonts or SVG: Georgia and Helvetica stand in for Spectral and Plex. %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
+    <title><%= message.subject %></title>
+    <style>
+      :root { color-scheme: dark; }
+      a { color: #f0a274; }
+      @media (max-width: 600px) {
+        .night-card { padding: 28px 22px !important; }
+        .night-title { font-size: 26px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #14130f; color: #eee7d6;">
+    <% if content_for?(:preheader) %>
+      <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: #14130f;"><%= yield :preheader %></div>
+    <% end %>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#14130f" style="background-color: #14130f;">
+      <tr>
+        <td align="center" style="padding: 32px 12px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 560px;">
+            <tr>
+              <td style="padding: 0 4px 16px; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; color: #eee7d6; letter-spacing: 0.02em;">
+                Grimwilder
+                <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8f8774; padding-left: 8px;">for Grimwild</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="night-card" bgcolor="#1e1c16" style="background-color: #1e1c16; border: 1px solid #383428; border-top: 3px solid #e8834a; border-radius: 14px; padding: 40px 36px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #cfc6b0;">
+                <%= yield %>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 20px 8px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.6; color: #8f8774; text-align: center;">
+                <%= yield :footer %>
+                Grimwilder is an unofficial play toolkit for <em>Grimwild</em> by J. D. Maxwell (Oddity Press), not endorsed by them.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -29,7 +29,7 @@ class Message < ApplicationRecord
   IMAGE_SIZE = 5.megabytes
 
   belongs_to :campaign
-  belongs_to :identity
+  include OutlivesItsAccount
   belongs_to :character, optional: true
   belongs_to :recipient, class_name: "Identity", optional: true
   has_one_attached :image

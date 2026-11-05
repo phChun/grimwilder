@@ -1,5 +1,6 @@
 # Makes an account for someone on the interest list, on the plan the admin
-# picks. They sign in with an emailed code, as with an account made by hand.
+# picks. They sign in with an emailed code, as with an account made by hand,
+# and get a welcome email (Interest#welcome!).
 class Admin::Interests::AccountsController < Admin::BaseController
   def create
     interest = Interest.find(params[:interest_id])
@@ -9,7 +10,7 @@ class Admin::Interests::AccountsController < Admin::BaseController
       redirect_to admin_interests_path, notice: "#{identity.email_address} already has an account."
     else
       identity.update!(plan: params.expect(identity: [ :plan ])[:plan])
-      redirect_to admin_interests_path, notice: "Account ready for #{identity.email_address}. Let them know they can sign in with an emailed code."
+      redirect_to admin_interests_path, notice: "Account ready for #{identity.email_address}. We've emailed them a welcome."
     end
   end
 end

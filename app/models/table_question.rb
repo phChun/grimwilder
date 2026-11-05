@@ -17,7 +17,7 @@ class TableQuestion < ApplicationRecord
   RECENT = 8
 
   belongs_to :campaign
-  belongs_to :identity
+  include OutlivesItsAccount
   has_many :answers, -> { order(:id) }, class_name: "TableAnswer", inverse_of: :table_question, dependent: :delete_all
 
   # Who's asked: player memberships here, set when it's made.

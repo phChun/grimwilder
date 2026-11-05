@@ -125,4 +125,40 @@ class AdminTest < ActionDispatch::IntegrationTest
   ensure
     Rails.configuration.x.signups_open = was_open
   end
+
+  test "an admin removes an account, but not their own or a campaign's only GM" do
+    campaigns(:bramblewood).memberships.create!(identity: identities(:stranger), role: :player)
+    sign_in_as identities(:ada)
+
+    get admin_identities_path
+    assert_select "tr", text: /pip@example.com/ do
+      assert_select "button", "Remove"
+    end
+    assert_select "tr", text: /ada@example.com/ do
+      assert_select "button", text: "Remove", count: 0
+    end
+
+    assert_difference -> { Identity.count }, -1 do
+      delete admin_identity_path(identities(:pip))
+    end
+    assert_redirected_to admin_identities_path
+    assert_equal "pip@example.com removed.", flash[:notice]
+
+    assert_no_difference -> { Identity.count } do
+      delete admin_identity_path(identities(:gwen))
+      delete admin_identity_path(identities(:ada))
+    end
+    assert_equal "You can't remove your own account.", flash[:alert]
+
+    delete admin_identity_path(identities(:gwen))
+    assert_match "only GM of The Bramblewood Accord", flash[:alert]
+  end
+
+  test "only admins remove accounts" do
+    sign_in_as identities(:gwen)
+    assert_no_difference -> { Identity.count } do
+      delete admin_identity_path(identities(:pip))
+    end
+    assert_response :not_found
+  end
 end

@@ -21,6 +21,7 @@
         <th scope="col">Plan</th>
         <th scope="col">Feedback</th>
         <th scope="col">Campaigns</th>
+        <th scope="col"><span class="visually-hidden">Remove</span></th>
       </tr>
     </thead>
     <tbody>
@@ -53,6 +54,12 @@
             <% end %>
           </td>
           <td><%= identity.memberships.map { "#{_1.campaign.name} (#{_1.gm? ? "GM" : "player"})" }.to_sentence.presence || "None" %></td>
+          <td>
+            <%# Identity::Removal: campaigns they're alone in go too; their rolls and chat stay, as a removed account's. %>
+            <% unless identity == Current.identity %>
+              <%= button_to "Remove", admin_identity_path(identity), method: :delete, params: { q: search_query.presence, page: params[:page].presence }.compact, class: "button button--ghost button--small", "aria-label": "Remove #{identity.display_name}'s account", form: { data: { turbo_confirm: "Remove #{identity.email_address}? Their characters and the campaigns they're alone in are deleted; their rolls and chat stay, as a removed account's. This can't be undone." } } %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
