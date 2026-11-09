@@ -1514,8 +1514,6 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 
 /* ---------- Character view ---------- */
 
-.site-main:has(.play-view) { max-width: 96rem; }
-
 .sheet { display: flex; flex-direction: column; gap: 20px; }
 
 .card__title { margin: 0 0 var(--space-3); font-size: 1.25rem; }
@@ -2164,7 +2162,6 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 
 /* ---------- GM table (campaigns/tables#show) ---------- */
 
-.site-main:has(.gm-view) { max-width: 96rem; }
 .gm-view__main { display: flex; flex-direction: column; gap: var(--space-5); }
 
 /* Scene header and suspense */
@@ -2384,7 +2381,6 @@ li.popover__head { margin: 0; padding-left: var(--space-3); }
 
 /* ---------- Campaign page (campaigns#show) ---------- */
 
-.site-main:has(.campaign-page) { max-width: 82rem; }
 /* One column to read down (hero, party, what looms, previously on), the table's chat in the rail beside it. */
 .campaign-page__main { display: flex; flex-direction: column; gap: 44px; }
 
