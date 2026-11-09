@@ -1622,9 +1622,10 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .path-picker__name { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
 .path-picker__core { margin: 2px 0 0; color: var(--text-soft); }
 .path-picker__label { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
-.path-dialog { width: calc(100% - 64px); height: calc(100dvh - 64px); max-height: none; }
+.path-dialog { width: calc(100% - 64px); height: calc(100dvh - 64px); max-height: none; overflow: hidden; }
 @media (max-width: 40rem) { .path-dialog { width: calc(100% - 16px); height: calc(100dvh - 16px); } }
-.path-dialog__grid { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+/* Only the list scrolls; the title, its ✕ and the hint stay put. The padding keeps a picked card's focus ring inside the scroll box. */
+.path-dialog__grid { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: 8px; margin: 0 -4px; padding: 4px; border: 0; min-width: 0; }
 /* One path per row: the path and its tagline on the left, its core talent on the right; stacked on a phone. */
 .path-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
 .path-card:has(input:checked) { border-color: color-mix(in srgb, var(--ember) 60%, var(--line)); background: linear-gradient(135deg, var(--ember-soft), var(--surface-2) 60%); }
