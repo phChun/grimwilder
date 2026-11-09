@@ -203,7 +203,8 @@ Data in `config/crucibles.yml` (97 crucibles, 152 tables), read by a plain `Cruc
 - Book lists live in `config/grimwild.yml`, read through `Grimwild`. JSON detail columns are cleaned and capped by model setters, which accept Rails' `{"0"=>…}` hashes. Stats total 8 on create (3 at level 0).
 - **Status** (`active`/`fallen`/`retired`, `Character::Farewell`) and **archived** (`Character::Archive`, housekeeping) take characters out of play. **Up for grabs** (`Character::Claiming`): GM-made characters any player can claim (`with_lock`). Query the party as `campaign.characters.played.active`.
 - `Character::Damage` (marks, harm, conditions as `{ "name", "lasts" }`, vex, `damage_thorns`, `take_mark`), `Character::Advancement` (XP, max level 7). `changed_by` records who changed harm.
-- The sheet (`characters#show`) is a size container; quick changes are `button_to` PATCHes with `quick: 1` and morph refreshes.
+- The sheet (`characters#show`) is a size container; quick changes are `button_to` PATCHes with `quick: 1` and morph refreshes. Every card but the stats and harm is a `<details class="sheet-fold">` remembered by `details_memory_controller.js`.
+- **Who** (backgrounds, traits, desires, features, gear) and **Story** (bonds, arcs, notes) edit in their own cards through turbo frames, on their own paths: `Characters::ProfilesController` and `Characters::StoriesController`, each permitting only its `FIELDS`. `characters#update` permits neither; only `create` takes them. The form fields are shared partials in `characters/fields/`.
 - Arcana (`Arcanum`, irregular inflection; `Character::Arcana`) get power pools sized by tier, refreshed by `refresh_arcana_pools!`.
 
 ## Talents

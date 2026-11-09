@@ -1,0 +1,20 @@
+<% content_for :title, "#{@character.short_name}'s story" %>
+
+<%# The Story card's form, swapped into the card on the sheet. Only these fields save here (Characters::StoriesController::FIELDS). %>
+<%= turbo_frame_tag "character_story" do %>
+  <%= form_with model: @character, url: character_story_path(@character), method: :patch, class: "stack sheet-edit" do |form| %>
+    <% if @character.errors.any? %>
+      <p class="form-error"><%= @character.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= render "characters/fields/datalists" %>
+    <%= render "characters/fields/story", character: @character %>
+    <div class="field">
+      <%= form.label :notes, class: "field__label" %>
+      <%= form.text_area :notes, rows: 4, class: "field__input", placeholder: "Gear, contacts, secrets…" %>
+    </div>
+    <div class="sheet-edit__actions">
+      <%= form.submit "Save", class: "button button--primary" %>
+      <%= link_to "Cancel", character_story_path(@character), class: "button button--quiet" %>
+    </div>
+  <% end %>
+<% end %>

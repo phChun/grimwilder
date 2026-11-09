@@ -4,6 +4,10 @@ class CharactersController < ApplicationController
   before_action :set_character, only: %i[ show edit update destroy ]
   before_action :require_owner, only: %i[ edit update destroy ]
 
+  # A new character fills in everything at once; afterwards who they are and
+  # their story change only through their own cards on the sheet.
+  NEW_ONLY = [ *Characters::ProfilesController::FIELDS, *Characters::StoriesController::FIELDS ].freeze
+
   def index
     @characters = Current.identity.characters.includes(:campaign).ordered
     @campaigns = Current.identity.campaigns.order(:name)
@@ -20,7 +24,7 @@ class CharactersController < ApplicationController
   end
 
   def create
-    @character = Current.identity.characters.new(character_params)
+    @character = Current.identity.characters.new(character_params(*NEW_ONLY))
 
     if @character.save
       # Next step: their talents (pg. 47), one per level, alongside the path's core talent.
@@ -76,14 +80,12 @@ class CharactersController < ApplicationController
       head :forbidden unless @character.owned_by?(Current.identity)
     end
 
-    def character_params
+    def character_params(*also)
       params.require(:character).permit(
         :name, :path, :legacy_core, :level_zero, :campaign_id, :status, :farewell, :up_for_grabs, :level, :xp,
         :brawn, :agility, :wits, :presence, :spark, :thread,
         :marked_brawn, :marked_agility, :marked_wits, :marked_presence, :bloodied, :rattled, :desperate,
-        :not_trait, :not_desire, :weapons, :armor, :talents, :notes,
-        traits: [], desires: [], features: [], weapon_styles: [], arcs: [],
-        backgrounds: [ :name, wises: [] ], bonds: [ :to, :bond, :character_id ]
+        :talents, *also
       ).tap { |permitted| permitted[:campaign_id] = nil if permitted.key?(:campaign_id) && permitted[:campaign_id].blank? }
     end
 end

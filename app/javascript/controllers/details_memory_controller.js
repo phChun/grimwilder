@@ -23,6 +23,13 @@ export default class extends Controller {
       if (saved !== null) this.set(details, saved)
       else if (this.phone) this.set(details, details.dataset.phoneOpen === "true")
     })
+    this.openLinkedSection()
+  }
+
+  // A link to a folded section (the sheet's #table-rolls) opens it.
+  openLinkedSection() {
+    const details = location.hash && document.getElementById(location.hash.slice(1))
+    if (details instanceof HTMLDetailsElement && this.sectionTargets.includes(details)) this.set(details, true)
   }
 
   // toggle doesn't bubble, so this listens in the capture phase (see the view).

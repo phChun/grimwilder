@@ -1,0 +1,6 @@
+<%# The word lists the character fields offer (type or pick). %>
+<datalist id="traits-list"><% Grimwild.traits.each do |trait| %><option value="<%= title_case(trait) %>"></option><% end %></datalist>
+<datalist id="desires-list"><% Grimwild.desires.each do |desire| %><option value="<%= title_case(desire) %>"></option><% end %></datalist>
+<datalist id="styles-list"><% Grimwild.weapon_styles.each do |style| %><option value="<%= title_case(style) %>"></option><% end %></datalist>
+<datalist id="backgrounds-list"><% Grimwild.backgrounds.each_key do |background| %><option value="<%= background %>"></option><% end %></datalist>
+<datalist id="arcs-list"><% Grimwild.arcs.values.flatten.each do |arc| %><option value="<%= title_case(arc) %>"></option><% end %></datalist>
