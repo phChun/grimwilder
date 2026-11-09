@@ -15,14 +15,20 @@
     <p><%= plan_hold_message(Current.identity, held.map(&:campaign)) %></p>
   </section>
 <% end %>
-<ul class="tool-grid__list" aria-label="Your campaigns">
+<ul class="tool-grid__list campaign-list" aria-label="Your campaigns">
   <% active.each do |membership| %>
     <% campaign = membership.campaign %>
     <li class="<%= class_names("campaign-card", "campaign-card--on-hold": campaign.on_hold?, "campaign-card--playable": membership.held? && !campaign.archived?) %>">
       <%# Straight to where you play: the GM table, or your character's sheet (Campaigns::PlaysController); an archived campaign opens its page. %>
-      <%= link_to campaign_play_path(campaign), class: "tool-card tool-card--ready" do %>
+      <%# Each card says what it's about, your part in it, where it stands and the next game. %>
+      <% mine = membership.gm? ? [] : membership.seated_characters.map(&:short_name) %>
+      <%= link_to campaign_play_path(campaign), class: "tool-card tool-card--ready campaign-card__link" do %>
+        <span class="campaign-card__role"><%= membership.gm? ? "You're the GM" : (mine.any? ? "Playing #{mine.to_sentence}" : "You're a player") %><% if campaign.on_hold? %> · On hold<% end %></span>
         <span class="tool-card__name"><%= campaign.name %></span>
-        <span class="tool-card__desc"><%= membership.gm? ? "You're the GM" : "You're a player" %><% if campaign.on_hold? %> · On hold<% end %></span>
+        <% if campaign.pitch.present? %><span class="campaign-card__pitch"><%= campaign.pitch.truncate(140, separator: " ") %></span><% end %>
+        <span class="campaign-card__standing">
+          <% campaign_standing(campaign).each do |fact| %><span class="<%= class_names("campaign-card__fact", "campaign-card__fact--live": fact.start_with?("Live now")) %>"><%= fact %></span> <% end %>
+        </span>
         <%= next_game_line(campaign) %>
       <% end %>
       <%# A held GM seat (Identity::Plans#keep_playing!): play this one, putting the least recently played on hold if the plan has no room. %>
@@ -48,7 +54,7 @@
   <% end %>
   <li>
     <section id="campaign-new" class="tool-card add-card" aria-labelledby="campaign-new-title">
-      <h2 id="campaign-new-title" class="tool-card__name">Create new campaign</h2>
+      <h2 id="campaign-new-title" class="tool-card__name campaign-list__new-title">Create new campaign</h2>
       <% if !Current.identity.room_to_run? && @campaign.errors.none? %>
         <p class="tool-card__desc"><%= Current.identity.plan_limit_message(:gm) %></p>
       <% else %>
