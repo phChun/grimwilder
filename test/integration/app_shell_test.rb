@@ -70,7 +70,9 @@ class AppShellTest < ActionDispatch::IntegrationTest
 
     row = css_select("nav.tabs a").map { _1["href"] }
     menu = css_select(".nav-menu nav a.nav-menu__link").map { _1["href"] }
-    assert_equal row, menu
+    assert_equal row.sort, menu.sort, "the same links"
+    assert_equal campaign_path(@campaign), menu.first, "in the phone menu the campaign's tabs come first"
+    assert_equal campaigns_path, row.first
     assert_select ".nav-menu details.nav-menu__fold:not([open]) > summary", "Tools"
     assert_select ".nav-menu details.nav-menu__fold a.nav-menu__link--sub", 3
     assert_select ".nav-menu .nav-menu__divider", 1
