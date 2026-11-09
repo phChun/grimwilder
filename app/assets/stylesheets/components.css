@@ -2668,9 +2668,7 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .feed__older:empty { margin: 0; }
 .feed__items { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0 0 var(--space-3); list-style: none; }
 .feed__items:has(li) + .feed__empty { display: none; }
-.feed__empty { margin: 0 0 var(--space-3); padding: var(--space-7) var(--space-4); text-align: center; }
-.feed__empty p { margin: 0 auto; max-width: 24rem; }
-.feed__empty-title { margin-bottom: var(--space-1); font-family: var(--font-display); font-size: 1.2rem; font-style: italic; font-weight: 500; color: var(--text-soft); }
+.feed__empty { margin: 0 0 var(--space-3); }
 
 /* "3 new": lines arrived while you were scrolled up (feed_controller.js). */
 .feed__new {

@@ -44,10 +44,7 @@
         <ol id="table_feed" class="feed__items" aria-live="polite" aria-label="Table chat and log" data-feed-target="list">
           <%= render "campaigns/feed_entries", feed: feed %>
         </ol>
-        <div class="empty feed__empty">
-          <p class="feed__empty-title">No scribbles here yet</p>
-          <p>The quill's sharpened and the parchment's bare. Rolls, scenes and talk land here as they happen.</p>
-        </div>
+        <p class="empty feed__empty">Nothing yet. Rolls, scenes and talk land here as they happen.</p>
       </div>
     </div>
     <%# Shown by feed_controller.js when lines arrive while you're scrolled up reading. %>
