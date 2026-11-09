@@ -13,9 +13,10 @@
 
     <%= yield :head %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Versioned (IconsHelper#site_icon_path), so a changed icon isn't stuck in a year-long cache. %>
+    <link rel="icon" href="<%= site_icon_path("favicon.ico") %>" sizes="32x32">
+    <link rel="icon" href="<%= site_icon_path("icon.svg") %>" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="<%= site_icon_path("icon.png") %>">
 
     <%# List stylesheets explicitly: Herb compiles stylesheet_link_tag to a static <link> via stylesheet_path, which doesn't understand Propshaft's :app shorthand. %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
