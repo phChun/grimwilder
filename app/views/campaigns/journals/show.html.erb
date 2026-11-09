@@ -1,29 +1,33 @@
-<% writable = @journal.writable_by?(Current.membership) %>
+<% own = @journal.membership == Current.membership %>
 <% owner = @journal.membership.identity %>
-<% content_for :title, "#{writable ? "Your journal" : "#{owner.display_name}'s journal"} · #{Current.campaign.name}" %>
+<% content_for :title, "#{own ? "Your journal" : "#{owner.display_name}'s journal"} · #{Current.campaign.name}" %>
 
-<%# A player's journal: a page per session, and per stretch between sessions they wrote in. The player writes the current page here; a GM reads the written pages while the journal is shared. %>
+<%# A player's journal: a New page button that opens its form in place, then the pages, starred first, then newest. A GM adds pages of their own here (read only for the player by default) and reads the player's while it's shared. %>
 <header class="page-header">
-  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %><% unless writable %> · <%= link_to "Journals", campaign_journals_path(Current.campaign) %><% end %></p>
-  <h1><%= writable ? "Your journal" : "#{owner.display_name}'s journal" %></h1>
-  <% if writable %>
+  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %><% unless own %> · <%= link_to "Journals", campaign_journals_path(Current.campaign) %><% end %></p>
+  <h1><%= own ? "Your journal" : "#{owner.display_name}'s journal" %></h1>
+  <% if own %>
     <div class="journal-share">
       <p class="page-header__lede">
-        <%= @journal.membership.journal_shared? ? "The GM can read it. Nobody else at the table can." : "Only you can read it." %>
+        <%= @journal.membership.journal_shared? ? "The GM can read it. Nobody else at the table can." : "Only you can read it, and the GM the pages they're in." %>
       </p>
       <%= button_to @journal.membership.journal_shared? ? "Keep it private" : "Let the GM read it",
         campaign_journal_path(Current.campaign, @journal.membership), method: :patch,
         params: { membership: { journal_shared: @journal.membership.journal_shared? ? "0" : "1" } }, class: "button button--small" %>
     </div>
-  <% else %>
+  <% elsif @journal.membership.journal_shared? %>
     <p class="page-header__lede">Shared with the GM. <%= owner.display_name %> can make it private at any time.</p>
+  <% else %>
+    <p class="page-header__lede"><%= owner.display_name %> keeps it private: you see only the GM's pages.</p>
   <% end %>
 </header>
 
 <div class="journal">
+  <%= render "campaigns/journals/new_button", journal: @journal %>
+  <hr class="journal__rule">
   <% if @pages.any? %>
-    <%= render partial: "campaigns/journals/page", collection: @pages, as: :page, locals: { journal: @journal, writable: writable } %>
+    <%= render partial: "campaigns/journals/page", collection: @pages, as: :page, locals: { journal: @journal, viewer: Current.membership } %>
   <% else %>
-    <p class="field__hint">Nothing written yet.</p>
+    <p class="empty">No pages yet.</p>
   <% end %>
 </div>

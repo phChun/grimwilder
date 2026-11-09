@@ -95,34 +95,50 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the journal card: the player's latest page, and a GM's while it's shared" do
-    PlaySession.start!(@campaign, characters: [], by: identities(:gwen))
-    memberships(:pip_player).journal.write!(memberships(:pip_player).journal.page("session-1"), "We crossed the bridge.")
-
+  test "the journal card: a New page button that opens its form, then the latest pages, each opened from its title" do
+    pip = memberships(:pip_player)
     sign_in_as identities(:pip)
     get character_path(@tibbs)
     assert_select "details#journal" do
-      assert_select "form[action=?] textarea", campaign_journal_page_path(@campaign, memberships(:pip_player), "session-1"), "We crossed the bridge."
-      assert_select "input[type=hidden][name=character_id][value=?]", @tibbs.id.to_s
-      assert_select "a[href=?]", campaign_journal_path(@campaign, memberships(:pip_player)), "See all journals"
+      assert_select "turbo-frame#journal_new a[href=?]", new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id), "New page"
+      assert_select "hr.journal__rule + .empty", "No pages yet."
+      assert_select "a[href=?]", campaign_journal_path(@campaign, pip), "See the whole journal"
     end
 
-    patch campaign_journal_page_path(@campaign, memberships(:pip_player), "session-1"), params: { character_id: @tibbs.id, journal_entry: { body: "We crossed the bridge, then the river." } }
+    get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
+    assert_select "turbo-frame#journal_new" do
+      assert_select "form[action=?][method=post] textarea", campaign_journal_pages_path(@campaign, pip)
+      assert_select "input[type=hidden][name=character_id][value=?]", @tibbs.id.to_s
+      assert_select "input[name='journal_page[locked]']", 0
+      assert_select "a.button--danger[href=?]", character_path(@tibbs), "Cancel"
+    end
+
+    post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "", body: "We crossed the bridge." } }
     assert_redirected_to character_path(@tibbs, anchor: "journal")
-    assert_equal "We crossed the bridge, then the river.", memberships(:pip_player).journal.page("session-1").body
+    page = pip.journal_pages.sole
+    get character_path(@tibbs)
+    assert_select "details#journal .journal-page--compact .journal-page__text", "We crossed the bridge."
+    assert_select "details#journal .journal-page__title a[href=?]", campaign_journal_page_path(@campaign, pip, page, character_id: @tibbs.id), page.heading
+    post campaign_journal_page_favorite_path(@campaign, pip, page), params: { character_id: @tibbs.id }
+    assert_redirected_to character_path(@tibbs, anchor: "journal")
 
     sign_out
     sign_in_as identities(:gwen)
     get character_path(@tibbs)
     assert_select "details#journal" do
-      assert_select ".journal-glance__text", "We crossed the bridge, then the river."
-      assert_select "textarea", 0
-      assert_select "a[href=?]", campaign_journals_path(@campaign), "See all journals"
+      assert_select ".journal-page__text", "We crossed the bridge."
+      assert_select ".journal-page__star--on[title=Starred]"
     end
+    get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
+    assert_select "input[type=checkbox][name='journal_page[locked]'][checked]"
 
-    memberships(:pip_player).update!(journal_shared: false)
+    pip.update!(journal_shared: false)
     get character_path(@tibbs)
-    assert_select "details#journal .journal-glance", 0
+    assert_select "details#journal .journal-page", 0
     assert_select "details#journal", /keeps their journal private/
+
+    post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "Who you were", body: "A thief, once.", locked: "1" } }
+    get character_path(@tibbs)
+    assert_select "details#journal .journal-page__text", "A thief, once.", "the GM always sees the GM's pages"
   end
 end

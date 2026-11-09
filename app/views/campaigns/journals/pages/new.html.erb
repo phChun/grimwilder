@@ -1,0 +1,13 @@
+<% content_for :title, "New page · #{Current.campaign.name}" %>
+
+<%# Takes the New page button's place (journals/_new_button), on the journals page or a sheet's Journal card. The form targets _top; its Cancel loads the button back from where it came. %>
+<turbo-frame id="journal_new" class="journal-new">
+  <section class="stack journal-new__form" aria-labelledby="journal_new_title">
+    <h3 id="journal_new_title" class="journal-new__title">New page</h3>
+    <% unless @journal.membership == Current.membership %>
+      <p class="field__hint">For a secret or a backstory. <%= @journal.membership.identity.display_name %> reads it in their journal and on their sheet.</p>
+    <% end %>
+    <%= render "campaigns/journals/form", journal: @journal, page: JournalPage.new, viewer: Current.membership, character: @character,
+      cancel_url: (@character ? character_path(@character) : campaign_journal_path(Current.campaign, @journal.membership)) %>
+  </section>
+</turbo-frame>

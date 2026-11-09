@@ -1,0 +1,22 @@
+<% content_for :title, "#{@page.heading} · Journal · #{Current.campaign.name}" %>
+
+<%# A page, opened from its title: its own page, and from the journal or a sheet a modal (shared/_frame_modal). Whoever may change it reads and edits it in the form, which targets _top, so saving refreshes the page it came from; anyone else reads it. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to "Journal", campaign_journal_path(Current.campaign, @journal.membership) %></p>
+    <h1><%= @page.heading %></h1>
+    <% if @page.shared? %><p class="journal-page__tag">With the GM</p>
+    <% elsif @page.by_gm? %><p class="journal-page__tag">From the GM · Read only</p><% end %>
+  </header>
+
+  <div class="panel stack">
+    <% if @journal.editable_by?(@page, Current.membership) %>
+      <%= render "campaigns/journals/form", journal: @journal, page: @page, viewer: Current.membership, character: @character %>
+      <%= button_to "Tear out this page", campaign_journal_page_path(Current.campaign, @journal.membership, @page), method: :delete, params: { character_id: @character&.id }.compact, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_frame: "_top", turbo_confirm: "Tear out #{@page.heading}? This can't be undone." } } %>
+    <% elsif @page.body.present? %>
+      <div class="journal-page__text"><%= chat_format(@page.body) %></div>
+    <% else %>
+      <p class="field__hint">Nothing written yet.</p>
+    <% end %>
+  </div>
+<% end %>
