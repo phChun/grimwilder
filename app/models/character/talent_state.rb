@@ -9,7 +9,7 @@
 # - `quarries` (Quarry): who this session's quarries are.
 # - `enchantment` (Magus): the trait the weapon is enchanted with, until it's
 #   ended for a potent effect.
-# - `oath` (Oathsworn, P6 pg. 69): each tenet's violation, `violated` (a slash),
+# - `oath` (Oathsworn, pg. 69): each tenet's violation, `violated` (a slash),
 #   `heavy` (filled in) or `broken` (no atoning); 1 less smite for each. Two
 #   broken make an Oathbreaker (Character::Oath). And Affirmation's spark.
 # - `menagerie` (Monster Menagerie): which of the bonded creatures answers.

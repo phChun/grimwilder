@@ -8,7 +8,7 @@ Guidance for AI coding agents (and humans) working in this repo. Read this befor
 
 Built: the public tools (action roller `/roll`, crucibles, talent catalog), passwordless accounts with plans, campaigns (join links, archiving, on hold, schedules), character sheets, the GM table and campaign page, table chat, sessions and scenes, pools, the table log, optional rules, journals, polls and handouts. Nothing is scheduled next; see *Roadmap*.
 
-Page numbers are Preview 6's: the CE text has no page breaks, and its three cross-references (pg. 25, 52, 175) match P6. Re-check them once there's a CE PDF. Crucibles and talent text now come from the CE text.
+Page numbers are the CE PDF's: talents, crucibles and the code's `pg.` references have all been checked against it. Crucibles and talent text come from the CE text.
 
 ## Stack
 
@@ -208,7 +208,7 @@ Data in `config/crucibles.yml` (97 crucibles, 152 tables), read by a plain `Cruc
 
 ## Talents
 
-- Catalog in `config/talents.yml` (`Talent`, `Talent::Group`, Data classes): 18 paths, background/heritage and legacy talents. Keys are slugged names unless the YAML sets `key:` (none do now). `retired: true` talents stay on existing sheets but can't be picked. Prohibitions and "[X Only]" go through `Talent#prohibited_for?`, checked only for new picks.
+- Catalog in `config/talents.yml` (`Talent`, `Talent::Group`, Data classes): 18 paths, background/heritage and legacy talents. Keys are slugged names unless the YAML sets `key:` (none do now). Prohibitions and "[X Only]" go through `Talent#prohibited_for?`, checked only for new picks.
 - `talent_keys` are capped by level (`talents_fit_level`, validated only when talents or level change, so old over-cap sheets still save). Eldritch talents (Pact) are a separate list. Optional rules: Level 0, stat progression, legacy cores.
 - Every talent has our own `summary:` (≤100 chars, not book text). Mechanics are declared in YAML and each has a test checking every entry: `uses:`, `rolls:` (`Talent::Roll`), `bonuses:` (`Talent::Bonus`; use `only:`, not `on:`, which YAML reads as `true`), `follow_ups:`, `choices:` (`Talent::Choice`, `Character::TalentChoices`; options must appear in the talent text), `arcana:`, `makes:`, `state:`.
 - Re-skins (`Character::TalentSkins`, `SkinnedTalent`) change name, summary and text only; mechanics stay.

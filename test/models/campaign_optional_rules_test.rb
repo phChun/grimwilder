@@ -1,6 +1,6 @@
 require "test_helper"
 
-# P6's optional rules a GM turns on for the table (Campaign::OptionalRules).
+# The optional rules a GM turns on for the table (Campaign::OptionalRules).
 class CampaignOptionalRulesTest < ActiveSupport::TestCase
   setup do
     @campaign = campaigns(:bramblewood)

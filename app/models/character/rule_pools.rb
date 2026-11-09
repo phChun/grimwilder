@@ -56,7 +56,7 @@ module Character::RulePools
     talent_pools.where(use_key: "#{BULWARK}/#{BULWARK}").destroy_all if bulwark_reworked?
   end
 
-  # Wealth (pg. 176): carousing by selling off treasure, or as the GM sees
+  # Wealth (pg. 177): carousing by selling off treasure, or as the GM sees
   # fit, adds 2d to the Coins pool, up to 8d.
   # Expanded downtime replaces carousing, so it's gone while that rule's on.
   def add_coins!(by:)

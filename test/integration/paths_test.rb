@@ -1,8 +1,8 @@
 require "test_helper"
 
-# Preview 6's Adventurer and Oathbreaker on the sheet, level 0 from the form,
+# The Adventurer and Oathbreaker on the sheet, level 0 from the form,
 # and weapon styles as a table's optional rule.
-class P6PathsTest < ActionDispatch::IntegrationTest
+class PathsTest < ActionDispatch::IntegrationTest
   setup do
     @tibbs = characters(:tibbs) # pip's Rogue at gwen's table, Bramblewood
     @campaign = campaigns(:bramblewood)

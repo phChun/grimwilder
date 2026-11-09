@@ -1,4 +1,4 @@
-# The Milestone levels optional rule (pg. 177, Campaign::Breaks#milestone!):
+# The Milestone levels optional rule (pg. 178, Campaign::Breaks#milestone!):
 # after a major group arc, the party levels up. GM only.
 class Campaigns::MilestonesController < ApplicationController
   include CampaignScoped

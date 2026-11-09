@@ -1,4 +1,4 @@
-# Wealth (pg. 176, Character::RulePools#add_coins!): carousing adds 2d to the
+# Wealth (pg. 177, Character::RulePools#add_coins!): carousing adds 2d to the
 # Coins pool, up to 8d. The owner and the campaign's GM.
 class Characters::CoinsController < ApplicationController
   include TendedCharacter

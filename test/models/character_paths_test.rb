@@ -1,8 +1,7 @@
 require "test_helper"
 
-# Preview 6's Adventurer path, Oathbreaker and the level 0 and retired-talent
-# rules (docs/design/p6-update, Phases 4 and 5).
-class CharacterP6PathsTest < ActiveSupport::TestCase
+# The Adventurer path, Oathbreaker and level 0.
+class CharacterPathsTest < ActiveSupport::TestCase
   setup do
     @tibbs = characters(:tibbs)
     @pip = identities(:pip)
@@ -58,23 +57,8 @@ class CharacterP6PathsTest < ActiveSupport::TestCase
     assert_not @tibbs.valid?, "only a character who started at level 0 can be level 0"
   end
 
-  test "Flurry is retired: out of the catalog and no new pick, but a sheet that has it keeps it" do
-    flurry = Talent.find("flurry")
-    assert flurry.retired?
-    assert_not_includes Talent.groups.find { _1.key == "legacy" }.talents, flurry
-    assert_not_includes Talent.choosable_for("Monk"), flurry
-    assert_includes Talent.groups.find { _1.key == "legacy" }.talents.map(&:key), "prepared-spell"
-
-    @tibbs.talent_keys = %w[ flurry ]
-    assert_not @tibbs.valid?
-
-    @tibbs.update_columns(talent_keys: %w[ flurry ])
-    assert @tibbs.reload.valid?
-  end
-
   test "Trap Making is still the Artificer's (the CE keeps it)" do
     trap_making = Talent.find("trap-making")
-    assert_not trap_making.retired?
     assert_includes Talent.groups.find { _1.key == "artificer" }.talents, trap_making
     assert_includes Talent.choosable_for("Artificer"), trap_making
     assert_no_match "take spark", trap_making.text

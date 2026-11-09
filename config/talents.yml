@@ -1540,11 +1540,6 @@
     uses:
     - { key: bardsongs, label: Bardsongs, count: 3, per: session, growth: { 3: 1, 6: 1 } }
     - { key: melodies, label: Melodies, count: 3, per: session, growth: { 3: 1, 6: 1 } }
-  - name: Flurry
-    summary: "Push yourself to do two physical things at once with one stat, using your two highest dice."
-    text: You can push yourself to attempt two distinct physical actions at once using one stat, and taking your highest two dice as the results. You can't prompt more than one impact move from this combined action.
-    page: 180
-    retired: true
   - name: Cunning Actions
     summary: "On a perfect in an intense scene, keep the spotlight for a safer follow-up, then pass it on."
     text: On a perfect in an intense scene, you can keep the spotlight, even if the GM wants to spend suspense. The GM must take suspense as an impact move on your follow-up. Afterward, move the spotlight to an ally.
