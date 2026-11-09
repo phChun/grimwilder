@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_09_200000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -223,12 +223,13 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_09_200000) do
 
   create_table "journal_pages", force: :cascade do |t|
     t.integer "membership_id", null: false
-    t.text "body", null: false
+    t.text "body", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "title"
     t.boolean "by_gm", default: false, null: false
     t.boolean "locked", default: false, null: false
+    t.boolean "favorite", default: false, null: false
     t.index ["membership_id"], name: "index_journal_pages_on_membership_id"
   end
 

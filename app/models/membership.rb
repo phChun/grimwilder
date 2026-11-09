@@ -14,6 +14,7 @@ class Membership < ApplicationRecord
   validates :identity_id, uniqueness: { scope: :campaign_id }
   validate :within_plan, :not_blocked, on: :create
 
+  after_create { JournalPage.start_for!(self) if player? }
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
   after_destroy_commit :send_open_pages_away
@@ -38,7 +39,7 @@ class Membership < ApplicationRecord
     end
   end
 
-  # The player's journal here (Journal): pages they write as they like.
+  # The player's journal here (Journal): pages they write when they like.
   def journal
     Journal.new(self)
   end

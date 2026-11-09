@@ -6,11 +6,16 @@ class JournalsTest < ActionDispatch::IntegrationTest
     @pip = memberships(:pip_player)
   end
 
-  test "a player adds pages, changes and tears them out, and can keep the journal from the GM" do
+  test "a player adds pages, stars, changes and tears them out, and can keep the journal from the GM" do
     sign_in_as identities(:pip)
     get campaign_journal_path(@campaign, @pip)
     assert_select ".tabs__link[aria-current]", "Journal"
-    assert_select ".journal-new form[action=?] textarea", campaign_journal_pages_path(@campaign, @pip)
+    assert_select "turbo-frame#journal_new a[href=?]", new_campaign_journal_page_path(@campaign, @pip), "New page"
+    assert_select ".journal__rule + .empty", "No pages yet."
+
+    get new_campaign_journal_page_path(@campaign, @pip)
+    assert_select "turbo-frame#journal_new form[action=?] textarea", campaign_journal_pages_path(@campaign, @pip)
+    assert_select "turbo-frame#journal_new .journal-form__actions input[type=submit][value=?] + a.button--danger[href=?]", "Add page", campaign_journal_path(@campaign, @pip), text: "Cancel"
 
     post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "The bridge", body: "We crossed it." } }
     page = @pip.journal_pages.sole
@@ -18,7 +23,17 @@ class JournalsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "#page-#{page.id} .journal-page__title", "The bridge"
 
-    get edit_campaign_journal_page_path(@campaign, @pip, page)
+    post campaign_journal_page_favorite_path(@campaign, @pip, page)
+    assert page.reload.favorite?
+    get campaign_journal_path(@campaign, @pip)
+    assert_select "#page-#{page.id}.journal-page--favorite form[action=?] button[aria-label=?]", campaign_journal_page_favorite_path(@campaign, @pip, page), "Unstar The bridge"
+    delete campaign_journal_page_favorite_path(@campaign, @pip, page)
+    assert_not page.reload.favorite?
+
+    get campaign_journal_path(@campaign, @pip)
+    assert_select "#page-#{page.id} .journal-page__title a[href=?][data-turbo-frame=modal]", campaign_journal_page_path(@campaign, @pip, page), "The bridge"
+    get campaign_journal_page_path(@campaign, @pip, page)
+    assert_select "turbo-frame#modal textarea", "We crossed it."
     assert_select "input[name='journal_page[locked]']", 0
     patch campaign_journal_page_path(@campaign, @pip, page), params: { journal_page: { title: "", body: "We crossed the river." } }
     assert_equal [ nil, "We crossed the river." ], page.reload.then { [ _1.title, _1.body ] }
@@ -31,7 +46,7 @@ class JournalsTest < ActionDispatch::IntegrationTest
     assert_not @pip.reload.journal_shared?
   end
 
-  test "the GM reads shared journals and adds locked pages; the player reads those but can't change them" do
+  test "the GM reads shared journals and adds locked pages; the player reads those but can't change them, and only the player stars" do
     mine = @pip.journal.write!(@pip, title: nil, body: "We crossed *the bridge*. **Never again.** <b>no</b>")
     sign_in_as identities(:gwen)
     get campaign_journals_path(@campaign)
@@ -41,7 +56,12 @@ class JournalsTest < ActionDispatch::IntegrationTest
     assert_select ".journal-page__text strong", "Never again."
     assert_select ".journal-page__text b", 0, "anything else typed stays text"
     assert_select ".journal-page__text", /<b>no<\/b>/
-    assert_select "#page-#{mine.id} a", text: "Edit", count: 0
+    get campaign_journal_page_path(@campaign, @pip, mine)
+    assert_select "turbo-frame#modal .journal-page__text em", "the bridge"
+    assert_select "turbo-frame#modal textarea", 0
+    assert_select ".journal-page__star", 0
+    post campaign_journal_page_favorite_path(@campaign, @pip, mine)
+    assert_response :not_found
     patch campaign_journal_page_path(@campaign, @pip, mine), params: { journal_page: { body: "Edited." } }
     assert_response :not_found
 
@@ -61,7 +81,9 @@ class JournalsTest < ActionDispatch::IntegrationTest
     get campaign_journal_path(@campaign, @pip)
     assert_select "#page-#{secret.id} .journal-page__tag", "From the GM"
     assert_select "#page-#{secret.id} .journal-page__tag", "Read only"
-    assert_select "#page-#{secret.id} a", text: "Edit", count: 0
+    get campaign_journal_page_path(@campaign, @pip, secret)
+    assert_select "turbo-frame#modal .journal-page__text", "A thief, once."
+    assert_select "turbo-frame#modal textarea", 0
     patch campaign_journal_page_path(@campaign, @pip, secret), params: { journal_page: { body: "Not a thief." } }
     assert_response :not_found
     delete campaign_journal_page_path(@campaign, @pip, secret)

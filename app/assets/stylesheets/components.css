@@ -1532,9 +1532,7 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 /* Who and Story edit in their cards. */
 .sheet-edit__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 /* Journal: the latest page at a glance. */
-.journal-glance__title { margin: 0 0 var(--space-1); font-weight: 600; }
-.journal-glance__new { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
-.journal-glance__text { margin: 0; color: var(--text-soft); white-space: pre-line; }
+.journal-glance { display: grid; gap: var(--space-3); }
 
 /* Identity band */
 .identity { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-5); }
@@ -3180,19 +3178,30 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .next-game--skipped { color: var(--muted); font-weight: 500; }
 .campaign-hero__soon { font-weight: 400; color: var(--muted); }
 
-/* A player's journal (campaigns/journals): a New page form, then the pages, newest first. */
+/* A player's journal (campaigns/journals), here and on the sheet: a New page button that opens its form in place, a rule, then the pages, starred first. */
 .journal { display: grid; gap: var(--space-3); max-width: 46rem; }
 .journal-share { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 .journal-share .page-header__lede { margin: 0; }
 .journal-share .button_to { margin: 0; }
-.journal-page__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); }
+.journal-page__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); }
 .journal-page__title { margin: 0; font-size: 1.3rem; }
 .journal-page__tag { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ember); }
 .journal-page__tag--quiet { color: var(--muted); }
-.journal-new { border-style: dashed; }
+.journal-new { display: block; }
+.journal-new__title { margin: 0; font-size: 1.1rem; }
+.journal__rule { width: 100%; margin: var(--space-3) 0; border: 0; border-top: 1px solid var(--line-soft); }
+.journal-page__open { color: inherit; text-decoration: none; }
+.journal-page__open:hover { color: var(--ember); text-decoration: underline; }
+.journal-page__star { display: inline-grid; place-items: center; min-width: var(--tap); min-height: var(--tap); margin: calc(var(--space-2) * -1) 0; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.journal-page__star:hover { color: var(--ember); }
+.journal-page__star--on { color: var(--ember); }
+.journal-page__star--on svg { fill: currentColor; }
+.journal-page .button_to { margin: 0; }
+.journal-page--compact .journal-page__title { font-size: 1.05rem; }
+.journal-page--compact .journal-page__text { color: var(--text-soft); font-size: 0.95rem; }
 .journal-page__text { margin: 0; font-family: var(--font-display); white-space: pre-line; }
 .journal-page__body { font-family: var(--font-display); line-height: 1.6; resize: vertical; }
-.journal-form__save { justify-self: start; align-self: flex-start; }
+.journal-form__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .journal-list { display: grid; gap: var(--space-2); max-width: 46rem; margin: 0; padding: 0; list-style: none; }
 .journal-list__item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 .journal-list__name { margin-right: auto; font-family: var(--font-display); font-size: 1.1rem; }

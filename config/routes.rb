@@ -128,7 +128,9 @@ Rails.application.routes.draw do
       resources :scene_plans, only: %i[ index create edit update destroy ]
       resources :scene_blocks, only: %i[ create edit update destroy ]
       resources :journals, only: %i[ index show update ] do # by membership: a player's journal
-        resources :pages, only: %i[ create edit update destroy ], module: :journals
+        resources :pages, only: %i[ new show create update destroy ], module: :journals do
+          resource :favorite, only: %i[ create destroy ], module: :pages # the player stars it
+        end
       end
       resources :scenes, only: %i[ new create update ] do
         resource :ending, only: %i[ new create ], module: :scenes

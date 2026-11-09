@@ -1,8 +1,8 @@
-# A player's journal at a campaign: their Membership's journal_pages, newest
-# first, written when they like. The player writes it; the campaign's GMs may
-# read it while it's shared (memberships.journal_shared, on by default), and
-# may add pages of their own, which they always see and may lock so the
-# player can only read them.
+# A player's journal at a campaign: their Membership's journal_pages, the
+# starred first, then newest, written when they like. The player writes it;
+# the campaign's GMs may read it while it's shared (memberships.journal_shared,
+# on by default), and may add pages of their own, which they always see and
+# may lock so the player can only read them.
 class Journal
   attr_reader :membership
 
@@ -24,7 +24,7 @@ class Journal
   def pages_for(viewer)
     return JournalPage.none unless readable_by?(viewer)
 
-    pages = membership.journal_pages.newest_first
+    pages = membership.journal_pages.favorites_first
     viewer == membership || membership.journal_shared? ? pages : pages.by_gm
   end
 
@@ -39,6 +39,11 @@ class Journal
     return false unless page.membership_id == membership.id && readable_by?(viewer)
 
     page.by_gm? ? gm?(viewer) || (viewer == membership && !page.locked?) : viewer == membership
+  end
+
+  # Only the player stars their pages.
+  def favoritable_by?(viewer)
+    membership.player? && viewer == membership
   end
 
   # A new page by this person: the GM's may be locked.

@@ -95,40 +95,50 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the journal card: the latest page, a New page form, and the GM's own locked pages" do
+  test "the journal card: a New page button that opens its form, then the latest pages, each opened from its title" do
     pip = memberships(:pip_player)
-    pip.journal.write!(pip, title: "The bridge", body: "We crossed the bridge.")
-
     sign_in_as identities(:pip)
     get character_path(@tibbs)
     assert_select "details#journal" do
-      assert_select ".journal-glance__text", "We crossed the bridge."
+      assert_select "turbo-frame#journal_new a[href=?]", new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id), "New page"
+      assert_select "hr.journal__rule + .empty", "No pages yet."
+      assert_select "a[href=?]", campaign_journal_path(@campaign, pip), "See the whole journal"
+    end
+
+    get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
+    assert_select "turbo-frame#journal_new" do
       assert_select "form[action=?][method=post] textarea", campaign_journal_pages_path(@campaign, pip)
       assert_select "input[type=hidden][name=character_id][value=?]", @tibbs.id.to_s
       assert_select "input[name='journal_page[locked]']", 0
-      assert_select "a[href=?]", campaign_journal_path(@campaign, pip), "Open the journal"
+      assert_select "a.button--danger[href=?]", character_path(@tibbs), "Cancel"
     end
 
-    post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "", body: "Then the river." } }
+    post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "", body: "We crossed the bridge." } }
     assert_redirected_to character_path(@tibbs, anchor: "journal")
-    assert_equal [ nil, false ], pip.journal_pages.newest_first.first.then { [ _1.title, _1.by_gm ] }
+    page = pip.journal_pages.sole
+    get character_path(@tibbs)
+    assert_select "details#journal .journal-page--compact .journal-page__text", "We crossed the bridge."
+    assert_select "details#journal .journal-page__title a[href=?]", campaign_journal_page_path(@campaign, pip, page, character_id: @tibbs.id), page.heading
+    post campaign_journal_page_favorite_path(@campaign, pip, page), params: { character_id: @tibbs.id }
+    assert_redirected_to character_path(@tibbs, anchor: "journal")
 
     sign_out
     sign_in_as identities(:gwen)
     get character_path(@tibbs)
     assert_select "details#journal" do
-      assert_select ".journal-glance__text", "Then the river."
-      assert_select "input[type=checkbox][name='journal_page[locked]'][checked]"
+      assert_select ".journal-page__text", "We crossed the bridge."
+      assert_select ".journal-page__star--on[title=Starred]"
     end
+    get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
+    assert_select "input[type=checkbox][name='journal_page[locked]'][checked]"
 
     pip.update!(journal_shared: false)
     get character_path(@tibbs)
-    assert_select "details#journal .journal-glance", 0
+    assert_select "details#journal .journal-page", 0
     assert_select "details#journal", /keeps their journal private/
 
     post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "Who you were", body: "A thief, once.", locked: "1" } }
-    assert_redirected_to character_path(@tibbs, anchor: "journal")
     get character_path(@tibbs)
-    assert_select "details#journal .journal-glance__text", "A thief, once.", "the GM always sees the GM's pages"
+    assert_select "details#journal .journal-page__text", "A thief, once.", "the GM always sees the GM's pages"
   end
 end

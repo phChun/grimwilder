@@ -1,12 +1,18 @@
-# The pages of a journal (JournalPage): the player adds, changes and tears out
+# The pages of a journal (JournalPage): the player adds, changes and deletes
 # their own; a GM adds pages of their own, which they may lock so the player
-# can only read them. Saving comes back to the journal, or to the sheet whose
-# Journal card it was written from.
+# can only read them. New is the form that takes the New page button's place
+# (the journal_new frame); saving comes back to the journal, or to the sheet
+# whose Journal card it was written from (character_id).
 class Campaigns::Journals::PagesController < ApplicationController
   include CampaignScoped
 
-  before_action :set_journal
-  before_action :set_page, only: %i[ edit update destroy ]
+  before_action :set_journal, :set_character
+  before_action :set_page, only: %i[ show update destroy ]
+  before_action :require_editable, only: %i[ update destroy ]
+
+  def new
+    raise ActiveRecord::RecordNotFound unless @journal.writable_by?(Current.membership)
+  end
 
   def create
     raise ActiveRecord::RecordNotFound unless @journal.writable_by?(Current.membership)
@@ -17,7 +23,8 @@ class Campaigns::Journals::PagesController < ApplicationController
     redirect_to back_to, alert: error.record.errors.full_messages.to_sentence
   end
 
-  def edit
+  # Read, or for whoever may change it, read and edit.
+  def show
   end
 
   def update
@@ -27,7 +34,7 @@ class Campaigns::Journals::PagesController < ApplicationController
     redirect_to back_to, notice: "#{@page.heading} saved."
   rescue ActiveRecord::RecordInvalid
     flash.now[:alert] = @page.errors.full_messages.to_sentence
-    render :edit, status: :unprocessable_entity
+    render :show, status: :unprocessable_entity
   end
 
   def destroy
@@ -40,10 +47,10 @@ class Campaigns::Journals::PagesController < ApplicationController
       params.expect(journal_page: %i[ title body locked ])
     end
 
-    # The journal, or the sheet whose Journal card the page was written from.
+    # The journal, or the sheet whose Journal card it was written from.
     def back_to(anchor: (@page&.persisted? ? "page-#{@page.id}" : nil))
-      if (character = Current.campaign.characters.find_by(id: params[:character_id]))
-        character_path(character, anchor: "journal")
+      if @character
+        character_path(@character, anchor: "journal")
       else
         campaign_journal_path(Current.campaign, @journal.membership, anchor: anchor)
       end
@@ -54,8 +61,15 @@ class Campaigns::Journals::PagesController < ApplicationController
       raise ActiveRecord::RecordNotFound unless @journal.readable_by?(Current.membership)
     end
 
+    def set_character
+      @character = Current.campaign.characters.find_by(id: params[:character_id]) if params[:character_id]
+    end
+
     def set_page
       @page = @journal.pages_for(Current.membership).find(params[:id])
+    end
+
+    def require_editable
       raise ActiveRecord::RecordNotFound unless @journal.editable_by?(@page, Current.membership)
     end
 end
