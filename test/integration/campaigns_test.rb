@@ -16,6 +16,29 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", campaign_table_path(campaign), text: "Open the GM table"
   end
 
+  test "each campaign's card says what it's about, your part in it, and where it stands" do
+    campaign = campaigns(:bramblewood)
+    campaign.update!(pitch: "Toll-roads and a quietly failing accord.")
+    gwen = identities(:gwen)
+    PlaySession.start!(campaign, characters: [ characters(:tibbs) ], by: gwen).end!(by: gwen)
+
+    sign_in_as identities(:pip)
+    get campaigns_path
+    assert_select ".campaign-list .campaign-card", /#{campaign.name}/ do
+      assert_select ".campaign-card__role", "Playing Tibbs"
+      assert_select ".campaign-card__pitch", "Toll-roads and a quietly failing accord."
+      assert_equal [ "Last played #{campaign.play_sessions.first.started_at.strftime("%a, %b %-d")}", "1 session" ], css_select(".campaign-card__fact").first(2).map(&:text)
+      assert_select ".campaign-card__fact", /\d+ characters? · \d+ players?/
+    end
+
+    PlaySession.start!(campaign, characters: [ characters(:tibbs) ], by: gwen)
+    sign_out
+    sign_in_as gwen
+    get campaigns_path
+    assert_select ".campaign-card__role", "You're the GM"
+    assert_select ".campaign-card__fact--live", "Live now · Session 2"
+  end
+
   test "non-members get a 404" do
     sign_in_as identities(:stranger)
 

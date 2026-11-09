@@ -58,6 +58,22 @@ module CampaignsHelper
 
 
   # A party card's harm line: "Bloodied · Agility marked · 4d poisoned", or "No harm".
+  # Where a campaign stands, for its card on the campaigns list: live now or
+  # when it was last played, then how many sessions and who's in the party.
+  # ["Live now · Session 5", "4 sessions", "3 characters · 3 players"]
+  def campaign_standing(campaign)
+    played = campaign.play_sessions.ended
+    last = played.order(number: :desc).first
+    status =
+      if (live = campaign.current_session) then "Live now · #{live.title}"
+      elsif last then "Last played #{session_date(last)}"
+      else "Not played yet"
+      end
+    characters = campaign.characters.played.active.count
+    players = campaign.memberships.player.count
+    [ status, (pluralize(played.count, "session") if last), "#{pluralize(characters, "character")} · #{pluralize(players, "player")}" ].compact
+  end
+
   def harm_line(character)
     harm = HARM.select { character.public_send(:"#{_1}?") }.map(&:capitalize)
     marks = Grimwild::STATS.select { character.marked?(_1) }.map { "#{_1.capitalize} marked" }

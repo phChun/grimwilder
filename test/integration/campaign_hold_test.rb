@@ -20,7 +20,7 @@ class CampaignHoldTest < ActionDispatch::IntegrationTest
     sign_in_as @gwen
     get campaigns_path
     assert_select ".hold-banner", "You're on Free, which runs 1 campaign at a time. The Bramblewood Accord is on hold. Choose which to play, archive one, or upgrade."
-    assert_select ".campaign-card--on-hold .tool-card__desc", /On hold/
+    assert_select ".campaign-card--on-hold .campaign-card__role", /On hold/
     assert_select ".campaign-card--on-hold form[action=?][data-turbo-confirm=?] button", campaign_hold_path(@campaign),
       "Play The Bramblewood Accord? Saltmarsh goes on hold in its place.", "Play this one"
 

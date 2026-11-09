@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Your campaigns at a glance**: each card on the campaigns list shows your part (GM, or who you play), the pitch, whether it's live or when it was last played, how many sessions, and who's in the party, in a wider, shorter card. ([#109](https://github.com/phChun/grimwilder/pull/109))
 - **Journal pages fold open on your sheet**: the Journal card shows your favorites and your latest page, each under its own heading; tap a title to read it there, with Edit below to change it, and See all for the rest. ([#108](https://github.com/phChun/grimwilder/pull/108))
 - **The journal uses the whole screen**: pages sit side by side, all the same height, and the GM's list of journals spreads out too. ([#108](https://github.com/phChun/grimwilder/pull/108))
 - **Sort your journal**: favorites first, chronologically, or last updated. ([#108](https://github.com/phChun/grimwilder/pull/108))

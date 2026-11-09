@@ -260,6 +260,18 @@
 
 /* A campaign on the campaigns list: the card links in, and the GM's ⋯ (archive or unarchive) sits in its top right corner, outside the link. */
 .campaign-card { position: relative; }
+/* Wider cards, each only as tall as its row needs: your part, the name, the pitch, where it stands and the next game. */
+.campaign-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); align-items: start; }
+.campaign-list > li { align-self: stretch; }
+.campaign-card__link { gap: var(--space-2); padding: var(--space-4) var(--space-5); }
+.campaign-card__role { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ember); }
+.campaign-card__pitch { font-family: var(--font-display); font-style: italic; font-size: 1.05rem; line-height: 1.4; color: var(--text-soft); }
+.campaign-card__standing { margin-top: var(--space-1); font-size: 0.87rem; line-height: 1.6; color: var(--muted); }
+/* Each fact keeps together, its dot after it, so a wrapped line never starts with one. */
+.campaign-card__fact { white-space: nowrap; }
+.campaign-card__fact:not(:last-child)::after { content: " ·"; color: var(--dim); }
+.campaign-card__fact--live { color: var(--ember); font-weight: 600; }
+.campaign-list__new-title { margin: 0; }
 .campaign-card .tool-card { padding-right: calc(var(--tap) + var(--space-4)); }
 .campaign-card__more { position: absolute; top: var(--space-3); right: var(--space-3); }
 .campaign-card__toggle { width: var(--tap); padding: 0; list-style: none; }
