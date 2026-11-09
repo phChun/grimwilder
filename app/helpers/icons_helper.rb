@@ -33,6 +33,16 @@ module IconsHelper
     '<g class="brand__pips"><circle cx="128" cy="134" r="28"/><circle cx="252" cy="134" r="28"/><circle cx="128" cy="200" r="28"/>' \
     '<circle cx="252" cy="200" r="28"/><circle cx="128" cy="266" r="28"/><circle cx="252" cy="266" r="28"/></g></g>'
 
+  # The site's icons in public/ (favicon.ico, icon.png, icon.svg) aren't
+  # fingerprinted, and are served to be cached for a year (Cloudflare kept
+  # Rails' red dot long after the dice replaced it). Bump this when they
+  # change, so browsers and the CDN fetch them afresh.
+  SITE_ICON_VERSION = "2"
+
+  def site_icon_path(file)
+    "/#{file}?v=#{SITE_ICON_VERSION}"
+  end
+
   def brand_mark
     tag.svg(BRAND_MARK.html_safe, class: "brand__mark", width: 46, height: 28, viewBox: "30 30 560 340", "aria-hidden": "true")
   end
