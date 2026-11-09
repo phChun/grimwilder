@@ -257,9 +257,6 @@
           <a href="<%= new_character_talent_path(@character, eldritch: (1 if @character.talents_to_choose.zero?)) %>" class="sheet-fold__count sheet-fold__count--link" aria-label="<%= pluralize(to_take, "talent") %> to take: choose <%= to_take == 1 ? "it" : "them" %>" title="<%= pluralize(to_take, "talent") %> to take"><%= to_take %> to take</a>
         <% end %></h2><%= icon(:chevron, size: 18) %>
       </summary>
-      <% if editable %>
-        <p class="sheet-fold__actions sheet-fold__actions--top"><%= link_to "Edit talents", new_character_talent_path(@character), class: "button button--small" %></p>
-      <% end %>
       <% talent_pools = @character.talent_pools.includes(:campaign).to_a %>
       <% live = @character.campaign&.current_session.present? %>
       <%# The core talent on its own, then the rest in a grid of matching heights. %>
@@ -333,6 +330,9 @@
           <h3 class="sheet-notes__title">Talent notes</h3>
           <%= simple_format(@character.talents) %>
         </div>
+      <% end %>
+      <% if editable %>
+        <p class="sheet-fold__actions"><%= link_to "Edit talents", new_character_talent_path(@character), class: "button button--small" %></p>
       <% end %>
     </details>
 
