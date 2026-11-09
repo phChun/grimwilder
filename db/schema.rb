@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_04_120100) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -221,15 +221,16 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_04_120100) do
     t.index ["email_address"], name: "index_interests_on_email_address", unique: true
   end
 
-  create_table "journal_entries", force: :cascade do |t|
+  create_table "journal_pages", force: :cascade do |t|
     t.integer "membership_id", null: false
-    t.integer "session_number", null: false
-    t.boolean "between", default: false, null: false
-    t.text "body", null: false
+    t.text "body", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["membership_id", "session_number", "between"], name: "index_journal_entries_on_page", unique: true
-    t.index ["membership_id"], name: "index_journal_entries_on_membership_id"
+    t.string "title"
+    t.boolean "by_gm", default: false, null: false
+    t.boolean "locked", default: false, null: false
+    t.boolean "favorite", default: false, null: false
+    t.index ["membership_id"], name: "index_journal_pages_on_membership_id"
   end
 
   create_table "magic_links", force: :cascade do |t|
@@ -501,7 +502,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_04_120100) do
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify
   add_foreign_key "feedbacks", "identities", on_delete: :cascade
   add_foreign_key "game_dates", "campaigns", on_delete: :cascade
-  add_foreign_key "journal_entries", "memberships", on_delete: :cascade
+  add_foreign_key "journal_pages", "memberships", on_delete: :cascade
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"
   add_foreign_key "messages", "campaigns", on_delete: :cascade

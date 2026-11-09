@@ -1,0 +1,5 @@
+<%# locals: (journal:, character: nil) %>
+<%# The New page button, in the journal_new frame: the form (pages/new) takes its place, and Cancel brings it back. %>
+<turbo-frame id="journal_new" class="journal-new">
+  <%= link_to "New page", new_campaign_journal_page_path(journal.campaign, journal.membership, character_id: character&.id), class: "button button--small journal-new__button" %>
+</turbo-frame>

@@ -2,54 +2,65 @@ require "test_helper"
 
 class JournalTest < ActiveSupport::TestCase
   setup do
-    @campaign = campaigns(:bramblewood)
     @pip = memberships(:pip_player)
+    @gm = memberships(:gwen_gm)
     @journal = @pip.journal
   end
 
-  test "before any session, the one page is the one before Session 1" do
-    assert_equal [ "before" ], @journal.pages.map(&:key)
-    assert @journal.current_page.current
+  test "pages are written when the player likes, starred first, then newest, with an optional title" do
+    @journal.write!(@pip, title: "  The bridge ", body: "  We crossed it.  ")
+    travel 1.minute
+    untitled = @journal.write!(@pip, title: " ", body: "Then the river.")
+
+    assert_equal [ "Then the river.", "We crossed it." ], @journal.pages_for(@pip).map(&:body)
+    assert_equal "The bridge", @pip.journal_pages.find_by(body: "We crossed it.").heading
+    assert_nil untitled.title
+    assert_equal untitled.created_at.strftime("%B %-d, %Y"), untitled.heading, "an untitled page goes by its day"
+    assert_raises(ActiveRecord::RecordInvalid) { @journal.write!(@pip, title: "", body: " ") }
+    assert @journal.write!(@pip, title: "Later", body: "").persisted?, "a title is enough"
+
+    @pip.journal_pages.find_by(body: "We crossed it.").update!(favorite: true)
+    assert_equal [ "We crossed it.", "", "Then the river." ], @journal.pages_for(@pip).map(&:body)
   end
 
-  test "a page per session, and between them only the ones written or happening now" do
-    first = PlaySession.start!(@campaign, characters: [], by: identities(:gwen))
-    @journal.write!(@journal.page("before"), "Packed my bags.")
-    assert_equal %w[ session-1 before ], @journal.pages.map(&:key)
-    assert_equal "session-1", @journal.current_page.key
+  test "every player starts with Character Secrets, starred, for the GM and the player both" do
+    player = campaigns(:bramblewood).memberships.create!(identity: identities(:stranger), role: :player)
+    secrets = player.journal_pages.sole
+    assert_equal [ "Character Secrets", "", true ], [ secrets.title, secrets.body, secrets.favorite ]
+    assert secrets.shared?
+    assert player.journal.editable_by?(secrets, player)
+    assert player.journal.editable_by?(secrets, @gm)
+    player.update!(journal_shared: false)
+    assert_equal [ secrets ], player.journal.pages_for(@gm).to_a
 
-    first.end!(by: identities(:gwen))
-    PlaySession.start!(@campaign, characters: [], by: identities(:gwen)).end!(by: identities(:gwen))
-    assert_equal %w[ after-2 session-2 session-1 before ], @journal.pages.map(&:key)
-    assert_equal [ "After Session 2", "after-2" ], [ @journal.current_page.title, @journal.current_page.key ]
-
-    @journal.write!(@journal.page("session-1"), "  The bridge.  ")
-    assert_equal [ "The bridge.", "Packed my bags." ], @journal.pages(written_only: true).map(&:body)
-    assert_not_includes @journal.pages.map(&:key), "after-1", "an empty stretch with nothing written isn't listed"
-    assert_equal "After Session 1", @journal.page("after-1").title, "but it can still be written"
-    assert_nil @journal.page("after-3")
-    assert_nil @journal.page("session-0")
-
-    @journal.write!(@journal.page("session-1"), " ")
-    assert_equal [ "Packed my bags." ], @journal.pages(written_only: true).map(&:body), "a blank page clears it"
+    assert_empty campaigns(:bramblewood).memberships.create!(identity: identities(:ada), role: :gm).journal_pages, "a GM keeps none"
   end
 
-  test "the GM reads it while it's shared; nobody else does, and only the player writes" do
-    gm = memberships(:gwen_gm)
-    assert @journal.readable_by?(@pip)
-    assert @journal.readable_by?(gm), "shared by default"
-    assert @journal.writable_by?(@pip)
-    assert_not @journal.writable_by?(gm)
+  test "the GM reads it while it's shared, and always reads the GM's own pages" do
+    mine = @journal.write!(@pip, title: nil, body: "Mine.")
+    theirs = @journal.write!(@gm, title: "Who you were", body: "A thief, once.", locked: true)
+    assert theirs.by_gm? && theirs.locked?
+    assert_not @journal.write!(@pip, title: nil, body: "Tried.", locked: true).locked?, "only the GM locks pages"
 
+    assert_includes @journal.pages_for(@gm), mine, "shared by default"
     @pip.update!(journal_shared: false)
-    assert_not @journal.readable_by?(gm)
-    assert_not gm.journal.writable_by?(gm), "the GM keeps no journal"
+    assert_equal [ theirs ], @journal.pages_for(@gm).to_a
+    assert_includes @journal.pages_for(@pip), theirs
+
+    other = @pip.campaign.memberships.create!(identity: identities(:stranger), role: :player)
+    assert_empty @journal.pages_for(other), "other players never read it"
+    assert_not @gm.journal.readable_by?(@gm), "the GM keeps no journal"
   end
 
-  test "a reset leaves the writing, by session number" do
-    PlaySession.start!(@campaign, characters: [], by: identities(:gwen))
-    @journal.write!(@journal.page("session-1"), "The bridge.")
-    @campaign.reset!(by: identities(:gwen))
-    assert_equal 1, @pip.journal_entries.count
+  test "the player changes their own pages and the GM's unlocked ones; the GM only the GM's" do
+    mine = @journal.write!(@pip, title: nil, body: "Mine.")
+    locked = @journal.write!(@gm, title: nil, body: "A secret.", locked: true)
+    open = @journal.write!(@gm, title: nil, body: "Fill this in.", locked: false)
+
+    assert @journal.editable_by?(mine, @pip)
+    assert_not @journal.editable_by?(locked, @pip)
+    assert @journal.editable_by?(open, @pip)
+    assert_not @journal.editable_by?(mine, @gm)
+    assert @journal.editable_by?(locked, @gm)
   end
 end
