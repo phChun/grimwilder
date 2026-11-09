@@ -4,7 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
-- **Pages use more of a wide screen**: the margins at the sides are half what they were, so the talent catalog, sheets and tables spread wider. ([#103](https://github.com/phChun/grimwilder/pull/103))
+- **Pages use more of a wide screen**: the margins at the sides are a quarter of what they were on a tablet or wider, so the talent catalog, sheets and tables spread wider. ([#103](https://github.com/phChun/grimwilder/pull/103))
 - **The table chat takes a third of the page** beside the character sheet, the GM table and the campaign page on a wide screen, instead of a narrow column. On a wide screen these pages fit the window: the header and footer stay put, the page scrolls on its own, and the chat fills the height with Send always in view. ([#103](https://github.com/phChun/grimwilder/pull/103))
 - **A roomier Taken list** when you choose talents: wider, with each talent's name, its summary and a Remove button in place of the ✕. ([#103](https://github.com/phChun/grimwilder/pull/103))
 - **The path picker fills more of the screen**, with less space around it. ([#103](https://github.com/phChun/grimwilder/pull/103))
