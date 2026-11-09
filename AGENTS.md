@@ -208,7 +208,7 @@ Data in `config/crucibles.yml` (97 crucibles, 152 tables), read by a plain `Cruc
 
 ## Talents
 
-- Catalog in `config/talents.yml` (`Talent`, `Talent::Group`, Data classes): 18 paths, background/heritage and legacy talents. Keys are slugged names unless the YAML sets `key:` (Hex keeps `pact`). `retired: true` talents stay on existing sheets but can't be picked. Prohibitions and "[X Only]" go through `Talent#prohibited_for?`, checked only for new picks.
+- Catalog in `config/talents.yml` (`Talent`, `Talent::Group`, Data classes): 18 paths, background/heritage and legacy talents. Keys are slugged names unless the YAML sets `key:` (none do now). `retired: true` talents stay on existing sheets but can't be picked. Prohibitions and "[X Only]" go through `Talent#prohibited_for?`, checked only for new picks.
 - `talent_keys` are capped by level (`talents_fit_level`, validated only when talents or level change, so old over-cap sheets still save). Eldritch talents (Pact) are a separate list. Optional rules: Level 0, stat progression, legacy cores.
 - Every talent has our own `summary:` (≤100 chars, not book text). Mechanics are declared in YAML and each has a test checking every entry: `uses:`, `rolls:` (`Talent::Roll`), `bonuses:` (`Talent::Bonus`; use `only:`, not `on:`, which YAML reads as `true`), `follow_ups:`, `choices:` (`Talent::Choice`, `Character::TalentChoices`; options must appear in the talent text), `arcana:`, `makes:`, `state:`.
 - Re-skins (`Character::TalentSkins`, `SkinnedTalent`) change name, summary and text only; mechanics stay.

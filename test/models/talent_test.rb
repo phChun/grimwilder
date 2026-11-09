@@ -8,16 +8,16 @@ class TalentTest < ActiveSupport::TestCase
       assert talents.first.core?, group.name if group.path?
       assert_equal rest.map { _1.name.downcase }.sort, rest.map { _1.name.downcase }, group.name
     end
-    assert_equal %w[ Hex Affliction Blood\ Rituals Knowing\ Gaze ], Talent.groups.find { _1.key == "warlock" }.talents.first(4).map(&:name)
+    assert_equal %w[ Pact Affliction Blood\ Rituals Knowing\ Gaze ], Talent.groups.find { _1.key == "warlock" }.talents.first(4).map(&:name)
   end
 
-  test "18 paths, each with a core talent and 7 path talents (the Adventurer has none, the Artificer 6), plus background talents" do
+  test "18 paths, each with a core talent and 7 path talents (the Adventurer has none), plus background talents" do
     paths = Talent.groups.select(&:path?)
     assert_equal Grimwild.paths.keys.sort, paths.map(&:name).sort
 
     paths.each do |group|
       assert_equal 1, group.talents.count(&:core?), "#{group.name} core"
-      assert_equal({ "Adventurer" => 0, "Artificer" => 6 }.fetch(group.name, 7), group.talents.reject(&:core?).size, "#{group.name} path talents")
+      assert_equal({ "Adventurer" => 0 }.fetch(group.name, 7), group.talents.reject(&:core?).size, "#{group.name} path talents")
       assert_equal Grimwild.core_talent(group.name), Talent.core_for(group.name).name
     end
 
@@ -169,7 +169,7 @@ class TalentChoiceTest < ActiveSupport::TestCase
     assert Talent.find("bailiwick").prohibited_for?("Rogue")
 
     pact = Talent.find("pact")
-    assert_equal "Hex", pact.name, "renamed in the book; the key stays"
+    assert_equal "Pact", pact.name
     assert_equal %w[ natures desires name trappings communication following ], pact.choices.map(&:key)
     assert_equal "Nature", pact.choice(:natures).table
     assert_not pact.choice(:following).open?

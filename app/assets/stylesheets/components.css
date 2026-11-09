@@ -1065,7 +1065,9 @@ form.button_to, .button_to { margin: 0; }
 .talent-picker__count { font-family: var(--font-dice); color: var(--text-soft); }
 .talent-picker__close, .talent-picker__fab { display: none; }
 .talent-picker__list { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
-.talent-picker__item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: var(--tap); padding: 0 var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.talent-picker__item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: var(--tap); padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.talent-picker__label { display: grid; gap: 2px; }
+.talent-picker__summary { color: var(--text-soft); font-size: 0.85rem; line-height: 1.35; }
 .talent-picker__remove { display: inline-grid; place-items: center; width: var(--tap); height: var(--tap); margin-right: calc(var(--space-2) * -1); border: 0; background: none; color: var(--text-soft); cursor: pointer; }
 .talent-picker__remove:hover { color: var(--text); }
 @media (max-width: 60rem) {

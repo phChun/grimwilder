@@ -203,7 +203,7 @@ class Pool < ApplicationRecord
     end
   end
 
-  # A talent pool that comes back at 0d (Talent::Use#refill): Hex's Patience
+  # A talent pool that comes back at 0d (Talent::Use#refill): Pact's Patience
   # every time (the patron visits), the Vassal once before it resets.
   def refills_left?
     (refills = talent_use&.refills) ? refills_used < refills : false

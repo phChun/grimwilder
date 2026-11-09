@@ -101,7 +101,7 @@ module Character::TalentUses
     pool_uses.select { per == :session || (per == :rest ? _1.per == "rest" : _1.per_scene?) || _1.per == "never" }.each do |use|
       size = use.pool_at(level).clamp(1, Pool::MAX_SIZE)
       pool = talent_pools.find_or_initialize_by(use_key: use.id)
-      # Kept until spent (Hex's Patience, Supplies): made once, then only
+      # Kept until spent (Pact's Patience, Supplies): made once, then only
       # renamed and grown, never refilled by a session. A per-rest pool (Vigor)
       # is made by a session but refilled only by a rest.
       next pool.update!(campaign: campaign, name: "#{name}: #{use.label}", starting_size: [ size, pool.size ].max) if pool.persisted? && (use.per == "never" || (use.per == "rest" && per != :rest))
