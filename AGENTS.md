@@ -226,7 +226,7 @@ Data in `config/crucibles.yml` (97 crucibles, 152 tables), read by a plain `Cruc
 - **Confirmations**: write `form: { data: { turbo_confirm: "…" } }`; `shared/_confirm` handles it.
 - **Modals**: link with `data: { turbo_frame: "modal" }` to a page wrapping its content in `turbo_frame_tag "modal"`; its forms target `_top`.
 - **Toasts**, no flash banners: `notice:` is a neutral toast; `alert:`, 422 re-renders and unrescued `RecordInvalid` are grim-red failure toasts (`ApplicationController#not_saved`).
-- Every popover and modal has a title and a ✕. Lists that grow end with a dashed "Create new …" card (`.add-card`), no + glyph.
+- Every popover and modal has a title and a ✕, except the header's tab menus (Tools, My characters), which close from their tab or a click outside. Lists that grow end with a dashed "Create new …" card (`.add-card`), no + glyph.
 - Text boxes with the book's words use `type_or_select` placeholders. Show list words with `title_case` (never Rails' `titleize`, which turns hyphens into spaces); stored values stay lowercase.
 - Accessibility: skip link, `:focus-visible` outlines, `aria-live` on changing results, `prefers-reduced-motion`.
 

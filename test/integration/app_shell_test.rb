@@ -40,6 +40,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select "nav.tabs details.tab-menu" do
       assert_select "summary.tabs__link", "Tools"
       assert_equal [ roll_path, crucibles_path, talents_path ], css_select(".tab-menu__menu a").map { _1["href"] }
+      assert_select ".popover__head", 0, "no title or close: the tab and a click outside close it"
     end
     assert_select ".tabs__divider", 0, "no campaign, no divider"
 

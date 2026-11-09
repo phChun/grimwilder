@@ -30,11 +30,10 @@
       <%= link_to name, sheet_path, class: "nav-menu__link nav-menu__link--sub", "aria-current": (open ? "page" : nil) %>
     <% end %>
   <% elsif path.is_a?(Array) %>
-    <%# A menu: the Tools, or a player's several sheets here. %>
+    <%# A menu: the Tools, or a player's several sheets here. No title or ✕: its tab is the title, and a click on it or anywhere outside (menu_controller.js) closes it. %>
     <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
       <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
       <ul class="tab-menu__menu" data-menu-target="panel">
-        <%= render "shared/popover_head", title: text, list: true %>
         <% path.each do |name, sheet_path, open| %>
           <li><%= link_to name, sheet_path, "aria-current": (open ? "page" : nil) %></li>
         <% end %>
