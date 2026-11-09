@@ -83,7 +83,7 @@ class PlaySession < ApplicationRecord
   end
 
   # Prepared scenes to start from, in the order the picker shows them: each
-  # scene collection's, then the individual ones (in no collection).
+  # scene collection's, then the unassigned ones.
   # [[collection or nil, scene plans]], leaving out any with none left to play.
   def scene_choices
     [ *campaign.scene_collections.ordered, nil ].map { |collection| [ collection, (collection ? collection.scenes_to_play : campaign.scene_plans.unplayed.loose.ordered).to_a ] }

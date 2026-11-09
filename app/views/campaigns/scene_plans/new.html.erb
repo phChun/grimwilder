@@ -1,10 +1,9 @@
 <% content_for :title, "New scene · #{Current.campaign.name}" %>
 
-<%# Takes an "Add a scene" button's place on the prep page (scene_plans/_add_button, by collection); on its own (or after a failed save), a page. The form targets _top; Cancel loads the button back. %>
-<% frame = "new_scene_plan_#{@plan.scene_collection_id || "loose"}" %>
-<turbo-frame id="<%= frame %>" class="scene-prep__add">
-  <section class="stack scene-prep__form" aria-labelledby="<%= frame %>_title">
-    <h3 id="<%= frame %>_title" class="scene-prep__form-title">New scene<%= " in #{@plan.scene_collection.title}" if @plan.scene_collection %></h3>
-    <%= render "campaigns/scene_plans/form", plan: @plan, collections: [], cancel_url: campaign_scene_plans_path(Current.campaign), frame: frame %>
+<%# Takes the Add a scene card's place on the prep page (its new_scene_plan frame), a collection picked if it came from one's Add a scene; on its own (or after a failed save), a page. The form targets _top; Cancel loads the card back. %>
+<turbo-frame id="new_scene_plan">
+  <section class="card stack add-card scene-prep__new" aria-labelledby="new_scene_plan_title">
+    <h3 id="new_scene_plan_title" class="card__title">New scene</h3>
+    <%= render "campaigns/scene_plans/form", plan: @plan, collections: Current.campaign.scene_collections.ordered, cancel_url: campaign_scene_plans_path(Current.campaign), frame: "new_scene_plan" %>
   </section>
 </turbo-frame>

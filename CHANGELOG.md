@@ -4,9 +4,9 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
-- **Scene collections**: scene blocks are now called scene collections. Add a scene, or a new collection, right where it goes on the prep page, which now spreads its collections across the screen. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Scene collections**: scene blocks are now called scene collections. The prep page shows each collection with its scenes across it and its buttons at the bottom, then Add a scene beside the unassigned scenes, then what's been played. Every card folds, with Expand all and Collapse all at the top. Scenes and collections are added right there, no side panel. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Move scenes from a menu**: each prepared scene has Edit, Move and Remove; Move lists the other collections. ([#107](https://github.com/phChun/grimwilder/pull/107))
-- **Starting a scene shows everything you've prepared**: each collection's scenes, then the individual ones, then a new scene. Sessions no longer ask where the players are headed. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Starting a scene shows everything you've prepared**: each collection's scenes, then the unassigned ones, then a new scene. Sessions no longer ask where the players are headed. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Scenes open with a story question**: give a scene a story roll question, and starting it opens the story roll with the question filled in, so you pick the odds and who rolls. Until it's rolled, the question waits on the table with Roll it. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Journals are pages you keep as you like**: New page opens a form right in the journal or on your sheet, with a title if you want one, whenever you want. Pages no longer belong to a session; the ones you'd written keep their session as their title. Tap a page's title to read it, change it or tear it out. ([#105](https://github.com/phChun/grimwilder/pull/105))
 - **Lists in the chat and journals**: start lines with `- ` for bullets or `1. ` for numbers. ([#105](https://github.com/phChun/grimwilder/pull/105))

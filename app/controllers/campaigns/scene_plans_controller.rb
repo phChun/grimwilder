@@ -1,8 +1,9 @@
 # Scene prep (ScenePlan): the GM writes scenes ahead of play, each a title,
 # notes and maybe a story roll question for when it opens, in a scene
 # collection (SceneCollection) or loose, and picks one when starting a scene.
-# New is the form that takes an "Add a scene" button's place on the prep page
-# (its frame, by collection). GM only.
+# New is the form that takes the Add a scene card's place on the prep page
+# (its new_scene_plan frame); collection= picks a collection to start on. GM
+# only.
 class Campaigns::ScenePlansController < ApplicationController
   include CampaignScoped
 

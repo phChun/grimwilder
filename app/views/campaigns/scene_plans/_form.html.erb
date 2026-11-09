@@ -1,11 +1,11 @@
 <%# locals: (plan:, collections:, framed: nil, cancel_url: nil, frame: nil) %>
-<%# A prepared scene: a title, notes for the GM, and maybe the question for a story roll as it opens: starting the scene opens the story roll with it, to pick the odds and who rolls. A new one belongs to the collection it was added in; an existing one can move with the select. framed: its own panel (the edit page). With cancel_url, Cancel sits beside the button and loads the frame back. %>
-<% id = "scene_plan_#{plan.id || "new_#{plan.scene_collection_id || "loose"}"}" %>
+<%# A prepared scene: a title, notes for the GM, and maybe the question for a story roll as it opens: starting the scene opens the story roll with it, to pick the odds and who rolls. Its collection is picked with the select (blank: unassigned). framed: its own panel (the edit page). With cancel_url, Cancel sits beside the button and loads the frame back. %>
+<% id = "scene_plan_#{plan.id || "new"}" %>
 <%= form_with model: [ Current.campaign, plan ], class: class_names("stack scene-plan-form", "panel": framed), data: { turbo_frame: "_top" } do |form| %>
   <% if plan.errors.any? %><p class="form-error"><%= plan.errors.full_messages.to_sentence %></p><% end %>
   <div class="field">
     <%= form.label :title, "Title", class: "field__label", for: "#{id}_title" %>
-    <%= form.text_field :title, id: "#{id}_title", required: true, maxlength: 120, autocomplete: "off", placeholder: "The bridge at Mirefall", class: "field__input" %>
+    <%= form.text_field :title, id: "#{id}_title", required: true, maxlength: 120, autocomplete: "off", autofocus: plan.new_record?, placeholder: "The bridge at Mirefall", class: "field__input" %>
   </div>
   <div class="field">
     <%= form.label :notes, "Notes", class: "field__label", for: "#{id}_notes" %>
@@ -16,12 +16,10 @@
     <%= form.text_field :story_question, id: "#{id}_story_question", maxlength: 200, autocomplete: "off", placeholder: "Are the guards awake?", class: "field__input", "aria-describedby": "#{id}_story_hint" %>
     <p id="<%= id %>_story_hint" class="field__hint">Starting the scene opens the story roll with this question, to pick the odds and who rolls.</p>
   </div>
-  <% if plan.new_record? %>
-    <%= form.hidden_field :scene_collection_id, id: "#{id}_collection" %>
-  <% elsif collections.any? %>
+  <% if collections.any? %>
     <div class="field">
       <%= form.label :scene_collection_id, "Scene collection", class: "field__label", for: "#{id}_collection" %>
-      <%= form.select :scene_collection_id, collections.map { [ _1.title, _1.id ] }, { include_blank: "No collection" }, id: "#{id}_collection", class: "field__input" %>
+      <%= form.select :scene_collection_id, collections.map { [ _1.title, _1.id ] }, { include_blank: "Unassigned" }, id: "#{id}_collection", class: "field__input" %>
     </div>
   <% end %>
   <div class="scene-plan-form__actions">

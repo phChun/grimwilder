@@ -164,14 +164,17 @@ class TablesTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get campaign_scene_plans_path(@campaign)
     assert_select ".fluid__rail", 0, "no side panel for new things"
-    assert_select "#scene_plans_loose turbo-frame#new_scene_plan_loose a[href=?]", new_campaign_scene_plan_path(@campaign), "Add a scene"
-    assert_select "turbo-frame#new_scene_collection a.add-card[href=?]", new_campaign_scene_collection_path(@campaign), /Create new scene collection/
+    assert_select ".scene-prep__tools button[data-action='details-memory#foldAll']", 2
+    assert_select ".scene-prep__row > turbo-frame#new_scene_plan + details#scene_plans_loose.sheet-fold[open] .sheet-fold__title", /Unassigned/
+    assert_select "turbo-frame#new_scene_plan a.add-card[href=?]", new_campaign_scene_plan_path(@campaign), /Add a scene/
+    assert_select ".scene-prep__collections > h2", "Scene collections"
+    assert_select ".scene-prep__collections turbo-frame#new_scene_collection a.add-card[href=?]", new_campaign_scene_collection_path(@campaign), /Create new scene collection/
 
     get new_campaign_scene_plan_path(@campaign)
-    assert_select "turbo-frame#new_scene_plan_loose form[action=?][data-turbo-frame=_top]", campaign_scene_plans_path(@campaign) do
+    assert_select "turbo-frame#new_scene_plan form[action=?][data-turbo-frame=_top]", campaign_scene_plans_path(@campaign) do
       assert_select "input[name='scene_plan[story_question]']"
       assert_select "input[name='scene_plan[opening_odds]']", 0
-      assert_select ".scene-plan-form__actions input[type=submit][value='Add scene'] + a.button--danger[href=?][data-turbo-frame=new_scene_plan_loose]", campaign_scene_plans_path(@campaign), text: "Cancel"
+      assert_select ".scene-plan-form__actions input[type=submit][value='Add scene'] + a.button--danger[href=?][data-turbo-frame=new_scene_plan]", campaign_scene_plans_path(@campaign), text: "Cancel"
     end
 
     post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", story_question: "Is the bridge guarded?" } }
@@ -179,7 +182,7 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_redirected_to campaign_scene_plans_path(@campaign, anchor: "scene_plan_#{plan.id}")
     post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: " " } }
     assert_response :unprocessable_entity
-    assert_select "turbo-frame#new_scene_plan_loose .form-error"
+    assert_select "turbo-frame#new_scene_plan .form-error"
 
     PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
     get new_campaign_scene_path(@campaign)
@@ -220,7 +223,7 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select ".scene-bar__question", 0, "rolled, so it's gone from the bar"
   end
 
-  test "the GM groups scenes in collections; starting a scene offers each collection, then the individual ones" do
+  test "the GM groups scenes in collections; starting a scene offers each collection, then the unassigned ones" do
     sign_in_as identities(:gwen)
     get new_campaign_scene_collection_path(@campaign)
     assert_select "turbo-frame#new_scene_collection form[action=?]", campaign_scene_collections_path(@campaign) do
@@ -231,12 +234,13 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_redirected_to campaign_scene_plans_path(@campaign, anchor: "scene_collection_#{castle.id}")
 
     get campaign_scene_plans_path(@campaign)
-    assert_select "#scene_collection_#{castle.id} turbo-frame#new_scene_plan_#{castle.id} a[href=?][aria-label=?]", new_campaign_scene_plan_path(@campaign, collection: castle.id), "Add a scene to The castle", "Add a scene"
-    get new_campaign_scene_plan_path(@campaign, collection: castle.id)
-    assert_select "turbo-frame#new_scene_plan_#{castle.id}" do
-      assert_select "h3", "New scene in The castle"
-      assert_select "input[type=hidden][name='scene_plan[scene_collection_id]'][value=?]", castle.id.to_s
+    assert_select "details#scene_collection_#{castle.id}.sheet-fold[open][data-section=?]", "scene-prep-#{castle.id}" do
+      assert_equal [ "Add a scene", "Edit", "Remove" ], css_select(".scene-collection__actions .button").map { _1.text.strip }
+      assert_select ".scene-collection__actions a[href=?][data-turbo-frame=new_scene_plan]", new_campaign_scene_plan_path(@campaign, collection: castle.id)
+      assert_select ".scene-collection__actions .button_to .button--danger", "Remove"
     end
+    get new_campaign_scene_plan_path(@campaign, collection: castle.id)
+    assert_select "turbo-frame#new_scene_plan select[name='scene_plan[scene_collection_id]'] option[selected][value=?]", castle.id.to_s, "The castle"
 
     post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The gatehouse", scene_collection_id: castle.id, story_question: "Are they expected?" } }
     post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "A storm rolls in" } }
@@ -246,11 +250,12 @@ class TablesTest < ActionDispatch::IntegrationTest
     get campaign_scene_plans_path(@campaign)
     assert_select "#scene_collection_#{castle.id} .scene-plans__title", "The gatehouse"
 
+    assert_equal %w[ Edit Move Remove ], css_select("##{dom_id(storm)} .scene-plans__actions > .button, ##{dom_id(storm)} .scene-plans__actions > .button_to .button, ##{dom_id(storm)} .scene-plans__actions summary").map { _1.text.strip }
     assert_select "##{dom_id(storm)} details.scene-plans__move" do
       assert_select "summary", "Move"
       assert_select "form[action=?] button", campaign_scene_plan_path(@campaign, storm), "The castle"
       assert_select "input[name='scene_plan[scene_collection_id]'][value=?]", castle.id.to_s
-      assert_select "button", { text: "Individual scenes", count: 0 }, "not where it already is"
+      assert_select "button", { text: "Unassigned", count: 0 }, "not where it already is"
     end
 
     # Moving a scene sends only its collection.
@@ -267,7 +272,7 @@ class TablesTest < ActionDispatch::IntegrationTest
 
     get new_campaign_scene_path(@campaign)
     assert_select "select[name='play_session[scene_collection_id]']", 0
-    assert_equal [ "The castle", "Individual scenes", "A new scene" ], css_select(".fold__title").map { _1.text.strip }
+    assert_equal [ "The castle", "Unassigned", "A new scene" ], css_select(".fold__title").map { _1.text.strip }
     assert_select ".scene-picker__group[open]", 2
 
     # Started as written: its title, notes and story question, which opens the story roll.

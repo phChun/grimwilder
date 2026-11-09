@@ -34,7 +34,7 @@ class Campaigns::SceneCollectionsController < ApplicationController
 
   def destroy
     @collection.destroy
-    redirect_to campaign_scene_plans_path(Current.campaign), notice: "#{@collection.title} removed. Its scenes are still in your prep, as individual scenes."
+    redirect_to campaign_scene_plans_path(Current.campaign), notice: "#{@collection.title} removed. Its scenes are still in your prep, unassigned."
   end
 
   private

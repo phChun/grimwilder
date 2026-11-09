@@ -1,5 +1,0 @@
-<%# locals: (scene_collection:) %>
-<%# "Add a scene" for a collection (or an individual one), in its own frame: the form (scene_plans/new) takes its place, and Cancel brings it back. %>
-<turbo-frame id="new_scene_plan_<%= scene_collection&.id || "loose" %>" class="scene-prep__add">
-  <a href="<%= new_campaign_scene_plan_path(Current.campaign, collection: scene_collection&.id) %>" class="button button--small button--ghost" aria-label="<%= scene_collection ? "Add a scene to #{scene_collection.title}" : "Add an individual scene" %>">Add a scene</a>
-</turbo-frame>
