@@ -3076,10 +3076,14 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-plans__notes { margin: var(--space-1) 0 0; color: var(--text-soft); white-space: pre-line; }
 .scene-plans__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__actions .button_to { margin: 0; }
-/* Scene collections on the prep page, one column; Add a scene and Create new scene collection open their forms in place; moving a scene between collections. */
-.scene-prep { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr)); gap: var(--space-4); align-items: start; }
+/* Scene collections on the prep page, stacked; Add a scene and Create new scene collection open their forms in place; moving a scene between collections. */
+.scene-prep { display: grid; gap: var(--space-4); }
 .scene-prep > * { margin: 0; }
-.scene-prep__played { grid-column: 1 / -1; }
+/* Each collection full width, its scenes as cards across it, like the talent catalog's. */
+.scene-prep .scene-plans:not(.scene-plans--played) { grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--space-3); }
+.scene-prep .scene-plans:not(.scene-plans--played) > .scene-plans__item { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+.scene-prep .scene-plans__item > .scene-plans__main { flex: 1 0 auto; }
+.scene-prep .scene-plans__item > .scene-plans__actions { margin-top: var(--space-2); }
 .scene-prep__add { display: block; }
 .scene-prep__form { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
 .scene-prep__form-title { margin: 0; font-size: 1.05rem; }
