@@ -2127,17 +2127,17 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   overflow: hidden;
 }
 
-/* Wide screens: the rail sticks beside the page at the viewport's height, and
-   the feed takes what's left, so the composer is always in view. */
+/* The chat always fits on screen: the feed takes what the head and composer leave, so the composer
+   stays in view. --rail-room is the header and the page's top padding above it, plus a gap below. */
+.table-rail { --rail-room: 7rem; max-height: calc(100dvh - 2 * var(--space-4)); }
+body:has(.live-banner) .table-rail { --rail-room: 11rem; }
+.table-rail .feed { flex: 1 1 auto; min-height: 0; }
+.table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
+/* Wide screens: beside the page it sticks, a screen tall less the room above it, so it fits at the top of the page too. */
 @media (min-width: 60rem) {
-  .fluid__rail.table-rail { position: sticky; top: var(--space-4); height: calc(100vh - 2 * var(--space-4)); }
-  .fluid__rail.table-rail .feed,
-  .gm-view__side .table-rail .feed { flex: 1 1 auto; min-height: 0; }
-  .fluid__rail.table-rail .feed__scroller,
-  .gm-view__side .table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
-  /* The GM table: the chat at a set height (85vh, never under 38rem), and Kept crucibles under
-     it at its full length; the page scrolls to reach it, so this column doesn't stick. */
-  .gm-view__side > .table-rail { height: max(38rem, 85vh); }
+  .fluid__rail.table-rail,
+  .gm-view__side > .table-rail { height: calc(100dvh - var(--rail-room)); min-height: 24rem; max-height: none; }
+  .fluid__rail.table-rail { position: sticky; top: var(--space-4); }
 }
 .gm-view__side { display: flex; flex-direction: column; gap: var(--space-3); }
 
