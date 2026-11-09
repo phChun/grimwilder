@@ -632,6 +632,21 @@ turbo-cable-stream-source { display: none; }
   .fluid__rail { max-width: none; }
 }
 
+/* The table shell: on a wide screen, a page with the table chat beside it fits the window. The
+   header and footer stay put, the page scrolls on its own, and the chat fills the height with its
+   messages scrolling inside it (on the GM table, the column scrolls to Kept crucibles under it). */
+@media (min-width: 64rem) {
+  body:has(.fluid > .table-rail, .fluid > .gm-view__side) { height: 100dvh; min-height: 0; overflow: hidden; }
+  .site-main:has(> .fluid > .table-rail, > .fluid > .gm-view__side) { display: flex; flex-direction: column; min-height: 0; padding-block: var(--space-4); }
+  .site-main > .fluid:has(> .table-rail, > .gm-view__side) { flex: 1; min-height: 0; flex-wrap: nowrap; align-items: stretch; }
+  /* The padding keeps focus rings inside the scroll box; the margin takes it back out. */
+  .site-main > .fluid:has(> .table-rail, > .gm-view__side) > .fluid__main { overflow-y: auto; margin: -4px; padding: 4px; }
+  .fluid > .gm-view__side { overflow-y: auto; }
+  .fluid > .gm-view__side > .table-rail { flex: 0 0 100%; }
+  .fluid > .table-rail,
+  .fluid > .gm-view__side > .table-rail { max-height: none; }
+}
+
 /* Full width, like the header: the toolkit's links on the left, the legal notice on the right. */
 .site-footer {
   display: flex;
