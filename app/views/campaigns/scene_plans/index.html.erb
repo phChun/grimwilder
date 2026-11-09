@@ -1,6 +1,6 @@
 <% content_for :title, "Scene prep · #{Current.campaign.name}" %>
 
-<%# The GM's prep, every card a fold (remembered per campaign by details-memory, with Expand all / Collapse all): the scene collections for where the players might go (SceneCollection), two across when there's room, each with its scenes still to play and its buttons at the bottom, then Create new scene collection; then the standalone scenes (in no collection); then a few that have been played. Each card's Add a scene opens its form in that card (scene_plans/_add). Starting a scene offers them all. %>
+<%# The GM's prep, every card a fold (remembered per campaign by details-memory, with Expand all / Collapse all): the scene collections for where the players might go (SceneCollection), two across when there's room, each with its scenes still to play and its buttons at the bottom, then, on one row, Create new scene collection and the standalone scenes (in no collection); then a few that have been played. Each card's Add a scene opens its form in that card (scene_plans/_add). Starting a scene offers them all. %>
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_table_path(Current.campaign) %></p>
   <h1>Scene prep</h1>
@@ -15,52 +15,57 @@
 
   <section aria-labelledby="scene_collections_title">
     <h2 id="scene_collections_title" class="section-title">Scene collections</h2>
-    <div class="scene-prep__collections">
-    <% @collections.each do |collection| %>
-      <% plans = collection.scene_plans.select { _1.scene_id.nil? }.sort_by { [ _1.position, _1.created_at ] } %>
-      <details id="<%= dom_id(collection) %>" class="card sheet-fold scene-collection" open data-details-memory-target="section" data-section="scene-prep-<%= collection.id %>">
-        <summary class="gm-fold__summary"><h3 class="card__title sheet-fold__title"><%= collection.title %> <small class="field__hint"><%= pluralize(plans.size, "scene") %> to play</small></h3><%= icon(:chevron, size: 18) %></summary>
-        <div class="stack">
-          <% if collection.notes %><p class="scene-plans__notes"><%= collection.notes %></p><% end %>
-          <% if plans.any? %>
-            <ol class="scene-plans">
-              <%= render partial: "campaigns/scene_plans/plan", collection: plans, as: :plan, locals: { collections: @collections } %>
-            </ol>
-          <% else %>
-            <p class="field__hint">No scenes left to play here.</p>
-          <% end %>
-          <div class="scene-plans__actions scene-collection__actions">
-            <%= render "campaigns/scene_plans/add", scene_collection: collection %>
-            <a href="<%= edit_campaign_scene_collection_path(Current.campaign, collection) %>" class="button button--small" aria-label="Edit <%= collection.title %>">Edit</a>
-            <%= button_to "Remove", campaign_scene_collection_path(Current.campaign, collection), method: :delete, class: "button button--small button--danger", "aria-label": "Remove #{collection.title}", form: { data: { turbo_confirm: "Remove #{collection.title}? Its scenes stay in your prep, as standalone scenes." } } %>
-          </div>
-        </div>
-      </details>
+    <% if @collections.any? %>
+      <div class="scene-prep__grid">
+        <% @collections.each do |collection| %>
+          <% plans = collection.scene_plans.select { _1.scene_id.nil? }.sort_by { [ _1.position, _1.created_at ] } %>
+          <details id="<%= dom_id(collection) %>" class="card sheet-fold scene-collection" open data-details-memory-target="section" data-section="scene-prep-<%= collection.id %>">
+            <summary class="gm-fold__summary"><h3 class="card__title sheet-fold__title"><%= collection.title %> <small class="field__hint"><%= pluralize(plans.size, "scene") %> to play</small></h3><%= icon(:chevron, size: 18) %></summary>
+            <div class="stack">
+              <% if collection.notes %><p class="scene-plans__notes"><%= collection.notes %></p><% end %>
+              <% if plans.any? %>
+                <ol class="scene-plans">
+                  <%= render partial: "campaigns/scene_plans/plan", collection: plans, as: :plan, locals: { collections: @collections } %>
+                </ol>
+              <% else %>
+                <p class="field__hint">No scenes left to play here.</p>
+              <% end %>
+              <div class="scene-plans__actions scene-collection__actions">
+                <%= render "campaigns/scene_plans/add", scene_collection: collection %>
+                <a href="<%= edit_campaign_scene_collection_path(Current.campaign, collection) %>" class="button button--small" aria-label="Edit <%= collection.title %>">Edit</a>
+                <%= button_to "Remove", campaign_scene_collection_path(Current.campaign, collection), method: :delete, class: "button button--small button--danger", "aria-label": "Remove #{collection.title}", form: { data: { turbo_confirm: "Remove #{collection.title}? Its scenes stay in your prep, as standalone scenes." } } %>
+              </div>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="field__hint">No scene collections yet.</p>
     <% end %>
+  </section>
 
+  <div class="scene-prep__grid scene-prep__more">
     <turbo-frame id="new_scene_collection">
       <%= link_to new_campaign_scene_collection_path(Current.campaign), class: "card add-card add-card--link scene-prep__new" do %>
-        <h3 class="card__title">Create new scene collection</h3>
+        <h2 class="card__title">Create new scene collection</h2>
         <p class="field__hint">A place or thread the players might follow, to gather its scenes under.</p>
       <% end %>
     </turbo-frame>
-    </div>
-  </section>
-
-  <details id="scene_plans_loose" class="card sheet-fold" open data-details-memory-target="section" data-section="scene-prep-standalone">
-    <summary class="gm-fold__summary"><h2 class="card__title sheet-fold__title">Standalone scenes <small class="field__hint"><%= pluralize(@loose.size, "scene") %> to play</small></h2><%= icon(:chevron, size: 18) %></summary>
-    <div class="stack">
-      <p class="field__hint">Scenes in no collection, for anywhere the story goes.</p>
-      <% if @loose.any? %>
-        <ol class="scene-plans">
-          <%= render partial: "campaigns/scene_plans/plan", collection: @loose, as: :plan, locals: { collections: @collections } %>
-        </ol>
-      <% end %>
-      <div class="scene-plans__actions scene-collection__actions">
-        <%= render "campaigns/scene_plans/add", scene_collection: nil %>
+    <details id="scene_plans_loose" class="card sheet-fold" open data-details-memory-target="section" data-section="scene-prep-standalone">
+      <summary class="gm-fold__summary"><h2 class="card__title sheet-fold__title">Standalone scenes <small class="field__hint"><%= pluralize(@loose.size, "scene") %> to play</small></h2><%= icon(:chevron, size: 18) %></summary>
+      <div class="stack">
+        <p class="field__hint">Scenes in no collection, for anywhere the story goes.</p>
+        <% if @loose.any? %>
+          <ol class="scene-plans">
+            <%= render partial: "campaigns/scene_plans/plan", collection: @loose, as: :plan, locals: { collections: @collections } %>
+          </ol>
+        <% end %>
+        <div class="scene-plans__actions scene-collection__actions">
+          <%= render "campaigns/scene_plans/add", scene_collection: nil %>
+        </div>
       </div>
-    </div>
-  </details>
+    </details>
+  </div>
 
   <% if @played.any? %>
     <details id="scene_plans_played" class="card sheet-fold" data-details-memory-target="section" data-section="scene-prep-played">

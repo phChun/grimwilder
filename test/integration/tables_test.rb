@@ -168,7 +168,8 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_select "details#scene_plans_loose.sheet-fold[open] .sheet-fold__title", /Standalone scenes/
     assert_select "details#scene_plans_loose .scene-collection__actions turbo-frame#new_scene_plan_standalone a[href=?]", new_campaign_scene_plan_path(@campaign), "Add a scene"
     assert_select "#scene_collections_title", "Scene collections"
-    assert_select ".scene-prep__collections turbo-frame#new_scene_collection a.add-card[href=?]", new_campaign_scene_collection_path(@campaign), /Create new scene collection/
+    assert_select ".scene-prep__more > turbo-frame#new_scene_collection:first-child a.add-card[href=?]", new_campaign_scene_collection_path(@campaign), /Create new scene collection/
+    assert_select ".scene-prep__more > turbo-frame#new_scene_collection + details#scene_plans_loose"
 
     get new_campaign_scene_plan_path(@campaign)
     assert_select "turbo-frame#new_scene_plan_standalone form[action=?][data-turbo-frame=_top]", campaign_scene_plans_path(@campaign) do
