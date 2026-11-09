@@ -38,7 +38,7 @@
         <span class="field__hint">Not available to a <%= character.path %>.</span>
       <% else %>
         <label class="talent-toggle">
-          <%= check_box_tag "talents[]", talent.key, chosen, id: "pick-#{talent.key}", form: "talent-list", class: "talent-toggle__box", data: { talent_picker_target: "box", action: "talent-picker#update", name: talent.name } %>
+          <%= check_box_tag "talents[]", talent.key, chosen, id: "pick-#{talent.key}", form: "talent-list", class: "talent-toggle__box", data: { talent_picker_target: "box", action: "talent-picker#update", name: talent.name, summary: talent.summary } %>
           <span class="button button--small talent-toggle__add">Add<span class="visually-hidden"> <%= talent.name %></span></span>
           <span class="button button--small button--primary talent-toggle__added"><%= icon(:check, size: 16) %> Added<span class="visually-hidden"> <%= talent.name %></span></span>
         </label>

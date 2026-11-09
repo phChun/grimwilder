@@ -47,7 +47,8 @@ class TalentsTest < ActionDispatch::IntegrationTest
     assert_select "#talent-mastermind input[type=checkbox][name='talents[]'][form=talent-list][checked]"
     assert_select "#talent-lucky input[type=checkbox][name='talents[]']:not([checked])"
     assert_select "#talent-picker-panel .talent-picker__count", "1 of 1"
-    assert_select "#talent-picker-panel .talent-picker__item", "Mastermind"
+    assert_select "#talent-picker-panel .talent-picker__item .talent-picker__name", "Mastermind"
+    assert_select "#talent-picker-panel .talent-picker__item .talent-picker__summary", Talent.find("mastermind").summary
 
     patch character_talent_list_path(tibbs), params: { talents: [ "", "mastermind", "lucky" ] }
     assert_redirected_to new_character_talent_path(tibbs)

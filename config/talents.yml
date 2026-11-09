@@ -7,8 +7,8 @@
 # "summary" is our own one-line gist (not book text), shown on the catalog, the
 # picker and the sheet. Write it for a player choosing a talent: what it lets
 # you do, how often, and any catch, in plain words. Keep it to 100 characters.
-# "key" (optional) fixes a talent's key when the book renames it (Pact is now
-# Hex), so saved characters keep it; otherwise the key comes from the name.
+# "key" (optional) fixes a talent's key if the book renames it, so saved
+# characters keep it; otherwise the key comes from the name.
 # "choices" are picks a talent asks for (Talent::Choice): `pick` at level 1
 # plus `growth` by level, from `from` (or named `groups`, with `min_each`),
 # `open: true` when the book's list is only suggestions, `same_as` to reuse
@@ -125,9 +125,8 @@
     - { tier: mythic, count: 1, opus: true }
   - name: Trap Making
     summary: "Set potent traps (blades, fire, poison, alarms) given time, or on the spot if you push yourself."
-    text: 'Given time, you can set potent traps, with an effect based on the style: blade—collapse—entangle—fire—poison—alarm. Push yourself to deploy a trap on the spot. On a perfect when triggered, take spark.'
+    text: 'Given time, you can set potent traps, with an effect based on the style: blade—collapse—entangle—fire—poison—alarm. Push yourself to deploy a trap on the spot.'
     page: 56
-    retired: true
   - name: Wandslinger
     summary: "A wand of elemental bolts, from acid to stun, fired with Wits; once a session, a secondary effect."
     text: 'You have a specialized wand and can use it to fire the following bolts of magic using Wits: acid burst—force blast—ice shard—inferno bolt—static charge—stun beam. Once per session, you can cause a secondary effect (as a critical) related to the type.'
@@ -1126,10 +1125,9 @@
   kind: path
   page: 83
   aka: magus, occultist, pactmaker
-  tagline: You have made a pact with a greater being—power in exchange for service, a pact that may prove to be a double-edged sword.
+  tagline: You have made a pact—power in exchange for service, a pact that may prove to be a double-edged sword.
   core:
-    name: Hex
-    key: pact # the book renamed Pact to Hex; the key stays so saved characters keep it
+    name: Pact
     summary: "Wield your patron's magic with 3d story rolls and a changeable Eldritch Talent; mind their patience."
     text: 'You have magic bestowed by a patron, allowing you to make a story roll (usually 3d) to wield their magic as a weapon, or ask to channel a potent magical effect using their nature as the touchstone. They gift you an Eldritch Talent—a changeable path talent manifesting with your patron’s trappings. Given time to commune, you can change an Eldritch Talent.
 

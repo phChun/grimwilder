@@ -2,6 +2,12 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-09
+
+- **The Warlock's core talent is Pact again**, as the Community Edition's book calls it. Saved characters keep it. ([#98](https://github.com/phChun/grimwilder/pull/98))
+- **Trap Making is back among the Artificer's talents**, with the book's text (no spark when a trap goes off). ([#98](https://github.com/phChun/grimwilder/pull/98))
+- **The Taken list shows each talent's summary** under its name when you choose talents, so you can compare your picks without scrolling back to their cards. ([#98](https://github.com/phChun/grimwilder/pull/98))
+
 ## 2026-11-05
 
 - **Admins can remove an account** from Admin › Accounts. Its characters go, and so does any campaign it was alone in; its rolls and chat stay in the log as a removed account's. It can't be your own account, or the only GM of a campaign others are in. ([#96](https://github.com/phChun/grimwilder/pull/96))

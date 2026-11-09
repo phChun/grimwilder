@@ -1,4 +1,4 @@
-# A warlock's Eldritch Talents (Hex, pg. 83): path talents gifted by the
+# A warlock's Eldritch Talents (Pact, pg. 83): path talents gifted by the
 # patron, 1 at the start and +1 at levels 3 and 6, changeable given time to
 # commune. They're extra: they don't count against the one chosen talent per
 # level (Character::Talents), so they live in their own list with their own
