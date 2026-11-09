@@ -1,6 +1,6 @@
 <% content_for :title, "Scene prep · #{Current.campaign.name}" %>
 
-<%# The GM's prep, every card a fold (remembered per campaign by details-memory, with Expand all / Collapse all): the scene collections for where the players might go (SceneCollection), two across when there's room, each with its scenes still to play and its buttons at the bottom, then, on one row, Create new scene collection and the standalone scenes (in no collection); then a few that have been played. Each card's Add a scene opens its form in that card (scene_plans/_add). Starting a scene offers them all. %>
+<%# The GM's prep, every card a fold (Expand all / Collapse all; the standalone and played ones remembered per campaign by details-memory): the scene collections for where the players might go (SceneCollection), two across when there's room, closed but for the one the last scene came from, which comes first, marked In progress, each with its scenes still to play and its buttons at the bottom, then, on one row, Create new scene collection and the standalone scenes (in no collection); then a few that have been played. Each card's Add a scene opens its form in that card (scene_plans/_add). Starting a scene offers them all. %>
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_table_path(Current.campaign) %></p>
   <h1>Scene prep</h1>
@@ -19,8 +19,9 @@
       <div class="scene-prep__grid">
         <% @collections.each do |collection| %>
           <% plans = collection.scene_plans.select { _1.scene_id.nil? }.sort_by { [ _1.position, _1.created_at ] } %>
-          <details id="<%= dom_id(collection) %>" class="card sheet-fold scene-collection" open data-details-memory-target="section" data-section="scene-prep-<%= collection.id %>">
-            <summary class="gm-fold__summary"><h3 class="card__title sheet-fold__title"><%= collection.title %> <small class="field__hint"><%= pluralize(plans.size, "scene") %> to play</small></h3><%= icon(:chevron, size: 18) %></summary>
+          <% current = collection == @last_collection %>
+          <%= tag.details id: dom_id(collection), class: class_names("card sheet-fold scene-collection", "scene-collection--current": current), open: current do %>
+            <summary class="gm-fold__summary"><h3 class="card__title sheet-fold__title"><%= collection.title %><% if current %> <span class="scene-collection__tag">In progress</span><% end %> <small class="field__hint"><%= pluralize(plans.size, "scene") %> to play</small></h3><%= icon(:chevron, size: 18) %></summary>
             <div class="stack">
               <% if collection.notes %><p class="scene-plans__notes"><%= collection.notes %></p><% end %>
               <% if plans.any? %>
@@ -36,7 +37,7 @@
                 <%= button_to "Remove", campaign_scene_collection_path(Current.campaign, collection), method: :delete, class: "button button--small button--danger", "aria-label": "Remove #{collection.title}", form: { data: { turbo_confirm: "Remove #{collection.title}? Its scenes stay in your prep, as standalone scenes." } } %>
               </div>
             </div>
-          </details>
+          <% end %>
         <% end %>
       </div>
     <% else %>

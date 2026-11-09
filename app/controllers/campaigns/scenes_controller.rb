@@ -46,5 +46,6 @@ class Campaigns::ScenesController < ApplicationController
     def set_session
       @session = Current.campaign.current_session
       @choices = @session&.scene_choices || []
+      @last_collection = Current.campaign.last_scene_collection
     end
 end

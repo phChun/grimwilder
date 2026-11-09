@@ -72,6 +72,18 @@ class Campaign < ApplicationRecord
     scenes.open.first
   end
 
+  # The scene collection the latest scene was prepared in, if it was: scene
+  # prep and the scene picker put it first, open.
+  def last_scene_collection
+    scenes.order(started_at: :desc, id: :desc).first&.scene_plan&.scene_collection
+  end
+
+  # The scene collections, the last scene's first.
+  def scene_collections_last_played_first
+    last = last_scene_collection
+    scene_collections.ordered.to_a.partition { _1 == last }.flatten
+  end
+
   # A boundary in the log ("Session 4 begins", "Rest"), which also refreshes everyone's table.
   def post_marker!(name, by:, text: nil, play_session: nil, scene: nil, level_ups: [])
     rolls.create!(kind: "marker", identity: by, name: name, play_session: play_session, scene: scene, question: text.to_s.strip.presence,

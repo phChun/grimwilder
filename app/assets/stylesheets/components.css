@@ -3088,6 +3088,9 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-prep__add:has(form) { order: 1; flex-basis: 100%; }
 .scene-prep__form { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
 .scene-prep__form-title { margin: 0; font-size: 1.05rem; }
+/* The collection the last scene came from: first, open, ember-edged and tagged In progress. */
+.scene-collection--current { border-color: var(--ember); }
+.scene-collection__tag { display: inline-block; margin-left: var(--space-1); padding: 1px 8px; border: 1px solid var(--ember); border-radius: 999px; color: var(--ember); font: 600 11px/1.5 var(--font-ui); letter-spacing: 0.08em; text-transform: uppercase; vertical-align: middle; }
 .scene-collection__actions { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
 .scene-plan-form__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__move { position: relative; }

@@ -1,12 +1,15 @@
 <% content_for :title, "Montage · #{Current.campaign.name}" %>
 
-<header class="page-header">
-  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
-  <h1>Montage</h1>
-  <p class="page-header__lede">
-    Zoom out over a stretch of the story. Everyone taking part makes a 2d action roll, and the highest result is
-    the outcome for the whole scene. Then zoom back in on any unlikely or interesting results.
-  </p>
-</header>
+<%# Its own page, and from ending a scene (then=end_scene) a modal (shared/_frame_modal), whose form stays in it and goes back to ending the scene. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+    <h1>Montage</h1>
+    <p class="page-header__lede">
+      Zoom out over a stretch of the story. Everyone taking part makes a 2d action roll, and the highest result is
+      the outcome for the whole scene. Then zoom back in on any unlikely or interesting results.
+    </p>
+  </header>
 
-<%= render "campaigns/montages/form", characters: @characters, classes: "panel" %>
+  <%= render "campaigns/montages/form", characters: @characters, classes: "panel" %>
+<% end %>

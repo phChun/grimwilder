@@ -1,5 +1,6 @@
 # Montages: the GM calls one and picks the seated characters taking part,
-# then each player rolls their own (RollCall).
+# then each player rolls their own (RollCall). Called while ending a scene
+# (then=end_scene, in its modal), it goes back to ending the scene.
 class Campaigns::MontagesController < ApplicationController
   include CampaignScoped
   before_action :refuse_when_on_hold
@@ -13,7 +14,7 @@ class Campaigns::MontagesController < ApplicationController
   def create
     RollCall.montage!(campaign: Current.campaign, by: Current.identity, scene: params[:scene], characters: participants)
     if params[:then] == "end_scene" && (scene = Current.campaign.current_scene)
-      redirect_to new_campaign_scene_ending_path(Current.campaign, scene)
+      redirect_to new_campaign_scene_ending_path(Current.campaign, scene, then: ("new_scene" if params[:cut].present?))
     else
       back_to_table(anchor: "rolls")
     end

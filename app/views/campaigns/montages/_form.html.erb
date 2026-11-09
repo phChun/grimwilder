@@ -1,6 +1,9 @@
 <%# locals: (characters:, classes: nil) %>
-<%= form_with url: campaign_montages_path(Current.campaign), class: class_names("stack quarrel-form", classes) do %>
-  <% if params[:then] == "end_scene" %><input type="hidden" name="then" value="end_scene"><% end %>
+<%# Called while ending a scene (then=end_scene), it stays in the modal (data-modal-stay) and goes back to ending it; cut= carries on to the next scene after. %>
+<% ending = params[:then] == "end_scene" %>
+<%= form_with url: campaign_montages_path(Current.campaign), class: class_names("stack quarrel-form", classes), data: (ending ? { modal_stay: true } : { turbo_frame: "_top" }) do %>
+  <% if ending %><input type="hidden" name="then" value="end_scene"><% end %>
+  <% if ending && params[:cut].present? %><input type="hidden" name="cut" value="1"><% end %>
   <div class="field">
     <label class="field__label" for="montage_scene">The scene</label>
     <input type="text" id="montage_scene" name="scene" value="<%= params[:scene] %>" maxlength="200" autocomplete="off" placeholder="The six-hour climb to the sanctum" class="field__input">

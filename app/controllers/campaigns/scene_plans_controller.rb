@@ -11,7 +11,9 @@ class Campaigns::ScenePlansController < ApplicationController
   before_action :set_plan, only: %i[ edit update destroy ]
 
   def index
-    @collections = Current.campaign.scene_collections.ordered.includes(:scene_plans)
+    @collections = Current.campaign.scene_collections_last_played_first
+    ActiveRecord::Associations::Preloader.new(records: @collections, associations: :scene_plans).call
+    @last_collection = Current.campaign.last_scene_collection
     @loose = Current.campaign.scene_plans.unplayed.loose.ordered
     @played = Current.campaign.scene_plans.played.includes(scene: :play_session).order(updated_at: :desc).limit(10)
   end

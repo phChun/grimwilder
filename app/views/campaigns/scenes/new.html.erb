@@ -1,6 +1,6 @@
 <% content_for :title, "Start a scene · #{Current.campaign.name}" %>
 
-<%# Its own page, and from the GM table's "Start scene" a modal (shared/_frame_modal). The prepared scenes come first: each scene collection's, then the standalone ones; each starts as written, or fills in the form below to adjust first (plan=). Then a new scene. Starting forms target _top, so the table refreshes. %>
+<%# Its own page, and from the GM table's "Start scene" a modal (shared/_frame_modal). The prepared scenes come first: each scene collection's, closed but for the one the last scene came from (first), then the standalone ones, open; each starts as written, or fills in the form below to adjust first (plan=). Then a new scene. Starting forms target _top, so the table refreshes. %>
 <%= turbo_frame_tag "modal" do %>
   <header class="page-header">
     <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
@@ -12,9 +12,9 @@
     <% if @choices.any? %>
       <div class="scene-picker">
         <% @choices.each do |collection, plans| %>
-          <%= tag.details class: "fold scene-picker__group", open: @plan.nil? || plans.include?(@plan) do %>
+          <%= tag.details class: "fold scene-picker__group", open: (@plan ? plans.include?(@plan) : (collection.nil? || collection == @last_collection)) do %>
             <summary class="fold__summary">
-              <span class="fold__title"><%= collection ? collection.title : "Standalone scenes" %></span>
+              <span class="fold__title"><%= collection ? collection.title : "Standalone scenes" %><% if collection && collection == @last_collection %> <span class="scene-collection__tag">In progress</span><% end %></span>
               <span class="fold__meta"><%= pluralize(plans.size, "scene") %></span>
             </summary>
             <% if collection&.notes %><p class="scene-plans__notes"><%= collection.notes %></p><% end %>

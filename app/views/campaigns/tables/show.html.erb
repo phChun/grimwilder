@@ -58,7 +58,7 @@
         <div class="scene-bar__actions">
           <%= render "campaigns/tables/suspense_panel", campaign: campaign %>
           <% if scene %>
-            <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost" %>
+            <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost", data: { turbo_frame: "modal" } %>
           <% elsif @session %>
             <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--ghost", data: { turbo_frame: "modal" } %>
           <% end %>
