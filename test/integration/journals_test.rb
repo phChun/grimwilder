@@ -18,6 +18,14 @@ class JournalsTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#journal_new .journal-form__actions input[type=submit][value=?] + a.button--danger[href=?]", "Add page", campaign_journal_path(@campaign, @pip), text: "Cancel"
 
     assert_select "turbo-frame#journal_new input[type=checkbox][name='journal_page[favorite]']:not([checked])"
+    assert_select "turbo-frame#journal_new textarea[aria-describedby=?]", "journal_page_new_format"
+    assert_select "turbo-frame#journal_new .format-help button.format-help__toggle[aria-describedby=journal_page_new_format]", "Need help with formatting?"
+    assert_select "#journal_page_new_format[role=tooltip]" do
+      assert_select ".format-help__shows em", "draws her blade"
+      assert_select ".format-help__shows strong", "Never again."
+      assert_select ".format-help__shows ul li", 2
+      assert_select ".format-help__shows ol li", 2
+    end
     post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "The bridge", body: "We crossed it." } }
     page = @pip.journal_pages.sole
     assert_redirected_to campaign_journal_path(@campaign, @pip, anchor: "page-#{page.id}")

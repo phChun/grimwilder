@@ -1,0 +1,12 @@
+<%# locals: (id:) %>
+<%# "Need help with formatting?": a tooltip, on hover or focus, of what chat_format does (MessagesHelper): what you type beside how it shows. id: the tooltip's, for a text box's aria-describedby. %>
+<% examples = [ "*draws her blade*", "**Never again.**", "- rope\n- lamp oil", "1. run\n2. hide" ] %>
+<div class="format-help">
+  <button type="button" class="format-help__toggle" aria-describedby="<%= id %>">Need help with formatting?</button>
+  <div id="<%= id %>" role="tooltip" class="format-help__tip">
+    <% examples.each do |typed| %>
+      <code class="format-help__typed"><%= typed %></code>
+      <div class="format-help__shows"><%= chat_format(typed) %></div>
+    <% end %>
+  </div>
+</div>

@@ -11,7 +11,7 @@
   <div class="field">
     <%= form.label :body, "Page", class: "field__label", for: "#{id}_body" %>
     <%= form.text_area :body, id: "#{id}_body", rows: page.persisted? ? 12 : 6, maxlength: JournalPage::BODY_LIMIT, placeholder: viewer.gm? ? "A secret, a backstory, something only they know…" : "What happened, who you met, what you're afraid of…", class: "field__input journal-page__body", "aria-describedby": "#{id}_format" %>
-    <p id="<%= id %>_format" class="field__hint">*italics* **bold**, - or 1. to start a list, as in the chat</p>
+    <%= render "shared/format_help", id: "#{id}_format" %>
   </div>
   <% if page.new_record? && journal.favoritable_by?(viewer) %>
     <label class="check">

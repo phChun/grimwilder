@@ -77,9 +77,12 @@
         <input type="hidden" name="character_id" value="<%= speakers.first.id %>">
       <% end %>
       <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
-      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="<%= opening.last[:data][:placeholder] %>" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
+      <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="<%= opening.last[:data][:placeholder] %>" aria-describedby="<%= prefix %>_hint <%= prefix %>_format" class="field__input composer__input" data-chat-form-target="body"></textarea>
       <div class="composer__row">
-        <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · - list · Shift+Enter: new line</p>
+        <div class="composer__hint">
+          <span id="<%= prefix %>_hint">Shift+Enter: new line</span>
+          <%= render "shared/format_help", id: "#{prefix}_format" %>
+        </div>
         <button type="submit" class="button button--primary composer__send">Send</button>
       </div>
     <% end %>
