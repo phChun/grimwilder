@@ -1,0 +1,50 @@
+<%# locals: (form:, character:, paths:) %>
+<%# The path, picked from a modal of cards (path_picker_controller.js): each shows the path's tagline and core talent, with the book's text folded away. The radios inside the dialog are the form's truth; the panel above shows the chosen one (every path's is rendered, all but one hidden) and the button opens the dialog. Picking closes it. %>
+<% chosen = paths.include?(character.path) ? character.path : nil %>
+<% groups = Talent.groups.select(&:path?).index_by(&:name) %>
+<div class="path-picker" data-controller="path-picker">
+  <div class="path-picker__chosen">
+    <p class="path-picker__none" data-path-picker-target="summary"<% if chosen %> hidden<% end %>>No path yet. It gives your core talent and sets the tone for the rest.</p>
+    <% paths.each do |path| %>
+      <% core = Talent.core_for(path) %>
+      <div class="path-picker__summary" data-path-picker-target="summary" data-path="<%= path %>"<% unless path == chosen %> hidden<% end %>>
+        <p class="path-picker__name"><%= path %></p>
+        <% if core %><p class="path-picker__core"><span class="path-picker__label">Core talent</span> <%= core.name %>: <%= core.summary %></p><% end %>
+      </div>
+    <% end %>
+    <button type="button" class="button path-picker__open" aria-haspopup="dialog" data-path-picker-target="button" data-action="path-picker#open"><%= chosen ? "Change path" : "Pick your path" %></button>
+  </div>
+
+  <dialog class="roll-dialog path-dialog" aria-labelledby="path-dialog-title" data-path-picker-target="dialog" data-action="click->path-picker#backdrop">
+    <header class="roll-dialog__head">
+      <h2 id="path-dialog-title" class="roll-dialog__title">Pick your path</h2>
+      <%= render "shared/close_button", action: "path-picker#close", css: "roll-dialog__close" %>
+    </header>
+    <p class="field__hint">Each path comes with its core talent. You'll choose more talents next, from any path.</p>
+    <fieldset class="path-dialog__grid">
+      <legend class="visually-hidden">Path</legend>
+      <% paths.each do |path| %>
+        <% group, core = groups[path], Talent.core_for(path) %>
+        <div class="path-card">
+          <label class="path-card__pick">
+            <%= form.radio_button :path, path, checked: path == chosen, class: "path-card__radio", data: { action: "change->path-picker#pick" } %>
+            <span class="path-card__name"><%= path %></span>
+            <% if group&.tagline %><span class="path-card__tagline"><%= group.tagline %></span><% end %>
+            <% if core %>
+              <span class="path-card__core"><span class="path-picker__label">Core talent</span> <strong><%= core.name %></strong></span>
+              <span class="path-card__summary"><%= core.summary %></span>
+            <% end %>
+          </label>
+          <% if core %>
+            <details class="path-card__more">
+              <summary>Read <%= core.name %> <%= icon(:chevron, size: 16) %></summary>
+              <% core.paragraphs.each do |paragraph| %><p class="path-card__text"><%= paragraph %></p><% end %>
+              <% if core.growth %><p class="path-card__text"><span class="path-picker__label">Grows</span> <%= core.growth %></p><% end %>
+              <p class="field__hint">pg. <%= core.page %></p>
+            </details>
+          <% end %>
+        </div>
+      <% end %>
+    </fieldset>
+  </dialog>
+</div>

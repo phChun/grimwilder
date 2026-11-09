@@ -16,7 +16,7 @@ class CharactersController < ApplicationController
   end
 
   def new
-    @character = Current.identity.characters.new(path: params[:path].presence || "Fighter", campaign_id: params[:campaign_id], up_for_grabs: params[:up_for_grabs] == "1")
+    @character = Current.identity.characters.new(path: params[:path].presence, campaign_id: params[:campaign_id], up_for_grabs: params[:up_for_grabs] == "1")
   end
 
   def create

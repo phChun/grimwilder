@@ -39,6 +39,33 @@ class CharactersTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", crucible_path("features"), 0, "no trip to another page"
   end
 
+  test "the path is picked from a modal of cards showing each core talent" do
+    sign_in_as identities(:gwen)
+    get new_character_path
+
+    assert_select ".path-picker button.path-picker__open", "Pick your path"
+    assert_select ".path-picker__none:not([hidden])"
+    assert_select "dialog.path-dialog .path-card", Grimwild.paths.size do
+      assert_select "input[type=radio][name='character[path]'][checked]", 0, "a new character picks their own"
+      assert_select "input[type=radio][name='character[path]'][value=Fighter]"
+      assert_select ".path-card__core strong", Talent.core_for("Fighter").name
+    end
+
+    post characters_path, params: { character: { name: "Ash", brawn: 3, agility: 2, wits: 2, presence: 1 } }
+    assert_response :unprocessable_entity
+    assert_select ".flash--alert", /Path has to be picked/
+  end
+
+  test "changing a path shows the one it has" do
+    sign_in_as identities(:gwen)
+    ash = identities(:gwen).characters.first
+    get edit_character_path(ash)
+
+    assert_select ".path-picker button.path-picker__open", "Change path"
+    assert_select ".path-picker__summary:not([hidden])[data-path=?]", ash.path
+    assert_select "input[type=radio][name='character[path]'][value=?][checked]", ash.path
+  end
+
   test "a new character can start at a higher level, with a talent for each" do
     sign_in_as identities(:pip)
     get new_character_path

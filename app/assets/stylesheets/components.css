@@ -1615,6 +1615,36 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
   .roll-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); padding: 14px 16px 16px; }
 }
 
+/* The character form's path: the chosen one and its core talent, and a modal of path cards to pick from. */
+.path-picker__chosen { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.path-picker__summary, .path-picker__none { flex: 1 1 16rem; margin: 0; }
+.path-picker__none { color: var(--muted); }
+.path-picker__name { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
+.path-picker__core { margin: 2px 0 0; color: var(--text-soft); }
+.path-picker__label { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.path-dialog { width: calc(100% - 64px); height: calc(100dvh - 64px); max-height: none; }
+@media (max-width: 40rem) { .path-dialog { width: calc(100% - 16px); height: calc(100dvh - 16px); } }
+.path-dialog__grid { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+/* One path per row: the path and its tagline on the left, its core talent on the right; stacked on a phone. */
+.path-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.path-card:has(input:checked) { border-color: color-mix(in srgb, var(--ember) 60%, var(--line)); background: linear-gradient(135deg, var(--ember-soft), var(--surface-2) 60%); }
+.path-card:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.path-card__pick { position: relative; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-areas: "name core" "tagline summary"; gap: 2px var(--space-5); align-items: start; padding: 12px 16px 6px; cursor: pointer; }
+.path-card__radio { position: absolute; opacity: 0; pointer-events: none; }
+.path-card__name { grid-area: name; font-family: var(--font-display); font-size: 1.2rem; }
+.path-card__tagline { grid-area: tagline; font-size: 0.9rem; font-style: italic; color: var(--muted); }
+.path-card__core { grid-area: core; padding-top: 4px; }
+.path-card__summary { grid-area: summary; font-size: 0.93rem; color: var(--text-soft); }
+@media (max-width: 40rem) {
+  .path-card__pick { grid-template-columns: minmax(0, 1fr); grid-template-areas: "name" "tagline" "core" "summary"; }
+  .path-card__core { padding-top: 6px; }
+}
+.path-card__more { padding: 0 16px 10px; }
+.path-card__more > summary { display: inline-flex; align-items: center; gap: 4px; min-height: var(--tap); font-size: 0.9rem; color: var(--muted); cursor: pointer; list-style: none; }
+.path-card__more > summary::-webkit-details-marker { display: none; }
+.path-card__more[open] > summary svg { transform: rotate(180deg); }
+.path-card__text { margin: 0 0 8px; font-size: 0.9rem; }
+
 .stat-roll__form { display: flex; flex-direction: column; gap: 12px; }
 .stat-roll__steppers { display: flex; flex-wrap: wrap; gap: 10px 20px; }
 .stat-roll__steppers .stepper__label { flex: 0 0 3.5rem; }
