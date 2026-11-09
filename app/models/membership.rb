@@ -2,7 +2,7 @@
 class Membership < ApplicationRecord
   belongs_to :campaign
   belongs_to :identity
-  has_many :journal_entries, dependent: :delete_all
+  has_many :journal_pages, dependent: :delete_all
   has_many :table_answers, dependent: :delete_all
 
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
@@ -14,6 +14,7 @@ class Membership < ApplicationRecord
   validates :identity_id, uniqueness: { scope: :campaign_id }
   validate :within_plan, :not_blocked, on: :create
 
+  after_create { JournalPage.start_for!(self) if player? }
   before_destroy :ensure_campaign_keeps_a_gm
   after_destroy :unseat_characters
   after_destroy_commit :send_open_pages_away
@@ -38,7 +39,7 @@ class Membership < ApplicationRecord
     end
   end
 
-  # The player's journal here (Journal), a page per session.
+  # The player's journal here (Journal): pages they write when they like.
   def journal
     Journal.new(self)
   end

@@ -6,14 +6,14 @@
   <% when "narration" %>
     <div class="chat-line__card chat-line__card--narration">
       <p class="chat-line__label">GM · Cut to <%= time %></p>
-      <p class="chat-line__body chat-line__body--voice"><%= chat_format(message.body) %></p>
+      <div class="chat-line__body chat-line__body--voice"><%= chat_format(message.body) %></div>
     </div>
   <% when "npc" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--npc"><%= message.name %></strong> <span class="chat-line__note">voiced by GM</span> <%= time %></p>
-    <p class="chat-line__bubble chat-line__bubble--npc chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
+    <div class="chat-line__bubble chat-line__bubble--npc chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</div>
   <% when "in_character" %>
     <p class="chat-line__head"><strong class="chat-line__who chat-line__who--character"><%= message.name %></strong> <span class="chat-line__note">in character · <%= message.identity.display_name %></span> <%= time %></p>
-    <p class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</p>
+    <div class="chat-line__bubble chat-line__bubble--character chat-line__body chat-line__body--voice">“<%= chat_format(message.body) %>”</div>
   <% when "handout" %>
     <div class="chat-line__card chat-line__card--handout">
       <p class="chat-line__label">GM · Handout <%= time %></p>
@@ -22,18 +22,18 @@
           <img src="<%= campaign_message_image_path(message.campaign_id, message) %>" alt="<%= message.body.presence || "The GM's handout" %> (opens full size)" loading="lazy">
         </a>
       <% end %>
-      <% if message.body.present? %><p class="chat-line__body"><%= chat_format(message.body) %></p><% end %>
+      <% if message.body.present? %><div class="chat-line__body"><%= chat_format(message.body) %></div><% end %>
     </div>
   <% when "whisper" %>
     <%# Only ever shown inside its own conversation, so it's just the words and the time; the label is for screen readers. %>
     <div class="chat-line__card chat-line__card--whisper">
       <p class="visually-hidden"><%= message.name %> to <%= message.recipient_name || "the GM" %>, privately</p>
-      <p class="chat-line__body"><%= chat_format(message.body) %></p>
+      <div class="chat-line__body"><%= chat_format(message.body) %></div>
       <p class="chat-line__whisper-time"><%= time %></p>
     </div>
   <% else %>
     <p class="chat-line__head"><strong class="chat-line__who"><%= message.name %></strong> <%= time %></p>
-    <p class="chat-line__bubble chat-line__body"><%= chat_format(message.body) %></p>
+    <div class="chat-line__bubble chat-line__body"><%= chat_format(message.body) %></div>
   <% end %>
   <% if message.persisted? %>
     <%= button_to campaign_message_path(message.campaign_id, message), method: :delete, class: "chat-line__delete", "aria-label": "Delete this line", title: "Delete this line", form: { class: "chat-line__delete-form", data: { turbo_confirm: "Delete this line from the chat, for everyone?" } } do %><%= icon(:close, size: 14) %><% end %>
