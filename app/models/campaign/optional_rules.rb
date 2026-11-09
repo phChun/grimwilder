@@ -4,12 +4,12 @@
 # (Character#rule_allows?); the rest change what the table offers:
 #
 # - `weapon_styles` (Gear, pg. 177): character forms ask for two styles.
-# - `vigor_pool`, `armor`, `supplies`, `wealth` (pg. 175–176): pools each
+# - `vigor_pool`, `armor`, `supplies`, `wealth` (pg. 175–177): pools each
 #   character holds (Character::RulePools).
 # - `encumbrance` (pg. 176): the sheet counts gear slots, 2 + Brawn.
-# - `milestone_levels` (pg. 177): no XP after a session; the GM levels the
+# - `milestone_levels` (pg. 178): no XP after a session; the GM levels the
 #   party up after a major arc (Campaign#milestone!).
-# - `focused_growth` (pg. 177): twice the XP to level, and the end of a
+# - `focused_growth` (pg. 178): twice the XP to level, and the end of a
 #   session can give bonus XP for what happened in play.
 # - `rest_resets` (pg. 175): sessions don't reset spark, thread or talents;
 #   the GM's Reset does, at a rest (Campaign#rest_reset!).
@@ -34,10 +34,10 @@ module Campaign::OptionalRules
     "vigor_pool" => [ "Vigor pool", 175, "For games without healing magic: a 3d Vigor pool each, rolled to clear 1 harm, refreshed by a rest or downtime." ],
     "armor" => [ "Armor", 176, "Light armor gives a 1d Armor pool each session, heavy 2d: roll it after a physical consequence to lessen it." ],
     "supplies" => [ "Supplies", 176, "A 4d Supplies pool each for common items and rations, rolled with heavy use and time away from civilization." ],
-    "wealth" => [ "Wealth", 176, "A 4d Coins pool each for larger purchases; drop 1d first for huge expenses." ],
+    "wealth" => [ "Wealth", 177, "A 4d Coins pool each for larger purchases; drop 1d first for huge expenses." ],
     "encumbrance" => [ "Encumbrance", 176, "Room for 2 + Brawn slots of gear, beyond main armor and weapons." ],
-    "milestone_levels" => [ "Milestone levels", 177, "No XP after sessions: the party levels up after completing a major group arc." ],
-    "focused_growth" => [ "Focused growth", 177, "Twice the XP to level, with a chance of bonus XP at the end of each session." ],
+    "milestone_levels" => [ "Milestone levels", 178, "No XP after sessions: the party levels up after completing a major group arc." ],
+    "focused_growth" => [ "Focused growth", 178, "Twice the XP to level, with a chance of bonus XP at the end of each session." ],
     "rest_resets" => [ "Rest resets", 175, "Talents, thread and spark reset at a rest instead of each session." ],
     "expanded_downtime" => [ "Expanded downtime", 142, "In downtime each PC rests, plans ahead, pursues a goal, unwinds or ventures (two if they sell a treasure), instead of carousing and everyone healing." ],
     "token_initiative" => [ "Token initiative", 175, "In an intense moment, each player gets 2 tokens to spend on story beats; all regain them once they're spent." ],

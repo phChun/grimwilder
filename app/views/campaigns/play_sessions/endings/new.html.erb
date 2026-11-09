@@ -18,7 +18,7 @@
     </label>
   <% end %>
   <% if Current.campaign.optional_rule?(:focused_growth) && !Current.campaign.optional_rule?(:milestone_levels) && @session.characters.any? %>
-    <%# Focused growth (pg. 177): a bonus XP for those whose play hit the campaign's focus. %>
+    <%# Focused growth (pg. 178): a bonus XP for those whose play hit the campaign's focus. %>
     <fieldset class="fieldset">
       <legend class="field__label">Focused growth: bonus XP for what happened in play</legend>
       <% @session.characters.each do |character| %>

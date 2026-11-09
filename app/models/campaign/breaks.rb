@@ -38,7 +38,7 @@ module Campaign::Breaks
     end
   end
 
-  # Milestone levels (pg. 177): after a major group arc, the party levels up.
+  # Milestone levels (pg. 178): after a major group arc, the party levels up.
   def milestone!(by:)
     raise ArgumentError, "#{name} doesn't use the Milestone levels rule." unless optional_rule?(:milestone_levels)
 
