@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **The dice favicon shows everywhere**: some browsers still showed an old red dot in the tab; the icon now always loads fresh after it changes. ([#111](https://github.com/phChun/grimwilder/pull/111))
 - **A steadier menu bar**: signed in, every page has All campaigns, Characters and a Tools menu (Roll, Crucibles, Talents); inside a campaign, its own tabs come first. ([#110](https://github.com/phChun/grimwilder/pull/110))
 - **Your campaigns at a glance**: each card on the campaigns list shows your part (GM, or who you play), the pitch, whether it's live or when it was last played, how many sessions, and who's in the party, in a wider, shorter card. ([#109](https://github.com/phChun/grimwilder/pull/109))
 - **Journal pages fold open on your sheet**: the Journal card shows your favorites and your latest page, each under its own heading; tap a title to read it there, with Edit below to change it, and See all for the rest. ([#108](https://github.com/phChun/grimwilder/pull/108))
