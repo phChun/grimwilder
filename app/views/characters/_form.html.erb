@@ -17,12 +17,12 @@
       <%= form.text_field :name, required: true, maxlength: 80, autocomplete: "off", placeholder: "Gibbletibble \"Tibbs\"", class: "field__input" %>
     </div>
     <div class="field">
-      <%= form.label :path, "Path", class: "field__label" %>
+      <span class="field__label">Path</span>
       <%# The table's GM may close some paths and options (Campaign::CharacterSettings); a character keeps what it already has. %>
       <% table = character.campaign %>
-      <% paths = Grimwild.paths.select { |path, _| table.nil? || table.path_allowed?(path) || path == character.path_was } %>
-      <%= form.select :path, paths.map { |path, core| [ "#{path} (#{core})", path ] }, {}, class: "field__input" %>
-      <p class="field__hint">Your path gives its core talent. Add another talent from any path below.<% if table && table.allowed_paths.any? %> <%= table.name %> has <%= pluralize(table.allowed_paths.size, "path") %> open.<% end %></p>
+      <% paths = Grimwild.paths.keys.select { |path| table.nil? || table.path_allowed?(path) || path == character.path_was } %>
+      <%= render "characters/path_picker", form: form, character: character, paths: paths %>
+      <% if table && table.allowed_paths.any? %><p class="field__hint"><%= table.name %> has <%= pluralize(table.allowed_paths.size, "path") %> open.</p><% end %>
       <% legacy = Talent.all.select(&:legacy_core_of) %>
       <% unless character.persisted? %>
         <% if (start = table&.starting_level) %>

@@ -12,7 +12,7 @@ class Character < ApplicationRecord
   normalizes :name, with: ->(value) { value.squish }
 
   validates :name, presence: true, length: { maximum: 80 }
-  validates :path, inclusion: { in: ->(_) { Grimwild.paths.keys } }
+  validates :path, inclusion: { in: ->(_) { Grimwild.paths.keys }, message: "has to be picked" }
   validates(*Grimwild::STATS, numericality: { only_integer: true, in: 1..3 })
   validates :spark, numericality: { only_integer: true, in: 0..Grimwild::MAX_SPARK }
   validates :thread, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: :session_thread }
