@@ -4,7 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
-- **Journal pages fold open on your sheet**: tap a page's title on the Journal card to read it there, with Edit below to change it. ([#108](https://github.com/phChun/grimwilder/pull/108))
+- **Journal pages fold open on your sheet**: the Journal card shows your favorites and your latest page, each under its own heading; tap a title to read it there, with Edit below to change it, and See all for the rest. ([#108](https://github.com/phChun/grimwilder/pull/108))
 - **The journal uses the whole screen**: pages sit side by side, all the same height, and the GM's list of journals spreads out too. ([#108](https://github.com/phChun/grimwilder/pull/108))
 - **Sort your journal**: favorites first, chronologically, or last updated. ([#108](https://github.com/phChun/grimwilder/pull/108))
 - **Need help with formatting?** under the chat box and journal pages shows examples of italics, bold and lists. ([#108](https://github.com/phChun/grimwilder/pull/108))
