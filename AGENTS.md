@@ -48,7 +48,7 @@ Run the Herb linter after every template change. Its `herb-state-valid-reads` ru
 ```
 app/assets/stylesheets/application.css   # @font-face, design tokens (dark only), base, shell, layout
 app/assets/stylesheets/components.css    # buttons, cards, dice, pools, pips, steppers, each screen
-app/helpers/application_helper.rb        # TOOLKIT_NAV (ready: false shows "soon"), title_case, toasts
+app/helpers/application_helper.rb        # TOOLKIT_NAV (ready: false shows "soon"; signed in, the Tools menu), title_case, toasts
 app/javascript/grimwild/dice.js          # PURE dice rules (no DOM), pinned as "grimwild/dice"
 app/models/grimwild/dice.rb              # the same rules for server rolls
 app/views/shared/                        # the partials every screen is built from (see *Design system*)

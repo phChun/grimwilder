@@ -1,11 +1,15 @@
 <%# locals: (membership:, menu: nil) %>
-<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true): the campaign's tabs inside one, else the toolkit's, then Characters and Admin. In the menu, "My characters" lists each sheet under its heading instead of folding them into a dropdown. %>
+<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true). Signed in, the same three everywhere: All campaigns, Characters and the Tools menu (Roll, Crucibles, Talents), then Admin; inside a campaign, its own tabs after a divider. Signed out, the toolkit's links on their own. In the ☰ menu a menu's links are listed under its heading instead of folding into a dropdown. %>
 <% link_class = menu ? "nav-menu__link" : "tabs__link" %>
 <% items = [] %>
-<% if membership %>
-  <% items.concat(campaign_tabs(membership)) %>
+<% if authenticated? %>
+  <% items << all_campaigns_tab << characters_tab << tools_tab %>
+  <% items << admin_tab if admin_tab %>
+  <% if membership %>
+    <% items << :divider %>
+    <% items.concat(campaign_tabs(membership)) %>
+  <% end %>
 <% else %>
-  <% items << all_campaigns_tab if authenticated? %>
   <% toolkit_nav.each do |item| %>
     <% if item[:ready] %>
       <% path = public_send(item[:path]) %>
@@ -15,12 +19,10 @@
     <% end %>
   <% end %>
 <% end %>
-<% if authenticated? %>
-  <% items << characters_tab %>
-  <% items << admin_tab if admin_tab %>
-<% end %>
 <% items.each do |text, path, current| %>
-  <% if path.nil? %>
+  <% if text == :divider %>
+    <span class="<%= menu ? "nav-menu__divider" : "tabs__divider" %>" aria-hidden="true"></span>
+  <% elsif path.nil? %>
     <span class="<%= link_class %> <%= link_class %>--soon" title="Coming soon"><%= text %></span>
   <% elsif path.is_a?(Array) && menu %>
     <span class="nav-menu__heading"><%= text %></span>
@@ -28,7 +30,7 @@
       <%= link_to name, sheet_path, class: "nav-menu__link nav-menu__link--sub", "aria-current": (open ? "page" : nil) %>
     <% end %>
   <% elsif path.is_a?(Array) %>
-    <%# More than one character seated here: a menu of their sheets. %>
+    <%# A menu: the Tools, or a player's several sheets here. %>
     <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
       <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
       <ul class="tab-menu__menu" data-menu-target="panel">
