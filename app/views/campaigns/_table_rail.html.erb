@@ -79,7 +79,7 @@
       <label class="visually-hidden" for="<%= prefix %>_body">Message</label>
       <textarea id="<%= prefix %>_body" name="body" rows="3" required maxlength="<%= Message::MAX_LENGTH %>" autocomplete="off" placeholder="<%= opening.last[:data][:placeholder] %>" aria-describedby="<%= prefix %>_hint" class="field__input composer__input" data-chat-form-target="body"></textarea>
       <div class="composer__row">
-        <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · Shift+Enter: new line</p>
+        <p class="composer__hint" id="<%= prefix %>_hint">*italics* **bold** · - list · Shift+Enter: new line</p>
         <button type="submit" class="button button--primary composer__send">Send</button>
       </div>
     <% end %>

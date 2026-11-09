@@ -2774,6 +2774,7 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .chat-line__who--npc { color: var(--suspense-text); }
 .chat-line__note { color: var(--dim); }
 .chat-line__body { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.chat-line__body :is(ul, ol), .journal-page__text :is(ul, ol) { margin: var(--space-1) 0; padding-left: 1.4em; }
 .chat-line__body--voice { font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.4; }
 /* *Actions* in a line that's already italic stand out by turning upright. */
 .chat-line__body--voice em { font-style: normal; }

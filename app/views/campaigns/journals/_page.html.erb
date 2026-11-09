@@ -16,7 +16,7 @@
     <span class="field__hint">written <%= time_ago_in_words(page.updated_at) %> ago</span>
   </header>
   <% if page.body.present? %>
-    <p class="journal-page__text"><%= chat_format(compact ? truncate(page.body, length: 240, separator: " ") : page.body) %></p>
+    <div class="journal-page__text"><%= chat_format(compact ? truncate(page.body, length: 240, separator: " ") : page.body) %></div>
   <% else %>
     <p class="field__hint">Nothing written yet.</p>
   <% end %>

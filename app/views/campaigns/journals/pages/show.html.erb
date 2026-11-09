@@ -14,7 +14,7 @@
       <%= render "campaigns/journals/form", journal: @journal, page: @page, viewer: Current.membership, character: @character %>
       <%= button_to "Tear out this page", campaign_journal_page_path(Current.campaign, @journal.membership, @page), method: :delete, params: { character_id: @character&.id }.compact, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_frame: "_top", turbo_confirm: "Tear out #{@page.heading}? This can't be undone." } } %>
     <% elsif @page.body.present? %>
-      <p class="journal-page__text"><%= chat_format(@page.body) %></p>
+      <div class="journal-page__text"><%= chat_format(@page.body) %></div>
     <% else %>
       <p class="field__hint">Nothing written yet.</p>
     <% end %>
