@@ -1,15 +1,13 @@
 <%# locals: (membership:, menu: nil) %>
-<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true). Signed in, the same three everywhere: All campaigns, Characters (then Admin, for admins) and the Tools menu (Roll, Crucibles, Talents); inside a campaign, its own tabs after a divider (before it, in the phone menu). Signed out, the toolkit's links on their own. In the ☰ menu a menu's links are listed under its heading instead of folding into a dropdown. %>
+<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true). Signed in, the same three everywhere: All campaigns, Characters (then Admin, for admins) and the Tools menu (Roll, Crucibles, Talents); inside a campaign, its own tabs come first, before a divider. Signed out, the toolkit's links on their own. In the ☰ menu a menu's links are listed under its heading instead of folding into a dropdown. %>
 <% link_class = menu ? "nav-menu__link" : "tabs__link" %>
 <% items = [] %>
 <% if authenticated? %>
   <% items << all_campaigns_tab << characters_tab %>
   <% items << admin_tab if admin_tab %>
   <% items << tools_tab %>
-  <%# Inside a campaign its tabs follow a divider; in the phone menu they come first, the place you're in on top. %>
-  <% if membership %>
-    <% items = menu ? [ *campaign_tabs(membership), :divider, *items ] : [ *items, :divider, *campaign_tabs(membership) ] %>
-  <% end %>
+  <%# Inside a campaign its tabs come first, the place you're in, then a divider and the rest. %>
+  <% items = [ *campaign_tabs(membership), :divider, *items ] if membership %>
 <% else %>
   <% toolkit_nav.each do |item| %>
     <% if item[:ready] %>

@@ -70,9 +70,8 @@ class AppShellTest < ActionDispatch::IntegrationTest
 
     row = css_select("nav.tabs a").map { _1["href"] }
     menu = css_select(".nav-menu nav a.nav-menu__link").map { _1["href"] }
-    assert_equal row.sort, menu.sort, "the same links"
-    assert_equal campaign_path(@campaign), menu.first, "in the phone menu the campaign's tabs come first"
-    assert_equal campaigns_path, row.first
+    assert_equal row, menu, "the same links, in the same order"
+    assert_equal campaign_path(@campaign), row.first, "the campaign's tabs come first"
     assert_select ".nav-menu details.nav-menu__fold:not([open]) > summary", "Tools"
     assert_select ".nav-menu details.nav-menu__fold a.nav-menu__link--sub", 3
     assert_select ".nav-menu .nav-menu__divider", 1
@@ -100,12 +99,12 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test "in a campaign its own tabs follow a divider, and the GM gets an account button" do
+  test "in a campaign its own tabs come first, then a divider and the rest, and the GM gets an account button" do
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
     tabs = css_select("nav.tabs[aria-label=Main] > a, nav.tabs[aria-label=Main] > details > summary, nav.tabs[aria-label=Main] > .tabs__divider").map { _1.matches?(".tabs__divider") ? "|" : _1.text.strip }
-    assert_equal [ "All campaigns", "Characters", "Tools", "|", @campaign.name, "Table", "Journals", "Log" ], tabs
+    assert_equal [ @campaign.name, "Table", "Journals", "Log", "|", "All campaigns", "Characters", "Tools" ], tabs
     assert_select ".tabs__link[aria-current=page][href=?] .tabs__name", campaign_path(@campaign), @campaign.name
     assert_select ".tabs__link[href=?]", campaign_table_path(@campaign), "Table"
     assert_select ".tabs__link[href=?]", campaign_journals_path(@campaign), "Journals"
