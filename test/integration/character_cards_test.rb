@@ -102,7 +102,7 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_select "details#journal" do
       assert_select "turbo-frame#journal_new a[href=?]", new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id), "New page"
       assert_select "hr.journal__rule + .empty", "No pages yet."
-      assert_select "a[href=?]", campaign_journal_path(@campaign, pip), "See the whole journal"
+      assert_select "a[href=?]", campaign_journal_path(@campaign, pip), "Open the journal"
     end
 
     get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
@@ -117,8 +117,12 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_redirected_to character_path(@tibbs, anchor: "journal")
     page = pip.journal_pages.sole
     get character_path(@tibbs)
-    assert_select "details#journal .journal-page--compact .journal-page__text", "We crossed the bridge."
-    assert_select "details#journal .journal-page__title a[href=?]", campaign_journal_page_path(@campaign, pip, page, character_id: @tibbs.id), page.heading
+    assert_select "details#journal .journal-page--compact details.journal-page__fold:not([open])" do
+      assert_select "summary .journal-page__title", page.heading
+      assert_select "summary a", 0, "the title folds the page open, it doesn't link"
+      assert_select ".journal-page__text", "We crossed the bridge."
+      assert_select ".journal-page__actions a[href=?][data-turbo-frame=modal]", campaign_journal_page_path(@campaign, pip, page, character_id: @tibbs.id), "Edit"
+    end
     post campaign_journal_page_favorite_path(@campaign, pip, page), params: { character_id: @tibbs.id }
     assert_redirected_to character_path(@tibbs, anchor: "journal")
 
@@ -128,6 +132,7 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_select "details#journal" do
       assert_select ".journal-page__text", "We crossed the bridge."
       assert_select ".journal-page__star--on[title=Starred]"
+      assert_select ".journal-page__actions", 0, "the GM reads the player's page, no Edit"
     end
     get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
     assert_select "input[type=checkbox][name='journal_page[locked]'][checked]"
@@ -140,5 +145,33 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "Who you were", body: "A thief, once.", locked: "1" } }
     get character_path(@tibbs)
     assert_select "details#journal .journal-page__text", "A thief, once.", "the GM always sees the GM's pages"
+  end
+
+  test "the journal card shows the starred pages and the latest, then See all" do
+    pip = memberships(:pip_player)
+    starred = pip.journal.write!(pip, title: "Oaths", body: "Kept.", favorite: true)
+    travel 1.minute
+    middle = pip.journal.write!(pip, title: "The bridge", body: "Crossed.")
+    travel 1.minute
+    latest = pip.journal.write!(pip, title: "The river", body: "Swum.")
+
+    sign_in_as identities(:pip)
+    get character_path(@tibbs)
+    assert_equal [ "page-#{starred.id}", "page-#{latest.id}" ], css_select("details#journal .journal-page").map { _1["id"] }
+    assert_equal %w[ Favorites Latest ], css_select("details#journal .journal-glance__heading").map(&:text)
+    assert_select "#sheet_journal_favorites + #page-#{starred.id}"
+    assert_select "#sheet_journal_latest + #page-#{latest.id}"
+    assert_select "details#journal a[href=?]", campaign_journal_path(@campaign, pip), "See all 3 pages"
+
+    travel 1.minute
+    middle.update!(body: "Crossed, twice.")
+    get character_path(@tibbs)
+    assert_equal [ "page-#{starred.id}", "page-#{middle.id}" ], css_select("details#journal .journal-page").map { _1["id"] }, "the latest is the last one written in"
+
+    starred.update!(favorite: false)
+    middle.update!(favorite: true)
+    get character_path(@tibbs)
+    assert_equal [ "page-#{middle.id}" ], css_select("details#journal .journal-page").map { _1["id"] }, "a starred latest shows once"
+    assert_equal %w[ Favorites ], css_select("details#journal .journal-glance__heading").map(&:text), "no Latest heading for nothing"
   end
 end

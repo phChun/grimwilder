@@ -4,6 +4,11 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Journal pages fold open on your sheet**: the Journal card shows your favorites and your latest page, each under its own heading; tap a title to read it there, with Edit below to change it, and See all for the rest. ([#108](https://github.com/phChun/grimwilder/pull/108))
+- **The journal uses the whole screen**: pages sit side by side, all the same height, and the GM's list of journals spreads out too. ([#108](https://github.com/phChun/grimwilder/pull/108))
+- **Sort your journal**: favorites first, chronologically, or last updated. ([#108](https://github.com/phChun/grimwilder/pull/108))
+- **Need help with formatting?** under the chat box and journal pages shows examples of italics, bold and lists. ([#108](https://github.com/phChun/grimwilder/pull/108))
+- **Star a page as you write it**, and stars sit neatly beside their titles. ([#108](https://github.com/phChun/grimwilder/pull/108))
 - **Talent uses in the log are the GM's call**: a new setting, Post talent uses to the table log, puts every use a character spends in the log. It replaces the checkbox each player had on their sheet. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Talents to take show on your sheet**: when your level allows more talents (or Eldritch Talents) than you have, the Talents card's title says how many, even folded, and tapping it opens the talent picker. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Scene collections**: scene blocks are now called scene collections, laid out two across on the prep page, each with its scenes and its buttons at the bottom. Scenes in no collection are standalone scenes. Every card folds, with Expand all and Collapse all at the top, and Add a scene opens its form right in the card. ([#107](https://github.com/phChun/grimwilder/pull/107))

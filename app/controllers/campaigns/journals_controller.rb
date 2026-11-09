@@ -14,8 +14,10 @@ class Campaigns::JournalsController < ApplicationController
     @players = Current.campaign.memberships.player.includes(:identity, :journal_pages).order(:created_at)
   end
 
+  # sort=: one of Journal::SORTS.
   def show
-    @pages = @journal.pages_for(Current.membership)
+    @sort = params[:sort].presence_in(Journal::SORTS.keys) || Journal::SORTS.keys.first
+    @pages = @journal.pages_for(Current.membership, sort: @sort)
   end
 
   def update

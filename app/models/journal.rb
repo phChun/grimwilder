@@ -4,6 +4,10 @@
 # on by default), and may add pages of their own, which they always see and
 # may lock so the player can only read them.
 class Journal
+  # The journal page's sort select: scope => label. The first is the default,
+  # and the only order the sheet's Journal card uses.
+  SORTS = { "favorites_first" => "Favorites first", "chronologically" => "Chronologically", "last_updated" => "Last updated" }.freeze
+
   attr_reader :membership
 
   def initialize(membership)
@@ -20,11 +24,12 @@ class Journal
     membership.player? && (viewer == membership || gm?(viewer))
   end
 
-  # The pages this person may read, newest first.
-  def pages_for(viewer)
+  # The pages this person may read, in a SORTS order (favorites first unless
+  # another is named).
+  def pages_for(viewer, sort: nil)
     return JournalPage.none unless readable_by?(viewer)
 
-    pages = membership.journal_pages.favorites_first
+    pages = membership.journal_pages.public_send(SORTS.key?(sort.to_s) ? sort.to_s : SORTS.keys.first)
     viewer == membership || membership.journal_shared? ? pages : pages.by_gm
   end
 
@@ -46,9 +51,10 @@ class Journal
     membership.player? && viewer == membership
   end
 
-  # A new page by this person: the GM's may be locked.
-  def write!(viewer, title:, body:, locked: false)
-    membership.journal_pages.create!(title: title, body: body, by_gm: gm?(viewer), locked: gm?(viewer) && locked)
+  # A new page by this person: the GM's may be locked, the player's starred.
+  def write!(viewer, title:, body:, locked: false, favorite: false)
+    membership.journal_pages.create!(title: title, body: body, by_gm: gm?(viewer), locked: gm?(viewer) && locked,
+      favorite: favoritable_by?(viewer) && favorite)
   end
 
   private

@@ -1,5 +1,5 @@
 <%# locals: (character:, viewer:) %>
-<%# The player's journal at this character's table (Journal), folded on the sheet: a New page button that opens its form in place, then the latest few pages this viewer may read, starred first, each with Edit. The player sees their own; a GM sees the player's pages while they're shared, and the GM's always (Character Secrets among them). Nobody else sees the card. %>
+<%# The player's journal at this character's table (Journal), folded on the sheet: a New page button that opens its form in place, then, under their own headings, the starred pages this viewer may read and the one last written in (if it isn't starred), each folding open with Edit, then See all. The player sees their own; a GM sees the player's pages while they're shared, and the GM's always (Character Secrets among them). Nobody else sees the card. %>
 <% campaign = character.campaign %>
 <% owner = campaign&.memberships&.find_by(identity_id: character.identity_id) %>
 <% journal = owner&.journal %>
@@ -8,11 +8,19 @@
     <summary class="gm-fold__summary"><h2 class="card__title sheet-fold__title">Journal</h2><%= icon(:chevron, size: 18) %></summary>
     <%= render "campaigns/journals/new_button", journal: journal, character: character %>
     <hr class="journal__rule">
-    <% pages = journal.pages_for(viewer).limit(5) %>
+    <% all = journal.pages_for(viewer).to_a %>
+    <% latest = journal.pages_for(viewer, sort: "last_updated").first %>
+    <% favorites = all.select(&:favorite?) %>
+    <% latest = nil if latest&.favorite? %>
+    <% pages = [ *favorites, latest ].compact %>
     <% if pages.any? %>
-      <div class="journal-glance">
-        <%= render partial: "campaigns/journals/page", collection: pages, as: :page, locals: { journal: journal, viewer: viewer, compact: true, character: character } %>
-      </div>
+      <% [ [ "Favorites", favorites ], [ "Latest", [ latest ].compact ] ].each do |heading, group| %>
+        <% next if group.empty? %>
+        <section class="journal-glance" aria-labelledby="sheet_journal_<%= heading.downcase %>">
+          <h3 id="sheet_journal_<%= heading.downcase %>" class="journal-glance__heading"><%= heading %></h3>
+          <%= render partial: "campaigns/journals/page", collection: group, as: :page, locals: { journal: journal, viewer: viewer, compact: true, character: character } %>
+        </section>
+      <% end %>
     <% else %>
       <p class="empty">No pages yet.</p>
     <% end %>
@@ -20,7 +28,7 @@
       <p class="field__hint"><%= owner.identity.display_name %> keeps their journal private: you see only the GM's pages.</p>
     <% end %>
     <p class="sheet-fold__actions">
-      <%= link_to "See the whole journal", campaign_journal_path(campaign, owner), class: "button button--small button--ghost" %>
+      <%= link_to (all.size > pages.size ? "See all #{pluralize(all.size, "page")}" : "Open the journal"), campaign_journal_path(campaign, owner), class: "button button--small" %>
     </p>
   </details>
 <% end %>
