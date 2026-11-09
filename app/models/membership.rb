@@ -2,7 +2,7 @@
 class Membership < ApplicationRecord
   belongs_to :campaign
   belongs_to :identity
-  has_many :journal_entries, dependent: :delete_all
+  has_many :journal_pages, dependent: :delete_all
   has_many :table_answers, dependent: :delete_all
 
   enum :role, { gm: "gm", player: "player" }, default: :player, validate: true
@@ -38,7 +38,7 @@ class Membership < ApplicationRecord
     end
   end
 
-  # The player's journal here (Journal), a page per session.
+  # The player's journal here (Journal): pages they write as they like.
   def journal
     Journal.new(self)
   end

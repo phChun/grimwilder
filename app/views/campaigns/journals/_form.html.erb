@@ -1,0 +1,24 @@
+<%# locals: (journal:, page:, viewer:, character: nil) %>
+<%# A page's fields, new or being changed: an optional title and the words. A GM's page may be locked, so the player can read it but not change it. From a sheet's Journal card (character), saving comes back to the sheet. %>
+<% id = "journal_page_#{page.id || "new"}#{"_sheet" if character}" %>
+<% url = page.persisted? ? campaign_journal_page_path(journal.campaign, journal.membership, page) : campaign_journal_pages_path(journal.campaign, journal.membership) %>
+<%= form_with model: page, scope: :journal_page, url: url, method: page.persisted? ? :patch : :post, class: "stack journal-form", data: { turbo_frame: "_top" } do |form| %>
+  <% if character %><input type="hidden" name="character_id" value="<%= character.id %>"><% end %>
+  <div class="field">
+    <%= form.label :title, "Title", class: "field__label", for: "#{id}_title" %>
+    <%= form.text_field :title, id: "#{id}_title", maxlength: JournalPage::TITLE_LIMIT, placeholder: "Optional", class: "field__input" %>
+  </div>
+  <div class="field">
+    <%= form.label :body, "Page", class: "field__label", for: "#{id}_body" %>
+    <%= form.text_area :body, id: "#{id}_body", rows: page.persisted? ? 12 : 6, required: true, maxlength: JournalPage::BODY_LIMIT, placeholder: viewer.gm? ? "A secret, a backstory, something only they know…" : "What happened, who you met, what you're afraid of…", class: "field__input journal-page__body", "aria-describedby": "#{id}_format" %>
+    <p id="<%= id %>_format" class="field__hint">*italics* **bold**, as in the chat</p>
+  </div>
+  <% if viewer.gm? %>
+    <label class="check">
+      <input type="hidden" name="journal_page[locked]" value="0">
+      <%= tag.input type: "checkbox", name: "journal_page[locked]", value: "1", checked: page.new_record? || page.locked?, id: "#{id}_locked" %>
+      <span>Read only for <%= journal.membership.identity.display_name %></span>
+    </label>
+  <% end %>
+  <%= form.submit page.persisted? ? "Save" : "Add page", class: "button button--primary journal-form__save" %>
+<% end %>

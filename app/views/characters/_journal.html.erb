@@ -1,38 +1,29 @@
 <%# locals: (character:, viewer:) %>
-<%# The player's journal at this character's table (Journal), folded on the sheet: the page being lived now to write in (for the player), their latest other page, and every journal. The player sees their own; a GM sees it while it's shared. Nobody else sees the card. %>
+<%# The player's journal at this character's table (Journal), folded on the sheet: the latest page this viewer may read, and a New page form. The player sees their own; a GM sees the player's pages while they're shared, and adds pages of their own (a secret, a backstory), read only for the player unless unticked. Nobody else sees the card. %>
 <% campaign = character.campaign %>
 <% owner = campaign&.memberships&.find_by(identity_id: character.identity_id) %>
-<% if owner&.player? && viewer && (viewer == owner || viewer.gm?) %>
-  <% journal = owner.journal %>
+<% journal = owner&.journal %>
+<% if journal&.readable_by?(viewer) %>
   <details id="journal" class="card sheet-fold" data-details-memory-target="section" data-section="character-<%= character.id %>-journal">
     <summary class="gm-fold__summary"><h2 class="card__title sheet-fold__title">Journal</h2><%= icon(:chevron, size: 18) %></summary>
-    <% current = journal.current_page if journal.writable_by?(viewer) %>
-    <% if current %>
-      <%# The player writes the page being lived now right here; saving comes back to the sheet. %>
-      <%= form_with model: current.entry || JournalEntry.new, scope: :journal_entry, url: campaign_journal_page_path(campaign, owner, current.key), method: :patch, class: "stack journal-glance__form" do |form| %>
-        <input type="hidden" name="character_id" value="<%= character.id %>">
-        <%= form.label :body, current.title, class: "journal-glance__title", for: "sheet_journal_body" %>
-        <%= form.text_area :body, id: "sheet_journal_body", rows: 5, maxlength: JournalEntry::BODY_LIMIT, placeholder: "What happened, who you met, what you're afraid of…", class: "field__input", "aria-describedby": "sheet_journal_format" %>
-        <p id="sheet_journal_format" class="field__hint">*italics* **bold**, as in the chat</p>
-        <%= form.submit "Save", class: "button button--primary journal-glance__save" %>
-      <% end %>
-    <% end %>
-    <% if journal.readable_by?(viewer) %>
-      <% written = journal.pages(written_only: true) %>
-      <% latest = current ? written.reject(&:current).first : written.first %>
-      <% if latest %>
-        <article class="journal-glance">
-          <p class="journal-glance__title"><%= latest.title %> <span class="field__hint">· written <%= time_ago_in_words(latest.entry.updated_at) %> ago</span></p>
-          <p class="journal-glance__text"><%= chat_format(truncate(latest.body, length: 400, separator: " ")) %></p>
-        </article>
-      <% elsif !current %>
-        <p class="empty">Nothing written yet.</p>
-      <% end %>
+    <% latest = journal.pages_for(viewer).first %>
+    <% if latest %>
+      <article class="journal-glance">
+        <p class="journal-glance__title"><%= latest.heading %><% if latest.by_gm? %> <span class="journal-page__tag">From the GM</span><% end %> <span class="field__hint">· written <%= time_ago_in_words(latest.updated_at) %> ago</span></p>
+        <p class="journal-glance__text"><%= chat_format(truncate(latest.body, length: 400, separator: " ")) %></p>
+      </article>
     <% else %>
-      <p class="empty"><%= owner.identity.display_name %> keeps their journal private.</p>
+      <p class="empty">Nothing written yet.</p>
     <% end %>
+    <% if viewer.gm? && !owner.journal_shared? %>
+      <p class="field__hint"><%= owner.identity.display_name %> keeps their journal private: you see only the GM's pages.</p>
+    <% end %>
+    <section class="journal-glance__new" aria-labelledby="sheet_journal_new">
+      <h3 id="sheet_journal_new" class="journal-glance__title">New page</h3>
+      <%= render "campaigns/journals/form", journal: journal, page: JournalPage.new, viewer: viewer, character: character %>
+    </section>
     <p class="sheet-fold__actions">
-      <%= link_to "See all journals", (viewer.gm? ? campaign_journals_path(campaign) : campaign_journal_path(campaign, owner)), class: "button button--small button--ghost" %>
+      <%= link_to "Open the journal", campaign_journal_path(campaign, owner), class: "button button--small button--ghost" %>
     </p>
   </details>
 <% end %>

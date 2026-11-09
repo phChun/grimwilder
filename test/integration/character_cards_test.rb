@@ -95,34 +95,40 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the journal card: the player's latest page, and a GM's while it's shared" do
-    PlaySession.start!(@campaign, characters: [], by: identities(:gwen))
-    memberships(:pip_player).journal.write!(memberships(:pip_player).journal.page("session-1"), "We crossed the bridge.")
+  test "the journal card: the latest page, a New page form, and the GM's own locked pages" do
+    pip = memberships(:pip_player)
+    pip.journal.write!(pip, title: "The bridge", body: "We crossed the bridge.")
 
     sign_in_as identities(:pip)
     get character_path(@tibbs)
     assert_select "details#journal" do
-      assert_select "form[action=?] textarea", campaign_journal_page_path(@campaign, memberships(:pip_player), "session-1"), "We crossed the bridge."
+      assert_select ".journal-glance__text", "We crossed the bridge."
+      assert_select "form[action=?][method=post] textarea", campaign_journal_pages_path(@campaign, pip)
       assert_select "input[type=hidden][name=character_id][value=?]", @tibbs.id.to_s
-      assert_select "a[href=?]", campaign_journal_path(@campaign, memberships(:pip_player)), "See all journals"
+      assert_select "input[name='journal_page[locked]']", 0
+      assert_select "a[href=?]", campaign_journal_path(@campaign, pip), "Open the journal"
     end
 
-    patch campaign_journal_page_path(@campaign, memberships(:pip_player), "session-1"), params: { character_id: @tibbs.id, journal_entry: { body: "We crossed the bridge, then the river." } }
+    post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "", body: "Then the river." } }
     assert_redirected_to character_path(@tibbs, anchor: "journal")
-    assert_equal "We crossed the bridge, then the river.", memberships(:pip_player).journal.page("session-1").body
+    assert_equal [ nil, false ], pip.journal_pages.newest_first.first.then { [ _1.title, _1.by_gm ] }
 
     sign_out
     sign_in_as identities(:gwen)
     get character_path(@tibbs)
     assert_select "details#journal" do
-      assert_select ".journal-glance__text", "We crossed the bridge, then the river."
-      assert_select "textarea", 0
-      assert_select "a[href=?]", campaign_journals_path(@campaign), "See all journals"
+      assert_select ".journal-glance__text", "Then the river."
+      assert_select "input[type=checkbox][name='journal_page[locked]'][checked]"
     end
 
-    memberships(:pip_player).update!(journal_shared: false)
+    pip.update!(journal_shared: false)
     get character_path(@tibbs)
     assert_select "details#journal .journal-glance", 0
     assert_select "details#journal", /keeps their journal private/
+
+    post campaign_journal_pages_path(@campaign, pip), params: { character_id: @tibbs.id, journal_page: { title: "Who you were", body: "A thief, once.", locked: "1" } }
+    assert_redirected_to character_path(@tibbs, anchor: "journal")
+    get character_path(@tibbs)
+    assert_select "details#journal .journal-glance__text", "A thief, once.", "the GM always sees the GM's pages"
   end
 end
