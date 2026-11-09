@@ -46,6 +46,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
 
     get talents_path
     assert_select "details.tab-menu summary.tabs__link--current", "Tools"
+    assert_select ".nav-menu details.nav-menu__fold[open] a[aria-current=page]", "Talents"
     assert_select ".tab-menu__menu a[aria-current=page]", "Talents"
 
     get campaigns_path
@@ -68,9 +69,10 @@ class AppShellTest < ActionDispatch::IntegrationTest
     get campaign_path(@campaign)
 
     row = css_select("nav.tabs a").map { _1["href"] }
-    menu = css_select(".nav-menu nav .nav-menu__link").map { _1["href"] }
+    menu = css_select(".nav-menu nav a.nav-menu__link").map { _1["href"] }
     assert_equal row, menu
-    assert_select ".nav-menu .nav-menu__heading", "Tools"
+    assert_select ".nav-menu details.nav-menu__fold:not([open]) > summary", "Tools"
+    assert_select ".nav-menu details.nav-menu__fold a.nav-menu__link--sub", 3
     assert_select ".nav-menu .nav-menu__divider", 1
     assert_select ".nav-menu .nav-menu__link[aria-current=page]", @campaign.name
     assert_select ".nav-menu .nav-menu__links--account a[href^=?]", new_feedback_path, /Send feedback/
@@ -86,7 +88,8 @@ class AppShellTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select ".nav-menu .nav-menu__heading", "My characters"
-    assert_select ".nav-menu .nav-menu__link--sub", 5, "the three tools and the two sheets"
+    assert_select ".nav-menu .nav-menu__heading", "My characters"
+    assert_select ".nav-menu > nav > .nav-menu__link--sub, .nav-menu nav > a.nav-menu__link--sub", 2, "the two sheets, listed open"
     assert_select ".nav-menu .nav-menu__link--sub", text: "Moss"
   end
 

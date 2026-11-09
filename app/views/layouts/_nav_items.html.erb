@@ -20,11 +20,19 @@
     <% end %>
   <% end %>
 <% end %>
-<% items.each do |text, path, current| %>
+<% items.each do |text, path, current, fold| %>
   <% if text == :divider %>
     <span class="<%= menu ? "nav-menu__divider" : "tabs__divider" %>" aria-hidden="true"></span>
   <% elsif path.nil? %>
     <span class="<%= link_class %> <%= link_class %>--soon" title="Coming soon"><%= text %></span>
+  <% elsif path.is_a?(Array) && menu && fold %>
+    <%# The Tools, folded in the phone menu unless one is open. %>
+    <%= tag.details class: "nav-menu__fold", open: current do %>
+      <summary class="nav-menu__link nav-menu__fold-toggle"><%= text %><%= icon(:chevron, size: 16) %></summary>
+      <% path.each do |name, sub_path, open| %>
+        <%= link_to name, sub_path, class: "nav-menu__link nav-menu__link--sub", "aria-current": (open ? "page" : nil) %>
+      <% end %>
+    <% end %>
   <% elsif path.is_a?(Array) && menu %>
     <span class="nav-menu__heading"><%= text %></span>
     <% path.each do |name, sheet_path, open| %>

@@ -524,6 +524,11 @@ small { font-size: 0.8em; color: var(--dim); }
 .nav-menu__link:hover { background: var(--surface-2); color: var(--text); }
 .nav-menu__link[aria-current="page"] { color: var(--text); font-weight: 600; box-shadow: inset 3px 0 0 var(--ember); }
 .nav-menu__link--sub { padding-left: var(--space-5); }
+/* Tools, folded in the phone menu: its toggle reads like a link, the chevron turning when open. */
+.nav-menu__fold-toggle { justify-content: space-between; cursor: pointer; list-style: none; }
+.nav-menu__fold-toggle::-webkit-details-marker { display: none; }
+.nav-menu__fold-toggle .icon { color: var(--dim); transition: transform 0.2s ease; }
+.nav-menu__fold[open] > .nav-menu__fold-toggle .icon { transform: rotate(180deg); }
 .nav-menu__link--soon { color: var(--dim); }
 .nav-menu__heading { padding: var(--space-2) var(--space-3) 0; color: var(--dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .nav-menu__account .account--inline { order: 0; width: 2rem; height: 2rem; margin-left: 0; font-size: 0.85rem; }

@@ -34,10 +34,11 @@ module ApplicationHelper
   end
 
   # Signed in, the toolkit folds into one Tools menu: [label, [[name, path,
-  # current?], ...], current?], like a player's several characters.
+  # current?], ...], current?, fold], like a player's several characters; fold:
+  # in the phone menu too, it's a fold, closed unless a tool is open.
   def tools_tab
     tools = toolkit_nav.select { _1[:ready] }.map { |item| path = public_send(item[:path]); [ item[:label], path, current_page?(path) ] }
-    [ "Tools", tools, tools.any?(&:last) ]
+    [ "Tools", tools, tools.any?(&:last), true ]
   end
 
   # The placeholder for a text box with a datalist of the book's words: it takes
