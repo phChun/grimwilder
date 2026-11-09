@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // and on a phone opens the panel as a drawer from its button. Each taken talent
 // shows its summary under its name, so the list can be compared at a glance.
 export default class extends Controller {
-  static targets = ["box", "list", "count", "save", "over", "empty", "fab", "fabCount", "removeIcon"]
+  static targets = ["box", "list", "count", "save", "over", "empty", "fab", "fabCount"]
   static values = { limit: Number }
 
   connect() {
@@ -51,11 +51,10 @@ export default class extends Controller {
     if (summary) label.append(this.span("talent-picker__summary", summary))
     const button = document.createElement("button")
     button.type = "button"
-    button.className = "talent-picker__remove"
+    button.className = "button button--small talent-picker__remove"
     button.dataset.key = key
     button.dataset.action = "talent-picker#remove"
-    button.setAttribute("aria-label", `Remove ${name}`)
-    button.append(this.removeIconTarget.content.cloneNode(true))
+    button.append("Remove", this.span("visually-hidden", ` ${name}`))
     li.append(label, button)
     return li
   }

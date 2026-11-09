@@ -598,11 +598,19 @@ small { font-size: 0.8em; color: var(--dim); }
 
 /* ---------- Layout ---------- */
 
+/* No cap on the width: past --page, the margins grow by an eighth of the extra (a quarter of what centring in --page used to leave). */
 .site-main {
   width: 100%;
-  max-width: var(--page);
-  margin-inline: auto;
   padding-inline: var(--space-4);
+}
+
+/* From tablet width the edges halve again: 8px, plus that eighth. Phones keep 16px. */
+@media (min-width: 48rem) {
+  .app-header,
+  .live-banner,
+  .site-footer { padding-inline: var(--space-2); }
+
+  .site-main { padding-inline: calc(max(0px, 100% - var(--page)) / 8 + var(--space-2)); }
 }
 
 .site-main {
@@ -620,6 +628,8 @@ small { font-size: 0.8em; color: var(--dim); }
 
 .fluid__main { flex: 999 1 640px; min-width: 0; }
 .fluid__rail { flex: 1 1 340px; max-width: 420px; min-width: 0; }
+/* The table chat (on its own, or heading the GM table's column) takes a third of the page. */
+.fluid__rail.table-rail, .fluid__rail.gm-view__side { flex-basis: max(340px, calc((100% - var(--space-5)) / 3)); max-width: none; }
 
 /* Once the rail can't fit beside the main column (640px + 340px + the gap),
    it wraps below the page and takes its full width. A container query, so it
@@ -629,6 +639,21 @@ small { font-size: 0.8em; color: var(--dim); }
 turbo-cable-stream-source { display: none; }
 @container (max-width: 1003.98px) {
   .fluid__rail { max-width: none; }
+}
+
+/* The table shell: on a wide screen, a page with the table chat beside it fits the window. The
+   header and footer stay put, the page scrolls on its own, and the chat fills the height with its
+   messages scrolling inside it (on the GM table, the column scrolls to Kept crucibles under it). */
+@media (min-width: 64rem) {
+  body:has(.fluid > .table-rail, .fluid > .gm-view__side) { height: 100dvh; min-height: 0; overflow: hidden; }
+  .site-main:has(> .fluid > .table-rail, > .fluid > .gm-view__side) { display: flex; flex-direction: column; min-height: 0; padding-block: var(--space-4); }
+  .site-main > .fluid:has(> .table-rail, > .gm-view__side) { flex: 1; min-height: 0; flex-wrap: nowrap; align-items: stretch; }
+  /* The padding keeps focus rings inside the scroll box (the margin takes it back out), with room on the right before the scrollbar. */
+  .site-main > .fluid:has(> .table-rail, > .gm-view__side) > .fluid__main { overflow-y: auto; margin: -4px; padding: 4px var(--space-4) 4px 4px; }
+  .fluid > .gm-view__side { overflow-y: auto; }
+  .fluid > .gm-view__side > .table-rail { flex: 0 0 100%; }
+  .fluid > .table-rail,
+  .fluid > .gm-view__side > .table-rail { max-height: none; }
 }
 
 /* Full width, like the header: the toolkit's links on the left, the legal notice on the right. */
@@ -666,14 +691,6 @@ turbo-cable-stream-source { display: none; }
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
-}
-
-@media (min-width: 48rem) {
-  .app-header,
-  .live-banner { padding-inline: var(--space-6); }
-
-  .site-main,
-  .site-footer { padding-inline: var(--space-6); }
 }
 
 @media (prefers-reduced-motion: reduce) {

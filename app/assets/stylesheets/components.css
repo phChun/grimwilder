@@ -1058,18 +1058,18 @@ form.button_to, .button_to { margin: 0; }
 .talent-toggle:has(.talent-toggle__box:focus-visible) .button { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* The talent picker: the catalog, and what's taken beside it (a drawer on a phone). */
-.talent-picker { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: var(--space-5); align-items: start; }
+.talent-picker { display: grid; grid-template-columns: minmax(0, 1fr) 26rem; gap: var(--space-5); align-items: start; }
 .talent-picker__panel { position: sticky; top: var(--space-4); }
 .talent-picker__head { display: flex; align-items: center; gap: var(--space-2); }
 .talent-picker__head .panel__title { margin: 0; flex: 1; }
 .talent-picker__count { font-family: var(--font-dice); color: var(--text-soft); }
 .talent-picker__close, .talent-picker__fab { display: none; }
-.talent-picker__list { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
-.talent-picker__item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: var(--tap); padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
-.talent-picker__label { display: grid; gap: 2px; }
-.talent-picker__summary { color: var(--text-soft); font-size: 0.85rem; line-height: 1.35; }
-.talent-picker__remove { display: inline-grid; place-items: center; width: var(--tap); height: var(--tap); margin-right: calc(var(--space-2) * -1); border: 0; background: none; color: var(--text-soft); cursor: pointer; }
-.talent-picker__remove:hover { color: var(--text); }
+.talent-picker__list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.talent-picker__item { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); min-height: var(--tap); padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.talent-picker__label { flex: 1; min-width: 0; display: grid; gap: var(--space-1); }
+.talent-picker__name { font-weight: 600; }
+.talent-picker__summary { color: var(--text-soft); font-size: 0.85rem; line-height: 1.4; }
+.talent-picker__remove { align-self: flex-start; }
 @media (max-width: 60rem) {
   .talent-picker { grid-template-columns: 1fr; }
   .talent-picker__panel { display: none; position: fixed; inset: auto var(--space-4) var(--space-4); z-index: 30; max-height: 75vh; overflow: auto; box-shadow: 0 12px 40px rgb(0 0 0 / 0.5); }
@@ -1514,8 +1514,6 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 
 /* ---------- Character view ---------- */
 
-.site-main:has(.play-view) { max-width: 96rem; }
-
 .sheet { display: flex; flex-direction: column; gap: 20px; }
 
 .card__title { margin: 0 0 var(--space-3); font-size: 1.25rem; }
@@ -1622,8 +1620,8 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .path-picker__name { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
 .path-picker__core { margin: 2px 0 0; color: var(--text-soft); }
 .path-picker__label { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
-.path-dialog { width: calc(100% - 64px); height: calc(100dvh - 64px); max-height: none; overflow: hidden; }
-@media (max-width: 40rem) { .path-dialog { width: calc(100% - 16px); height: calc(100dvh - 16px); } }
+.path-dialog { width: calc(100% - 24px); height: calc(100dvh - 24px); max-height: none; padding: 14px 16px 16px; overflow: hidden; }
+@media (max-width: 40rem) { .path-dialog { width: calc(100% - 8px); height: calc(100dvh - 8px); padding: 12px 12px 12px; } }
 /* Only the list scrolls; the title, its ✕ and the hint stay put. The padding keeps a picked card's focus ring inside the scroll box. */
 .path-dialog__grid { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: 8px; margin: 0 -4px; padding: 4px; border: 0; min-width: 0; }
 /* One path per row: the path and its tagline on the left, its core talent on the right; stacked on a phone. */
@@ -2129,18 +2127,11 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
   overflow: hidden;
 }
 
-/* Wide screens: the rail sticks beside the page at the viewport's height, and
-   the feed takes what's left, so the composer is always in view. */
-@media (min-width: 60rem) {
-  .fluid__rail.table-rail { position: sticky; top: var(--space-4); height: calc(100vh - 2 * var(--space-4)); }
-  .fluid__rail.table-rail .feed,
-  .gm-view__side .table-rail .feed { flex: 1 1 auto; min-height: 0; }
-  .fluid__rail.table-rail .feed__scroller,
-  .gm-view__side .table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
-  /* The GM table: the chat at a set height (85vh, never under 38rem), and Kept crucibles under
-     it at its full length; the page scrolls to reach it, so this column doesn't stick. */
-  .gm-view__side > .table-rail { height: max(38rem, 85vh); }
-}
+/* The chat never runs past the screen: the feed takes what the head and composer leave, so the
+   composer stays in view. On a wide screen the table shell (application.css) sets its height. */
+.table-rail { max-height: calc(100dvh - 2 * var(--space-4)); }
+.table-rail .feed { flex: 1 1 auto; min-height: 0; }
+.table-rail .feed__scroller { flex: 1 1 auto; min-height: 10rem; max-height: none; }
 .gm-view__side { display: flex; flex-direction: column; gap: var(--space-3); }
 
 .table-rail__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: 12px 14px; border-bottom: 1px solid var(--line-soft); }
@@ -2164,7 +2155,6 @@ span.mark-toggle { display: inline-flex; align-items: center; cursor: default; }
 
 /* ---------- GM table (campaigns/tables#show) ---------- */
 
-.site-main:has(.gm-view) { max-width: 96rem; }
 .gm-view__main { display: flex; flex-direction: column; gap: var(--space-5); }
 
 /* Scene header and suspense */
@@ -2384,7 +2374,6 @@ li.popover__head { margin: 0; padding-left: var(--space-3); }
 
 /* ---------- Campaign page (campaigns#show) ---------- */
 
-.site-main:has(.campaign-page) { max-width: 82rem; }
 /* One column to read down (hero, party, what looms, previously on), the table's chat in the rail beside it. */
 .campaign-page__main { display: flex; flex-direction: column; gap: 44px; }
 
