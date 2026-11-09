@@ -48,7 +48,7 @@ Run the Herb linter after every template change. Its `herb-state-valid-reads` ru
 ```
 app/assets/stylesheets/application.css   # @font-face, design tokens (dark only), base, shell, layout
 app/assets/stylesheets/components.css    # buttons, cards, dice, pools, pips, steppers, each screen
-app/helpers/application_helper.rb        # TOOLKIT_NAV (ready: false shows "soon"), title_case, toasts
+app/helpers/application_helper.rb        # TOOLKIT_NAV (ready: false shows "soon"; signed in, the Tools menu), title_case, toasts
 app/javascript/grimwild/dice.js          # PURE dice rules (no DOM), pinned as "grimwild/dice"
 app/models/grimwild/dice.rb              # the same rules for server rolls
 app/views/shared/                        # the partials every screen is built from (see *Design system*)
@@ -226,7 +226,7 @@ Data in `config/crucibles.yml` (97 crucibles, 152 tables), read by a plain `Cruc
 - **Confirmations**: write `form: { data: { turbo_confirm: "…" } }`; `shared/_confirm` handles it.
 - **Modals**: link with `data: { turbo_frame: "modal" }` to a page wrapping its content in `turbo_frame_tag "modal"`; its forms target `_top`.
 - **Toasts**, no flash banners: `notice:` is a neutral toast; `alert:`, 422 re-renders and unrescued `RecordInvalid` are grim-red failure toasts (`ApplicationController#not_saved`).
-- Every popover and modal has a title and a ✕. Lists that grow end with a dashed "Create new …" card (`.add-card`), no + glyph.
+- Every popover and modal has a title and a ✕, except the header's tab menus (Tools, My characters), which close from their tab or a click outside. Lists that grow end with a dashed "Create new …" card (`.add-card`), no + glyph.
 - Text boxes with the book's words use `type_or_select` placeholders. Show list words with `title_case` (never Rails' `titleize`, which turns hyphens into spaces); stored values stay lowercase.
 - Accessibility: skip link, `:focus-visible` outlines, `aria-live` on changing results, `prefers-reduced-motion`.
 

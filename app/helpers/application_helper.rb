@@ -33,20 +33,27 @@ module ApplicationHelper
     TOOLKIT_NAV
   end
 
+  # Signed in, the toolkit folds into one Tools menu: [label, [[name, path,
+  # current?], ...], current?, fold], like a player's several characters; fold:
+  # in the phone menu too, it's a fold, closed unless a tool is open.
+  def tools_tab
+    tools = toolkit_nav.select { _1[:ready] }.map { |item| path = public_send(item[:path]); [ item[:label], path, current_page?(path) ] }
+    [ "Tools", tools, tools.any?(&:last), true ]
+  end
+
   # The placeholder for a text box with a datalist of the book's words: it takes
   # anything typed, or one of ours. prefix: what the box is for ("But not…").
   def type_or_select(prefix = nil)
     prefix ? "#{prefix} type one in or select from our list" : "Type one in or select from our list"
   end
 
-  # First in both navs, signed in: every campaign you're at, or have been.
+  # First in the nav, signed in: every campaign you're at, or have been.
   def all_campaigns_tab
     [ "All campaigns", campaigns_path, controller_path == "campaigns" && action_name.in?(%w[ index create ]) ]
   end
 
-  # Every signed-in person's own characters, the last tab in the header inside
-  # a campaign or out: [label, path, current?]. A player's sheet in a campaign
-  # is "My character" instead.
+  # Every signed-in person's own characters, second in the nav: [label, path,
+  # current?]. A player's sheet in a campaign is "My character" instead.
   def characters_tab
     [ "Characters", characters_path, controller_path == "characters" && action_name.in?(%w[ index new create ]) ]
   end
@@ -62,10 +69,11 @@ module ApplicationHelper
     Current.membership || @membership
   end
 
-  # The header's tabs inside a campaign: [label, path, current?], starting
-  # with All campaigns and then this one, by name (cut short if it's long). A
-  # player with more than one character seated here gets "My characters" with
-  # a menu of them instead of a path: [[name, path, current?], ...].
+  # The campaign's own tabs, after the divider while you're inside one:
+  # [label, path, current?], starting with this one, by name (cut short if
+  # it's long). A player with more than one character seated here gets "My
+  # characters" with a menu of them instead of a path: [[name, path,
+  # current?], ...].
   def campaign_tabs(membership)
     campaign = membership.campaign
     this_one = [ tag.span(campaign.name, class: "tabs__name"), campaign_path(campaign), controller_path == "campaigns" && action_name == "show" ]
@@ -73,7 +81,6 @@ module ApplicationHelper
 
     if membership.gm?
       [
-        all_campaigns_tab,
         this_one,
         ([ "Table", campaign_table_path(campaign), controller_path == "campaigns/tables" ] if campaign.playable?),
         [ "Journals", campaign_journals_path(campaign), controller_path.start_with?("campaigns/journals") ],
@@ -88,7 +95,7 @@ module ApplicationHelper
         else [ "My characters", sheets, sheets.any?(&:last) ]
         end
       journal = [ "Journal", campaign_journal_path(campaign, membership), controller_path.start_with?("campaigns/journals") ]
-      [ all_campaigns_tab, this_one, mine, journal, log ].compact
+      [ this_one, mine, journal, log ].compact
     end
   end
 

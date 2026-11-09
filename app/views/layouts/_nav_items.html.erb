@@ -1,11 +1,14 @@
 <%# locals: (membership:, menu: nil) %>
-<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true): the campaign's tabs inside one, else the toolkit's, then Characters and Admin. In the menu, "My characters" lists each sheet under its heading instead of folding them into a dropdown. %>
+<%# The header's links, in the tab row (wide screens) or the ☰ menu (phones, menu: true). Signed in, the same three everywhere: All campaigns, Characters (then Admin, for admins) and the Tools menu (Roll, Crucibles, Talents); inside a campaign, its own tabs come first, before a divider. Signed out, the toolkit's links on their own. In the ☰ menu a menu's links are listed under its heading instead of folding into a dropdown. %>
 <% link_class = menu ? "nav-menu__link" : "tabs__link" %>
 <% items = [] %>
-<% if membership %>
-  <% items.concat(campaign_tabs(membership)) %>
+<% if authenticated? %>
+  <% items << all_campaigns_tab << characters_tab %>
+  <% items << admin_tab if admin_tab %>
+  <% items << tools_tab %>
+  <%# Inside a campaign its tabs come first, the place you're in, then a divider and the rest. %>
+  <% items = [ *campaign_tabs(membership), :divider, *items ] if membership %>
 <% else %>
-  <% items << all_campaigns_tab if authenticated? %>
   <% toolkit_nav.each do |item| %>
     <% if item[:ready] %>
       <% path = public_send(item[:path]) %>
@@ -15,24 +18,29 @@
     <% end %>
   <% end %>
 <% end %>
-<% if authenticated? %>
-  <% items << characters_tab %>
-  <% items << admin_tab if admin_tab %>
-<% end %>
-<% items.each do |text, path, current| %>
-  <% if path.nil? %>
+<% items.each do |text, path, current, fold| %>
+  <% if text == :divider %>
+    <span class="<%= menu ? "nav-menu__divider" : "tabs__divider" %>" aria-hidden="true"></span>
+  <% elsif path.nil? %>
     <span class="<%= link_class %> <%= link_class %>--soon" title="Coming soon"><%= text %></span>
+  <% elsif path.is_a?(Array) && menu && fold %>
+    <%# The Tools, folded in the phone menu unless one is open. %>
+    <%= tag.details class: "nav-menu__fold", open: current do %>
+      <summary class="nav-menu__link nav-menu__fold-toggle"><%= text %><%= icon(:chevron, size: 16) %></summary>
+      <% path.each do |name, sub_path, open| %>
+        <%= link_to name, sub_path, class: "nav-menu__link nav-menu__link--sub", "aria-current": (open ? "page" : nil) %>
+      <% end %>
+    <% end %>
   <% elsif path.is_a?(Array) && menu %>
     <span class="nav-menu__heading"><%= text %></span>
     <% path.each do |name, sheet_path, open| %>
       <%= link_to name, sheet_path, class: "nav-menu__link nav-menu__link--sub", "aria-current": (open ? "page" : nil) %>
     <% end %>
   <% elsif path.is_a?(Array) %>
-    <%# More than one character seated here: a menu of their sheets. %>
+    <%# A menu: the Tools, or a player's several sheets here. No title or ✕: its tab is the title, and a click on it or anywhere outside (menu_controller.js) closes it. %>
     <details class="tab-menu" data-controller="menu" data-action="toggle->menu#place">
       <summary class="<%= class_names("tabs__link", "tab-menu__button", "tabs__link--current": current) %>"><%= text %><%= icon(:chevron, size: 14) %></summary>
       <ul class="tab-menu__menu" data-menu-target="panel">
-        <%= render "shared/popover_head", title: text, list: true %>
         <% path.each do |name, sheet_path, open| %>
           <li><%= link_to name, sheet_path, "aria-current": (open ? "page" : nil) %></li>
         <% end %>

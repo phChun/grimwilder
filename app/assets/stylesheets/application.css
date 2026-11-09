@@ -444,7 +444,11 @@ small { font-size: 0.8em; color: var(--dim); }
   box-shadow: inset 0 -2px 0 var(--ember);
 }
 
-/* A tab with a menu: "My characters" when a player has several seated here. */
+/* Between the three that are always there and a campaign's own tabs. */
+.tabs__divider { align-self: center; width: 1px; height: 1.4rem; margin: 0 var(--space-2); background: var(--line-strong); }
+.nav-menu__divider { height: 1px; margin: var(--space-2) 0; background: var(--line-soft); }
+
+/* A tab with a menu: Tools, or "My characters" when a player has several seated here. */
 .tab-menu { position: relative; }
 .tab-menu__button { gap: var(--space-1); cursor: pointer; list-style: none; }
 .tab-menu__button::-webkit-details-marker { display: none; }
@@ -520,6 +524,11 @@ small { font-size: 0.8em; color: var(--dim); }
 .nav-menu__link:hover { background: var(--surface-2); color: var(--text); }
 .nav-menu__link[aria-current="page"] { color: var(--text); font-weight: 600; box-shadow: inset 3px 0 0 var(--ember); }
 .nav-menu__link--sub { padding-left: var(--space-5); }
+/* Tools, folded in the phone menu: its toggle reads like a link, the chevron turning when open. */
+.nav-menu__fold-toggle { justify-content: space-between; cursor: pointer; list-style: none; }
+.nav-menu__fold-toggle::-webkit-details-marker { display: none; }
+.nav-menu__fold-toggle .icon { color: var(--dim); transition: transform 0.2s ease; }
+.nav-menu__fold[open] > .nav-menu__fold-toggle .icon { transform: rotate(180deg); }
 .nav-menu__link--soon { color: var(--dim); }
 .nav-menu__heading { padding: var(--space-2) var(--space-3) 0; color: var(--dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .nav-menu__account .account--inline { order: 0; width: 2rem; height: 2rem; margin-left: 0; font-size: 0.85rem; }

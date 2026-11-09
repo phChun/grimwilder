@@ -3,17 +3,18 @@ require "test_helper"
 class AppShellTest < ActionDispatch::IntegrationTest
   setup { @campaign = campaigns(:bramblewood) }
 
-  test "outside a campaign the tabs are the toolkit's, and signed out there's a sign-in button" do
+  test "signed out, the tabs are the toolkit's, and there's a sign-in button" do
     get root_path
     assert_select ".app-header .brand .brand__name", "Grimwilder"
     assert_select ".app-header .brand .brand__beta", "Beta"
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", "Roll"
+    assert_select "nav.tabs[aria-label=Main] .tabs__link", "Roll"
     assert_select ".app-header a.account--signin", "Sign in"
     assert_select ".app-header .reset-notice", 0
     assert_select ".tabs__link", text: "All campaigns", count: 0
     assert_select ".site-footer__tools a", "Crucibles"
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 3
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", text: "Characters", count: 0
+    assert_select "nav.tabs[aria-label=Main] .tabs__link", 3, "signed out, the toolkit's links on their own"
+    assert_select "nav.tabs[aria-label=Main] .tabs__link", text: "Characters", count: 0
+    assert_select "details.tab-menu", 0
     assert_select ".site-footer__tools a", text: "Characters", count: 0
   end
 
@@ -30,13 +31,23 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".tool-card", 3
   end
 
-  test "signed in, every page's tabs start with all campaigns and end with your characters" do
+  test "signed in, every page has All campaigns, Characters and the Tools menu" do
     sign_in_as identities(:stranger)
     get root_path
     assert_select ".app-header .reset-notice", "While in beta, data may be reset any time"
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link", 5
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
-    assert_select "nav.tabs[aria-label=Toolkit] .tabs__link[href=?]", characters_path, "Characters"
+    assert_equal [ "All campaigns", "Characters", "Tools" ], css_select("nav.tabs[aria-label=Main] > .tabs__link, nav.tabs[aria-label=Main] > .tab-menu > summary").map { _1.text.strip }
+    assert_select "nav.tabs > .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
+    assert_select "nav.tabs details.tab-menu" do
+      assert_select "summary.tabs__link", "Tools"
+      assert_equal [ roll_path, crucibles_path, talents_path ], css_select(".tab-menu__menu a").map { _1["href"] }
+      assert_select ".popover__head", 0, "no title or close: the tab and a click outside close it"
+    end
+    assert_select ".tabs__divider", 0, "no campaign, no divider"
+
+    get talents_path
+    assert_select "details.tab-menu summary.tabs__link--current", "Tools"
+    assert_select ".nav-menu details.nav-menu__fold[open] a[aria-current=page]", "Talents"
+    assert_select ".tab-menu__menu a[aria-current=page]", "Talents"
 
     get campaigns_path
     assert_select ".tabs__link[aria-current=page]", "All campaigns"
@@ -46,14 +57,24 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer__tools a", text: "Characters", count: 0
   end
 
+  test "an admin's Admin tab comes before Tools" do
+    sign_in_as identities(:ada)
+    get root_path
+    assert_equal [ "All campaigns", "Characters", "Admin", "Tools" ], css_select("nav.tabs[aria-label=Main] > .tabs__link, nav.tabs[aria-label=Main] > .tab-menu > summary").map { _1.text.strip }
+  end
+
   test "on a phone the tabs, feedback and account fold into the menu, with the same links" do
     identities(:gwen).update!(feedback_enabled: true)
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
-    row = css_select("nav.tabs .tabs__link").map { _1["href"] }
-    menu = css_select(".nav-menu nav .nav-menu__link").map { _1["href"] }
-    assert_equal row, menu
+    row = css_select("nav.tabs a").map { _1["href"] }
+    menu = css_select(".nav-menu nav a.nav-menu__link").map { _1["href"] }
+    assert_equal row, menu, "the same links, in the same order"
+    assert_equal campaign_path(@campaign), row.first, "the campaign's tabs come first"
+    assert_select ".nav-menu details.nav-menu__fold:not([open]) > summary", "Tools"
+    assert_select ".nav-menu details.nav-menu__fold a.nav-menu__link--sub", 3
+    assert_select ".nav-menu .nav-menu__divider", 1
     assert_select ".nav-menu .nav-menu__link[aria-current=page]", @campaign.name
     assert_select ".nav-menu .nav-menu__links--account a[href^=?]", new_feedback_path, /Send feedback/
     assert_select ".nav-menu .nav-menu__links--account a[href=?]", profile_path, /Account · Gwen/
@@ -68,7 +89,9 @@ class AppShellTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
     get campaign_path(@campaign)
     assert_select ".nav-menu .nav-menu__heading", "My characters"
-    assert_select ".nav-menu .nav-menu__link--sub", 2
+    assert_select ".nav-menu .nav-menu__heading", "My characters"
+    assert_select ".nav-menu > nav > .nav-menu__link--sub, .nav-menu nav > a.nav-menu__link--sub", 2, "the two sheets, listed open"
+    assert_select ".nav-menu .nav-menu__link--sub", text: "Moss"
   end
 
   test "making a character needs an account" do
@@ -76,12 +99,12 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test "the GM gets the campaign's tabs and an account button" do
+  test "in a campaign its own tabs come first, then a divider and the rest, and the GM gets an account button" do
     sign_in_as identities(:gwen)
     get campaign_path(@campaign)
 
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 6
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link:first-child[href=?]", campaigns_path, "All campaigns"
+    tabs = css_select("nav.tabs[aria-label=Main] > a, nav.tabs[aria-label=Main] > details > summary, nav.tabs[aria-label=Main] > .tabs__divider").map { _1.matches?(".tabs__divider") ? "|" : _1.text.strip }
+    assert_equal [ @campaign.name, "Table", "Journals", "Log", "|", "All campaigns", "Characters", "Tools" ], tabs
     assert_select ".tabs__link[aria-current=page][href=?] .tabs__name", campaign_path(@campaign), @campaign.name
     assert_select ".tabs__link[href=?]", campaign_table_path(@campaign), "Table"
     assert_select ".tabs__link[href=?]", campaign_journals_path(@campaign), "Journals"
@@ -104,7 +127,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
     get character_path(characters(:tibbs))
 
     assert_select ".tabs__link[aria-current=page][href=?]", character_path(characters(:tibbs)), "My character"
-    assert_select "nav.tabs[aria-label=Campaign] .tabs__link", count: 6
+    assert_select "nav.tabs[aria-label=Main] > a.tabs__link", count: 6
     assert_select ".tabs__link[href=?]", campaign_journal_path(@campaign, memberships(:pip_player)), "Journal"
     assert_select ".tabs__link", text: "Party", count: 0
   end
@@ -117,7 +140,7 @@ class AppShellTest < ActionDispatch::IntegrationTest
 
     get campaign_path(@campaign)
     assert_select ".tabs__link", text: "My character", count: 0
-    assert_select "details.tab-menu" do
+    assert_select "details.tab-menu:has(summary:contains('My characters'))" do
       assert_select "summary.tabs__link:not(.tabs__link--current)", "My characters"
       assert_select ".tab-menu__menu a", 2, "only the ones still playing"
       assert_select ".tab-menu__menu a[href=?]", character_path(moss), "Moss"

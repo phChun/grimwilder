@@ -1,5 +1,5 @@
 <%# locals: (membership:) %>
-<%# The shell: wordmark, tabs (All campaigns first, signed in) and account. Inside a campaign the tabs are the campaign's; elsewhere they're the toolkit's (layouts/_nav_items). On a phone the tabs, Feedback and the account fold into the ☰ menu. %>
+<%# The shell: wordmark, tabs and account. Signed in, the tabs are All campaigns, Characters and Tools, with a campaign's own first, before a divider, while you're in one; signed out, the toolkit's (layouts/_nav_items). On a phone the tabs, Feedback and the account fold into the ☰ menu. %>
 <header class="app-header">
   <%= link_to root_path, class: "brand" do %>
     <%= brand_mark %>
@@ -7,7 +7,7 @@
     <span class="brand__beta">Beta</span>
   <% end %>
 
-  <nav class="tabs" aria-label="<%= membership ? "Campaign" : "Toolkit" %>">
+  <nav class="tabs" aria-label="Main">
     <%= render "layouts/nav_items", membership: membership %>
   </nav>
 
@@ -29,7 +29,7 @@
     <summary class="button nav-menu__toggle" aria-label="Menu"><%= icon(:menu, size: 20) %></summary>
     <div class="nav-menu__panel" data-menu-target="panel">
       <%= render "shared/popover_head", title: "Menu" %>
-      <nav class="nav-menu__links" aria-label="<%= membership ? "Campaign" : "Toolkit" %>">
+      <nav class="nav-menu__links" aria-label="Main">
         <%= render "layouts/nav_items", membership: membership, menu: true %>
       </nav>
       <div class="nav-menu__links nav-menu__links--account">
