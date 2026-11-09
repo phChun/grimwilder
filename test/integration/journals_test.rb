@@ -46,6 +46,10 @@ class JournalsTest < ActionDispatch::IntegrationTest
     post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "Keep", body: "On top.", favorite: "1" } }
     assert @pip.journal_pages.sole.favorite?, "a new page can start starred"
 
+    get campaign_journal_path(@campaign, @pip, sort: "chronologically")
+    assert_select "form.journal__sort[method=get] select[name=sort] option[selected][value=chronologically]", "Chronologically"
+    assert_equal [ "Favorites first", "Chronologically", "Last updated" ], css_select("select#journal_sort option").map(&:text)
+
     patch campaign_journal_path(@campaign, @pip), params: { membership: { journal_shared: "0" } }
     assert_not @pip.reload.journal_shared?
   end

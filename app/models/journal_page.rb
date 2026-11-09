@@ -10,7 +10,11 @@ class JournalPage < ApplicationRecord
 
   belongs_to :membership
 
+  # How the journal lists them (Journal::SORTS): starred then newest, in the
+  # order written, or the latest changed first.
   scope :favorites_first, -> { order(favorite: :desc, created_at: :desc, id: :desc) }
+  scope :chronologically, -> { order(:created_at, :id) }
+  scope :last_updated, -> { order(updated_at: :desc, id: :desc) }
   scope :by_gm, -> { where(by_gm: true) }
 
   normalizes :title, with: ->(value) { value.strip.presence }

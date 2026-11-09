@@ -21,6 +21,11 @@ class JournalTest < ActiveSupport::TestCase
 
     @pip.journal_pages.find_by(body: "We crossed it.").update!(favorite: true)
     assert_equal [ "We crossed it.", "", "Then the river." ], @journal.pages_for(@pip).map(&:body)
+    assert_equal [ "We crossed it.", "Then the river.", "" ], @journal.pages_for(@pip, sort: "chronologically").map(&:body)
+    travel 1.minute
+    @pip.journal_pages.find_by(body: "Then the river.").update!(body: "Then the river, twice.")
+    assert_equal "Then the river, twice.", @journal.pages_for(@pip, sort: "last_updated").first.body
+    assert_equal @journal.pages_for(@pip).to_a, @journal.pages_for(@pip, sort: "drop table").to_a, "an unknown sort is favorites first"
   end
 
   test "every player starts with Character Secrets, starred, for the GM and the player both" do

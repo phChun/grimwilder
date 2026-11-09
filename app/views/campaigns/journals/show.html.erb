@@ -2,7 +2,7 @@
 <% owner = @journal.membership.identity %>
 <% content_for :title, "#{own ? "Your journal" : "#{owner.display_name}'s journal"} · #{Current.campaign.name}" %>
 
-<%# A player's journal: a New page button that opens its form in place, then the pages, starred first, then newest, across the page. A GM adds pages of their own here (read only for the player by default) and reads the player's while it's shared. %>
+<%# A player's journal: a New page button that opens its form in place, then a Sort select (Journal::SORTS: favorites first, chronologically or last updated), then the pages across the page. A GM adds pages of their own here (read only for the player by default) and reads the player's while it's shared. %>
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %><% unless own %> · <%= link_to "Journals", campaign_journals_path(Current.campaign) %><% end %></p>
   <h1><%= own ? "Your journal" : "#{owner.display_name}'s journal" %></h1>
@@ -26,6 +26,12 @@
   <%= render "campaigns/journals/new_button", journal: @journal %>
   <hr class="journal__rule">
   <% if @pages.any? %>
+    <%# The order the pages are in (Journal::SORTS), kept in the URL. %>
+    <%= form_with url: campaign_journal_path(Current.campaign, @journal.membership), method: :get, class: "journal__sort", data: { controller: "auto-submit", turbo_action: "replace" } do |form| %>
+      <%= form.label :sort, "Sort", class: "field__label", for: "journal_sort" %>
+      <%= form.select :sort, Journal::SORTS.invert.to_a, { selected: @sort }, id: "journal_sort", class: "field__input", data: { action: "change->auto-submit#submit" } %>
+      <noscript><%= form.submit "Sort", class: "button button--small" %></noscript>
+    <% end %>
     <div class="journal__pages">
       <%= render partial: "campaigns/journals/page", collection: @pages, as: :page, locals: { journal: @journal, viewer: Current.membership } %>
     </div>
