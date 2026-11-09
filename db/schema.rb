@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_10_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_10_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -104,6 +104,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_10_120000) do
     t.integer "starting_level"
     t.json "allowed_paths", default: [], null: false
     t.boolean "join_link_enabled", default: true, null: false
+    t.boolean "log_talent_uses", default: false, null: false
     t.index ["archived_at"], name: "index_campaigns_on_archived_at"
     t.index ["join_code"], name: "index_campaigns_on_join_code", unique: true
   end

@@ -249,7 +249,7 @@
       </div>
     </section>
 
-    <details id="talents" class="card sheet-fold" data-controller="talent-uses talent-fold" data-details-memory-target="section" data-section="character-<%= @character.id %>-talents" data-phone-open="true" open>
+    <details id="talents" class="card sheet-fold" data-controller="talent-fold" data-details-memory-target="section" data-section="character-<%= @character.id %>-talents" data-phone-open="true" open>
       <%# Talents still to take (its level allows more, or Eldritch Talents to choose): a pill on the title, seen even folded, that goes to choosing them. %>
       <% to_take = editable ? @character.talents_to_choose + @character.eldritch_talents_to_choose : 0 %>
       <summary class="gm-fold__summary">
@@ -270,12 +270,6 @@
             <%= render "characters/talent", talent: talent, character: @character, editable: editable, tends: tends, pools: talent_pools, live: live %>
           <% end %>
         </div>
-      <% end %>
-      <% if tends && @character.use_counters.any? %>
-        <label class="check use-note">
-          <input type="checkbox" data-talent-uses-target="note" data-action="talent-uses#remember">
-          Post to the table log when spending
-        </label>
       <% end %>
       <% if editable && @character.talents_to_choose.positive? %>
         <%= link_to "Pick a talent at level #{@character.level}", new_character_talent_path(@character), class: "talent-slot" %>

@@ -4,6 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Talent uses in the log are the GM's call**: a new setting, Post talent uses to the table log, puts every use a character spends in the log. It replaces the checkbox each player had on their sheet. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Talents to take show on your sheet**: when your level allows more talents (or Eldritch Talents) than you have, the Talents card's title says how many, even folded, and tapping it opens the talent picker. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Scene collections**: scene blocks are now called scene collections, laid out two across on the prep page, each with its scenes and its buttons at the bottom. Scenes in no collection are standalone scenes. Every card folds, with Expand all and Collapse all at the top, and Add a scene opens its form right in the card. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Move scenes from a menu**: each prepared scene has Edit, Move and Remove; Move lists the other collections. ([#107](https://github.com/phChun/grimwilder/pull/107))

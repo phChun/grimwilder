@@ -7,7 +7,7 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
       campaign: @campaign, talent_keys: [ "bardic-lore" ])
   end
 
-  test "the owner ticks uses on the sheet, and can post them to the log" do
+  test "the owner ticks uses on the sheet; they go in the log when the GM says so" do
     sign_in_as identities(:pip)
 
     get character_path(@fen)
@@ -15,14 +15,18 @@ class TalentUsesTest < ActionDispatch::IntegrationTest
     assert_select "#talent-inspiration button.use-box", 3
     assert_select "#talent-inspiration .use-tracker__resets", "3 left · resets each session"
     assert_select "#talent-bardic-lore .talent-card__chip", "+1 thread each session"
-    assert_select "#talents input[data-talent-uses-target=note]"
+    assert_select "#talents input[type=checkbox]", 0, "no checkbox of the player's own"
 
-    patch character_talent_uses_path(@fen), params: { use: "inspiration/inspiration", spent: 1, note: "1" }
+    patch character_talent_uses_path(@fen), params: { use: "inspiration/inspiration", spent: 1 }
     assert_redirected_to character_path(@fen, anchor: "talent-inspiration")
     assert_equal 1, @fen.reload.talent_uses["inspiration/inspiration"]
+    assert_equal 0, @campaign.rolls.note.count, "off by default"
+
+    @campaign.update!(log_talent_uses: true)
+    patch character_talent_uses_path(@fen), params: { use: "inspiration/inspiration", spent: 2 }
     assert_equal "Fen spends inspiration", @campaign.rolls.note.last.question
 
-    patch character_talent_uses_path(@fen), params: { use: "inspiration/inspiration", spent: 0, note: "1" }
+    patch character_talent_uses_path(@fen), params: { use: "inspiration/inspiration", spent: 0 }
     assert_equal 0, @fen.reload.talent_uses["inspiration/inspiration"]
     assert_equal 1, @campaign.rolls.note.count, "unspending doesn't post"
 

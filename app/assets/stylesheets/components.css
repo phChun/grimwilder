@@ -1357,7 +1357,6 @@ button.use-box { position: relative; cursor: pointer; }
 button.use-box:hover { border-color: var(--ember); }
 button.use-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .use-box--spent { border-color: var(--ember); background: var(--ember); }
-.use-note { font-size: 0.85rem; }
 /* A use whose boxes are the talent's picks: Hidden Magic's words, burned by name. */
 .use-words { display: inline-flex; flex-wrap: wrap; gap: 4px; }
 .use-word { min-height: 2rem; padding: 2px 10px; border: 1.5px solid var(--line-strong); border-radius: 999px; background: none; font: inherit; font-size: 0.85rem; color: var(--text); }
