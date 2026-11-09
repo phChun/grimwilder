@@ -87,6 +87,7 @@ class TalentsTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:pip)
 
     get character_path(vex)
+    assert_select "#sheet-talents a.sheet-fold__count--link[href=?]", new_character_talent_path(vex, eldritch: 1), "1 to take"
     assert_select ".eldritch__count", "0 of 1"
     assert_select ".eldritch a.talent-slot[href=?]", new_character_talent_path(vex, eldritch: 1), "Pick an Eldritch Talent"
 
@@ -136,5 +137,21 @@ class TalentsTest < ActionDispatch::IntegrationTest
 
     post character_talents_path(characters(:tibbs)), params: { talent: "lucky" }
     assert_response :not_found
+  end
+
+  test "talents still to take show on the sheet's Talents title, for the owner, and lead to choosing them" do
+    tibbs = characters(:tibbs)
+    sign_in_as identities(:pip)
+    get character_path(tibbs)
+    assert_select "#sheet-talents .sheet-fold__count--link", 0, "nothing to take"
+
+    tibbs.update!(level: 3)
+    get character_path(tibbs)
+    assert_select "#sheet-talents a.sheet-fold__count--link[href=?][aria-label=?]", new_character_talent_path(tibbs), "2 talents to take: choose them", "2 to take"
+
+    sign_out
+    sign_in_as identities(:gwen)
+    get character_path(tibbs)
+    assert_select "#sheet-talents .sheet-fold__count--link", 0, "only the owner picks talents"
   end
 end

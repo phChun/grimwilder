@@ -1522,6 +1522,8 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 /* A notification count beside a fold's title: an ember pill, an outline at nothing. */
 .sheet-fold__title:has(.sheet-fold__count) { display: inline-flex; align-items: center; gap: var(--space-2); }
 .sheet-fold__count { display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 6px; border: 1px solid var(--ember); border-radius: 999px; background: var(--ember); color: var(--ember-ink); font: 700 0.75rem/1 var(--font-ui); }
+.sheet-fold__count--link { width: auto; padding: 0 8px; text-decoration: none; letter-spacing: 0.02em; }
+.sheet-fold__count--link:hover, .sheet-fold__count--link:focus-visible { color: var(--ember-ink); text-decoration: underline; }
 .sheet-fold__count--none { background: none; border-color: var(--line-strong); color: var(--dim); }
 .sheet-fold[open] > .gm-fold__summary { margin-bottom: var(--space-3); }
 .sheet-fold__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0 0; }

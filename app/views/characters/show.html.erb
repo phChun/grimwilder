@@ -250,7 +250,13 @@
     </section>
 
     <details id="talents" class="card sheet-fold" data-controller="talent-uses talent-fold" data-details-memory-target="section" data-section="character-<%= @character.id %>-talents" data-phone-open="true" open>
-      <summary class="gm-fold__summary"><h2 id="sheet-talents" class="card__title sheet-fold__title">Talents</h2><%= icon(:chevron, size: 18) %></summary>
+      <%# Talents still to take (its level allows more, or Eldritch Talents to choose): a pill on the title, seen even folded, that goes to choosing them. %>
+      <% to_take = editable ? @character.talents_to_choose + @character.eldritch_talents_to_choose : 0 %>
+      <summary class="gm-fold__summary">
+        <h2 id="sheet-talents" class="card__title sheet-fold__title">Talents<% if to_take.positive? %>
+          <a href="<%= new_character_talent_path(@character, eldritch: (1 if @character.talents_to_choose.zero?)) %>" class="sheet-fold__count sheet-fold__count--link" aria-label="<%= pluralize(to_take, "talent") %> to take: choose <%= to_take == 1 ? "it" : "them" %>" title="<%= pluralize(to_take, "talent") %> to take"><%= to_take %> to take</a>
+        <% end %></h2><%= icon(:chevron, size: 18) %>
+      </summary>
       <% if editable %>
         <p class="sheet-fold__actions sheet-fold__actions--top"><%= link_to "Edit talents", new_character_talent_path(@character), class: "button button--small" %></p>
       <% end %>
