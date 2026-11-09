@@ -330,7 +330,7 @@
   kind: path
   page: 63
   aka: shapeshifter, grovekeeper, wildling
-  tagline: You embrace and embody the untamed power of the natural world, transforming into beasts and channeling the spirit of the wild.
+  tagline: You transform into beasts and channel the spirit of the wild, embracing the untamed power of the natural world.
   core:
     name: Wild Shape
     summary: "Shift into beasts from a 2d pool that refills each scene; special forms, like flyers, cost more."
@@ -400,7 +400,7 @@
   name: Fighter
   kind: path
   page: 65
-  aka: blademaster, duelist, sergeant
+  aka: blademaster, warrior, sergeant
   tagline: You become one with your weapon, and through it, you find your real purpose in this life.
   core:
     name: Weapon Mastery
@@ -485,7 +485,7 @@
   kind: path
   page: 67
   aka: martial artist, mystic, wanderer
-  tagline: Your body is a vessel through which you channel your discipline into grace, precision, and the never-ending journey towards perfection.
+  tagline: You channel your discipline into grace, and precision, as you follow your never-ending journey towards perfection.
   core:
     name: Discipline
     summary: "4 flow a scene for fluid maneuvers, mystic feats and ignoring bad odds; interrupt once a session."
@@ -553,7 +553,7 @@
   kind: path
   page: 69
   aka: crusader, champion, justiciar
-  tagline: You have sworn an oath and your unwavering dedication gives you powerful conviction, which you can wield to shape the world.
+  tagline: You have unwavering dedication to your oath, which you can wield to shape the world.
   core:
     name: Oathsworn
     summary: "Live by 3 tenets: +1d when bloodied, rattled or desperate, and 3 smite a session to cut task pools."
@@ -719,7 +719,7 @@
   kind: path
   page: 73
   aka: beastmaster, pathfinder, trapper
-  tagline: You stalk relentlessly, moving unseen through the terrain, tracking your prey with deadly precision and striking them when they're weakest.
+  tagline: You stalk unseen through the terrain, tracking prey with deadly precision and striking them when they’re weakest.
   core:
     name: Quarry
     summary: "Once a session, mark a foe: you and allies add your quarry die to find, study or attack it."
@@ -976,7 +976,7 @@
   kind: path
   page: 79
   aka: caller, binder, planeswalker
-  tagline: You can create creatures from the essence of other planes to protect yourself and bring ruin to your enemies.
+  tagline: You are bound to a creature from another plane, able to summon it to protect yourself and bring ruin to your enemies.
   core:
     name: Vassal
     summary: "Summon a creature from another plane: a 4d power pool with 2 aspects, like big enough to ride."
@@ -1051,7 +1051,7 @@
   kind: path
   page: 81
   aka: fencer, duelist, buccaneer
-  tagline: You fight with swagger, skill, and a smile, turning every desperate clash into a daring performance with luck ever by your side.
+  tagline: You fight with swagger, skill, and a smile, turning every clash into a daring performance, with luck ever by your side.
   core:
     name: Panache
     summary: "2 panache a scene to strip thorns before you roll, +1 when a thorn cuts you; quip to interrupt."
@@ -1073,7 +1073,7 @@
   - name: Audacity
     summary: "Do something wildly reckless: 5s count as 6s (but 4s as 1s), and onlookers are left awed or baffled."
     text: 'When you act with pure reckless abandon, 5s count as 6s, but 4s count as 1s. Regardless of the outcome, those around you are briefly struck by: awe—bewilderment—panic—excitement.'
-    note: These are the kinds of ideas that you alone have the gall to attempt, consequences be damned—potentially as a tangle with voluntarily increasing stakes.
+    note: These are the kinds of ideas that you alone have the gall to attempt, consequences be damned—potentially as a tangle with voluntarily increased stakes.
     page: 82
     bonuses:
     - { key: abandon, label: "Pure reckless abandon: 5s count as 6s, 4s as 1s", dice: 0, counts_as: reckless }
@@ -1331,11 +1331,11 @@
   kind: path
   page: 87
   aka: diviner, evoker, abjurer
-  tagline: You wield arcane power through precise knowledge, casting spells from an ever-expanding repertoire, your studies endless.
+  tagline: You wield arcane power through precise knowledge, casting spells from an ever-expanding repertoire.
   core:
     name: Spellcraft
     summary: "Cast with Wits from 4 spell theorems in your spellbook: 4 spells and 2 potent spells a session."
-    text: 'You have spellcasting ability. You roll Wits to cast and the spell theorem you are casting serves as its touchstone. You know 4 spell theorems inscribed in your spellbook, created using the Spell Crucible (below). Each session, you can cast 4 spells and 2 potent spells. You choose which spell theorem to use when you cast, interpreting it as you see fit. Spells cast without risk require no roll and don’t count against your limited number per session, unless potent. You can learn new theorems from studying and experimenting with scrolls, consuming them.
+    text: 'You have spellcasting ability. You roll Wits to cast and the spell theorem you are casting serves as its touchstone. You know 4 spell theorems inscribed in your spellbook, created using the Spell Crucible (below). Each session, you can cast 4 spells and 2 potent spells. You choose which spell theorem to use when you cast, interpreting it as you see fit. Spells cast with no risk require no roll and don’t count against your limited number per session, unless potent. You can learn new theorems from studying and experimenting with scrolls, consuming them.
 
 
       GROWTH: At levels 2, 4, and 6, gain +1 spell and potent spell per session, +1 theorem.'

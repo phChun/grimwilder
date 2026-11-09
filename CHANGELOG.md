@@ -7,6 +7,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 - **The Warlock's core talent is Pact again**, as the Community Edition's book calls it. Saved characters keep it. ([#98](https://github.com/phChun/grimwilder/pull/98))
 - **Trap Making is back among the Artificer's talents**, with the book's text (no spark when a trap goes off). ([#98](https://github.com/phChun/grimwilder/pull/98))
 - **The Taken list shows each talent's summary** under its name when you choose talents, so you can compare your picks without scrolling back to their cards. ([#98](https://github.com/phChun/grimwilder/pull/98))
+- **Path taglines follow the book** for the Druid, Monk, Paladin, Ranger, Summoner, Swashbuckler and Wizard, the Fighter is also known as a warrior, and Spellcraft and Audacity's tip match its wording. ([#98](https://github.com/phChun/grimwilder/pull/98))
 
 ## 2026-11-05
 
