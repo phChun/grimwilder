@@ -619,6 +619,8 @@ small { font-size: 0.8em; color: var(--dim); }
 
 .fluid__main { flex: 999 1 640px; min-width: 0; }
 .fluid__rail { flex: 1 1 340px; max-width: 420px; min-width: 0; }
+/* The table chat (on its own, or heading the GM table's column) takes a third of the page. */
+.fluid__rail.table-rail, .fluid__rail.gm-view__side { flex-basis: max(340px, calc((100% - var(--space-5)) / 3)); max-width: none; }
 
 /* Once the rail can't fit beside the main column (640px + 340px + the gap),
    it wraps below the page and takes its full width. A container query, so it
