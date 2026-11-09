@@ -4,6 +4,8 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Journals are pages you keep as you like**: add a New page from your journal or your sheet, with a title if you want one, whenever you want. Pages no longer belong to a session; the ones you'd written keep their session as their title. Edit or tear out any page of yours. ([#105](https://github.com/phChun/grimwilder/pull/105))
+- **The GM can add pages to a player's journal**, from the journal or the character's sheet: a secret, a backstory. They're read only for the player unless the GM says otherwise, and the GM sees them even in a private journal. ([#105](https://github.com/phChun/grimwilder/pull/105))
 - **Fold away the sheet's cards**: every card on a character sheet but the stats and harm opens and closes from its title, and remembers how you left it. Talents come first, then What looms, Journal, Arcana, Story and Who; What looms, Journal, Arcana and Story start closed. ([#104](https://github.com/phChun/grimwilder/pull/104))
 - **What looms shows a count** of the pools looming over the table, like a notification badge. ([#104](https://github.com/phChun/grimwilder/pull/104))
 - **Your journal on your sheet**: write about this session right from your character's sheet, see your last page, and open every journal from the card. Your GM sees it there too while you share it. ([#104](https://github.com/phChun/grimwilder/pull/104))
