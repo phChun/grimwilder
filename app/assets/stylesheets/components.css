@@ -3076,7 +3076,7 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-plans__notes { margin: var(--space-1) 0 0; color: var(--text-soft); white-space: pre-line; }
 .scene-plans__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__actions .button_to { margin: 0; }
-/* Scene prep: folds (Expand all / Collapse all on top), every gap the same so stacked cards space evenly on a phone; the scene collections two across when there's room, each with its scenes as cards and its buttons at the bottom; then Create new scene collection beside the standalone scenes, on the same grid. A card's Add a scene opens its form in place, on a row of its own below the other buttons. */
+/* Scene prep: folds (Expand all / Collapse all on top), every gap the same so stacked cards space evenly on a phone; the scene collections two across when there's room, each with its scenes as rows (what it is, then its buttons) and its own buttons at the bottom; then Create new scene collection beside the standalone scenes, on the same grid. A card's Add a scene opens its form in place, on a row of its own below the other buttons. */
 .scene-prep { display: grid; gap: var(--space-3); }
 .scene-prep .section-title { margin: var(--space-3) 0 var(--space-3); }
 .scene-prep__tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
@@ -3088,10 +3088,6 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-prep__add:has(form) { order: 1; flex-basis: 100%; }
 .scene-prep__form { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
 .scene-prep__form-title { margin: 0; font-size: 1.05rem; }
-.scene-prep .scene-plans:not(.scene-plans--played) { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--space-3); }
-.scene-prep .scene-plans:not(.scene-plans--played) > .scene-plans__item { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
-.scene-prep .scene-plans__item > .scene-plans__main { flex: 1 0 auto; }
-.scene-prep .scene-plans__item > .scene-plans__actions { margin-top: var(--space-2); }
 .scene-collection__actions { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
 .scene-plan-form__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__move { position: relative; }
