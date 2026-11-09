@@ -38,6 +38,12 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
+  # Anyone can send a Client-IP header alongside the X-Forwarded-For that Cloudflare
+  # and kamal-proxy write, and Rails' spoofing check then answers with a 500. Without
+  # the check, remote_ip still takes the last untrusted X-Forwarded-For address (the
+  # one Cloudflare saw), so Client-IP never wins and rate limits keep working.
+  config.action_dispatch.ip_spoofing_check = false
+
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
