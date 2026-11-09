@@ -8,7 +8,7 @@ Guidance for AI coding agents (and humans) working in this repo. Read this befor
 
 Built: the public tools (action roller `/roll`, crucibles, talent catalog), passwordless accounts with plans, campaigns (join links, archiving, on hold, schedules), character sheets, the GM table and campaign page, table chat, sessions and scenes, pools, the table log, optional rules, journals, polls and handouts. Nothing is scheduled next; see *Roadmap*.
 
-Page numbers are the CE PDF's (they match Preview 6's): talents, crucibles and the code's `pg.` references have all been checked against it. Crucibles and talent text come from the CE text.
+Page numbers are the CE PDF's: talents, crucibles and the code's `pg.` references have all been checked against it. Crucibles and talent text come from the CE text.
 
 ## Stack
 
