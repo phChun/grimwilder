@@ -1,0 +1,10 @@
+<% content_for :title, "New scene collection · #{Current.campaign.name}" %>
+
+<%# Takes the "Create new scene collection" button's place on the prep page (its new_scene_collection frame); on its own (or after a failed save), a page. The form targets _top; Cancel loads the button back. %>
+<turbo-frame id="new_scene_collection">
+  <section class="card stack add-card scene-prep__new" aria-labelledby="new_scene_collection_title">
+    <h2 id="new_scene_collection_title" class="card__title">New scene collection</h2>
+    <p class="field__hint">A place or thread the players might follow, to gather its scenes under.</p>
+    <%= render "campaigns/scene_collections/form", collection: @collection, cancel_url: campaign_scene_plans_path(Current.campaign) %>
+  </section>
+</turbo-frame>

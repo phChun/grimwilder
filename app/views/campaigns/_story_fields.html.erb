@@ -1,13 +1,14 @@
-<%# locals: (my_characters:, spark: nil, odds: nil) %>
-<%# spark: false leaves out the spark field, for a roll call (the player picks their spark when they roll). odds: the dice to start on (a prepared scene's). %>
+<%# locals: (my_characters:, spark: nil, odds: nil, prefix: nil) %>
+<%# spark: false leaves out the spark field, for a roll call (the player picks their spark when they roll). odds: the dice to start on. prefix: for the fields' ids, when two forms share a page (the Rolls fold and the story roll modal). %>
 <% spark = true if spark.nil? %>
 <% odds ||= 2 %>
+<% prefix ||= "story" %>
 <fieldset class="roll-setup__group">
   <legend class="field__label">Odds</legend>
   <div class="segmented segmented--auto">
     <% Roll::ODDS.each do |dice, odds_name| %>
       <label class="segmented__option">
-        <%= radio_button_tag :odds, dice, dice == odds %>
+        <%= radio_button_tag :odds, dice, dice == odds, id: "#{prefix}_odds_#{dice}" %>
         <span class="segmented__text"><%= dice %>d <small><%= odds_name.delete_suffix(" odds") %></small></span>
       </label>
     <% end %>
@@ -16,14 +17,14 @@
 
 <div class="story-roll__fields">
   <div class="field">
-    <label class="field__label" for="story_thorns">Thorns <small>rare</small></label>
-    <input type="number" id="story_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+    <label class="field__label" for="<%= prefix %>_thorns">Thorns <small>rare</small></label>
+    <input type="number" id="<%= prefix %>_thorns" name="thorns" value="0" min="0" max="<%= Character::Rolling::MAX_EXTRA %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
   </div>
 
   <% if my_characters.any? %>
     <div class="field">
-      <label class="field__label" for="story_character">For</label>
-      <select id="story_character" name="character_id" class="field__input">
+      <label class="field__label" for="<%= prefix %>_character">For</label>
+      <select id="<%= prefix %>_character" name="character_id" class="field__input">
         <option value="">No one in particular</option>
         <% my_characters.each do |character| %>
           <option value="<%= character.id %>"><%= character.name %> (<%= pluralize(character.spark, "spark") %>)</option>
@@ -33,8 +34,8 @@
 
     <% if spark %>
       <div class="field">
-        <label class="field__label" for="story_spark">Spark <small>+1d each</small></label>
-        <input type="number" id="story_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
+        <label class="field__label" for="<%= prefix %>_spark">Spark <small>+1d each</small></label>
+        <input type="number" id="<%= prefix %>_spark" name="spark" value="0" min="0" max="<%= Grimwild::MAX_SPARK %>" inputmode="numeric" autocomplete="off" class="field__input roll-setup__number">
       </div>
     <% end %>
   <% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_10_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -308,11 +308,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
     t.boolean "standout", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "scene_block_id"
     t.index ["campaign_id", "number"], name: "index_play_sessions_on_campaign_id_and_number", unique: true
     t.index ["campaign_id"], name: "index_play_sessions_on_campaign_id"
     t.index ["campaign_id"], name: "index_play_sessions_one_open_per_campaign", unique: true, where: "ended_at IS NULL"
-    t.index ["scene_block_id"], name: "index_play_sessions_on_scene_block_id"
   end
 
   create_table "pools", force: :cascade do |t|
@@ -409,29 +407,28 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
     t.index ["scene_id"], name: "index_rolls_on_scene_id"
   end
 
-  create_table "scene_blocks", force: :cascade do |t|
+  create_table "scene_collections", force: :cascade do |t|
     t.integer "campaign_id", null: false
     t.string "title", null: false
     t.text "notes"
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["campaign_id"], name: "index_scene_blocks_on_campaign_id"
+    t.index ["campaign_id"], name: "index_scene_collections_on_campaign_id"
   end
 
   create_table "scene_plans", force: :cascade do |t|
     t.integer "campaign_id", null: false
     t.string "title", null: false
     t.text "notes"
-    t.string "opening_question"
-    t.integer "opening_odds"
+    t.string "story_question"
     t.integer "position", default: 0, null: false
     t.integer "scene_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "scene_block_id"
+    t.integer "scene_collection_id"
     t.index ["campaign_id"], name: "index_scene_plans_on_campaign_id"
-    t.index ["scene_block_id"], name: "index_scene_plans_on_scene_block_id"
+    t.index ["scene_collection_id"], name: "index_scene_plans_on_scene_collection_id"
     t.index ["scene_id"], name: "index_scene_plans_on_scene_id"
   end
 
@@ -447,6 +444,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
     t.integer "closing_roll_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "story_question"
     t.index ["campaign_id"], name: "index_scenes_on_campaign_id"
     t.index ["closing_roll_id"], name: "index_scenes_on_closing_roll_id"
     t.index ["opening_roll_id"], name: "index_scenes_on_opening_roll_id"
@@ -513,7 +511,6 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
   add_foreign_key "play_session_characters", "characters", on_delete: :cascade
   add_foreign_key "play_session_characters", "play_sessions", on_delete: :cascade
   add_foreign_key "play_sessions", "campaigns"
-  add_foreign_key "play_sessions", "scene_blocks", on_delete: :nullify
   add_foreign_key "pools", "arcana", on_delete: :cascade
   add_foreign_key "pools", "campaigns"
   add_foreign_key "pools", "characters", on_delete: :cascade
@@ -527,9 +524,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_09_210000) do
   add_foreign_key "rolls", "play_sessions", on_delete: :nullify
   add_foreign_key "rolls", "pools", on_delete: :nullify
   add_foreign_key "rolls", "scenes", on_delete: :nullify
-  add_foreign_key "scene_blocks", "campaigns"
+  add_foreign_key "scene_collections", "campaigns"
   add_foreign_key "scene_plans", "campaigns"
-  add_foreign_key "scene_plans", "scene_blocks", on_delete: :nullify
+  add_foreign_key "scene_plans", "scene_collections", on_delete: :nullify
   add_foreign_key "scene_plans", "scenes", on_delete: :nullify
   add_foreign_key "scenes", "campaigns"
   add_foreign_key "scenes", "play_sessions", on_delete: :cascade

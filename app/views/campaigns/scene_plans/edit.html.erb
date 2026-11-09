@@ -5,4 +5,4 @@
   <h1><%= @plan.title %></h1>
 </header>
 
-<%= render "campaigns/scene_plans/form", plan: @plan, blocks: Current.campaign.scene_blocks.ordered, framed: true %>
+<%= render "campaigns/scene_plans/form", plan: @plan, collections: Current.campaign.scene_collections.ordered, framed: true %>

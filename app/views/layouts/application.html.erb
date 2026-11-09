@@ -53,6 +53,8 @@
     <%= render "shared/toasts" %>
     <%= render "shared/confirm" %>
     <%= render "shared/frame_modal" %>
+    <%# A page to open in the modal on landing (modal_opener_controller.js), when a redirect asked for one. %>
+    <% if (modal_url = flash[:open_modal]).present? %><div hidden data-controller="modal-opener" data-modal-opener-url-value="<%= modal_url %>"></div><% end %>
 
     <footer class="site-footer">
       <nav aria-label="Toolkit">

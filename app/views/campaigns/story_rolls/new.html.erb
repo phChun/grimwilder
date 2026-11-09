@@ -1,0 +1,12 @@
+<% content_for :title, "Story roll · #{Current.campaign.name}" %>
+
+<%# The story roll in the modal (shared/_frame_modal): opened when a scene starts with a story question (flash[:open_modal]), or from the scene bar's Roll it, the question filled in. The GM picks the odds and who rolls. The form targets _top, so the table refreshes. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= Current.campaign.current_scene&.heading || Current.campaign.name %></p>
+    <h1>Story roll</h1>
+  </header>
+  <div class="panel">
+    <%= render "campaigns/story_roll", my_characters: @characters, party: @characters, question: params[:question].to_s.squish.first(200).presence, prefix: "modal_story" %>
+  </div>
+<% end %>

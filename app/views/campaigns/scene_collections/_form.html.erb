@@ -1,0 +1,18 @@
+<%# locals: (collection:, framed: nil, cancel_url: nil) %>
+<%# A scene collection: where the players might go, and notes for the GM. framed: its own panel (the edit page). With cancel_url, Cancel sits beside the button and loads the "Create new scene collection" button back. %>
+<% id = "scene_collection_#{collection.id || "new"}" %>
+<%= form_with model: [ Current.campaign, collection ], class: class_names("stack scene-plan-form", "panel": framed), data: { turbo_frame: "_top" } do |form| %>
+  <% if collection.errors.any? %><p class="form-error"><%= collection.errors.full_messages.to_sentence %></p><% end %>
+  <div class="field">
+    <%= form.label :title, "Where they might go", class: "field__label", for: "#{id}_title" %>
+    <%= form.text_field :title, id: "#{id}_title", required: true, maxlength: 120, autocomplete: "off", placeholder: "The castle", class: "field__input" %>
+  </div>
+  <div class="field">
+    <%= form.label :notes, "Notes", class: "field__label", for: "#{id}_notes" %>
+    <%= form.text_area :notes, id: "#{id}_notes", rows: 3, maxlength: 2000, placeholder: "Who holds it, what they know, what's changed…", class: "field__input" %>
+  </div>
+  <div class="scene-plan-form__actions">
+    <%= form.submit collection.new_record? ? "Add collection" : "Save", class: "button button--primary" %>
+    <% if cancel_url %><%= link_to "Cancel", cancel_url, class: "button button--danger", data: { turbo_frame: "new_scene_collection" } %><% end %>
+  </div>
+<% end %>

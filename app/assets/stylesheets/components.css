@@ -1269,7 +1269,7 @@ form.button_to, .button_to { margin: 0; }
 /* Story roll */
 .story-roll__fields { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .story-roll__fields .field { flex: 1 1 8rem; }
-.story-roll:has(#story_character option[value=""]:not(:checked)) .story-roll__secret { display: none; }
+.story-roll:has(select[name=character_id] option[value=""]:not(:checked)) .story-roll__secret { display: none; }
 
 /* Crucibles in the side column */
 .crucible-picker__choose { display: flex; gap: var(--space-2); }
@@ -1334,9 +1334,6 @@ form.button_to, .button_to { margin: 0; }
 
 .log-entry--note { --entry-color: var(--line-strong); padding-block: var(--space-1); }
 .log-note__text { color: var(--muted); }
-.scene-form__opening { padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); }
-.scene-form__opening[open] > .fold__summary { margin-bottom: var(--space-3); }
-.scene-form__opening .fold__title { font-family: var(--font-ui); font-size: 1rem; font-weight: 700; }
 
 /* Talent uses: tick boxes on the sheet, a summary and talent pools on the table */
 .use-boxes { display: inline-flex; flex-wrap: wrap; gap: 4px; }
@@ -3079,13 +3076,24 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-plans__notes { margin: var(--space-1) 0 0; color: var(--text-soft); white-space: pre-line; }
 .scene-plans__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__actions .button_to { margin: 0; }
-/* Blocks of scenes on the prep page, and moving a scene between them. */
-.scene-block__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
-.scene-block__head .card__title { margin: 0; }
-.scene-plans__move { margin: 0; }
-.scene-plans__move .field__input { width: auto; max-width: 12rem; }
-/* Starting a scene (campaigns/scenes/new): the session's block, the prepared scenes in folds, then a new one. */
-.scene-picker__block { display: grid; gap: var(--space-1); margin-bottom: var(--space-3); max-width: 24rem; }
+/* Scene collections on the prep page, one column; Add a scene and Create new scene collection open their forms in place; moving a scene between collections. */
+.scene-prep { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr)); gap: var(--space-4); align-items: start; }
+.scene-prep > * { margin: 0; }
+.scene-prep__played { grid-column: 1 / -1; }
+.scene-prep__add { display: block; }
+.scene-prep__form { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
+.scene-prep__form-title { margin: 0; font-size: 1.05rem; }
+.scene-prep__new { display: flex; flex-direction: column; gap: var(--space-1); border-style: dashed; }
+.scene-prep__new .field__hint { margin: 0; }
+.scene-plan-form__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.scene-collection__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.scene-collection__head .card__title { margin: 0; }
+.scene-plans__move { position: relative; }
+.scene-plans__move-toggle { list-style: none; }
+.scene-plans__move-toggle::-webkit-details-marker { display: none; }
+.scene-plans__move-menu { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); display: grid; gap: var(--space-1); width: min(16rem, calc(100vw - 2rem)); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: var(--shadow); }
+.scene-plans__move-menu .button_to, .scene-plans__move-menu .button_to .button { width: 100%; justify-content: flex-start; }
+/* Starting a scene (campaigns/scenes/new): the prepared scenes in folds, by collection, then a new one. */
 .scene-picker { display: grid; gap: var(--space-3); margin-bottom: var(--space-3); }
 .scene-picker__group { display: grid; gap: var(--space-2); }
 .scene-picker__group > .scene-plans { margin-top: var(--space-2); }
@@ -3096,11 +3104,9 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-plans__notes--short { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 /* The scene's notes in the GM table's scene bar, while it's on. */
 .scene-bar__notes { margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.scene-bar__question { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3); border: 1px dashed var(--line-strong); border-radius: var(--radius-control); }
 .scene-bar__notes-title { font-size: 0.87rem; font-weight: 600; color: var(--muted); }
 .scene-bar__notes .scene-plans__notes { margin-top: var(--space-2); }
-/* A fieldset won't shrink below its content unless told; the odds wrap in a narrow rail. */
-.scene-plan-form__opening { display: grid; gap: var(--space-2); min-width: 0; }
-.segmented--auto.scene-plan-form__odds { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr)); }
 
 /* Vex on the Harm card (pg. 30): four toggles like harm's, the response's line under the lit one. */
 .vex { display: grid; gap: var(--space-2); margin-top: var(--space-3); }

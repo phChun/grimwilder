@@ -13,7 +13,7 @@ class ScenesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_campaign_play_session_path(@campaign), text: "Start a session first"
   end
 
-  test "the GM runs a scene: open with a story roll, roll a montage, close it" do
+  test "the GM runs a scene: open with a story question, roll a montage, close it" do
     PlaySession.start!(@campaign, characters: [ @tibbs ], by: identities(:gwen))
     @tibbs.update!(conditions: [ { name: "twisted ankle", lasts: "scene" } ])
     sign_in_as identities(:gwen)
@@ -21,10 +21,10 @@ class ScenesTest < ActionDispatch::IntegrationTest
     get campaign_table_path(@campaign)
     assert_select ".scene-bar a[href=?]", new_campaign_scene_path(@campaign), text: "Start scene"
 
-    post campaign_scenes_path(@campaign), params: { title: "The bridge at Mirefall", open_with_story: "1", question: "Is it guarded?", odds: 2 }
+    post campaign_scenes_path(@campaign), params: { title: "The bridge at Mirefall", story_question: "Is it guarded?" }
     scene = @campaign.current_scene
     assert_redirected_to campaign_table_path(@campaign, anchor: "roll-log")
-    assert scene.opening_roll.story?
+    assert_equal "Is it guarded?", scene.story_question
 
     follow_redirect!
     assert_select ".scene-bar__status", /Session 1 · live · Scene 1 of 1/

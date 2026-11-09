@@ -22,12 +22,22 @@ class SceneTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordInvalid) { Scene.start!(@session, title: " ", by: identities(:gwen)) }
   end
 
-  test "a scene can open with a story roll" do
-    scene = Scene.start!(@session, title: "The bridge", by: identities(:gwen),
-      opening: { question: "Is it guarded?", odds: 2, thorns: 0, character: nil, spend_spark: 0 })
+  test "a scene with a story question opens with the first story roll asking it" do
+    scene = Scene.start!(@session, title: "The bridge", by: identities(:gwen), story_question: "  Is it  guarded? ")
+    assert_equal "Is it guarded?", scene.story_question
 
-    assert scene.opening_roll.story?
-    assert_equal [ scene, @session ], [ scene.opening_roll.scene, scene.opening_roll.play_session ]
+    Roll.story!(campaign: @campaign, by: identities(:gwen), question: "Who's there?")
+    assert_nil scene.reload.opening_roll, "another question isn't the opening"
+    opening = Roll.story!(campaign: @campaign, by: identities(:gwen), question: "is it guarded?")
+    Roll.story!(campaign: @campaign, by: identities(:gwen), question: "Is it guarded?")
+    assert_equal opening, scene.reload.opening_roll
+    assert_equal [ scene, @session ], [ opening.scene, opening.play_session ]
+  end
+
+  test "a scene with no story question opens with no roll" do
+    scene = Scene.start!(@session, title: "The bridge", by: identities(:gwen))
+    Roll.story!(campaign: @campaign, by: identities(:gwen), question: "Is it guarded?")
+    assert_nil scene.reload.opening_roll
   end
 
   test "rolls during a scene are stamped with it; between scenes they aren't" do

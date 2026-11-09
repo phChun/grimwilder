@@ -7,8 +7,8 @@ class SessionHistoryTest < ActionDispatch::IntegrationTest
     @before = @tibbs.roll!("wits", by: identities(:pip))
 
     first = PlaySession.start!(@campaign, characters: [ @tibbs ], by: identities(:gwen))
-    @scene = Scene.start!(first, title: "The bridge at Mirefall", by: identities(:gwen),
-      opening: { question: "Guarded?", odds: 2, thorns: 0, character: nil, spend_spark: 0 })
+    @scene = Scene.start!(first, title: "The bridge at Mirefall", by: identities(:gwen), story_question: "Guarded?")
+    Roll.story!(campaign: @campaign, by: identities(:gwen), question: "Guarded?")
     @in_scene = @tibbs.roll!("agility", by: identities(:pip))
     @scene.end!(by: identities(:gwen), notes: "Across, barely.")
     @hidden = pools(:ambush).roll!(by: identities(:gwen))

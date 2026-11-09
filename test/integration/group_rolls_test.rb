@@ -60,7 +60,7 @@ class GroupRollsTest < ActionDispatch::IntegrationTest
     sign_out
     sign_in_as identities(:gwen)
     get campaign_table_path(@campaign)
-    assert_select "#story_character option", 3, "no one, Tibbs or Bram"
+    assert_select "select#story_character option", 3, "no one, Tibbs or Bram"
 
     post campaign_story_rolls_path(@campaign), params: { character_id: @tibbs.id, thorns: 1 }
     assert_redirected_to campaign_table_path(@campaign, anchor: "rolls")

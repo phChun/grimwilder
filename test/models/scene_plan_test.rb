@@ -3,13 +3,12 @@ require "test_helper"
 class ScenePlanTest < ActiveSupport::TestCase
   setup { @campaign = campaigns(:bramblewood) }
 
-  test "plans line up in the order made, and an opening needs real odds" do
-    first = @campaign.scene_plans.create!(title: " The  bridge ")
-    second = @campaign.scene_plans.create!(title: "The mill", opening_odds: 3)
+  test "plans line up in the order made, with an optional story question" do
+    first = @campaign.scene_plans.create!(title: " The  bridge ", story_question: " ")
+    second = @campaign.scene_plans.create!(title: "The mill", story_question: " Is the  miller home? ")
     assert_equal [ "The bridge", first, second ], [ first.title, *@campaign.scene_plans.ordered ]
-    assert_not first.opening?
-    assert second.opening?
-    assert_not @campaign.scene_plans.new(title: "Odd", opening_odds: 4).valid?
+    assert_equal [ nil, "Is the miller home?" ], [ first.story_question, second.story_question ]
+    assert_not @campaign.scene_plans.new(title: "Long", story_question: "?" * 201).valid?
   end
 
   test "starting a scene from a plan makes it that scene's, and a reset frees it" do
@@ -23,10 +22,10 @@ class ScenePlanTest < ActiveSupport::TestCase
     assert_equal [ plan ], @campaign.scene_plans.unplayed.to_a, "its scene is gone, so it's back to play"
   end
 
-  test "a scene's block must be this campaign's" do
-    other = campaigns(:bramblewood).scene_blocks.create!(title: "The castle")
-    assert @campaign.scene_plans.new(title: "Gate", scene_block: other).valid?
-    elsewhere = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:tess)).scene_blocks.create!(title: "Docks")
-    assert_not @campaign.scene_plans.new(title: "Gate", scene_block: elsewhere).valid?
+  test "a scene's collection must be this campaign's" do
+    other = campaigns(:bramblewood).scene_collections.create!(title: "The castle")
+    assert @campaign.scene_plans.new(title: "Gate", scene_collection: other).valid?
+    elsewhere = Campaign.create_with_gm!(name: "Elsewhere", gm: identities(:tess)).scene_collections.create!(title: "Docks")
+    assert_not @campaign.scene_plans.new(title: "Gate", scene_collection: elsewhere).valid?
   end
 end

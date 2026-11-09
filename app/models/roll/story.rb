@@ -3,10 +3,15 @@
 # thorns are rare but allowed. Made for a character, it can take spark like any
 # roll, and a disaster gives spark (pg. 13). For no one in particular, the GM
 # can keep it secret (gm_only): it's in the GM's log alone, as hidden pools are.
+# One asking its scene's story question is what the scene opened with.
 module Roll::Story
   extend ActiveSupport::Concern
 
   ODDS = { 1 => "bad odds", 2 => "even odds", 3 => "good odds" }.freeze
+
+  included do
+    after_create { scene.opened_with!(self) if story? && scene }
+  end
 
   class_methods do
     # rolled: { dice:, thorns: } the player already rolled at a roll call, with

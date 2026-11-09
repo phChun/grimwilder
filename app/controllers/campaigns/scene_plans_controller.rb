@@ -1,6 +1,8 @@
 # Scene prep (ScenePlan): the GM writes scenes ahead of play, each a title,
-# notes and maybe an opening story roll, in a block (SceneBlock) or loose,
-# and picks one when starting a scene. GM only.
+# notes and maybe a story roll question for when it opens, in a scene
+# collection (SceneCollection) or loose, and picks one when starting a scene.
+# New is the form that takes an "Add a scene" button's place on the prep page
+# (its frame, by collection). GM only.
 class Campaigns::ScenePlansController < ApplicationController
   include CampaignScoped
 
@@ -8,8 +10,13 @@ class Campaigns::ScenePlansController < ApplicationController
   before_action :set_plan, only: %i[ edit update destroy ]
 
   def index
-    @plan = Current.campaign.scene_plans.new(scene_block_id: params[:block])
-    load_plans
+    @collections = Current.campaign.scene_collections.ordered.includes(:scene_plans)
+    @loose = Current.campaign.scene_plans.unplayed.loose.ordered
+    @played = Current.campaign.scene_plans.played.includes(scene: :play_session).order(updated_at: :desc).limit(10)
+  end
+
+  def new
+    @plan = Current.campaign.scene_plans.new(scene_collection: Current.campaign.scene_collections.find_by(id: params[:collection]))
   end
 
   def create
@@ -17,8 +24,7 @@ class Campaigns::ScenePlansController < ApplicationController
     if @plan.save
       redirect_to campaign_scene_plans_path(Current.campaign, anchor: helpers.dom_id(@plan)), notice: "#{@plan.title} is ready to play."
     else
-      load_plans
-      render :index, status: :unprocessable_entity
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -43,18 +49,11 @@ class Campaigns::ScenePlansController < ApplicationController
       @plan = Current.campaign.scene_plans.find(params[:id])
     end
 
-    def load_plans
-      @blocks = Current.campaign.scene_blocks.ordered.includes(:scene_plans)
-      @loose = Current.campaign.scene_plans.unplayed.loose.ordered
-      @played = Current.campaign.scene_plans.played.includes(scene: :play_session).order(updated_at: :desc).limit(10)
-    end
-
-    # A scene can move to another block on its own (the list's Block select),
-    # so each field is only set when it's sent.
+    # A scene can move to another collection on its own (the list's Collection
+    # select), so each field is only set when it's sent.
     def plan_params
-      params.expect(scene_plan: [ :title, :notes, :opening_question, :opening_odds, :scene_block_id ]).tap do |permitted|
-        permitted[:opening_odds] = permitted[:opening_odds].presence if permitted.key?(:opening_odds)
-        permitted[:scene_block] = Current.campaign.scene_blocks.find_by(id: permitted.delete(:scene_block_id)) if permitted.key?(:scene_block_id)
+      params.expect(scene_plan: [ :title, :notes, :story_question, :scene_collection_id ]).tap do |permitted|
+        permitted[:scene_collection] = Current.campaign.scene_collections.find_by(id: permitted.delete(:scene_collection_id)) if permitted.key?(:scene_collection_id)
       end
     end
 end
