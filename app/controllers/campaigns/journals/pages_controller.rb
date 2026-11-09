@@ -10,7 +10,7 @@ class Campaigns::Journals::PagesController < ApplicationController
 
   def update
     @journal.write!(@page, params.expect(journal_entry: [ :body ])[:body])
-    redirect_to campaign_journal_path(Current.campaign, Current.membership, anchor: "page-#{@page.key}"), notice: "#{@page.title} saved."
+    redirect_to back_to, notice: "#{@page.title} saved."
   rescue ActiveRecord::RecordInvalid => error
     flash.now[:alert] = error.record.errors.full_messages.to_sentence
     @body = params.dig(:journal_entry, :body)
@@ -18,6 +18,15 @@ class Campaigns::Journals::PagesController < ApplicationController
   end
 
   private
+    # The journal, or the sheet whose Journal card the page was written from.
+    def back_to
+      if (character = Current.identity.characters.find_by(id: params[:character_id], campaign: Current.campaign))
+        character_path(character, anchor: "journal")
+      else
+        campaign_journal_path(Current.campaign, Current.membership, anchor: "page-#{@page.key}")
+      end
+    end
+
     def set_page
       @journal = Current.campaign.memberships.find(params[:journal_id]).journal
       raise ActiveRecord::RecordNotFound unless @journal.writable_by?(Current.membership)

@@ -99,7 +99,7 @@ class CharactersTest < ActionDispatch::IntegrationTest
     @tibbs.update!(bonds: [ { "to" => "Bram", "bond" => "tense rivalry" }, { "to" => "Lillylux", "bond" => "lowkey affection" } ])
     sign_in_as identities(:pip)
 
-    get edit_character_path(@tibbs)
+    get edit_character_story_path(@tibbs)
     assert_select ".bond-row", 1
     assert_select ".bond-row label", /Bram\s+played by Gwen/
     assert_select ".bond-row input[type=hidden][name='character[bonds][0][character_id]'][value=?]", bram.id.to_s
@@ -112,7 +112,7 @@ class CharactersTest < ActionDispatch::IntegrationTest
     end
     assert_match %r{<template data-bonds-target="template"[^>]*>.*name="character\[bonds\]\[__INDEX__\]\[to\]"}m, response.body
 
-    patch character_path(@tibbs), params: { character: { bonds: {
+    patch character_story_path(@tibbs), params: { character: { bonds: {
       "0" => { "character_id" => bram.id, "to" => "Bram", "bond" => "deep respect" },
       "1" => { "to" => "", "bond" => "" },
       "2" => { "to" => "Miller Hode", "bond" => "growing doubts" },

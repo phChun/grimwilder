@@ -38,6 +38,8 @@ Rails.application.routes.draw do
       end
       resource :claim, only: %i[ create destroy ]
       resource :seat, only: :update
+      resource :profile, only: %i[ show edit update ] # who they are: backgrounds, traits, desires, features, gear
+      resource :story, only: %i[ show edit update ] # what changes in play: bonds, arcs, notes
       resource :story_end, only: %i[ create destroy ]
       resource :archive, only: %i[ create destroy ] # the owner puts a character away (Character::Archive), or back
       resource :stat_progression, only: %i[ create destroy ]

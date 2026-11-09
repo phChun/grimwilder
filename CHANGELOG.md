@@ -4,6 +4,10 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Fold away the sheet's cards**: every card on a character sheet but the stats and harm opens and closes from its title, and remembers how you left it. Talents come first, then What looms, Journal, Arcana, Story and Who; What looms, Journal, Arcana and Story start closed. ([#104](https://github.com/phChun/grimwilder/pull/104))
+- **What looms shows a count** of the pools looming over the table, like a notification badge. ([#104](https://github.com/phChun/grimwilder/pull/104))
+- **Your journal on your sheet**: write about this session right from your character's sheet, see your last page, and open every journal from the card. Your GM sees it there too while you share it. ([#104](https://github.com/phChun/grimwilder/pull/104))
+- **Who they are, and their story, edit in place**: the sheet splits who a character is (backgrounds, traits, desires, features, gear) from their story (bonds, arcs, notes), and each card has its own Edit. They're no longer on the Edit sheet page. ([#104](https://github.com/phChun/grimwilder/pull/104))
 - **Pages use more of a wide screen**: the margins at the sides are a quarter of what they were on a tablet or wider, so the talent catalog, sheets and tables spread wider. ([#103](https://github.com/phChun/grimwilder/pull/103))
 - **The table chat takes a third of the page** beside the character sheet, the GM table and the campaign page on a wide screen, instead of a narrow column. On a wide screen these pages fit the window: the header and footer stay put, the page scrolls on its own, and the chat fills the height with Send always in view. ([#103](https://github.com/phChun/grimwilder/pull/103))
 - **A roomier Taken list** when you choose talents: wider, with each talent's name, its summary and a Remove button in place of the ✕. ([#103](https://github.com/phChun/grimwilder/pull/103))

@@ -1,0 +1,36 @@
+<%# locals: (form:, character:) %>
+<%# Features, weapons, armor (an optional rule) and weapon styles (another). Needs the styles-list datalist. %>
+<%# The features crucible rolls right here (a lazy frame, fetched when the fold opens): tapping a word puts it in the next empty box (feature_fill_controller.js). %>
+<fieldset class="fieldset" data-controller="feature-fill" data-feature-fill-nouns-value="<%= { "Clothing" => "clothes", "Voice" => "voice", "Eyes" => "eyes" }.to_json %>" data-action="crucible:pick->feature-fill#fill">
+  <legend class="field__label">Three distinctive features</legend>
+  <% 3.times do |i| %>
+    <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[features][]" value="<%= character.features[i] %>" autocomplete="off" placeholder="<%= [ "shock of brown hair", "cane", "kind eyes" ][i] %>" class="field__input" aria-label="Feature <%= i + 1 %>" data-feature-fill-target="input">
+  <% end %>
+  <details class="fold feature-crucible">
+    <summary class="fold__summary"><span class="fold__title">Roll the Features Crucible for Ideas</span></summary>
+    <p class="field__hint" data-feature-fill-target="status" aria-live="polite">Roll, then tap a word to put it in the next empty box.</p>
+    <turbo-frame id="crucible" src="<%= crucible_path("features", embed: 1) %>" loading="lazy"></turbo-frame>
+  </details>
+</fieldset>
+<div class="field">
+  <%= form.label :weapons, "Weapons", class: "field__label" %>
+  <%= form.text_field :weapons, maxlength: Character::WORD_LIMIT, autocomplete: "off", placeholder: "short sword and buckler", class: "field__input" %>
+</div>
+<% if character.campaign&.optional_rule?(:armor) || character.armor %>
+  <%# The Armor optional rule (pg. 176): light or heavy armor gives an Armor pool each session. %>
+  <div class="field">
+    <%= form.label :armor, "Armor", class: "field__label" %>
+    <%= form.select :armor, [ [ "None", "" ], [ "Light: 1d Armor pool, Lightly Armored", "light" ], [ "Heavy: 2d Armor pool, Heavily Armored", "heavy" ] ], {}, class: "field__input" %>
+  </div>
+<% end %>
+<%# Weapon styles are an optional rule (pg. 177): asked for at a table that uses it, or once filled in. %>
+<% if weapon_styles_offered?(character) %>
+  <fieldset class="fieldset">
+    <legend class="field__label">Two weapon styles</legend>
+    <div class="two-up">
+      <% 2.times do |i| %>
+        <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[weapon_styles][]" value="<%= character.weapon_styles[i] %>" list="styles-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Weapon style <%= i + 1 %>">
+      <% end %>
+    </div>
+  </fieldset>
+<% end %>

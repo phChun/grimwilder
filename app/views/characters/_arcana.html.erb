@@ -4,13 +4,11 @@
 <% grants = character.arcana_grants %>
 <% arcana = character.arcana.ordered.to_a %>
 <% if arcana.any? || grants.any? || tends %>
-  <section id="arcana" class="card" aria-labelledby="sheet-arcana">
-    <div class="talents__head">
-      <h2 id="sheet-arcana" class="card__title">Arcana</h2>
-      <% if tends %>
-        <%= link_to "Add arcana", new_character_arcanum_path(character), class: "button button--small", data: { turbo_frame: "modal" } %>
-      <% end %>
-    </div>
+  <details id="arcana" class="card sheet-fold" data-details-memory-target="section" data-section="character-<%= character.id %>-arcana">
+    <summary class="gm-fold__summary"><h2 id="sheet-arcana" class="card__title sheet-fold__title">Arcana</h2><%= icon(:chevron, size: 18) %></summary>
+    <% if tends %>
+      <p class="sheet-fold__actions sheet-fold__actions--top"><%= link_to "Add arcana", new_character_arcanum_path(character), class: "button button--small", data: { turbo_frame: "modal" } %></p>
+    <% end %>
 
     <% if grants.any? %>
       <ul class="arcana-grants">
@@ -36,5 +34,5 @@
     <% elsif tends %>
       <p class="field__hint">Relics of power the character holds, found, bought or made (pg. 41).</p>
     <% end %>
-  </section>
+  </details>
 <% end %>

@@ -1,0 +1,57 @@
+<%# locals: (character:, editable:) %>
+<%# The Who card's contents: who the character is, which rarely changes. The owner edits it right here (Characters::ProfilesController swaps in the form). Lists are title-cased (the book's lists are lowercase; what's stored isn't changed); the weapons line is shown as written. %>
+<%= turbo_frame_tag "character_profile" do %>
+  <% wises = character.backgrounds.flat_map { _1["wises"].to_a }.compact_blank %>
+  <dl class="facts">
+    <div>
+      <dt>Backgrounds</dt>
+      <dd><% if character.backgrounds.any? %><ul class="facts__list"><% character.backgrounds.each do |background| %><li><%= title_case(background["name"]) %></li><% end %></ul><% else %>—<% end %></dd>
+    </div>
+    <div>
+      <dt>Wises</dt>
+      <dd><% if wises.any? %><ul class="facts__list"><% wises.each do |wise| %><li><%= title_case(wise) %></li><% end %></ul><% else %>—<% end %></dd>
+    </div>
+    <div>
+      <dt>Traits</dt>
+      <dd>
+        <% if character.traits.any? || character.not_trait.present? %>
+          <ul class="facts__list">
+            <% character.traits.each do |trait| %><li><%= title_case(trait) %></li><% end %>
+            <% if character.not_trait.present? %><li class="facts__not"><span class="facts__but">But not</span> <%= title_case(character.not_trait) %></li><% end %>
+          </ul>
+        <% else %>
+          —
+        <% end %>
+      </dd>
+    </div>
+    <div>
+      <dt>Desires</dt>
+      <dd>
+        <% if character.desires.any? || character.not_desire.present? %>
+          <ul class="facts__list">
+            <% character.desires.each do |desire| %><li><%= title_case(desire) %></li><% end %>
+            <% if character.not_desire.present? %><li class="facts__not"><span class="facts__but">But not</span> <%= title_case(character.not_desire) %></li><% end %>
+          </ul>
+        <% else %>
+          —
+        <% end %>
+      </dd>
+    </div>
+    <div>
+      <dt>Features</dt>
+      <dd><% if character.features.any? %><ul class="facts__list"><% character.features.each do |feature| %><li><%= feature %></li><% end %></ul><% else %>—<% end %></dd>
+    </div>
+    <div>
+      <dt>Carrying</dt>
+      <dd>
+        <%= character.weapons.presence || "—" %>
+        <% if character.weapon_styles.any? %>
+          <ul class="facts__list"><% character.weapon_styles.each do |style| %><li><%= title_case(style) %></li><% end %></ul>
+        <% end %>
+      </dd>
+    </div>
+  </dl>
+  <% if editable %>
+    <p class="sheet-fold__actions"><%= link_to "Edit", edit_character_profile_path(character), class: "button button--small", "aria-label": "Edit who #{character.short_name} is" %></p>
+  <% end %>
+<% end %>

@@ -1,0 +1,18 @@
+<% content_for :title, "Who #{@character.short_name} is" %>
+
+<%# The Who card's form, swapped into the card on the sheet. Only these fields save here (Characters::ProfilesController::FIELDS). %>
+<%= turbo_frame_tag "character_profile" do %>
+  <%= form_with model: @character, url: character_profile_path(@character), method: :patch, class: "stack sheet-edit" do |form| %>
+    <% if @character.errors.any? %>
+      <p class="form-error"><%= @character.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= render "characters/fields/datalists" %>
+    <%= render "characters/fields/backgrounds", character: @character %>
+    <%= render "characters/fields/heart", form: form, character: @character %>
+    <%= render "characters/fields/look", form: form, character: @character %>
+    <div class="sheet-edit__actions">
+      <%= form.submit "Save", class: "button button--primary" %>
+      <%= link_to "Cancel", character_profile_path(@character), class: "button button--quiet" %>
+    </div>
+  <% end %>
+<% end %>

@@ -63,7 +63,7 @@ class CampaignHoldTest < ActionDispatch::IntegrationTest
     assert_difference -> { Message.count } do
       post campaign_messages_path(@campaign), params: { context: "talk", body: "Still on for Friday?" }
     end
-    patch character_path(@tibbs), params: { character: { notes: "Owes the miller." } }
+    patch character_story_path(@tibbs), params: { character: { notes: "Owes the miller." } }
     assert_equal "Owes the miller.", @tibbs.reload.notes
 
     get campaign_path(@campaign)

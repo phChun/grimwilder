@@ -1,8 +1,8 @@
 <%# locals: (campaign:, pools:, my_characters:) %>
 <%# A player's rolls at the table, on their sheet where they play: the shared pools they can see (roll, push, drop first). Rolling comes back here (CampaignScoped#back_to_table). The campaign page shows the pools read-only; story rolls, montages and quarrels are the GM's to call. %>
 <%= turbo_stream_from campaign, :pools %>
-<section id="table-rolls" class="card table-rolls" aria-labelledby="table-rolls-title">
-  <h2 id="table-rolls-title" class="card__title">What looms</h2>
+<details id="table-rolls" class="card sheet-fold table-rolls" data-details-memory-target="section" data-section="sheet-looms">
+  <summary class="gm-fold__summary"><h2 id="table-rolls-title" class="card__title sheet-fold__title">What looms <span class="<%= class_names("sheet-fold__count", "sheet-fold__count--none": pools.empty?) %>" aria-label="<%= pluralize(pools.size, "pool") %>"><%= pools.size %></span></h2><%= icon(:chevron, size: 18) %></summary>
   <% if pools.any? %>
     <div class="pool-rows">
       <% pools.each do |pool| %>
@@ -12,4 +12,4 @@
   <% else %>
     <p class="empty">Nothing yet. Your GM adds pools as the story needs.</p>
   <% end %>
-</section>
+</details>

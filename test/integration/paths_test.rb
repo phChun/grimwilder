@@ -63,11 +63,11 @@ class PathsTest < ActionDispatch::IntegrationTest
 
   test "weapon styles are asked for only at a table that uses the rule" do
     sign_in_as identities(:pip)
-    get edit_character_path(@tibbs)
+    get edit_character_profile_path(@tibbs)
     assert_select "input[name='character[weapon_styles][]']", 0
 
     @campaign.update!(optional_rules: %w[ weapon_styles ])
-    get edit_character_path(@tibbs)
+    get edit_character_profile_path(@tibbs)
     assert_select "input[name='character[weapon_styles][]']", 2
   end
 

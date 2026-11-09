@@ -1,0 +1,37 @@
+<%# locals: (character:) %>
+<%# Arcs and bonds. Needs the arcs-list datalist. %>
+<fieldset class="fieldset">
+  <legend class="field__label">Character arcs (one or two)</legend>
+  <% 2.times do |i| %>
+    <input type="text" maxlength="<%= Character::WORD_LIMIT %>" name="character[arcs][]" value="<%= character.arcs[i] %>" list="arcs-list" placeholder="<%= type_or_select %>" autocomplete="off" class="field__input" aria-label="Arc <%= i + 1 %>">
+  <% end %>
+</fieldset>
+<fieldset class="fieldset">
+  <legend class="field__label">Bonds: how you see each other PC, and any NPCs</legend>
+  <%# One bond toward each other character at the table (pg. 23, 47); bonds to anyone else, or for a character not at a table, are written in by name. %>
+  <% party = character.bond_party.to_a %>
+  <% others = (character.campaign ? character.bonds_beyond(party) : character.bonds) + [ {} ] %>
+  <% party.each_with_index do |other, i| %>
+    <div class="bond-row">
+      <label class="bond-row__who" for="bond_<%= i %>"><span class="bond-row__name"><%= other.name %></span> <span class="bond-row__player"><%= other.owned_by?(character.identity) ? "also yours" : "played by #{other.identity.display_name}" %></span></label>
+      <input type="hidden" name="character[bonds][<%= i %>][character_id]" value="<%= other.id %>">
+      <input type="hidden" name="character[bonds][<%= i %>][to]" value="<%= other.name %>">
+      <input type="text" id="bond_<%= i %>" name="character[bonds][<%= i %>][bond]" value="<%= character.bond_for(other)&.dig("bond") %>" maxlength="<%= Character::BOND_LIMIT %>" placeholder="Lowkey Affection" autocomplete="off" class="field__input">
+    </div>
+  <% end %>
+  <% if character.campaign && party.empty? %>
+    <p class="field__hint">No one else is at <%= character.campaign.name %>'s table yet. Each character who joins gets a bond here.</p>
+  <% end %>
+  <%# NPCs and anyone else, by name: as many as the player likes. %>
+  <div class="bonds-npcs" data-controller="bonds" data-bonds-next-value="<%= party.size + others.size %>">
+    <p class="bonds-npcs__title">NPCs and others</p>
+    <div class="stack bonds-npcs__list" data-bonds-target="list">
+      <% others.each_with_index do |bond, n| %>
+        <%= render "characters/bond_row", index: party.size + n, bond: bond %>
+      <% end %>
+    </div>
+    <template data-bonds-target="template"><%= render "characters/bond_row", index: "__INDEX__", bond: {} %></template>
+    <button type="button" class="button button--small bonds-npcs__add" data-action="bonds#add">Add an NPC</button>
+  </div>
+  <p class="field__hint">Match an intensity (<%= Grimwild.bond_intensities.map { title_case(_1) }.to_sentence(last_word_connector: " or ") %>) with a nature like <%= Grimwild.bond_natures.first(6).map { title_case(_1) }.join(", ") %>.</p>
+</fieldset>
