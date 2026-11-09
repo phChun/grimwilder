@@ -12,13 +12,13 @@
     <% end %>
     <%= link_to "Edit", edit_campaign_scene_plan_path(Current.campaign, plan), class: "button button--small" %>
     <% if collections.any? %>
-      <%# Move: a menu of the other scene collections (or unassigned), each a button that sends only the collection. %>
+      <%# Move: a menu of the other scene collections (or the standalone scenes), each a button that sends only the collection. %>
       <details id="<%= dom_id(plan, :move) %>" class="scene-plans__move" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
         <summary class="button button--small scene-plans__move-toggle" aria-label="Move <%= plan.title %>">Move</summary>
         <div class="scene-plans__move-menu" data-menu-target="panel">
           <%= render "shared/popover_head", title: "Move to" %>
           <% [ *collections, nil ].reject { _1&.id == plan.scene_collection_id }.each do |target| %>
-            <%= button_to (target ? target.title : "Unassigned"), campaign_scene_plan_path(Current.campaign, plan), method: :patch, params: { scene_plan: { scene_collection_id: target&.id.to_s } }, class: "button button--small button--ghost" %>
+            <%= button_to (target ? target.title : "Standalone scenes"), campaign_scene_plan_path(Current.campaign, plan), method: :patch, params: { scene_plan: { scene_collection_id: target&.id.to_s } }, class: "button button--small button--ghost" %>
           <% end %>
         </div>
       </details>

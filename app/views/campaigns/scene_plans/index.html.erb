@@ -1,10 +1,10 @@
 <% content_for :title, "Scene prep · #{Current.campaign.name}" %>
 
-<%# The GM's prep, every card a fold (remembered per campaign by details-memory, with Expand all / Collapse all): the scene collections for where the players might go (SceneCollection), each with its scenes still to play as cards across it and its buttons at the bottom, then Create new scene collection; then Add a scene (its form opens in place, the collection picked there) beside the Unassigned scenes; then a few that have been played. Starting a scene offers them all. %>
+<%# The GM's prep, every card a fold (remembered per campaign by details-memory, with Expand all / Collapse all): the scene collections for where the players might go (SceneCollection), two across when there's room, each with its scenes still to play and its buttons at the bottom, then Create new scene collection; then the standalone scenes (in no collection); then a few that have been played. Each card's Add a scene opens its form in that card (scene_plans/_add). Starting a scene offers them all. %>
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_table_path(Current.campaign) %></p>
   <h1>Scene prep</h1>
-  <p class="page-header__lede">Write scenes ahead of play, gathered in scene collections for where the players might go. Starting a scene offers every collection's scenes, then the unassigned ones.</p>
+  <p class="page-header__lede">Write scenes ahead of play, gathered in scene collections for where the players might go. Starting a scene offers every collection's scenes, then the standalone ones.</p>
 </header>
 
 <div class="scene-prep" data-controller="details-memory" data-details-memory-campaign-value="<%= Current.campaign.id %>" data-action="toggle->details-memory#toggled:capture turbo:morph@document->details-memory#restore">
@@ -13,8 +13,9 @@
     <button type="button" class="button button--small button--ghost" data-action="details-memory#foldAll" data-details-memory-open-param="false">Collapse all</button>
   </div>
 
-  <section class="scene-prep__collections" aria-labelledby="scene_collections_title">
+  <section aria-labelledby="scene_collections_title">
     <h2 id="scene_collections_title" class="section-title">Scene collections</h2>
+    <div class="scene-prep__collections">
     <% @collections.each do |collection| %>
       <% plans = collection.scene_plans.select { _1.scene_id.nil? }.sort_by { [ _1.position, _1.created_at ] } %>
       <details id="<%= dom_id(collection) %>" class="card sheet-fold scene-collection" open data-details-memory-target="section" data-section="scene-prep-<%= collection.id %>">
@@ -29,9 +30,9 @@
             <p class="field__hint">No scenes left to play here.</p>
           <% end %>
           <div class="scene-plans__actions scene-collection__actions">
-            <a href="<%= new_campaign_scene_plan_path(Current.campaign, collection: collection.id) %>" class="button button--small" data-turbo-frame="new_scene_plan" aria-label="Add a scene to <%= collection.title %>">Add a scene</a>
+            <%= render "campaigns/scene_plans/add", scene_collection: collection %>
             <a href="<%= edit_campaign_scene_collection_path(Current.campaign, collection) %>" class="button button--small" aria-label="Edit <%= collection.title %>">Edit</a>
-            <%= button_to "Remove", campaign_scene_collection_path(Current.campaign, collection), method: :delete, class: "button button--small button--danger", "aria-label": "Remove #{collection.title}", form: { data: { turbo_confirm: "Remove #{collection.title}? Its scenes stay in your prep, unassigned." } } %>
+            <%= button_to "Remove", campaign_scene_collection_path(Current.campaign, collection), method: :delete, class: "button button--small button--danger", "aria-label": "Remove #{collection.title}", form: { data: { turbo_confirm: "Remove #{collection.title}? Its scenes stay in your prep, as standalone scenes." } } %>
           </div>
         </div>
       </details>
@@ -43,27 +44,23 @@
         <p class="field__hint">A place or thread the players might follow, to gather its scenes under.</p>
       <% end %>
     </turbo-frame>
+    </div>
   </section>
 
-  <div class="scene-prep__row">
-    <turbo-frame id="new_scene_plan">
-      <%= link_to new_campaign_scene_plan_path(Current.campaign), class: "card add-card add-card--link scene-prep__new" do %>
-        <h3 class="card__title">Add a scene</h3>
-        <p class="field__hint">A title, notes, and maybe a story roll question, in a collection or unassigned.</p>
-      <% end %>
-    </turbo-frame>
-
-    <details id="scene_plans_loose" class="card sheet-fold" open data-details-memory-target="section" data-section="scene-prep-unassigned">
-      <summary class="gm-fold__summary"><h3 class="card__title sheet-fold__title">Unassigned <small class="field__hint"><%= pluralize(@loose.size, "scene") %> to play</small></h3><%= icon(:chevron, size: 18) %></summary>
+  <details id="scene_plans_loose" class="card sheet-fold" open data-details-memory-target="section" data-section="scene-prep-standalone">
+    <summary class="gm-fold__summary"><h2 class="card__title sheet-fold__title">Standalone scenes <small class="field__hint"><%= pluralize(@loose.size, "scene") %> to play</small></h2><%= icon(:chevron, size: 18) %></summary>
+    <div class="stack">
+      <p class="field__hint">Scenes in no collection, for anywhere the story goes.</p>
       <% if @loose.any? %>
         <ol class="scene-plans">
           <%= render partial: "campaigns/scene_plans/plan", collection: @loose, as: :plan, locals: { collections: @collections } %>
         </ol>
-      <% else %>
-        <p class="field__hint">Every scene to play is in a collection.</p>
       <% end %>
-    </details>
-  </div>
+      <div class="scene-plans__actions scene-collection__actions">
+        <%= render "campaigns/scene_plans/add", scene_collection: nil %>
+      </div>
+    </div>
+  </details>
 
   <% if @played.any? %>
     <details id="scene_plans_played" class="card sheet-fold" data-details-memory-target="section" data-section="scene-prep-played">

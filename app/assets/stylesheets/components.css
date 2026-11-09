@@ -3076,17 +3076,18 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .scene-plans__notes { margin: var(--space-1) 0 0; color: var(--text-soft); white-space: pre-line; }
 .scene-plans__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .scene-plans__actions .button_to { margin: 0; }
-/* Scene prep: folds (Expand all / Collapse all on top); each collection full width, its scenes as cards stretching across it and its buttons at the bottom; then Add a scene beside Unassigned; Add a scene and Create new scene collection open their forms in place. */
-.scene-prep { display: grid; gap: var(--space-4); }
-.scene-prep__tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
-.scene-prep__collections { display: grid; gap: var(--space-3); }
-.scene-prep__collections > .section-title { margin: 0; }
-.scene-prep__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--space-3); align-items: start; }
+/* Scene prep: folds (Expand all / Collapse all on top); the scene collections two across when there's room, each with its scenes as cards and its buttons at the bottom; then the standalone scenes, full width. A card's Add a scene opens its form in place, on a row of its own below the other buttons. */
+.scene-prep { display: grid; gap: var(--space-5); }
+.scene-prep__tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); margin-bottom: calc(var(--space-3) * -1); }
+.scene-prep__collections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr)); gap: var(--space-3); align-items: start; }
 .scene-prep turbo-frame { display: block; }
 .scene-prep__new { display: flex; flex-direction: column; gap: var(--space-1); border-style: dashed; }
 .scene-prep__new .card__title { margin: 0; }
 .scene-prep__new .field__hint { margin: 0; }
-.scene-prep .scene-plans:not(.scene-plans--played) { grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--space-3); }
+.scene-prep__add:has(form) { order: 1; flex-basis: 100%; }
+.scene-prep__form { padding-top: var(--space-3); border-top: 1px solid var(--line-soft); }
+.scene-prep__form-title { margin: 0; font-size: 1.05rem; }
+.scene-prep .scene-plans:not(.scene-plans--played) { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--space-3); }
 .scene-prep .scene-plans:not(.scene-plans--played) > .scene-plans__item { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
 .scene-prep .scene-plans__item > .scene-plans__main { flex: 1 0 auto; }
 .scene-prep .scene-plans__item > .scene-plans__actions { margin-top: var(--space-2); }

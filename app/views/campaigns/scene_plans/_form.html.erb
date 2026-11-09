@@ -1,5 +1,5 @@
 <%# locals: (plan:, collections:, framed: nil, cancel_url: nil, frame: nil) %>
-<%# A prepared scene: a title, notes for the GM, and maybe the question for a story roll as it opens: starting the scene opens the story roll with it, to pick the odds and who rolls. Its collection is picked with the select (blank: unassigned). framed: its own panel (the edit page). With cancel_url, Cancel sits beside the button and loads the frame back. %>
+<%# A prepared scene: a title, notes for the GM, and maybe the question for a story roll as it opens: starting the scene opens the story roll with it, to pick the odds and who rolls. Its collection is picked with the select (blank: standalone). framed: its own panel (the edit page). With cancel_url, Cancel sits beside the button and loads the frame back. %>
 <% id = "scene_plan_#{plan.id || "new"}" %>
 <%= form_with model: [ Current.campaign, plan ], class: class_names("stack scene-plan-form", "panel": framed), data: { turbo_frame: "_top" } do |form| %>
   <% if plan.errors.any? %><p class="form-error"><%= plan.errors.full_messages.to_sentence %></p><% end %>
@@ -19,7 +19,7 @@
   <% if collections.any? %>
     <div class="field">
       <%= form.label :scene_collection_id, "Scene collection", class: "field__label", for: "#{id}_collection" %>
-      <%= form.select :scene_collection_id, collections.map { [ _1.title, _1.id ] }, { include_blank: "Unassigned" }, id: "#{id}_collection", class: "field__input" %>
+      <%= form.select :scene_collection_id, collections.map { [ _1.title, _1.id ] }, { include_blank: "Standalone (no collection)" }, id: "#{id}_collection", class: "field__input" %>
     </div>
   <% end %>
   <div class="scene-plan-form__actions">

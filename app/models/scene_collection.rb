@@ -2,7 +2,7 @@
 # players might go: the players head for the castle, so here are the castle's
 # scenes. Each has a title and notes, which show on the GM table while one of
 # its scenes is on. Starting a scene offers every collection's scenes.
-# Removing a collection keeps its scenes, unassigned.
+# Removing a collection keeps its scenes, as standalone ones.
 class SceneCollection < ApplicationRecord
   belongs_to :campaign
   has_many :scene_plans, dependent: :nullify
