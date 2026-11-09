@@ -56,6 +56,12 @@ class AppShellTest < ActionDispatch::IntegrationTest
     assert_select ".site-footer__tools a", text: "Characters", count: 0
   end
 
+  test "an admin's Admin tab comes before Tools" do
+    sign_in_as identities(:ada)
+    get root_path
+    assert_equal [ "All campaigns", "Characters", "Admin", "Tools" ], css_select("nav.tabs[aria-label=Main] > .tabs__link, nav.tabs[aria-label=Main] > .tab-menu > summary").map { _1.text.strip }
+  end
+
   test "on a phone the tabs, feedback and account fold into the menu, with the same links" do
     identities(:gwen).update!(feedback_enabled: true)
     sign_in_as identities(:gwen)
