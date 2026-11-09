@@ -598,11 +598,10 @@ small { font-size: 0.8em; color: var(--dim); }
 
 /* ---------- Layout ---------- */
 
+/* No cap on the width: past --page, the margins grow by a quarter of the extra (half what centring in --page used to leave). */
 .site-main {
   width: 100%;
-  max-width: var(--page);
-  margin-inline: auto;
-  padding-inline: var(--space-4);
+  padding-inline: calc(max(0px, 100% - var(--page)) / 4 + var(--space-4));
 }
 
 .site-main {
@@ -666,14 +665,6 @@ turbo-cable-stream-source { display: none; }
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
-}
-
-@media (min-width: 48rem) {
-  .app-header,
-  .live-banner { padding-inline: var(--space-6); }
-
-  .site-main,
-  .site-footer { padding-inline: var(--space-6); }
 }
 
 @media (prefers-reduced-motion: reduce) {

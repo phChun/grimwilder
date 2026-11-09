@@ -1058,18 +1058,18 @@ form.button_to, .button_to { margin: 0; }
 .talent-toggle:has(.talent-toggle__box:focus-visible) .button { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* The talent picker: the catalog, and what's taken beside it (a drawer on a phone). */
-.talent-picker { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: var(--space-5); align-items: start; }
+.talent-picker { display: grid; grid-template-columns: minmax(0, 1fr) 26rem; gap: var(--space-5); align-items: start; }
 .talent-picker__panel { position: sticky; top: var(--space-4); }
 .talent-picker__head { display: flex; align-items: center; gap: var(--space-2); }
 .talent-picker__head .panel__title { margin: 0; flex: 1; }
 .talent-picker__count { font-family: var(--font-dice); color: var(--text-soft); }
 .talent-picker__close, .talent-picker__fab { display: none; }
-.talent-picker__list { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
-.talent-picker__item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: var(--tap); padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
-.talent-picker__label { display: grid; gap: 2px; }
-.talent-picker__summary { color: var(--text-soft); font-size: 0.85rem; line-height: 1.35; }
-.talent-picker__remove { display: inline-grid; place-items: center; width: var(--tap); height: var(--tap); margin-right: calc(var(--space-2) * -1); border: 0; background: none; color: var(--text-soft); cursor: pointer; }
-.talent-picker__remove:hover { color: var(--text); }
+.talent-picker__list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.talent-picker__item { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); min-height: var(--tap); padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface-2); }
+.talent-picker__label { flex: 1; min-width: 0; display: grid; gap: var(--space-1); }
+.talent-picker__name { font-weight: 600; }
+.talent-picker__summary { color: var(--text-soft); font-size: 0.85rem; line-height: 1.4; }
+.talent-picker__remove { align-self: flex-start; }
 @media (max-width: 60rem) {
   .talent-picker { grid-template-columns: 1fr; }
   .talent-picker__panel { display: none; position: fixed; inset: auto var(--space-4) var(--space-4); z-index: 30; max-height: 75vh; overflow: auto; box-shadow: 0 12px 40px rgb(0 0 0 / 0.5); }
@@ -1622,8 +1622,8 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 .path-picker__name { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
 .path-picker__core { margin: 2px 0 0; color: var(--text-soft); }
 .path-picker__label { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
-.path-dialog { width: calc(100% - 64px); height: calc(100dvh - 64px); max-height: none; overflow: hidden; }
-@media (max-width: 40rem) { .path-dialog { width: calc(100% - 16px); height: calc(100dvh - 16px); } }
+.path-dialog { width: calc(100% - 24px); height: calc(100dvh - 24px); max-height: none; padding: 14px 16px 16px; overflow: hidden; }
+@media (max-width: 40rem) { .path-dialog { width: calc(100% - 8px); height: calc(100dvh - 8px); padding: 12px 12px 12px; } }
 /* Only the list scrolls; the title, its ✕ and the hint stay put. The padding keeps a picked card's focus ring inside the scroll box. */
 .path-dialog__grid { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: 8px; margin: 0 -4px; padding: 4px; border: 0; min-width: 0; }
 /* One path per row: the path and its tagline on the left, its core talent on the right; stacked on a phone. */

@@ -4,6 +4,9 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Pages use more of a wide screen**: the margins at the sides are half what they were, so the talent catalog, sheets and tables spread wider. ([#103](https://github.com/phChun/grimwilder/pull/103))
+- **A roomier Taken list** when you choose talents: wider, with each talent's name, its summary and a Remove button in place of the ✕. ([#103](https://github.com/phChun/grimwilder/pull/103))
+- **The path picker fills more of the screen**, with less space around it. ([#103](https://github.com/phChun/grimwilder/pull/103))
 - **Talents follow Community Edition 1.0**: Flurry, which the book no longer has, is gone, and every talent's page number now points to the right page in the book. Settings now give the right pages for the Wealth, Milestone levels and Focused growth optional rules. ([#101](https://github.com/phChun/grimwilder/pull/101))
 - **Pick your path from cards**: making or editing a character, Pick your path opens a list of every path with its tagline and core talent, and the talent's full text a tap away. New characters no longer start as a Fighter. ([#100](https://github.com/phChun/grimwilder/pull/100))
 - **The Warlock's core talent is Pact again**, as the Community Edition's book calls it. Saved characters keep it. ([#98](https://github.com/phChun/grimwilder/pull/98))
