@@ -1,5 +1,7 @@
 # Ticking a talent's uses on the sheet (Character::TalentUses). The owner and
-# the campaign's GM can; it's server state, so the table sees it too.
+# the campaign's GM can; it's server state, so the table sees it too. When the
+# GM has turned on Campaign#log_talent_uses, each use spent goes in the table
+# log as well.
 class Characters::TalentUsesController < ApplicationController
   require_authentication
 
@@ -13,7 +15,7 @@ class Characters::TalentUsesController < ApplicationController
     before = @character.use_counters.find { _1.id == use_id }&.then { @character.uses_spent(_1) } || 0
     use = params[:name].present? ? @character.toggle_named_use!(use_id, params[:name]) : @character.spend_use!(use_id, spent: params[:spent])
 
-    if params[:note] == "1" && @character.uses_spent(use) > before && @character.campaign
+    if @character.campaign&.log_talent_uses? && @character.uses_spent(use) > before
       spent = params[:name].present? ? "burns #{params[:name]}" : "spends #{use.label.downcase}"
       Roll.note!(campaign: @character.campaign, by: Current.identity, character: @character, text: "#{@character.name} #{spent}")
     end

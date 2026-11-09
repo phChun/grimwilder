@@ -1,13 +1,19 @@
-# Story rolls from the GM's Rolls fold. For a character, it's a roll call:
-# that character's player rolls it (RollCall). For no one in particular (the
-# GM testing luck, say) it's rolled straight away, and the GM can keep it to
-# themselves (gm_only: only the GM's log shows it). Only the GM calls for
-# rolls; a player's talent rolls are their own (Characters::TalentRollsController).
+# Story rolls from the GM's Rolls fold, or from the modal that opens when a
+# scene starts with a story question (new, with question=). For a character,
+# it's a roll call: that character's player rolls it (RollCall). For no one
+# in particular (the GM testing luck, say) it's rolled straight away, and the
+# GM can keep it to themselves (gm_only: only the GM's log shows it). Only the
+# GM calls for rolls; a player's talent rolls are their own
+# (Characters::TalentRollsController).
 class Campaigns::StoryRollsController < ApplicationController
   include CampaignScoped, StoryRollParams
   before_action :refuse_when_on_hold
 
   before_action :require_gm
+
+  def new
+    @characters = Current.campaign.characters.played.active.includes(:identity).ordered
+  end
 
   def create
     if (character = called_character)

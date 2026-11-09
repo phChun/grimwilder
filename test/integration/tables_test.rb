@@ -97,18 +97,38 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_equal 4, food.reload.size
   end
 
-  test "cut to a new scene: end this one, then start the next" do
+  test "cut to a new scene: end this one in a modal, then start the next in another" do
     session = PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
     scene = Scene.start!(session, title: "The mill fire", by: identities(:gwen))
     sign_in_as identities(:gwen)
 
+    get campaign_table_path(@campaign)
+    assert_select ".scene-bar a[href=?][data-turbo-frame=modal]", new_campaign_scene_ending_path(@campaign, scene, then: "new_scene"), "Cut to new scene"
     get new_campaign_scene_ending_path(@campaign, scene, then: "new_scene")
-    assert_select "input[type=hidden][name=then][value=new_scene]"
-    assert_select "button[type=submit]", "End it and start the next scene"
+    assert_select "turbo-frame#modal form[action=?][data-turbo-frame=_top]", campaign_scene_ending_path(@campaign, scene) do
+      assert_select "input[type=hidden][name=then][value=new_scene]"
+      assert_select "button[type=submit]", "End it and start the next scene"
+    end
+
+    # A montage called from the modal stays in it, and comes back to ending the scene.
+    montage = new_campaign_montage_path(@campaign, then: "end_scene", scene: "The mill fire", cut: 1)
+    assert_select "turbo-frame#modal a[href=?]:not([data-turbo-frame])", montage, "Call for a montage"
+    get montage
+    assert_select "turbo-frame#modal form[action=?][data-modal-stay]:not([data-turbo-frame])", campaign_montages_path(@campaign) do
+      assert_select "input[type=hidden][name=then][value=end_scene]"
+      assert_select "input[type=hidden][name=cut][value='1']"
+    end
+    post campaign_montages_path(@campaign), params: { then: "end_scene", cut: "1", scene: "The mill fire", participants: { characters(:tibbs).id => { in: "1" } } }
+    assert_redirected_to new_campaign_scene_ending_path(@campaign, scene, then: "new_scene")
+    follow_redirect!
+    assert_select "turbo-frame#modal a[href=?]", new_campaign_scene_ending_path(@campaign, scene, then: "new_scene"), "Check again"
+    assert_select "a", { text: "Call for a montage", count: 0 }, "one montage at a time"
 
     post campaign_scene_ending_path(@campaign, scene), params: { then: "new_scene" }
-    assert_redirected_to new_campaign_scene_path(@campaign)
+    assert_redirected_to campaign_table_path(@campaign, anchor: "roll-log")
     assert_not scene.reload.open?
+    follow_redirect!
+    assert_select "[data-controller=modal-opener][data-modal-opener-url-value=?]", new_campaign_scene_path(@campaign)
   end
 
   test "the rail has the feed, the composer and a note box" do
@@ -160,81 +180,150 @@ class TablesTest < ActionDispatch::IntegrationTest
     assert_equal 6, tibbs.talent_pools.find_by!(use_key: "rule/coins").size
   end
 
-  test "the GM prepares scenes, then starts one from the prep, filled in" do
+  test "the GM adds scenes inline, then starts one, adjusted, and the story roll opens with its question" do
     sign_in_as identities(:gwen)
     get campaign_scene_plans_path(@campaign)
-    assert_response :success
+    assert_select ".fluid__rail", 0, "no side panel for new things"
+    assert_select ".scene-prep__tools button[data-action='details-memory#foldAll']", 2
+    assert_select "details#scene_plans_loose.sheet-fold[open] .sheet-fold__title", /Standalone scenes/
+    assert_select "details#scene_plans_loose .scene-collection__actions turbo-frame#new_scene_plan_standalone a[href=?]", new_campaign_scene_plan_path(@campaign), "Add a scene"
+    assert_select "#scene_collections_title", "Scene collections"
+    assert_select ".scene-prep__more > turbo-frame#new_scene_collection:first-child a.add-card[href=?]", new_campaign_scene_collection_path(@campaign), /Create new scene collection/
+    assert_select ".scene-prep__more > turbo-frame#new_scene_collection + details#scene_plans_loose"
 
-    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", opening_odds: "3", opening_question: "Is the bridge guarded?" } }
+    get new_campaign_scene_plan_path(@campaign)
+    assert_select "turbo-frame#new_scene_plan_standalone form[action=?][data-turbo-frame=_top]", campaign_scene_plans_path(@campaign) do
+      assert_select "input[name='scene_plan[story_question]']"
+      assert_select "input[name='scene_plan[opening_odds]']", 0
+      assert_select ".scene-plan-form__actions input[type=submit][value='Add scene'] + a.button--danger[href=?][data-turbo-frame=new_scene_plan_standalone]", campaign_scene_plans_path(@campaign), text: "Cancel"
+    end
+
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", story_question: "Is the bridge guarded?" } }
     plan = @campaign.scene_plans.sole
     assert_redirected_to campaign_scene_plans_path(@campaign, anchor: "scene_plan_#{plan.id}")
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: " " } }
+    assert_response :unprocessable_entity
+    assert_select "turbo-frame#new_scene_plan_standalone .form-error"
 
     PlaySession.start!(@campaign, characters: [ characters(:tibbs) ], by: identities(:gwen))
     get new_campaign_scene_path(@campaign)
     assert_select ".scene-picker .scene-plans__title", "The bridge at Mirefall"
+    assert_select ".scene-picker .field__hint", "Story roll: Is the bridge guarded?"
     assert_select ".scene-picker a[href=?]", new_campaign_scene_path(@campaign, plan: plan.id, anchor: "scene_title"), "Adjust first"
     assert_select ".scene-picker a[aria-label=?]", "Adjust The bridge at Mirefall first"
 
     get new_campaign_scene_path(@campaign, plan: plan.id)
     assert_select "input#scene_title[value=?]", "The bridge at Mirefall"
     assert_select "textarea#scene_notes", "Toll-keepers want a bribe."
-    assert_select "details.scene-form__opening[open]"
-    assert_select "input#scene_open_with_story[checked]"
-    assert_select "input#story_question[value=?]", "Is the bridge guarded?"
-    assert_select "input[name=odds][value='3'][checked]"
+    assert_select "input#scene_story_question[value=?]", "Is the bridge guarded?"
+    assert_select "input[name=odds]", 0, "the odds are picked in the story roll"
 
-    post campaign_scenes_path(@campaign), params: { scene_plan_id: plan.id, title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", open_with_story: "1", question: "Is the bridge guarded?", odds: "3" }
+    post campaign_scenes_path(@campaign), params: { scene_plan_id: plan.id, title: "The bridge at Mirefall", notes: "Toll-keepers want a bribe.", story_question: "Is the bridge watched?" }
     scene = @campaign.reload.current_scene
-    assert_equal [ "The bridge at Mirefall", "Toll-keepers want a bribe.", scene ], [ scene.title, scene.notes, plan.reload.scene ]
-    assert_equal [ 3, "Is the bridge guarded?" ], [ scene.opening_roll.stat_dice, scene.opening_roll.question ]
+    assert_equal [ "The bridge at Mirefall", "Toll-keepers want a bribe.", "Is the bridge watched?", scene ], [ scene.title, scene.notes, scene.story_question, plan.reload.scene ]
+    assert_nil scene.opening_roll, "nothing's rolled until the GM rolls it"
     assert_empty @campaign.scene_plans.unplayed, "a plan once played leaves the list"
+
+    follow_redirect!
+    story = new_campaign_story_roll_path(@campaign, question: "Is the bridge watched?")
+    assert_select "[data-controller=modal-opener][data-modal-opener-url-value=?]", story
+    assert_select ".scene-bar__question a[href=?][data-turbo-frame=modal]", story, "Roll it"
+    get campaign_table_path(@campaign)
+    assert_select "[data-controller=modal-opener]", 0, "it opens once"
+
+    get story
+    assert_select "turbo-frame#modal form.story-roll[action=?][data-turbo-frame=_top]", campaign_story_rolls_path(@campaign) do
+      assert_select "input#modal_story_question[value=?]", "Is the bridge watched?"
+      assert_select "input[name=odds][value='2'][checked]"
+      assert_select "select#modal_story_character option", 3, "no one in particular, Tibbs or Bram"
+    end
+
+    post campaign_story_rolls_path(@campaign), params: { question: "Is the bridge watched?", odds: "3" }
+    assert_equal [ 3, "Is the bridge watched?" ], [ scene.reload.opening_roll.stat_dice, scene.opening_roll.question ]
+    get campaign_table_path(@campaign)
+    assert_select ".scene-bar__question", 0, "rolled, so it's gone from the bar"
   end
 
-  test "the GM groups scenes in blocks, starts a session on one, and its scenes come first" do
+  test "the GM groups scenes in collections; starting a scene offers each collection, then the standalone ones" do
     sign_in_as identities(:gwen)
-    post campaign_scene_blocks_path(@campaign), params: { scene_block: { title: "The castle", notes: "The baron is away." } }
-    castle = @campaign.scene_blocks.sole
-    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The gatehouse", scene_block_id: castle.id, opening_odds: "1", opening_question: "Are they expected?" } }
-    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "A storm rolls in" } }
-    gatehouse, storm = @campaign.scene_plans.ordered.to_a
-    assert_equal [ castle, nil ], [ gatehouse.scene_block, storm.scene_block ]
+    get new_campaign_scene_collection_path(@campaign)
+    assert_select "turbo-frame#new_scene_collection form[action=?]", campaign_scene_collections_path(@campaign) do
+      assert_select "a.button--danger[href=?][data-turbo-frame=new_scene_collection]", campaign_scene_plans_path(@campaign), "Cancel"
+    end
+    post campaign_scene_collections_path(@campaign), params: { scene_collection: { title: "The castle", notes: "The baron is away." } }
+    castle = @campaign.scene_collections.sole
+    assert_redirected_to campaign_scene_plans_path(@campaign, anchor: "scene_collection_#{castle.id}")
 
     get campaign_scene_plans_path(@campaign)
-    assert_select "#scene_block_#{castle.id} .scene-plans__title", "The gatehouse"
+    assert_select "details#scene_collection_#{castle.id}.sheet-fold:not([open])", 1, "collections start closed"
+    assert_select "details#scene_collection_#{castle.id}" do
+      assert_equal [ "Add a scene", "Edit", "Remove" ], css_select("#scene_collection_#{castle.id} .scene-collection__actions .button").map { _1.text.strip }
+      assert_select ".scene-collection__actions turbo-frame#new_scene_plan_#{castle.id} a[href=?]", new_campaign_scene_plan_path(@campaign, collection: castle.id)
+      assert_select ".scene-collection__actions .button_to .button--danger", "Remove"
+    end
+    get new_campaign_scene_plan_path(@campaign, collection: castle.id)
+    assert_select "turbo-frame#new_scene_plan_#{castle.id} select[name='scene_plan[scene_collection_id]'] option[selected][value=?]", castle.id.to_s, "The castle"
 
-    # Moving a scene sends only its block.
-    patch campaign_scene_plan_path(@campaign, storm), params: { scene_plan: { scene_block_id: castle.id } }
-    assert_equal [ castle, "A storm rolls in" ], [ storm.reload.scene_block, storm.title ]
-    patch campaign_scene_plan_path(@campaign, storm), params: { scene_plan: { scene_block_id: "" } }
-    assert_nil storm.reload.scene_block
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "The gatehouse", scene_collection_id: castle.id, story_question: "Are they expected?" } }
+    post campaign_scene_plans_path(@campaign), params: { scene_plan: { title: "A storm rolls in" } }
+    gatehouse, storm = @campaign.scene_plans.ordered.to_a
+    assert_equal [ castle, nil ], [ gatehouse.scene_collection, storm.scene_collection ]
+
+    get campaign_scene_plans_path(@campaign)
+    assert_select "#scene_collection_#{castle.id} .scene-plans__title", "The gatehouse"
+
+    assert_equal %w[ Edit Move Remove ], css_select("##{dom_id(storm)} .scene-plans__actions > .button, ##{dom_id(storm)} .scene-plans__actions > .button_to .button, ##{dom_id(storm)} .scene-plans__actions summary").map { _1.text.strip }
+    assert_select "##{dom_id(storm)} details.scene-plans__move" do
+      assert_select "summary", "Move"
+      assert_select "form[action=?] button", campaign_scene_plan_path(@campaign, storm), "The castle"
+      assert_select "input[name='scene_plan[scene_collection_id]'][value=?]", castle.id.to_s
+      assert_select "button", { text: "Standalone scenes", count: 0 }, "not where it already is"
+    end
+
+    # Moving a scene sends only its collection.
+    patch campaign_scene_plan_path(@campaign, storm), params: { scene_plan: { scene_collection_id: castle.id } }
+    assert_equal [ castle, "A storm rolls in" ], [ storm.reload.scene_collection, storm.title ]
+    patch campaign_scene_plan_path(@campaign, storm), params: { scene_plan: { scene_collection_id: "" } }
+    assert_nil storm.reload.scene_collection
 
     get new_campaign_play_session_path(@campaign)
-    assert_select "input[name=scene_block_id][value='#{castle.id}']"
-    post campaign_play_sessions_path(@campaign), params: { character_ids: [ characters(:tibbs).id ], scene_block_id: castle.id }
+    assert_select "input[name=scene_collection_id]", 0, "a session doesn't pick a collection"
+    post campaign_play_sessions_path(@campaign), params: { character_ids: [ characters(:tibbs).id ] }
     session = @campaign.reload.current_session
-    assert_equal castle, session.scene_block
     assert_equal [ [ castle, [ gatehouse ] ], [ nil, [ storm ] ] ], session.scene_choices
 
     get new_campaign_scene_path(@campaign)
-    assert_select ".scene-picker__group[open] .fold__title", "The castle · this session"
+    assert_select "select[name='play_session[scene_collection_id]']", 0
+    assert_equal [ "The castle", "Standalone scenes", "A new scene" ], css_select(".fold__title").map { _1.text.strip }
+    assert_select ".scene-picker__group[open] .fold__title", "Standalone scenes", "collections start closed"
 
-    # Started as written: its title, notes and opening.
+    # Started as written: its title, notes and story question, which opens the story roll.
     post campaign_scenes_path(@campaign), params: { scene_plan_id: gatehouse.id, as_written: "1" }
     scene = @campaign.reload.current_scene
-    assert_equal [ "The gatehouse", scene, 1, "Are they expected?" ], [ scene.title, gatehouse.reload.scene, scene.opening_roll.stat_dice, scene.opening_roll.question ]
-
-    get campaign_table_path(@campaign)
+    assert_equal [ "The gatehouse", scene, "Are they expected?" ], [ scene.title, gatehouse.reload.scene, scene.story_question ]
+    follow_redirect!
+    assert_select "[data-controller=modal-opener][data-modal-opener-url-value=?]", new_campaign_story_roll_path(@campaign, question: "Are they expected?")
     assert_select ".scene-bar__notes", /The baron is away/
 
-    # The players head elsewhere: the session plays no block, and any scene is still there.
-    patch campaign_play_session_path(@campaign, session), params: { play_session: { scene_block_id: "" } }
-    assert_redirected_to new_campaign_scene_path(@campaign)
-    assert_nil session.reload.scene_block
-    assert_equal [ [ nil, [ storm ] ] ], session.scene_choices
+    assert_equal [ [ nil, [ storm ] ] ], session.scene_choices, "a collection with none left to play isn't offered"
 
-    delete campaign_scene_block_path(@campaign, castle)
-    assert_nil storm.reload.scene_block_id
-    assert_equal 2, @campaign.scene_plans.count, "removing a block keeps its scenes"
+    # The last scene came from the castle: it comes first, open, on the prep page and in the picker.
+    tower = @campaign.scene_collections.create!(title: "The tower")
+    @campaign.scene_plans.create!(title: "The stair", scene_collection: tower)
+    @campaign.scene_plans.create!(title: "The keep", scene_collection: castle)
+    get campaign_scene_plans_path(@campaign)
+    assert_equal [ "scene_collection_#{castle.id}", "scene_collection_#{tower.id}" ], css_select(".scene-prep__grid > details.scene-collection").map { _1["id"] }
+    assert_select "details#scene_collection_#{castle.id}.scene-collection--current[open] .scene-collection__tag", "In progress"
+    assert_select ".scene-collection__tag", 1
+    assert_select "details#scene_collection_#{tower.id}:not([open])"
+    scene.end!(by: identities(:gwen))
+    get new_campaign_scene_path(@campaign)
+    assert_equal [ "The castle In progress", "The tower", "Standalone scenes", "A new scene" ], css_select(".fold__title").map { _1.text.squish }
+    assert_equal [ "The castle In progress", "Standalone scenes" ], css_select(".scene-picker__group[open] .fold__title").map { _1.text.squish }
+
+    delete campaign_scene_collection_path(@campaign, castle)
+    assert_nil storm.reload.scene_collection_id
+    assert_equal 4, @campaign.scene_plans.count, "removing a collection keeps its scenes"
   end
 
   test "only the GM preps scenes" do

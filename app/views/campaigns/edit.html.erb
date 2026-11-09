@@ -63,6 +63,10 @@
           <%= form.check_box :players_set_level %>
           <span><strong>Players set their own level.</strong> Off, levels change only with XP or a milestone.</span>
         </label>
+        <label class="check">
+          <%= form.check_box :log_talent_uses %>
+          <span><strong>Post talent uses to the table log.</strong> Each use a character spends from their sheet shows in the log ("Fen spends inspiration").</span>
+        </label>
         <div class="field field--inline">
           <%= form.label :starting_level, "New characters start at", class: "field__label" %>
           <%= form.select :starting_level, [ [ "The player's choice", "" ], *(campaign.optional_rule?(:level_zero) ? [ [ "Level 0", 0 ] ] : []), *(1..Grimwild::MAX_LEVEL).map { [ "Level #{_1}", _1 ] } ], {}, class: "field__input" %>

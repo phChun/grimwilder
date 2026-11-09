@@ -16,7 +16,7 @@ class Campaign < ApplicationRecord
   has_many :play_sessions, dependent: :destroy
   has_many :scenes
   has_many :scene_plans, dependent: :delete_all
-  has_many :scene_blocks, dependent: :delete_all
+  has_many :scene_collections, dependent: :delete_all
   has_one :schedule, class_name: "Campaign::Schedule", dependent: :destroy
   has_many :game_dates, dependent: :delete_all
   has_many :pools, dependent: :destroy
@@ -70,6 +70,18 @@ class Campaign < ApplicationRecord
 
   def current_scene
     scenes.open.first
+  end
+
+  # The scene collection the latest scene was prepared in, if it was: scene
+  # prep and the scene picker put it first, open.
+  def last_scene_collection
+    scenes.order(started_at: :desc, id: :desc).first&.scene_plan&.scene_collection
+  end
+
+  # The scene collections, the last scene's first.
+  def scene_collections_last_played_first
+    last = last_scene_collection
+    scene_collections.ordered.to_a.partition { _1 == last }.flatten
   end
 
   # A boundary in the log ("Session 4 begins", "Rest"), which also refreshes everyone's table.

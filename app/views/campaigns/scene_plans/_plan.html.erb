@@ -1,23 +1,25 @@
-<%# locals: (plan:, blocks:) %>
-<%# One scene still to play on the prep page: what it is, then Start it (in a session, between scenes), Edit, Remove, and a select that moves it to another block. %>
+<%# locals: (plan:, collections:) %>
+<%# One scene still to play on the prep page: what it is, then Edit, Move (a menu of the other collections) and Remove. Scenes start from the GM table's Start scene. %>
 <li id="<%= dom_id(plan) %>" class="scene-plans__item">
   <div class="scene-plans__main">
     <strong class="scene-plans__title"><%= plan.title %></strong>
-    <% if plan.opening? %><span class="field__hint">Opens with a <%= plan.opening_odds %>d story roll<%= ": #{plan.opening_question}" if plan.opening_question %></span><% end %>
+    <% if plan.story_question %><span class="field__hint">Story roll: <%= plan.story_question %></span><% end %>
     <% if plan.notes %><p class="scene-plans__notes"><%= plan.notes %></p><% end %>
   </div>
   <div class="scene-plans__actions">
-    <% if Current.campaign.current_session && !Current.campaign.current_scene %>
-      <%= button_to "Start it", campaign_scenes_path(Current.campaign), params: { scene_plan_id: plan.id, as_written: 1 }, class: "button button--small button--primary" %>
-    <% end %>
     <%= link_to "Edit", edit_campaign_scene_plan_path(Current.campaign, plan), class: "button button--small" %>
-    <%= button_to "Remove", campaign_scene_plan_path(Current.campaign, plan), method: :delete, class: "button button--small button--ghost button--danger-text", form: { data: { turbo_confirm: "Remove #{plan.title}?" } } %>
-    <% if blocks.any? %>
-      <%= form_with model: [ Current.campaign, plan ], class: "scene-plans__move", data: { controller: "auto-submit" } do |form| %>
-        <%= form.label :scene_block_id, "Block for #{plan.title}", class: "visually-hidden", for: "scene_plan_#{plan.id}_block" %>
-        <%= form.select :scene_block_id, blocks.map { [ _1.title, _1.id ] }, { include_blank: "No block" }, id: "scene_plan_#{plan.id}_block", class: "field__input field__input--small", data: { action: "change->auto-submit#submit" } %>
-        <noscript><%= form.submit "Move", class: "button button--small" %></noscript>
-      <% end %>
+    <% if collections.any? %>
+      <%# Move: a menu of the other scene collections (or the standalone scenes), each a button that sends only the collection. %>
+      <details id="<%= dom_id(plan, :move) %>" class="scene-plans__move" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
+        <summary class="button button--small scene-plans__move-toggle" aria-label="Move <%= plan.title %>">Move</summary>
+        <div class="scene-plans__move-menu" data-menu-target="panel">
+          <%= render "shared/popover_head", title: "Move to" %>
+          <% [ *collections, nil ].reject { _1&.id == plan.scene_collection_id }.each do |target| %>
+            <%= button_to (target ? target.title : "Standalone scenes"), campaign_scene_plan_path(Current.campaign, plan), method: :patch, params: { scene_plan: { scene_collection_id: target&.id.to_s } }, class: "button button--small button--ghost" %>
+          <% end %>
+        </div>
+      </details>
     <% end %>
+    <%= button_to "Remove", campaign_scene_plan_path(Current.campaign, plan), method: :delete, class: "button button--small button--danger", form: { data: { turbo_confirm: "Remove #{plan.title}?" } } %>
   </div>
 </li>

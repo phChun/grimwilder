@@ -4,6 +4,14 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-09
 
+- **Talent uses in the log are the GM's call**: a new setting, Post talent uses to the table log, puts every use a character spends in the log. It replaces the checkbox each player had on their sheet. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Talents to take show on your sheet**: when your level allows more talents (or Eldritch Talents) than you have, the Talents card's title says how many, even folded, and tapping it opens the talent picker. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Scene collections**: scene blocks are now called scene collections, laid out two across on the prep page, each with its scenes and its buttons at the bottom. Scenes in no collection are standalone scenes. Every card folds, with Expand all and Collapse all at the top, and Add a scene opens its form right in the card. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Move scenes from a menu**: each prepared scene has Edit, Move and Remove; Move lists the other collections. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Starting a scene shows everything you've prepared**: each collection's scenes, then the standalone ones, then a new scene. Sessions no longer ask where the players are headed. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Your scene collection in progress comes first**: the collection the last scene came from leads the prep page and the scene picker, open and marked In progress; the others start closed. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Cut to a new scene without leaving the table**: ending the scene, calling a montage for it, and starting the next all happen in pop-ups over the GM table. ([#107](https://github.com/phChun/grimwilder/pull/107))
+- **Scenes open with a story question**: give a scene a story roll question, and starting it opens the story roll with the question filled in, so you pick the odds and who rolls. Until it's rolled, the question waits on the table with Roll it. ([#107](https://github.com/phChun/grimwilder/pull/107))
 - **Journals are pages you keep as you like**: New page opens a form right in the journal or on your sheet, with a title if you want one, whenever you want. Pages no longer belong to a session; the ones you'd written keep their session as their title. Tap a page's title to read it, change it or tear it out. ([#105](https://github.com/phChun/grimwilder/pull/105))
 - **Lists in the chat and journals**: start lines with `- ` for bullets or `1. ` for numbers. ([#105](https://github.com/phChun/grimwilder/pull/105))
 - **Star your favorite pages** to keep them at the top of your journal and your sheet. ([#105](https://github.com/phChun/grimwilder/pull/105))

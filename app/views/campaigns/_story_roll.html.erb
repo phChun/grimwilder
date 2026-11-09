@@ -1,27 +1,29 @@
-<%# locals: (my_characters:, party: nil) %>
+<%# locals: (my_characters:, party: nil, question: nil, prefix: nil) %>
+<%# question: the question to start on (a scene's story question). prefix: for the fields' ids, when two story roll forms share a page (the Rolls fold and the story roll modal). %>
 <% party ||= [] %>
+<% prefix ||= "story" %>
 <p class="field__hint">For luck, or how true a doubtful detail is: from good (perfect) to bad (disaster). Pick a character and their player rolls it; anyone assisting rolls 1d of their own.</p>
-<%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack story-roll" do %>
+<%= form_with url: campaign_story_rolls_path(Current.campaign), class: "stack story-roll", data: { turbo_frame: "_top" } do %>
   <div class="field">
-    <label class="field__label" for="story_question">Question <small>(optional)</small></label>
-    <input type="text" id="story_question" name="question" maxlength="200" autocomplete="off" placeholder="Do I see any guards?" class="field__input">
+    <label class="field__label" for="<%= prefix %>_question">Question <small>(optional)</small></label>
+    <input type="text" id="<%= prefix %>_question" name="question" value="<%= question %>" maxlength="200" autocomplete="off" placeholder="Do I see any guards?" class="field__input">
   </div>
 
-  <%= render "campaigns/story_fields", my_characters: my_characters, spark: false %>
+  <%= render "campaigns/story_fields", my_characters: my_characters, spark: false, prefix: prefix %>
 
   <% if my_characters.any? && party.many? %>
     <fieldset class="roll-setup__group">
       <legend class="field__label">Assists <small>1d each, shares the risk; they roll it</small></legend>
       <div class="stat-roll__assists">
         <% party.each do |character| %>
-          <label class="check"><%= check_box_tag "assists[]", character.id, false, id: "story_assist_#{character.id}" %> <%= character.name %></label>
+          <label class="check"><%= check_box_tag "assists[]", character.id, false, id: "#{prefix}_assist_#{character.id}" %> <%= character.name %></label>
         <% end %>
       </div>
     </fieldset>
   <% end %>
 
   <%# Only for no one in particular: a character's player sees their own roll. CSS hides it once a character is picked, and the server ignores it then. %>
-  <label class="check story-roll__secret"><%= check_box_tag :gm_only, "1", false, id: "story_gm_only" %> Only I see it <small class="field__hint">(kept out of the players' log)</small></label>
+  <label class="check story-roll__secret"><%= check_box_tag :gm_only, "1", false, id: "#{prefix}_gm_only" %> Only I see it <small class="field__hint">(kept out of the players' log)</small></label>
 
   <button type="submit" class="button button--primary">Roll</button>
 <% end %>

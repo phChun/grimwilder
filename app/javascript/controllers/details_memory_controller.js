@@ -60,6 +60,13 @@ export default class extends Controller {
     })
   }
 
+  // Expand all / Collapse all (data-details-memory-open-param): every fold
+  // (details.sheet-fold) at once; sections are remembered as if opened or
+  // closed by hand.
+  foldAll(event) {
+    this.element.querySelectorAll("details.sheet-fold").forEach((details) => { details.open = event.params.open })
+  }
+
   // Section shortcuts and the settings button open the section they point at.
   jump(event) {
     const id = new URL(event.currentTarget.href).hash.slice(1)

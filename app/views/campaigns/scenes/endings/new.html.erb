@@ -5,31 +5,37 @@
 <%# A montage called from here lands once everyone has rolled; the refresh offers it. %>
 <%= turbo_stream_from Current.campaign, :roll_calls %>
 
-<header class="page-header">
-  <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
-  <h1>End scene <%= @scene.number %>: <%= @scene.title %></h1>
-  <p class="page-header__lede">Close it once it has served its purpose, usually with a montage roll (pg. 96).</p>
-</header>
+<%# Its own page, and from the GM table's "Cut to new scene" a modal (shared/_frame_modal). Call for a montage opens its form in the same modal, which comes back here once it's called; until everyone has rolled, Check again reloads this. The form targets _top. %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
+    <h1>End scene <%= @scene.number %>: <%= @scene.title %></h1>
+    <p class="page-header__lede">Close it once it has served its purpose, usually with a montage roll (pg. 96).</p>
+  </header>
 
-<%= form_with url: campaign_scene_ending_path(Current.campaign, @scene), class: "panel stack session-form" do %>
-  <div class="field">
-    <label class="field__label" for="scene_closing">Close with a montage</label>
-    <% if @montages.any? %>
-      <%= select_tag :closing_roll_id, options_for_select(@montages.map { [ "#{_1.question || _1.name}: #{_1.outcome}", _1.id ] }, @montages.first.id), include_blank: "No montage", id: "scene_closing", class: "field__input" %>
-    <% else %>
-      <p class="field__hint">No montage rolled in this scene yet.</p>
-    <% end %>
-    <p class="field__hint"><%= link_to "Call for a montage", new_campaign_montage_path(Current.campaign, then: "end_scene", scene: @scene.title) %>, then come back here.</p>
-  </div>
+  <%= form_with url: campaign_scene_ending_path(Current.campaign, @scene), class: "panel stack session-form", data: { turbo_frame: "_top" } do %>
+    <div class="field">
+      <label class="field__label" for="scene_closing">Close with a montage</label>
+      <% if (waiting = Current.campaign.roll_calls.open.montage.exists?) %>
+        <p class="field__hint">A montage is waiting on its rolls. <%= link_to "Check again", new_campaign_scene_ending_path(Current.campaign, @scene, then: params[:then].presence) %></p>
+      <% end %>
+      <% if @montages.any? %>
+        <%= select_tag :closing_roll_id, options_for_select(@montages.map { [ "#{_1.question || _1.name}: #{_1.outcome}", _1.id ] }, @montages.first.id), include_blank: "No montage", id: "scene_closing", class: "field__input" %>
+      <% else %>
+        <p class="field__hint">No montage rolled in this scene yet.</p>
+      <% end %>
+      <% unless waiting %><p class="field__hint"><%= link_to "Call for a montage", new_campaign_montage_path(Current.campaign, then: "end_scene", scene: @scene.title, cut: (1 if params[:then] == "new_scene")) %>, then close the scene with it once everyone has rolled.</p><% end %>
+    </div>
 
-  <div class="field">
-    <label class="field__label" for="scene_notes">Notes</label>
-    <textarea id="scene_notes" name="notes" rows="4" class="field__input" autocomplete="off" placeholder="What happened, what's left hanging…"></textarea>
-  </div>
+    <div class="field">
+      <label class="field__label" for="scene_notes">Notes</label>
+      <textarea id="scene_notes" name="notes" rows="4" class="field__input" autocomplete="off" placeholder="What happened, what's left hanging…"></textarea>
+    </div>
 
-  <%= render "campaigns/scenes/lingering_conditions", scene: @scene %>
+    <%= render "campaigns/scenes/lingering_conditions", scene: @scene %>
 
-  <% cut = params[:then] == "new_scene" %>
-  <% if cut %><input type="hidden" name="then" value="new_scene"><% end %>
-  <button type="submit" class="button button--primary"><%= cut ? "End it and start the next scene" : "End the scene" %></button>
+    <% cut = params[:then] == "new_scene" %>
+    <% if cut %><input type="hidden" name="then" value="new_scene"><% end %>
+    <button type="submit" class="button button--primary"><%= cut ? "End it and start the next scene" : "End the scene" %></button>
+  <% end %>
 <% end %>

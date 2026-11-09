@@ -28,25 +28,6 @@
     <% end %>
   </fieldset>
 
-  <%# A block of prepared scenes for where the players are headed: its scenes come first when a scene starts. %>
-  <% if @blocks.any? %>
-    <fieldset class="roll-setup__group">
-      <legend class="field__label">Where are they headed?</legend>
-      <label class="check">
-        <%= radio_button_tag :scene_block_id, "", params[:scene_block_id].blank?, id: "session_block_none" %>
-        <span>Nowhere in particular yet</span>
-      </label>
-      <% @blocks.each do |block| %>
-        <% left = block.scene_plans.count { _1.scene_id.nil? } %>
-        <label class="check">
-          <%= radio_button_tag :scene_block_id, block.id, params[:scene_block_id] == block.id.to_s, id: "session_block_#{block.id}" %>
-          <span><strong><%= block.title %></strong> <small><%= pluralize(left, "scene") %> to play</small></span>
-        </label>
-      <% end %>
-      <p class="field__hint">Its scenes come first when you start a scene. You can change it, or pull in any other prepared scene, during the session.</p>
-    </fieldset>
-  <% end %>
-
   <% if @number > 1 %>
     <div class="session-form__recap">
       <div class="field">

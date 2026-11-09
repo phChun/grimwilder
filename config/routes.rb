@@ -97,7 +97,7 @@ Rails.application.routes.draw do
       resource :table, only: :show
       resources :memberships, only: :destroy
       resources :blocks, only: %i[ create destroy ] # the GM keeps someone out (Campaign::Blocking)
-      resources :story_rolls, only: :create
+      resources :story_rolls, only: %i[ new create ] # new: the modal, with a question to start on (a scene's)
       resource :feed, only: :show # older lines for the table rail, as you scroll back
       resources :quarrels, only: %i[ new create ]
       resources :montages, only: %i[ new create ]
@@ -125,8 +125,8 @@ Rails.application.routes.draw do
       end
       resource :suspense, only: :update
 
-      resources :scene_plans, only: %i[ index create edit update destroy ]
-      resources :scene_blocks, only: %i[ create edit update destroy ]
+      resources :scene_plans, only: %i[ index new create edit update destroy ]
+      resources :scene_collections, only: %i[ new create edit update destroy ]
       resources :journals, only: %i[ index show update ] do # by membership: a player's journal
         resources :pages, only: %i[ new show create update destroy ], module: :journals do
           resource :favorite, only: %i[ create destroy ], module: :pages # the player stars it

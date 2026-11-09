@@ -6,27 +6,25 @@
 # Ending one gives everyone present 1 XP, or 2 for a standout session.
 class PlaySession < ApplicationRecord
   belongs_to :campaign
-  belongs_to :scene_block, optional: true # the prepared scenes it's playing, first when a scene starts
   has_and_belongs_to_many :characters, join_table: :play_session_characters
   has_many :rolls, dependent: :nullify
   has_many :scenes, dependent: :destroy
 
   validates :number, numericality: { only_integer: true, greater_than: 0 }, uniqueness: { scope: :campaign_id }
   validate :one_open_per_campaign, on: :create
-  validate :block_in_campaign
 
   scope :ordered, -> { order(:number) }
   scope :open, -> { where(ended_at: nil) }
   scope :ended, -> { where.not(ended_at: nil) }
 
-  def self.start!(campaign, characters:, by:, recap: nil, block: nil)
+  def self.start!(campaign, characters:, by:, recap: nil)
     campaign.refuse_play!
     raise ArgumentError, "#{campaign.current_session.title} is still going." if campaign.current_session
     raise ArgumentError, "Everyone here must be seated in #{campaign.name}." unless characters.all? { _1.campaign_id == campaign.id }
 
     transaction do
       number = campaign.play_sessions.maximum(:number).to_i + 1
-      session = campaign.play_sessions.create!(number: number, started_at: Time.current, characters: characters, scene_block: block,
+      session = campaign.play_sessions.create!(number: number, started_at: Time.current, characters: characters,
         recap: (recap.to_s.strip.presence unless number == 1))
 
       characters.each { _1.start_session!(first: session.first?) }
@@ -84,21 +82,15 @@ class PlaySession < ApplicationRecord
     campaign.post_marker!(name, play_session: self, **options)
   end
 
-  # Prepared scenes to start from, in the order the picker shows them: this
-  # session's block, then the loose ones, then each other block's.
-  # [[block or nil, scene plans]], leaving out any with none left to play.
+  # Prepared scenes to start from, in the order the picker shows them: each
+  # scene collection's (the last scene's first), then the standalone ones.
+  # [[collection or nil, scene plans]], leaving out any with none left to play.
   def scene_choices
-    blocks = campaign.scene_blocks.ordered.to_a
-    own = blocks.find { _1.id == scene_block_id }
-    [ own, nil, *(blocks - [ own ]) ].uniq.map { |block| [ block, (block ? block.scenes_to_play : campaign.scene_plans.unplayed.loose.ordered).to_a ] }
+    [ *campaign.scene_collections_last_played_first, nil ].map { |collection| [ collection, (collection ? collection.scenes_to_play : campaign.scene_plans.unplayed.loose.ordered).to_a ] }
       .reject { |_, plans| plans.empty? }
   end
 
   private
-    def block_in_campaign
-      errors.add(:scene_block, "isn't in this campaign") if scene_block && scene_block.campaign_id != campaign_id
-    end
-
     def one_open_per_campaign
       errors.add(:base, "#{campaign.name} already has a session going") if open? && campaign&.play_sessions&.open&.exists?
     end

@@ -55,7 +55,7 @@ class CampaignsController < ApplicationController
     end
 
     def campaign_params
-      params.expect(campaign: [ :name, :pitch, :setting, :party_never, :group_arc, :players_make_characters, :players_set_level, :starting_level, party_is: [], optional_rules: [], allowed_paths: [] ])
+      params.expect(campaign: [ :name, :pitch, :setting, :party_never, :group_arc, :players_make_characters, :players_set_level, :log_talent_uses, :starting_level, party_is: [], optional_rules: [], allowed_paths: [] ])
     end
 
     def load_settings

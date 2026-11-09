@@ -1,39 +1,29 @@
 <% content_for :title, "Start a scene · #{Current.campaign.name}" %>
 
-<%# Its own page, and from the GM table's "Start scene" a modal (shared/_frame_modal). The prepared scenes come first: this session's block, then the scenes in no block, then the other blocks folded away; each starts as written, or fills in the form below to adjust first (plan=). Then a new scene. Starting forms target _top, so the table refreshes. %>
+<%# Its own page, and from the GM table's "Start scene" a modal (shared/_frame_modal). The prepared scenes come first: each scene collection's, closed but for the one the last scene came from (first), then the standalone ones, open; each starts as written, or fills in the form below to adjust first (plan=). Then a new scene. Starting forms target _top, so the table refreshes. %>
 <%= turbo_frame_tag "modal" do %>
   <header class="page-header">
     <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %></p>
     <h1>Start a scene</h1>
-    <p class="page-header__lede">Open in the middle of the action (pg. 96). If the setup is unclear, open with a story roll.</p>
+    <p class="page-header__lede">Open in the middle of the action (pg. 96). If the setup is unclear, open with a story roll: give the scene a question, and the story roll opens with it.</p>
   </header>
 
   <% if @session %>
-    <% if @blocks.any? %>
-      <%# Which block the session is playing: the players may have headed somewhere else. %>
-      <%= form_with model: [ Current.campaign, @session ], class: "scene-picker__block", data: { controller: "auto-submit" } do |form| %>
-        <%= form.label :scene_block_id, "#{@session.title} is playing", class: "field__label" %>
-        <%= form.select :scene_block_id, @blocks.map { [ _1.title, _1.id ] }, { include_blank: "No block in particular" }, class: "field__input", data: { action: "change->auto-submit#submit" } %>
-        <noscript><%= form.submit "Change", class: "button button--small" %></noscript>
-      <% end %>
-    <% end %>
-
     <% if @choices.any? %>
       <div class="scene-picker">
-        <% @choices.each_with_index do |(block, plans), index| %>
-          <% own = block.nil? || block.id == @session.scene_block_id || index.zero? %>
-          <%= tag.details class: "fold scene-picker__group", open: own || plans.include?(@plan) do %>
+        <% @choices.each do |collection, plans| %>
+          <%= tag.details class: "fold scene-picker__group", open: (@plan ? plans.include?(@plan) : (collection.nil? || collection == @last_collection)) do %>
             <summary class="fold__summary">
-              <span class="fold__title"><%= block ? (block.id == @session.scene_block_id ? "#{block.title} · this session" : block.title) : "In no block" %></span>
+              <span class="fold__title"><%= collection ? collection.title : "Standalone scenes" %><% if collection && collection == @last_collection %> <span class="scene-collection__tag">In progress</span><% end %></span>
               <span class="fold__meta"><%= pluralize(plans.size, "scene") %></span>
             </summary>
-            <% if block&.notes %><p class="scene-plans__notes"><%= block.notes %></p><% end %>
+            <% if collection&.notes %><p class="scene-plans__notes"><%= collection.notes %></p><% end %>
             <ol class="scene-plans">
               <% plans.each do |plan| %>
                 <li class="<%= class_names("scene-plans__item", "scene-plans__item--picked": plan == @plan) %>">
                   <div class="scene-plans__main">
                     <strong class="scene-plans__title"><%= plan.title %></strong>
-                    <% if plan.opening? %><span class="field__hint">Opens with a <%= plan.opening_odds %>d story roll<%= ": #{plan.opening_question}" if plan.opening_question %></span><% end %>
+                    <% if plan.story_question %><span class="field__hint">Story roll: <%= plan.story_question %></span><% end %>
                     <% if plan.notes %><p class="scene-plans__notes scene-plans__notes--short"><%= plan.notes %></p><% end %>
                   </div>
                   <div class="scene-plans__actions">
@@ -66,22 +56,11 @@
           <textarea id="scene_notes" name="notes" rows="3" maxlength="2000" class="field__input"><%= params[:notes] || @plan&.notes %></textarea>
         </div>
 
-        <%= tag.details class: "fold scene-form__opening", open: @plan&.opening? do %>
-          <summary class="fold__summary">
-            <span class="fold__title">Open with a story roll</span>
-          </summary>
-          <div class="stack">
-            <label class="check">
-              <%= check_box_tag :open_with_story, "1", params[:open_with_story] == "1" || @plan&.opening?, id: "scene_open_with_story" %>
-              Roll it as the scene opens
-            </label>
-            <div class="field">
-              <label class="field__label" for="story_question">Question <small>(optional)</small></label>
-              <input type="text" id="story_question" name="question" value="<%= @plan&.opening_question %>" maxlength="200" autocomplete="off" placeholder="Are the guards awake?" class="field__input">
-            </div>
-            <%= render "campaigns/story_fields", my_characters: @my_characters, odds: @plan&.opening_odds %>
-          </div>
-        <% end %>
+        <div class="field">
+          <label class="field__label" for="scene_story_question">Story roll question <small>(optional)</small></label>
+          <input type="text" id="scene_story_question" name="story_question" value="<%= params[:story_question] || @plan&.story_question %>" maxlength="200" autocomplete="off" placeholder="Are the guards awake?" class="field__input" aria-describedby="scene_story_hint">
+          <p id="scene_story_hint" class="field__hint">The story roll opens with it as the scene starts, to pick the odds and who rolls.</p>
+        </div>
 
         <button type="submit" class="button button--primary">Start the scene</button>
       <% end %>

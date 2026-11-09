@@ -185,7 +185,8 @@ class TalentChoicesTest < ActionDispatch::IntegrationTest
     assert_select "#talent-hidden-magic .use-tracker__resets", "2 left · resets each session"
     assert_select "#talent-hidden-magic a.talent-card__pick-more", "Choose 4 more words of power"
 
-    patch character_talent_uses_path(nell), params: { use: "hidden-magic/words", name: "storm", note: "1" }
+    campaigns(:bramblewood).update!(log_talent_uses: true)
+    patch character_talent_uses_path(nell), params: { use: "hidden-magic/words", name: "storm" }
     assert_equal [ "storm" ], nell.reload.burned_names(Talent.find("hidden-magic").uses.sole)
     assert_equal "Nell burns storm", campaigns(:bramblewood).rolls.note.last.question
 

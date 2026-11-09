@@ -35,14 +35,21 @@
             </p>
           <% end %>
         </div>
-        <%# The GM's notes while the scene is on (from its prep, or the new-scene form), and the block the session is playing. details-memory keeps it open or shut. %>
-        <% block = @session&.scene_block %>
-        <% if scene&.notes.present? || block&.notes.present? %>
+        <%# The scene's story question, until a story roll asks it (Scene#opened_with!): Roll it opens the story roll modal with it, as starting the scene did. %>
+        <% if scene&.story_question && scene.opening_roll_id.nil? %>
+          <p class="scene-bar__question">
+            <span><span class="scene-bar__notes-title">Story roll:</span> <%= scene.story_question %></span>
+            <%= link_to "Roll it", new_campaign_story_roll_path(campaign, question: scene.story_question), class: "button button--small", data: { turbo_frame: "modal" } %>
+          </p>
+        <% end %>
+        <%# The GM's notes while the scene is on (from its prep, or the new-scene form), and those of the scene collection it was prepared in. details-memory keeps it open or shut. %>
+        <% collection = scene&.scene_plan&.scene_collection %>
+        <% if scene&.notes.present? || collection&.notes.present? %>
           <details class="fold scene-bar__notes" id="scene-notes" data-details-memory-target="section" data-section="scene-notes" open>
-            <summary class="fold__summary"><span class="scene-bar__notes-title">Your notes<%= " · #{block.title}" if block %></span></summary>
+            <summary class="fold__summary"><span class="scene-bar__notes-title">Your notes<%= " · #{collection.title}" if collection %></span></summary>
             <% if scene&.notes.present? %><p class="scene-plans__notes"><%= scene.notes %></p><% end %>
-            <% if block&.notes.present? %>
-              <p class="scene-plans__notes"><% if scene&.notes.present? %><strong><%= block.title %>:</strong> <% end %><%= block.notes %></p>
+            <% if collection&.notes.present? %>
+              <p class="scene-plans__notes"><% if scene&.notes.present? %><strong><%= collection.title %>:</strong> <% end %><%= collection.notes %></p>
             <% end %>
           </details>
         <% end %>
@@ -51,7 +58,7 @@
         <div class="scene-bar__actions">
           <%= render "campaigns/tables/suspense_panel", campaign: campaign %>
           <% if scene %>
-            <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost" %>
+            <%= link_to "Cut to new scene", new_campaign_scene_ending_path(campaign, scene, then: "new_scene"), class: "button button--ghost", data: { turbo_frame: "modal" } %>
           <% elsif @session %>
             <%= link_to "Start scene", new_campaign_scene_path(campaign), class: "button button--ghost", data: { turbo_frame: "modal" } %>
           <% end %>

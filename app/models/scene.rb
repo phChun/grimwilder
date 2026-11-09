@@ -1,6 +1,8 @@
 # One stretch of action within a session (pg. 96). It opens in the middle of
-# things, with a story roll if the setup is unclear, and closes with a montage
-# once it has served its purpose. Ending it can clear "clears after scene"
+# things, with a story roll if the setup is unclear (its story_question, which
+# the GM rolls from the story roll modal that opens with it; the first story
+# roll on it becomes its opening_roll), and closes with a montage once it has
+# served its purpose. Ending it can clear "clears after scene"
 # conditions (pg. 30) from the characters there.
 class Scene < ApplicationRecord
   belongs_to :play_session
@@ -8,29 +10,31 @@ class Scene < ApplicationRecord
   belongs_to :opening_roll, class_name: "Roll", optional: true
   belongs_to :closing_roll, class_name: "Roll", optional: true
   has_many :rolls, dependent: :nullify
+  has_one :scene_plan # the prepared scene it was started from, if any
 
   normalizes :title, with: ->(value) { value.squish }
+  normalizes :story_question, with: ->(value) { value.squish.presence }
 
   validates :title, presence: true, length: { maximum: 120 }
+  validates :story_question, length: { maximum: 200 }
   validates :number, numericality: { only_integer: true, greater_than: 0 }, uniqueness: { scope: :play_session_id }
   validate :one_open_per_session, on: :create
 
   scope :ordered, -> { order(:number) }
   scope :open, -> { where(ended_at: nil) }
 
-  # opening: story roll arguments (Roll.story!) to open with, or nil.
+  # story_question: what to ask in a story roll as it opens, if anything.
   # plan: the ScenePlan it was started from, which then belongs to it.
-  def self.start!(session, title:, by:, opening: nil, notes: nil, plan: nil)
+  def self.start!(session, title:, by:, notes: nil, story_question: nil, plan: nil)
     session.campaign.refuse_play!
     raise ArgumentError, "#{session.title} has ended." unless session.open?
     raise ArgumentError, "#{session.current_scene.heading} is still going." if session.current_scene
 
     transaction do
       scene = session.scenes.create!(campaign: session.campaign, number: session.scenes.maximum(:number).to_i + 1,
-        title: title, notes: notes.to_s.strip.presence, started_at: Time.current)
+        title: title, notes: notes.to_s.strip.presence, story_question: story_question, started_at: Time.current)
       plan&.update!(scene: scene)
       session.post_marker!(scene.heading, by: by, scene: scene)
-      scene.update!(opening_roll: Roll.story!(campaign: session.campaign, by: by, **opening)) if opening
       scene
     end
   end
@@ -41,6 +45,14 @@ class Scene < ApplicationRecord
 
   def open?
     ended_at.nil?
+  end
+
+  # A story roll made while it's on: the first asking its story question is
+  # what it opened with.
+  def opened_with!(roll)
+    return unless open? && opening_roll_id.nil? && story_question && roll.story? && roll.scene_id == id
+
+    update!(opening_roll: roll) if roll.question&.casecmp?(story_question)
   end
 
   # Each present character's "clears after scene" conditions, as [character, index, condition].
