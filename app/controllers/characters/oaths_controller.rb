@@ -1,4 +1,4 @@
-# Oathbreaker (P6 pg. 69, Character::Oath), from the Paladin's core talent
+# Oathbreaker (pg. 69, Character::Oath), from the Paladin's core talent
 # card: the owner breaks the oath, or marks the one redemption.
 class Characters::OathsController < ApplicationController
   include CharacterScoped

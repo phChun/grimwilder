@@ -1,4 +1,4 @@
-# Oathbreaker (P6 pg. 69): a Paladin who breaks two tenets loses Oathsworn and
+# Oathbreaker (pg. 69): a Paladin who breaks two tenets loses Oathsworn and
 # takes the Adventurer's Talented in its place, with its extra talents.
 # Redemption, by ritual or mythic deed, restores Oathsworn and keeps one talent
 # gained while oathbroken; it's possible only once. The owner marks both.

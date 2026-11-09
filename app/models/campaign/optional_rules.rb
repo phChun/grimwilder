@@ -1,4 +1,4 @@
-# The optional rules a GM turns on for the table, in settings (P6 pg. 175–179),
+# The optional rules a GM turns on for the table, in settings (pg. 175–179),
 # grouped there by GROUPS. Stat progression, legacy cores and level 0 are the
 # GM's say-so for options each character then takes up on their sheet
 # (Character#rule_allows?); the rest change what the table offers:

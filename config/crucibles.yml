@@ -643,7 +643,7 @@
   tables:
   - { name: Effect, columns: [Effect], rows: [[stunning], [falling], [noisy], [poisonous], [entangling], [injuring]] }
   - { name: Trigger, columns: [Trigger], rows: [[tripwire], [pressure plate], [snare loop], [bait], [hidden], [proximity]] }
-# Monster tables (P6 pg. 146–172): the d6 lists on the monster pages, one die each.
+# Monster tables (pg. 146–172): the d6 lists on the monster pages, one die each.
 - key: magitechnobabble
   name: Magitechnobabble
   group: characters

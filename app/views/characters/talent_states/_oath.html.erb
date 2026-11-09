@@ -1,5 +1,5 @@
 <%# locals: (character:, talent:, editable:) %>
-<%# Oathsworn's tenets (P6 pg. 69, Character::TalentState): each violation slashes, then fills, then breaks a tenet; each in violation costs 1 smite, and a second broken one makes an Oathbreaker. Affirmation gives spark to another character, once a session. %>
+<%# Oathsworn's tenets (pg. 69, Character::TalentState): each violation slashes, then fills, then breaks a tenet; each in violation costs 1 smite, and a second broken one makes an Oathbreaker. Affirmation gives spark to another character, once a session. %>
 <% tenets = character.picks_for(talent.choice("tenets")) %>
 <% violations = character.tenet_violations %>
 <% if tenets.any? %>

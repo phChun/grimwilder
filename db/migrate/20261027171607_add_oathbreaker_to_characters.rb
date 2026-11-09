@@ -1,4 +1,4 @@
-# A Paladin who breaks their oath (P6 pg. 69): Oathsworn gives way to the
+# A Paladin who breaks their oath (pg. 69): Oathsworn gives way to the
 # Adventurer's Talented until redeemed, which can happen only once. And a
 # character who started at level 0 (optional rule, pg. 177), who adds their
 # last stat point at level 1.

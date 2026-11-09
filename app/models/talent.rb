@@ -4,7 +4,7 @@
 # "[Bard Only]" belongs to that path alone.
 #
 # Read-only reference data, like Crucible, so it isn't in the database.
-class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses, :follow_ups, :makes, :state, :casts, :crucible, :legacy_core_of, :extra_talents, :retired)
+class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :core, :uses, :rolls, :choices, :arcana, :bonuses, :follow_ups, :makes, :state, :casts, :crucible, :legacy_core_of, :extra_talents)
   def self.all
     catalog[:talents]
   end
@@ -31,9 +31,9 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
   end
 
   # Talents a character can choose: never a core talent (legacy ones
-  # included), never one prohibited for their path, never one the book retired.
+  # included), never one prohibited for their path.
   def self.choosable_for(path)
-    all.reject { |talent| talent.core? || talent.legacy_core_of || talent.retired? || talent.prohibited_for?(path) }
+    all.reject { |talent| talent.core? || talent.legacy_core_of || talent.prohibited_for?(path) }
   end
 
   def self.catalog
@@ -71,8 +71,7 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
       bonuses: Array(attributes["bonuses"]).map { Talent::Bonus.from(key, _1) },
       follow_ups: Array(attributes["follow_ups"]).map { Talent::FollowUp.from(key, _1) },
       makes: Array(attributes["makes"]).map { Talent::MadePool.from(key, _1) }, state: attributes["state"], casts: attributes["casts"], crucible: attributes["crucible"],
-      legacy_core_of: attributes["legacy_core_of"], extra_talents: attributes["extra_talents"]&.transform_keys(&:to_sym),
-      retired: attributes["retired"] == true)
+      legacy_core_of: attributes["legacy_core_of"], extra_talents: attributes["extra_talents"]&.transform_keys(&:to_sym))
   end
 
   def self.keyify(name)
@@ -84,19 +83,14 @@ class Talent < Data.define(:key, :name, :summary, :text, :note, :page, :group, :
       kind == "path"
     end
 
-    # The core talent first, then the rest A to Z. Retired talents (Flurry,
-    # cut in Preview 6) stay on sheets that have them, out of the catalog.
+    # The core talent first, then the rest A to Z.
     def talents
-      Talent.all.select { |talent| talent.group == self && !talent.retired? }.sort_by { [ _1.core? ? 0 : 1, _1.name.downcase ] }
+      Talent.all.select { |talent| talent.group == self }.sort_by { [ _1.core? ? 0 : 1, _1.name.downcase ] }
     end
   end
 
   def core?
     core
-  end
-
-  def retired?
-    retired
   end
 
   # Talents a core talent adds to the one per level (the Adventurer's

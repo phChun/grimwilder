@@ -179,7 +179,7 @@
       </li>
       <li>
         <%= link_to talents_path, class: "tool-card tool-card--ready" do %>
-          <span class="tool-card__glyph" aria-hidden="true"><%= Talent.all.reject(&:retired?).size %></span>
+          <span class="tool-card__glyph" aria-hidden="true"><%= Talent.all.size %></span>
           <span class="tool-card__name">Talents</span>
           <span class="tool-card__desc">Every path's talents, plus background, heritage and legacy talents, with a one-line gist of each.</span>
         <% end %>
