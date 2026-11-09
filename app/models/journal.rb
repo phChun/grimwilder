@@ -46,9 +46,10 @@ class Journal
     membership.player? && viewer == membership
   end
 
-  # A new page by this person: the GM's may be locked.
-  def write!(viewer, title:, body:, locked: false)
-    membership.journal_pages.create!(title: title, body: body, by_gm: gm?(viewer), locked: gm?(viewer) && locked)
+  # A new page by this person: the GM's may be locked, the player's starred.
+  def write!(viewer, title:, body:, locked: false, favorite: false)
+    membership.journal_pages.create!(title: title, body: body, by_gm: gm?(viewer), locked: gm?(viewer) && locked,
+      favorite: favoritable_by?(viewer) && favorite)
   end
 
   private

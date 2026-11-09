@@ -17,6 +17,7 @@ class JournalsTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#journal_new form[action=?] textarea", campaign_journal_pages_path(@campaign, @pip)
     assert_select "turbo-frame#journal_new .journal-form__actions input[type=submit][value=?] + a.button--danger[href=?]", "Add page", campaign_journal_path(@campaign, @pip), text: "Cancel"
 
+    assert_select "turbo-frame#journal_new input[type=checkbox][name='journal_page[favorite]']:not([checked])"
     post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "The bridge", body: "We crossed it." } }
     page = @pip.journal_pages.sole
     assert_redirected_to campaign_journal_path(@campaign, @pip, anchor: "page-#{page.id}")
@@ -42,6 +43,9 @@ class JournalsTest < ActionDispatch::IntegrationTest
     assert_redirected_to campaign_journal_path(@campaign, @pip)
     assert_empty @pip.journal_pages
 
+    post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "Keep", body: "On top.", favorite: "1" } }
+    assert @pip.journal_pages.sole.favorite?, "a new page can start starred"
+
     patch campaign_journal_path(@campaign, @pip), params: { membership: { journal_shared: "0" } }
     assert_not @pip.reload.journal_shared?
   end
@@ -65,9 +69,12 @@ class JournalsTest < ActionDispatch::IntegrationTest
     patch campaign_journal_page_path(@campaign, @pip, mine), params: { journal_page: { body: "Edited." } }
     assert_response :not_found
 
-    post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "Who you were", body: "A thief, once.", locked: "1" } }
+    get new_campaign_journal_page_path(@campaign, @pip)
+    assert_select "input[name='journal_page[favorite]']", 0, "only the player stars"
+    post campaign_journal_pages_path(@campaign, @pip), params: { journal_page: { title: "Who you were", body: "A thief, once.", locked: "1", favorite: "1" } }
     secret = @pip.journal_pages.by_gm.sole
     assert secret.locked?
+    assert_not secret.favorite?
 
     @pip.update!(journal_shared: false)
     get campaign_journal_path(@campaign, @pip)

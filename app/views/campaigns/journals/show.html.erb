@@ -2,7 +2,7 @@
 <% owner = @journal.membership.identity %>
 <% content_for :title, "#{own ? "Your journal" : "#{owner.display_name}'s journal"} · #{Current.campaign.name}" %>
 
-<%# A player's journal: a New page button that opens its form in place, then the pages, starred first, then newest. A GM adds pages of their own here (read only for the player by default) and reads the player's while it's shared. %>
+<%# A player's journal: a New page button that opens its form in place, then the pages, starred first, then newest, across the page. A GM adds pages of their own here (read only for the player by default) and reads the player's while it's shared. %>
 <header class="page-header">
   <p class="eyebrow"><%= link_to Current.campaign.name, campaign_path(Current.campaign) %><% unless own %> · <%= link_to "Journals", campaign_journals_path(Current.campaign) %><% end %></p>
   <h1><%= own ? "Your journal" : "#{owner.display_name}'s journal" %></h1>
@@ -26,7 +26,9 @@
   <%= render "campaigns/journals/new_button", journal: @journal %>
   <hr class="journal__rule">
   <% if @pages.any? %>
-    <%= render partial: "campaigns/journals/page", collection: @pages, as: :page, locals: { journal: @journal, viewer: Current.membership } %>
+    <div class="journal__pages">
+      <%= render partial: "campaigns/journals/page", collection: @pages, as: :page, locals: { journal: @journal, viewer: Current.membership } %>
+    </div>
   <% else %>
     <p class="empty">No pages yet.</p>
   <% end %>

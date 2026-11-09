@@ -117,8 +117,12 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_redirected_to character_path(@tibbs, anchor: "journal")
     page = pip.journal_pages.sole
     get character_path(@tibbs)
-    assert_select "details#journal .journal-page--compact .journal-page__text", "We crossed the bridge."
-    assert_select "details#journal .journal-page__title a[href=?]", campaign_journal_page_path(@campaign, pip, page, character_id: @tibbs.id), page.heading
+    assert_select "details#journal .journal-page--compact details.journal-page__fold:not([open])" do
+      assert_select "summary .journal-page__title", page.heading
+      assert_select "summary a", 0, "the title folds the page open, it doesn't link"
+      assert_select ".journal-page__text", "We crossed the bridge."
+      assert_select ".journal-page__actions a[href=?][data-turbo-frame=modal]", campaign_journal_page_path(@campaign, pip, page, character_id: @tibbs.id), "Edit"
+    end
     post campaign_journal_page_favorite_path(@campaign, pip, page), params: { character_id: @tibbs.id }
     assert_redirected_to character_path(@tibbs, anchor: "journal")
 
@@ -128,6 +132,7 @@ class CharacterCardsTest < ActionDispatch::IntegrationTest
     assert_select "details#journal" do
       assert_select ".journal-page__text", "We crossed the bridge."
       assert_select ".journal-page__star--on[title=Starred]"
+      assert_select ".journal-page__actions", 0, "the GM reads the player's page, no Edit"
     end
     get new_campaign_journal_page_path(@campaign, pip, character_id: @tibbs.id)
     assert_select "input[type=checkbox][name='journal_page[locked]'][checked]"

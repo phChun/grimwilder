@@ -17,7 +17,8 @@ class Campaigns::Journals::PagesController < ApplicationController
   def create
     raise ActiveRecord::RecordNotFound unless @journal.writable_by?(Current.membership)
 
-    @page = @journal.write!(Current.membership, title: page_params[:title], body: page_params[:body], locked: page_params[:locked] == "1")
+    @page = @journal.write!(Current.membership, title: page_params[:title], body: page_params[:body],
+      locked: page_params[:locked] == "1", favorite: page_params[:favorite] == "1")
     redirect_to back_to, notice: "#{@page.heading} added."
   rescue ActiveRecord::RecordInvalid => error
     redirect_to back_to, alert: error.record.errors.full_messages.to_sentence
@@ -44,7 +45,7 @@ class Campaigns::Journals::PagesController < ApplicationController
 
   private
     def page_params
-      params.expect(journal_page: %i[ title body locked ])
+      params.expect(journal_page: %i[ title body locked favorite ])
     end
 
     # The journal, or the sheet whose Journal card it was written from.

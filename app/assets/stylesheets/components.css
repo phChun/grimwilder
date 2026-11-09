@@ -3191,8 +3191,10 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .next-game--skipped { color: var(--muted); font-weight: 500; }
 .campaign-hero__soon { font-weight: 400; color: var(--muted); }
 
-/* A player's journal (campaigns/journals), here and on the sheet: a New page button that opens its form in place, a rule, then the pages, starred first. */
-.journal { display: grid; gap: var(--space-3); max-width: 46rem; }
+/* A player's journal (campaigns/journals), here and on the sheet: a New page button that opens its form in place, a rule, then the pages, starred first; here they spread across the page. */
+.journal { display: grid; gap: var(--space-3); }
+/* The pages across the page, two or three wide on a big screen, every card as tall as the tallest (rows of 1fr share the tallest row's height). */
+.journal__pages { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); grid-auto-rows: 1fr; gap: var(--space-3); }
 .journal-share { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 .journal-share .page-header__lede { margin: 0; }
 .journal-share .button_to { margin: 0; }
@@ -3205,17 +3207,28 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .journal__rule { width: 100%; margin: var(--space-3) 0; border: 0; border-top: 1px solid var(--line-soft); }
 .journal-page__open { color: inherit; text-decoration: none; }
 .journal-page__open:hover { color: var(--ember); text-decoration: underline; }
-.journal-page__star { display: inline-grid; place-items: center; min-width: var(--tap); min-height: var(--tap); margin: calc(var(--space-2) * -1) 0; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.journal-page__star { display: inline-grid; place-items: center; width: var(--tap); height: var(--tap); margin: 0; padding: 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.journal-page__star svg { display: block; }
 .journal-page__star:hover { color: var(--ember); }
 .journal-page__star--on { color: var(--ember); }
 .journal-page__star--on svg { fill: currentColor; }
 .journal-page .button_to { margin: 0; }
+/* On a sheet's Journal card, each page's title folds its words open, read only, with Edit below; the star sits beside the fold. */
+.journal-page--compact.journal-page--starrable { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 0 var(--space-1); }
+.journal-page--compact > .button_to, .journal-page--compact > .journal-page__star { display: grid; place-items: center; height: var(--tap); }
 .journal-page--compact .journal-page__title { font-size: 1.05rem; }
 .journal-page--compact .journal-page__text { color: var(--text-soft); font-size: 0.95rem; }
+.journal-page__summary { min-height: var(--tap); align-items: center; list-style: none; cursor: pointer; }
+.journal-page__summary::-webkit-details-marker { display: none; }
+.journal-page__summary:hover .journal-page__title { color: var(--ember); }
+.journal-page__summary .icon--chevron { flex: none; margin-left: auto; color: var(--dim); transition: transform 0.2s ease; }
+.journal-page__fold[open] > .journal-page__summary .icon--chevron { transform: rotate(180deg); }
+.journal-page__fold-body { padding: var(--space-1) 0 var(--space-2); }
+.journal-page__actions { margin: 0; }
 .journal-page__text { margin: 0; font-family: var(--font-display); white-space: pre-line; }
 .journal-page__body { font-family: var(--font-display); line-height: 1.6; resize: vertical; }
 .journal-form__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.journal-list { display: grid; gap: var(--space-2); max-width: 46rem; margin: 0; padding: 0; list-style: none; }
+.journal-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
 .journal-list__item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
 .journal-list__name { margin-right: auto; font-family: var(--font-display); font-size: 1.1rem; }
 
