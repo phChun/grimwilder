@@ -1,0 +1,12 @@
+<%# locals: (record:, url:, playing: nil) %>
+<%# How many of a counted arcana or item (Countable), styled like a talent's tally use: − and + for the owner and GM while the character is in play, the number for everyone else. %>
+<div class="use-tracker use-tracker--tally">
+  <span class="use-tracker__name">Carried</span>
+  <% if playing %>
+    <%= button_to "−", url, method: :patch, params: { by: -1 }, class: "button button--small use-tally__step", disabled: record.quantity.zero?, "aria-label": "One fewer #{record.name}", form: { class: "use-box__form" } %>
+  <% end %>
+  <strong class="use-tally__count" aria-label="<%= record.quantity %> carried"><%= record.quantity %></strong>
+  <% if playing %>
+    <%= button_to "+", url, method: :patch, params: { by: 1 }, class: "button button--small use-tally__step", disabled: record.quantity >= Countable::MAX_QUANTITY, "aria-label": "One more #{record.name}", form: { class: "use-box__form" } %>
+  <% end %>
+</div>

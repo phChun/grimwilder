@@ -1,13 +1,17 @@
 <%# locals: (character:, tends: nil, pools: nil) %>
-<%# The sheet's arcana (Character::Arcana): reminders from talents that grant them, each arcana's card, and adding one. Shown when there's something to show or the viewer can add one. %>
+<%# The sheet's arcana and items (Character::Arcana, Character::Items): reminders from talents that grant arcana, each arcana's card, then each important item's, and adding either. Shown when there's something to show or the viewer can add one. %>
 <% pools ||= [] %>
 <% grants = character.arcana_grants %>
 <% arcana = character.arcana.ordered.to_a %>
-<% if arcana.any? || grants.any? || tends %>
-  <details id="arcana" class="card sheet-fold" data-details-memory-target="section" data-section="character-<%= character.id %>-arcana">
-    <summary class="gm-fold__summary"><h2 id="sheet-arcana" class="card__title sheet-fold__title">Arcana</h2><%= icon(:chevron, size: 18) %></summary>
+<% items = character.items.ordered.to_a %>
+<% if arcana.any? || items.any? || grants.any? || tends %>
+  <details id="arcana" class="card sheet-fold" data-controller="talent-fold" data-details-memory-target="section" data-section="character-<%= character.id %>-arcana">
+    <summary class="gm-fold__summary"><h2 id="sheet-arcana" class="card__title sheet-fold__title">Arcana and items</h2><%= icon(:chevron, size: 18) %></summary>
     <% if tends %>
-      <p class="sheet-fold__actions sheet-fold__actions--top"><%= link_to "Add arcana", new_character_arcanum_path(character), class: "button button--small", data: { turbo_frame: "modal" } %></p>
+      <p class="sheet-fold__actions sheet-fold__actions--top">
+        <%= link_to "Add arcana", new_character_arcanum_path(character), class: "button button--small", data: { turbo_frame: "modal" } %>
+        <%= link_to "Add item", new_character_item_path(character), class: "button button--small", data: { turbo_frame: "modal" } %>
+      </p>
     <% end %>
 
     <% if grants.any? %>
@@ -31,8 +35,16 @@
           <%= render "characters/arcanum", arcanum: arcanum, character: character, tends: tends, pool: pools.find { _1.arcanum_id == arcanum.id } %>
         <% end %>
       </div>
-    <% elsif tends %>
-      <p class="field__hint">Relics of power the character holds, found, bought or made (pg. 41).</p>
+    <% end %>
+    <% if items.any? %>
+      <div class="talent-list">
+        <% items.each do |item| %>
+          <%= render "characters/item", item: item, character: character, tends: tends %>
+        <% end %>
+      </div>
+    <% end %>
+    <% if arcana.none? && items.none? && tends %>
+      <p class="field__hint">Relics of power the character holds, found, bought or made (pg. 41), and any other items worth keeping track of.</p>
     <% end %>
   </details>
 <% end %>

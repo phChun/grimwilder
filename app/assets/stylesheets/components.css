@@ -3043,6 +3043,11 @@ details[open] > .table-rail__summary .icon { transform: rotate(180deg); }
 .arcanum-card__function { border-color: var(--ember); color: var(--ember); }
 .arcanum-card__opus { display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-2); }
 .arcanum-card__opus .talent-card__label { margin: 0; }
+.arcanum-card__limits .talent-card__label + .talent-card__label::before { content: "· "; }
+/* Arcana and items have no ⋯ menu: their titles use the width, and their buttons (count, Edit, Remove) sit along the bottom. */
+.arcanum-card .talent-card__titles, .item-card .talent-card__titles { padding-right: 0; }
+.arcanum-card .talent-card__actions, .item-card .talent-card__actions { align-items: center; }
+.arcanum-card .talent-card__actions > .use-tracker, .item-card .talent-card__actions > .use-tracker { margin-right: auto; }
 .arcanum-form__group { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
 .arcanum-form__options { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--space-1) var(--space-3); }
 .arcanum-form__options--row { display: flex; flex-wrap: wrap; }

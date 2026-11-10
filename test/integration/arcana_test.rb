@@ -157,9 +157,40 @@ class ArcanaTest < ActionDispatch::IntegrationTest
     get new_character_arcanum_path(@tibbs)
     assert_select "input[type=checkbox][name='arcanum[additions][]'][value=unique_reset]"
 
-    post character_arcana_path(@tibbs), params: { arcanum: { name: "Whispering Skull", function: "reveal", tier: "major", additions: [ "", "sentient", "curse" ] } }
+    post character_arcana_path(@tibbs), params: { arcanum: { name: "Whispering Skull", function: "reveal", tier: "major", additions: [ "", "sentient", "curse" ], limitations: "Lies when the moon is new." } }
     get character_path(@tibbs)
-    assert_select ".arcanum-card .talent-card__pick", text: "Sentient"
-    assert_select ".arcanum-card .talent-card__pick", text: "Curse"
+    assert_equal %w[ Sentient Curse ], css_select(".arcanum-card__limits .talent-card__label").map(&:text)
+    assert_select ".arcanum-card__limits", /Lies when the moon is new\./
+    assert_select ".arcanum-card__limits .talent-card__label", text: "Limits", count: 0
+
+    sign_out
+    sign_in_as identities(:gwen)
+    @tibbs.arcana.create!(name: "Rope of Knots", function: "protect", limitations: "Only knots it already knows.")
+    get character_path(@tibbs)
+    assert_select "#arcanum-#{@tibbs.arcana.last.id} .arcanum-card__limits .talent-card__label", "Limits"
+  end
+
+  test "a counted arcana counts up and down; edit and remove sit at the bottom of its card" do
+    potions = @tibbs.arcana.create!(name: "Healing potion", function: "restore", expendable: true, counted: true, quantity: 3)
+    ring = @tibbs.arcana.create!(name: "Ring", function: "protect")
+    sign_in_as identities(:pip)
+
+    get character_path(@tibbs)
+    assert_select "#arcanum-#{potions.id} details.talent-card__fold summary .talent-card__summary", /\A3 carried · Minor expendable arcana · Restore/
+    assert_select "#arcanum-#{potions.id} .talent-card__actions .use-tally__count", "3"
+    assert_select "#arcanum-#{potions.id} .talent-card__actions a[href=?]", edit_character_arcanum_path(@tibbs, potions), "Edit"
+    assert_select "#arcanum-#{potions.id} .talent-card__actions form[action=?] button", character_arcanum_path(@tibbs, potions), "Remove"
+    assert_select ".arcanum-card .talent-card__more-menu", 0
+    assert_select "#arcanum-#{ring.id} .use-tally__count", 0
+
+    patch character_arcanum_count_path(@tibbs, potions), params: { by: -1 }
+    assert_redirected_to character_path(@tibbs, anchor: "arcanum-#{potions.id}")
+    assert_equal 2, potions.reload.quantity
+
+    patch character_arcanum_count_path(@tibbs, ring), params: { by: 1 }
+    assert_response :not_found
+
+    patch character_arcanum_path(@tibbs, ring), params: { arcanum: { counted: "1", quantity: "2" } }
+    assert_equal [ true, 2 ], ring.reload.values_at(:counted, :quantity)
   end
 end

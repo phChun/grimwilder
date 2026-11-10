@@ -2,6 +2,12 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-10
+
+- **Keep track of important items**: the sheet's Arcana card is now Arcana and items; Add item keeps a name and a description for a key, a letter or an heirloom. ([#113](https://github.com/phChun/grimwilder/pull/113))
+- **Arcana and items fold like talents**: each card shows its name and a one-line summary, and opens to the rest, with Edit and Remove at the bottom instead of a ⋯ menu. ([#113](https://github.com/phChun/grimwilder/pull/113))
+- **Keep a count**: tick Keep a count on an arcana or item (three healing potions, ten torches) and tap − or + on its card. ([#113](https://github.com/phChun/grimwilder/pull/113))
+
 ## 2026-11-09
 
 - **The dice favicon shows everywhere**: some browsers still showed an old red dot in the tab; the icon now always loads fresh after it changes. ([#111](https://github.com/phChun/grimwilder/pull/111))

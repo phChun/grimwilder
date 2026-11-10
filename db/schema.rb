@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_11_10_130000) do
+ActiveRecord::Schema[8.2].define(version: 2026_11_10_160000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -56,6 +56,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_10_130000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "additions", default: [], null: false
+    t.boolean "counted", default: false, null: false
+    t.integer "quantity", default: 1, null: false
     t.index ["character_id"], name: "index_arcana_on_character_id"
   end
 
@@ -220,6 +222,17 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_10_130000) do
     t.datetime "updated_at", null: false
     t.datetime "welcomed_at"
     t.index ["email_address"], name: "index_interests_on_email_address", unique: true
+  end
+
+  create_table "items", force: :cascade do |t|
+    t.integer "character_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "quantity", default: 1, null: false
+    t.boolean "counted", default: false, null: false
+    t.index ["character_id"], name: "index_items_on_character_id"
   end
 
   create_table "journal_pages", force: :cascade do |t|
@@ -501,6 +514,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_11_10_130000) do
   add_foreign_key "characters", "identities", column: "harm_changed_by_id", on_delete: :nullify
   add_foreign_key "feedbacks", "identities", on_delete: :cascade
   add_foreign_key "game_dates", "campaigns", on_delete: :cascade
+  add_foreign_key "items", "characters"
   add_foreign_key "journal_pages", "memberships", on_delete: :cascade
   add_foreign_key "memberships", "campaigns"
   add_foreign_key "memberships", "identities"

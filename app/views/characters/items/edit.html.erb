@@ -1,0 +1,10 @@
+<% content_for :title, "#{@item.name} · #{@character.name}" %>
+
+<%# Its own page, and from an item's ⋯ menu a modal (shared/_frame_modal). %>
+<%= turbo_frame_tag "modal" do %>
+  <header class="page-header">
+    <p class="eyebrow"><%= link_to @character.name, character_path(@character) %></p>
+    <h1><%= @item.name %></h1>
+  </header>
+  <%= render "characters/items/form", character: @character, item: @item %>
+<% end %>

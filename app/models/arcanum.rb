@@ -3,10 +3,13 @@
 # or trivial for an expendable one). It may have a power pool, kept in the
 # character's campaign like a talent pool and refilled each session
 # (Character::Arcana). Expendable arcana are used up once.
+# Counted ones keep how many (Countable): three healing potions.
 #
 # One is an "arcanum" in the code so Rails can tell one from many; the book
 # and the sheet say "arcana" for both.
 class Arcanum < ApplicationRecord
+  include Countable
+
   TIERS = %w[ trivial minor major mythic ].freeze
   POOL_SIZES = { "minor" => 2, "major" => 4, "mythic" => 6 }.freeze
   # Optional additions (pg. 42), more likely on greater arcana: key => [name, what it means].

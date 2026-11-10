@@ -206,6 +206,8 @@ Data in `config/crucibles.yml` (97 crucibles, 152 tables), read by a plain `Cruc
 - The sheet (`characters#show`) is a size container; quick changes are `button_to` PATCHes with `quick: 1` and morph refreshes. Every card but the stats and harm is a `<details class="sheet-fold">` remembered by `details_memory_controller.js`.
 - **Who** (backgrounds, traits, desires, features, gear) and **Story** (bonds, arcs, notes) edit in their own cards through turbo frames, on their own paths: `Characters::ProfilesController` and `Characters::StoriesController`, each permitting only its `FIELDS`. `characters#update` permits neither; only `create` takes them. The form fields are shared partials in `characters/fields/`.
 - Arcana (`Arcanum`, irregular inflection; `Character::Arcana`) get power pools sized by tier, refreshed by `refresh_arcana_pools!`.
+- Important items (`Item`, `Character::Items`): a name and a description, no other mechanics, in the same sheet card as the arcana (`characters/_arcana`, titled Arcana and items); `Characters::ItemsController` for those who tend the character.
+- Arcana and items fold like talent cards, with no ⋯ menu: their buttons (count, Use it up, Edit, Remove) sit along the bottom. Either may be `counted` (`Countable`, `quantity` 0–999), counted one at a time by − and + (`characters/_count`, `Characters::ArcanaCountsController`, `Characters::ItemCountsController`).
 
 ## Talents
 

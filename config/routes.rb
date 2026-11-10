@@ -35,6 +35,10 @@ Rails.application.routes.draw do
       resources :arcana, only: %i[ new create edit update destroy ] do
         resource :use, only: %i[ create destroy ], controller: "arcana_uses"
         resource :opus, only: %i[ create update ], controller: "magnum_opuses"
+        resource :count, only: :update, controller: "arcana_counts"
+      end
+      resources :items, only: %i[ new create edit update destroy ] do
+        resource :count, only: :update, controller: "item_counts"
       end
       resource :claim, only: %i[ create destroy ]
       resource :seat, only: :update
