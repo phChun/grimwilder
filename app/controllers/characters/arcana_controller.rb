@@ -45,7 +45,7 @@ class Characters::ArcanaController < ApplicationController
     end
 
     def arcanum_params
-      params.expect(arcanum: [ :name, :tier, :function, :description, :limitations, :expendable, :power_pool, :source, touchstones: [], additions: [] ]).tap do |permitted|
+      params.expect(arcanum: [ :name, :tier, :function, :description, :limitations, :expendable, :power_pool, :counted, :quantity, :source, touchstones: [], additions: [] ]).tap do |permitted|
         permitted[:source] = permitted[:source].presence_in(talent_keys) if permitted.key?(:source)
       end
     end

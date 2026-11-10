@@ -1,0 +1,10 @@
+<%# locals: (form:) %>
+<%# Keep a count (Countable), and how many to start with. %>
+<label class="check">
+  <%= form.check_box :counted %>
+  <span>Keep a count: for several of the same, like three healing potions</span>
+</label>
+<div class="field">
+  <%= form.label :quantity, "How many", class: "field__label" %>
+  <%= form.number_field :quantity, min: 0, max: Countable::MAX_QUANTITY, required: true, inputmode: "numeric", class: "field__input field__input--short" %>
+</div>

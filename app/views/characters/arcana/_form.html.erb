@@ -43,6 +43,7 @@
       <%= form.check_box :power_pool %>
       <span>Power pool: 2d minor, 4d major, 6d mythic, refilled each session</span>
     </label>
+    <%= render "characters/count_fields", form: form %>
   </fieldset>
 
   <% if arcanum.opus? %>

@@ -1,0 +1,21 @@
+<%# locals: (character:, item:) %>
+<%# An important item's form: its name, what matters about it, and whether to keep a count. %>
+<%= form_with model: [ character, item ], class: "panel stack", data: { turbo_frame: "_top" } do |form| %>
+  <% if item.errors.any? %>
+    <p class="form-error"><%= item.errors.full_messages.to_sentence %></p>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name, "Name", class: "field__label" %>
+    <%= form.text_field :name, maxlength: 80, autocomplete: "off", required: true, placeholder: "Map to the Sunken Abbey", class: "field__input" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, "Description", class: "field__label" %>
+    <%= form.text_area :description, rows: 3, maxlength: Item::DESCRIPTION_LIMIT, placeholder: "Optional: where it came from, what it's for, why it matters.", class: "field__input" %>
+  </div>
+
+  <%= render "characters/count_fields", form: form %>
+
+  <%= form.submit item.new_record? ? "Add item" : "Save", class: "button button--primary" %>
+<% end %>

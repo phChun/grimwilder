@@ -1,0 +1,28 @@
+<%# locals: (item:, character:, tends: nil) %>
+<%# One important item on the sheet, built like a talent card (characters/_talent): folded to its name and the start of its description (and how many, if counted); open, the whole description, then along the bottom its count (characters/_count) and, for the owner and GM, Edit and Remove. %>
+<% playing = tends && character.in_play? %>
+<article id="item-<%= item.id %>" class="talent-card item-card">
+  <%# details-memory keeps it open through a refresh, and talent_fold_controller.js opens it when the page jumps to it. %>
+  <details id="item-<%= item.id %>-fold" class="talent-card__fold">
+    <summary class="talent-card__head">
+      <span class="talent-card__titles">
+        <h3 class="talent-card__name"><%= item.name %></h3>
+        <span class="talent-card__summary"><%= [ ("#{item.quantity} carried" if item.counted?), (truncate(item.description, length: 90, separator: " ") if item.description) ].compact.join(" · ").presence || "Item" %></span>
+      </span>
+      <%= icon(:chevron, size: 18) %>
+    </summary>
+    <div class="talent-card__body">
+      <p class="talent-card__source">Item</p>
+      <% if item.description %><p class="talent-card__text"><%= item.description %></p><% end %>
+      <% if item.counted? || tends %>
+        <div class="talent-card__actions">
+          <%= render "characters/count", record: item, url: character_item_count_path(character, item), playing: playing if item.counted? %>
+          <% if tends %>
+            <%= link_to "Edit", edit_character_item_path(character, item), class: "button button--small", "aria-label": "Edit #{item.name}", data: { turbo_frame: "modal" } %>
+            <%= button_to "Remove", character_item_path(character, item), method: :delete, class: "button button--ghost button--small button--danger-text", "aria-label": "Remove #{item.name}", form: { class: "talent-card__action", data: { turbo_confirm: "Remove #{item.name}?" } } %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </details>
+</article>

@@ -1,76 +1,90 @@
 <%# locals: (arcanum:, character:, tends: nil, pool: nil) %>
-<%# One arcana on the sheet: its name, tier and where it came from, the function and touchstones, what it does, its power pool, and for the owner and GM: use it up (expendable), Magnum Opus's roll and lock, and edit or remove in the ⋯ menu. %>
+<%# One arcana on the sheet, built like a talent card (characters/_talent): folded to its name, tier and touchstones (and how many, if counted); open, where it came from, the touchstones, what it does, its limitations under the additions chosen for it, Magnum Opus's roll and lock, its power pool, then along the bottom its count (characters/_count) and, for the owner and GM, use it up (expendable), Edit and Remove. %>
 <% playing = tends && character.in_play? %>
+<% opus_open = arcanum.opus? && !arcanum.opus_complete? %>
 <article id="arcanum-<%= arcanum.id %>" class="<%= class_names("talent-card arcanum-card", "arcanum-card--mythic": arcanum.mythic?, "arcanum-card--used": arcanum.used?) %>">
-  <div class="talent-card__head">
-    <h3 class="talent-card__name"><%= arcanum.name %></h3>
-    <% if tends %>
-      <details id="arcanum-<%= arcanum.id %>-menu" class="talent-card__more-menu" data-controller="menu" data-action="toggle->menu#place turbo:submit-end->menu#closeOnSuccess">
-        <summary class="button button--ghost talent-card__toggle" aria-label="More for <%= arcanum.name %>"><%= icon(:more, size: 18) %></summary>
-        <div class="talent-card__menu" data-menu-target="panel">
-          <%= render "shared/popover_head", title: arcanum.name %>
-          <%= link_to "Edit arcana…", edit_character_arcanum_path(character, arcanum), class: "button button--ghost button--small", data: { turbo_frame: "modal" } %>
-          <%= button_to "Remove arcana", character_arcanum_path(character, arcanum), method: :delete, class: "button button--ghost button--small button--danger-text", form: { data: { turbo_confirm: "Remove #{arcanum.name}?" } } %>
-        </div>
-      </details>
-    <% end %>
-  </div>
-  <p class="talent-card__source"><%= arcanum.tier_label %><% if arcanum.granted_by %> · <%= arcanum.granted_by.name %><% end %><% if arcanum.used? %> · Used up<% end %></p>
+  <%# details-memory keeps it open through a refresh, and talent_fold_controller.js opens it when the page jumps to it. %>
+  <details id="arcanum-<%= arcanum.id %>-fold" class="talent-card__fold">
+    <summary class="talent-card__head">
+      <span class="talent-card__titles">
+        <h3 class="talent-card__name"><%= arcanum.name %></h3>
+        <span class="talent-card__summary"><%= [ ("#{arcanum.quantity} carried" if arcanum.counted?), arcanum.tier_label, ("used up" if arcanum.used?), arcanum.all_touchstones.map { title_case(_1) }.join(", ") ].compact.join(" · ") %></span>
+        <% if opus_open && playing %><span class="talent-card__session"><%= icon(:die, size: 14) %> Magnum Opus: <%= arcanum.touchstones.size %> of <%= Arcanum::OPUS_TOUCHSTONES %> locked in</span><% end %>
+      </span>
+      <%= icon(:chevron, size: 18) %>
+    </summary>
+    <div class="talent-card__body">
+      <p class="talent-card__source"><%= arcanum.tier_label %><% if arcanum.granted_by %> · <%= arcanum.granted_by.name %><% end %><% if arcanum.used? %> · Used up<% end %></p>
 
-  <p class="talent-card__label">Touchstones</p>
-  <ul class="talent-card__picks" aria-label="Touchstones">
-    <li class="talent-card__pick arcanum-card__function" title="<%= Grimwild.arcana_functions[arcanum.function] %>"><%= arcanum.function.capitalize %></li>
-    <% arcanum.touchstones.each do |touchstone| %><li class="talent-card__pick"><%= title_case(touchstone) %></li><% end %>
-  </ul>
+      <p class="talent-card__label">Touchstones</p>
+      <ul class="talent-card__picks" aria-label="Touchstones">
+        <li class="talent-card__pick arcanum-card__function" title="<%= Grimwild.arcana_functions[arcanum.function] %>"><%= arcanum.function.capitalize %></li>
+        <% arcanum.touchstones.each do |touchstone| %><li class="talent-card__pick"><%= title_case(touchstone) %></li><% end %>
+      </ul>
 
-  <% if arcanum.description %><p class="talent-card__summary"><%= arcanum.description %></p><% end %>
-  <% if arcanum.limitations %><p class="talent-card__growth"><span class="talent-card__label">Limits</span> <%= arcanum.limitations %></p><% end %>
-  <%# A curse is a secret drawback: only the owner and the GM see it. %>
-  <% shown = arcanum.additions.reject { _1 == "curse" && !tends } %>
-  <% if shown.any? %>
-    <ul class="talent-card__picks" aria-label="Additions"><% shown.each do |key| %><li class="talent-card__pick" title="<%= Arcanum::ADDITIONS[key].last %>"><%= Arcanum::ADDITIONS[key].first %></li><% end %></ul>
-  <% end %>
+      <% if arcanum.description %><p class="talent-card__text"><%= arcanum.description %></p><% end %>
+      <%# Its limitations, led by the additions chosen for it (Heavy cost, Curse…) in place of a "Limits" label. A curse is a secret drawback: only the owner and the GM see it. %>
+      <% shown = arcanum.additions.reject { _1 == "curse" && !tends } %>
+      <% if arcanum.limitations || shown.any? %>
+        <p class="talent-card__growth arcanum-card__limits">
+          <% if shown.any? %>
+            <% shown.each do |key| %><span class="talent-card__label" title="<%= Arcanum::ADDITIONS[key].last %>"><%= Arcanum::ADDITIONS[key].first %></span><% end %>
+          <% else %>
+            <span class="talent-card__label">Limits</span>
+          <% end %>
+          <%= arcanum.limitations %>
+        </p>
+      <% end %>
 
-  <% if arcanum.opus? && !arcanum.opus_complete? %>
-    <%# Magnum Opus: roll this session's touchstones, then lock one in for good. %>
-    <div class="arcanum-card__opus">
-      <p class="talent-card__label">Magnum Opus · <%= arcanum.touchstones.size %> of <%= Arcanum::OPUS_TOUCHSTONES %> locked in</p>
-      <% if arcanum.rolled_touchstones.any? %>
-        <p class="field__hint">This session's touchstones<%= ": lock one in" if arcanum.lock_ready? && playing %>.</p>
-        <div class="talent-card__actions">
-          <% arcanum.rolled_touchstones.each do |word| %>
-            <% if arcanum.lock_ready? && playing %>
-              <%= button_to "Lock in #{title_case(word)}", character_arcanum_opus_path(character, arcanum), method: :patch, params: { touchstone: word }, class: "button button--small", form: { class: "talent-card__action" } %>
-            <% else %>
-              <span class="talent-card__pick"><%= title_case(word) %></span>
-            <% end %>
+      <% if opus_open %>
+        <%# Magnum Opus: roll this session's touchstones, then lock one in for good. %>
+        <div class="arcanum-card__opus">
+          <p class="talent-card__label">Magnum Opus · <%= arcanum.touchstones.size %> of <%= Arcanum::OPUS_TOUCHSTONES %> locked in</p>
+          <% if arcanum.rolled_touchstones.any? %>
+            <p class="field__hint">This session's touchstones<%= ": lock one in" if arcanum.lock_ready? && playing %>.</p>
+            <div class="talent-card__actions">
+              <% arcanum.rolled_touchstones.each do |word| %>
+                <% if arcanum.lock_ready? && playing %>
+                  <%= button_to "Lock in #{title_case(word)}", character_arcanum_opus_path(character, arcanum), method: :patch, params: { touchstone: word }, class: "button button--small", form: { class: "talent-card__action" } %>
+                <% else %>
+                  <span class="talent-card__pick"><%= title_case(word) %></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% elsif playing %>
+            <%= button_to "Roll this session's touchstones", character_arcanum_opus_path(character, arcanum), class: "button button--small", form: { class: "talent-card__action" } %>
           <% end %>
         </div>
-      <% elsif playing %>
-        <%= button_to "Roll this session's touchstones", character_arcanum_opus_path(character, arcanum), class: "button button--small", form: { class: "talent-card__action" } %>
+      <% end %>
+
+      <% if pool %>
+        <div class="pool-rows pool-rows--sheet">
+          <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
+        </div>
+      <% elsif arcanum.power_pool? && !arcanum.used? %>
+        <div class="talent-card__pool-preview">
+          <span class="use-tracker__name">Power pool</span>
+          <%= render "shared/pool_track", pool: Pool.new(starting_size: arcanum.pool_size, size: arcanum.pool_size) %>
+          <span class="use-tracker__resets"><%= arcanum.pool_size %>d power pool · ready when <%= character.name %> is at a table</span>
+        </div>
+      <% end %>
+
+      <% if arcanum.counted? || tends %>
+        <div class="talent-card__actions">
+          <%= render "characters/count", record: arcanum, url: character_arcanum_count_path(character, arcanum), playing: playing if arcanum.counted? %>
+          <% if arcanum.expendable? && playing %>
+            <% if arcanum.used? %>
+              <%= button_to "Put it back", character_arcanum_use_path(character, arcanum), method: :delete, class: "button button--ghost button--small", form: { class: "talent-card__action" } %>
+            <% else %>
+              <%= button_to "Use it up", character_arcanum_use_path(character, arcanum), class: "button button--small", form: { class: "talent-card__action", data: { turbo_confirm: "Use up #{arcanum.name}? It's gone once used." } } %>
+            <% end %>
+          <% end %>
+          <% if tends %>
+            <%= link_to "Edit", edit_character_arcanum_path(character, arcanum), class: "button button--small", "aria-label": "Edit #{arcanum.name}", data: { turbo_frame: "modal" } %>
+            <%= button_to "Remove", character_arcanum_path(character, arcanum), method: :delete, class: "button button--ghost button--small button--danger-text", "aria-label": "Remove #{arcanum.name}", form: { class: "talent-card__action", data: { turbo_confirm: "Remove #{arcanum.name}?" } } %>
+          <% end %>
+        </div>
       <% end %>
     </div>
-  <% end %>
-
-  <% if pool %>
-    <div class="pool-rows pool-rows--sheet">
-      <%= render "campaigns/pools/pool", pool: pool, my_characters: [], gm: false, return_to: "character" %>
-    </div>
-  <% elsif arcanum.power_pool? && !arcanum.used? %>
-    <div class="talent-card__pool-preview">
-      <span class="use-tracker__name">Power pool</span>
-      <%= render "shared/pool_track", pool: Pool.new(starting_size: arcanum.pool_size, size: arcanum.pool_size) %>
-      <span class="use-tracker__resets"><%= arcanum.pool_size %>d power pool · ready when <%= character.name %> is at a table</span>
-    </div>
-  <% end %>
-
-  <% if arcanum.expendable? && playing %>
-    <div class="talent-card__actions">
-      <% if arcanum.used? %>
-        <%= button_to "Put it back", character_arcanum_use_path(character, arcanum), method: :delete, class: "button button--ghost button--small", form: { class: "talent-card__action" } %>
-      <% else %>
-        <%= button_to "Use it up", character_arcanum_use_path(character, arcanum), class: "button button--small", form: { class: "talent-card__action", data: { turbo_confirm: "Use up #{arcanum.name}? It's gone once used." } } %>
-      <% end %>
-    </div>
-  <% end %>
+  </details>
 </article>
