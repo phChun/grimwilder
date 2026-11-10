@@ -2,11 +2,14 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-10
+
+- **Keep track of important items**: the sheet's Arcana card is now Arcana and items; Add item keeps a name and a description for a key, a letter or an heirloom. ([#113](https://github.com/phChun/grimwilder/pull/113))
+- **Arcana and items fold like talents**: each card shows its name and a one-line summary, and opens to the rest, with Edit and Remove at the bottom instead of a ⋯ menu. ([#113](https://github.com/phChun/grimwilder/pull/113))
+- **Keep a count**: tick Keep a count on an arcana or item (three healing potions, ten torches) and tap − or + on its card. ([#113](https://github.com/phChun/grimwilder/pull/113))
+
 ## 2026-11-09
 
-- **Keep track of important items**: the sheet's Arcana card is now Arcana and items; Add item keeps a name and a description for a key, a letter or an heirloom. ([#PR](https://github.com/phChun/grimwilder/pull/PR))
-- **Arcana and items fold like talents**: each card shows its name and a one-line summary, and opens to the rest, with Edit and Remove at the bottom instead of a ⋯ menu. ([#PR](https://github.com/phChun/grimwilder/pull/PR))
-- **Keep a count**: tick Keep a count on an arcana or item (three healing potions, ten torches) and tap − or + on its card. ([#PR](https://github.com/phChun/grimwilder/pull/PR))
 - **The dice favicon shows everywhere**: some browsers still showed an old red dot in the tab; the icon now always loads fresh after it changes. ([#111](https://github.com/phChun/grimwilder/pull/111))
 - **A steadier menu bar**: signed in, every page has All campaigns, Characters and a Tools menu (Roll, Crucibles, Talents); inside a campaign, its own tabs come first. ([#110](https://github.com/phChun/grimwilder/pull/110))
 - **Your campaigns at a glance**: each card on the campaigns list shows your part (GM, or who you play), the pitch, whether it's live or when it was last played, how many sessions, and who's in the party, in a wider, shorter card. ([#109](https://github.com/phChun/grimwilder/pull/109))
