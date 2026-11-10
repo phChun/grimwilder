@@ -434,8 +434,10 @@ small { font-size: 0.8em; color: var(--dim); }
 }
 
 .tabs__link:hover { color: var(--text); }
-/* The campaign you're in, by name: cut short if it's long. */
-.tabs__name { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The campaign you're in, by name: cut short if it's long (its title has the
+   whole name). In the phone menu it can use the panel's width. */
+.tabs__name { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-menu__link .tabs__name { max-width: none; min-width: 0; }
 
 .tabs__link[aria-current="page"],
 .tabs__link--current {

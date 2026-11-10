@@ -76,7 +76,7 @@ module ApplicationHelper
   # current?], ...].
   def campaign_tabs(membership)
     campaign = membership.campaign
-    this_one = [ tag.span(campaign.name, class: "tabs__name"), campaign_path(campaign), controller_path == "campaigns" && action_name == "show" ]
+    this_one = [ tag.span(campaign.name, class: "tabs__name", title: campaign.name), campaign_path(campaign), controller_path == "campaigns" && action_name == "show" ]
     log = [ "Log", campaign_play_sessions_path(campaign), controller_path == "campaigns/play_sessions" ]
 
     if membership.gm?
