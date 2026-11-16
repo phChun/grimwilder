@@ -4,7 +4,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 
 ## 2026-11-16
 
-- **Library updates**: Rails, Puma and other libraries are up to date. ([#119](https://github.com/phChun/grimwilder/pull/119))
+- **Library updates**: passkey sign-in (webauthn), the web server proxy (Thruster) and other libraries are up to date. ([#119](https://github.com/phChun/grimwilder/pull/119))
 
 ## 2026-11-10
 
