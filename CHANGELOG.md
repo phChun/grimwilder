@@ -2,6 +2,10 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-16
+
+- **Library updates**: Rails, Puma and other libraries are up to date. ([#119](https://github.com/phChun/grimwilder/pull/119))
+
 ## 2026-11-10
 
 - **Keep track of important items**: the sheet's Arcana card is now Arcana and items; Add item keeps a name and a description for a key, a letter or an heirloom. ([#113](https://github.com/phChun/grimwilder/pull/113))
