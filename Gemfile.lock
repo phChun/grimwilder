@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/rails/rails.git
-  revision: 4617bd9eae08b39523c29797bded9932edc46f41
+  revision: f12b61577667833a528a16ce52b73d6e7e2845e9
   branch: main
   specs:
     actioncable (8.2.0.alpha)
@@ -256,12 +256,12 @@ GEM
     openssl-signature_algorithm (1.3.0)
       openssl (> 2.0)
     ostruct (0.6.3)
-    pagy (43.8.2)
+    pagy (43.8.3)
       json
       uri
       yaml
     parallel (2.3.0)
-    parser (3.3.13.0)
+    parser (3.3.14.0)
       ast (~> 2.4.1)
       racc
     pp (0.6.4)
@@ -282,7 +282,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (8.1.1)
+    puma (8.1.2)
       nio4r (~> 2.0)
     raabro (1.5.0)
     racc (1.8.1)
@@ -318,10 +318,10 @@ GEM
       cruise (>= 0.3.0)
       herb (>= 0.11.2)
       websocket (~> 1.2)
-    regexp_parser (2.13.1)
+    regexp_parser (2.13.4)
     reline (0.7.0)
       io-console (~> 0.5)
-    rubocop (1.92.2)
+    rubocop (1.92.3)
       json (>= 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -332,9 +332,11 @@ GEM
       rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.51.0)
+    rubocop-ast (1.52.0)
+      ast (~> 2.4)
       parser (>= 3.3.7.2)
       prism (>= 1.7)
+      racc
     rubocop-performance (1.27.0)
       lint_roller (~> 1.1)
       rubocop (>= 1.89.0, < 2.0)
@@ -354,7 +356,7 @@ GEM
     safety_net_attestation (0.5.0)
       jwt (>= 2.0, < 4.0)
     securerandom (0.4.1)
-    selenium-webdriver (4.52.0)
+    selenium-webdriver (4.53.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rubyzip (>= 1.2.2, < 4.0)
@@ -426,10 +428,10 @@ GEM
       safety_net_attestation (~> 0.5.0)
       tpm-key_attestation (~> 0.14.0)
     websocket (1.2.11)
-    websocket-driver (0.8.2)
+    websocket-driver (0.9.0)
       base64
-      websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.5)
+      websocket-extensions (>= 0.2.0)
+    websocket-extensions (0.2.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     yaml (0.4.0)
@@ -499,7 +501,6 @@ CHECKSUMS
   bootsnap (1.26.1) sha256=5b5bd90f8f13ea338627c1d56ffbe2ea25e743ac48c2afec1a9bea3a06a264e2
   brakeman (8.1.0) sha256=cfa9e5214e4925842f4bc849a64f8a7e6c5d0425fe98eac8d7b7bc60fdc17e07
   builder (3.3.0) sha256=497918d2f9dca528fdca4b88d84e4ef4387256d984b8154e9d5d3fe5a9c8835f
-  bundler (4.0.18) sha256=02d9a17429de1847b4e0c9f27a9ee4b20c0a74c0a641b4e77195d6019e3618ac
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   capybara (3.40.0) sha256=42dba720578ea1ca65fd7a41d163dd368502c191804558f6e0f71b391054aeef
   cbor (0.6.2.2) sha256=e8b09d8d8e983956b7aac991aa53a4d8ce721ce0cc3d8f5c8b2b2d8ffb5b98cd
@@ -568,9 +569,9 @@ CHECKSUMS
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   openssl-signature_algorithm (1.3.0) sha256=a3b40b5e8276162d4a6e50c7c97cdaf1446f9b2c3946a6fa2c14628e0c957e80
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
-  pagy (43.8.2) sha256=3c2b4621c4b5dc2023a8909a5cb7bf29b37ff1e3773a07c192782ae16f2716c6
+  pagy (43.8.3) sha256=f14532c09cf5257c2e4893a5646d7b6e2a47b7d15b9385022cd1b59f3f17f9cb
   parallel (2.3.0) sha256=f75a3e904101ce6a1ccb6b8dc800cbafd42166d83330192438dcf29395167a6f
-  parser (3.3.13.0) sha256=e02f9b63c2fe05b0c68f692ba4df89b3cb113b663964f75d988fbebfd6c3deca
+  parser (3.3.14.0) sha256=62f8f76af7b919425ee2d811880e9dcb8011ab40bfd59970dfb583141697e58f
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prettyprint (0.2.1) sha256=d555d57ea6d7cf001d4774b693546a6bd88bec1e778ddffb5c60b68ceec4b7d4
   prism (2.1.0-aarch64-linux-gnu) sha256=808dddc72def68e1a0463689414c97e0ba211938eddbab05387a4844aa2b3ec2
@@ -583,7 +584,7 @@ CHECKSUMS
   propshaft (1.3.2) sha256=1d56a3e56a92c21bfc29caf07406b5386b00d4c47ddf357cf989a5a234b1389e
   psych (5.5.0) sha256=4b245bbbd0f3238df8ccee766ebc1a6b062b10e4ee1d3284eb588739ba156a0a
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
-  puma (8.1.1) sha256=24800758cf064ecc19d056301b6946f628d77ea14653d485fa17ff6a6331555c
+  puma (8.1.2) sha256=3a6d9a34c9a4d0175eabd11b703939b5d43ebe08bc2534ac7dfd4df33a6ceedc
   raabro (1.5.0) sha256=3f998a7bc84f9c84df3ab580634d2e0a5bda4f0841168d56035f529c9877440a
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.8) sha256=1fecc85e463ebc7a2a945fff829ffcd549babeb1556384796fad946c28dc4ec7
@@ -600,10 +601,10 @@ CHECKSUMS
   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
   rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
   reactionview (0.6.1) sha256=b58b933580129c36516d0bedda27dbb89a0e97f3ea38561031bc03be61d9e76f
-  regexp_parser (2.13.1) sha256=5aedb6b7c35688f51e86eef17a15374dfd287c83f4ca644b2c5f3ec50a33b44b
+  regexp_parser (2.13.4) sha256=1d0547814f57e6f00946957bd0ca201bc42f42cfb08eee89df60998aedcd8a3b
   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
-  rubocop (1.92.2) sha256=14fb31eed143a0dc6f78186c550c1715e81cd38f59d05d1165050e445c1f5382
-  rubocop-ast (1.51.0) sha256=0ec311e36b191b3872d909078a35274e962ae97dbce64be6812d145ca59acfcb
+  rubocop (1.92.3) sha256=fd77feac46e8e91c3a534f868a1702c59f5bf8173515fd00a3c6ce1198672ff6
+  rubocop-ast (1.52.0) sha256=18d5c58fe4e59c9a9222172dc5ba4c52642d445ce4e696ed86646beea675fe8d
   rubocop-performance (1.27.0) sha256=eeeb1374d062a368ee1c787b70eb0b0cc4b184cb1f8565f424760946146d61ce
   rubocop-rails (2.38.0) sha256=6e2b7c532efa95e3050371bec20b8f5b025662acead8bc70ee31f0e3e6fa2f06
   rubocop-rails-omakase (1.1.0) sha256=2af73ac8ee5852de2919abbd2618af9c15c19b512c4cfc1f9a5d3b6ef009109d
@@ -611,7 +612,7 @@ CHECKSUMS
   rubyzip (3.7.0) sha256=65c19294da75297a939006f3516deacc33185fbd721ff1954f7a231db6d3e121
   safety_net_attestation (0.5.0) sha256=c8cd01dd550dbe8553862918af6355a04672db11d218ec96104ce3955293f2aa
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
-  selenium-webdriver (4.52.0) sha256=5d45ba100ea8b57f5a8c25979a636d48b4c60c39973478930d78e884bdeecd2d
+  selenium-webdriver (4.53.0) sha256=211aa56ca366de20abf2af22f8f7742c5389ab834ab0d97de5e2bcb5f44f418d
   solid_cable (4.1.0) sha256=828e3d509207b82b4f05f4e9c85f696994710679b52d511aa7f97ebd212d3226
   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
   solid_queue (1.7.2) sha256=a22685e1d2ee14ce7b4e5d4592c9d8e837951884c51555609dee58679ed03325
@@ -642,11 +643,11 @@ CHECKSUMS
   web-console (4.3.0) sha256=e13b71301cdfc2093f155b5aa3a622db80b4672d1f2f713119cc7ec7ac6a6da4
   webauthn (3.5.1) sha256=9885391ac03dd9ae7c57c71eeff78fe1bb77efd58aebc2bec63b0cfcfd82de0b
   websocket (1.2.11) sha256=b7e7a74e2410b5e85c25858b26b3322f29161e300935f70a0e0d3c35e0462737
-  websocket-driver (0.8.2) sha256=97c556b019bf3410b4961002ac501621e9322d3f8a7bc02161a09301cc4c4146
-  websocket-extensions (0.1.5) sha256=1c6ba63092cda343eb53fc657110c71c754c56484aad42578495227d717a8241
+  websocket-driver (0.9.0) sha256=4dfcc6ac0ea1b6771daf5fb54cbbca131e4d5922ea0a65ba2da980370dadbe9f
+  websocket-extensions (0.2.0) sha256=6fb0d0f687aa8adc8eafa5ce68db36dfd6a8ebf232515040ce27c33c1291e589
   xpath (3.2.0) sha256=6dfda79d91bb3b949b947ecc5919f042ef2f399b904013eb3ef6d20dd3a4082e
   yaml (0.4.0) sha256=240e69d1e6ce3584d6085978719a0faa6218ae426e034d8f9b02fb54d3471942
   zeitwerk (2.8.3) sha256=2c85125a8467ce069e20123d1e709a08955c9d29c118c25b46b7b7fafdbb92e5
 
 BUNDLED WITH
-  4.0.18
+  4.0.20
