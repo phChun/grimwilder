@@ -10,6 +10,7 @@ What changed in Grimwilder, one entry per merged pull request, grouped by the da
 - **Deleting stands out**: Delete buttons are solid red. ([#122](https://github.com/phChun/grimwilder/pull/122))
 - **Long names fit their menus**: a menu's title is cut to one line, with the full name on hover. ([#122](https://github.com/phChun/grimwilder/pull/122))
 - **Admins can delete a campaign** from the admin Campaigns list. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **Ruby 4.0.10** in production too, matching development. ([#122](https://github.com/phChun/grimwilder/pull/122))
 
 ## 2026-11-16
 

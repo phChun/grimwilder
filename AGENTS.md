@@ -14,12 +14,12 @@ Page numbers are the CE PDF's: talents, crucibles and the code's `pg.` reference
 
 | Piece | Choice |
 |---|---|
-| Ruby / Rails | Ruby **4.0.9**, Rails **8.2.0.alpha** (`main` from GitHub) |
+| Ruby / Rails | Ruby **4.0.10**, Rails **8.2.0.alpha** (`main` from GitHub) |
 | Views | `.html.erb` compiled by **Herb**, routed through **ReActionView 0.6** (reactionview.dev) |
 | JS | importmap-rails, Turbo, Stimulus, the `reactionview` client (pinned by the gem) |
 | CSS | Plain CSS via Propshaft. No Tailwind, no Sass |
 | DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a droplet behind Cloudflare, images on ghcr.io (`ghcr.io/phchun/grimwilder`) |
-| Image | Docker Hardened Images (`dhi.io/ruby:4.0.9-debian13[-dev]`; `docker login dhi.io` first). See *Production* |
+| Image | Docker Hardened Images (`dhi.io/ruby:4.0.10-debian13[-dev]`; `docker login dhi.io` first). See *Production* |
 | Tests | Minitest (`bin/rails test`) plus Node's built-in test runner for pure JS |
 | Auth | Passwordless: emailed codes + passkeys (`webauthn`); no `has_secure_password` / bcrypt |
 
@@ -245,7 +245,7 @@ The repo is open source under O'Saasy (`LICENSE.md`).
 
 ## Production
 
-- **Image**: Docker Hardened Images with **no shell, no package manager and no `/usr/bin/env`**. `bin/docker-entrypoint` is Ruby and runs `db:prepare`; run commands as `ruby bin/rails …` inside a container (`docker run image bin/rails …` goes through the entrypoint and is fine). `BUNDLE_VERSION=system`. jemalloc and zoneinfo are copied from the build stage; there's no libvips, so images are never transformed (`variant_processor = :disabled`). Runs as uid 1000. Keep `.ruby-version` and the `RUBY_VERSION` build arg together.
+- **Image**: Docker Hardened Images with **no shell, no package manager and no `/usr/bin/env`**. `bin/docker-entrypoint` is Ruby and runs `db:prepare`; run commands as `ruby bin/rails …` inside a container (`docker run image bin/rails …` goes through the entrypoint and is fine). `BUNDLE_VERSION=system`. jemalloc and zoneinfo are copied from the build stage; there's no libvips, so images are never transformed (`variant_processor = :disabled`). Runs as uid 1000. Keep the Ruby version in `mise.toml`, the `RUBY_VERSION` build arg and `ruby-version` in `deploy.yml` together.
 - **Live** at https://grimwilder.com (`www.` redirects). `bin/kamal deploy|console|logs` from the Mac need secrets from 1Password; the server address and secrets never go in the repo. `APP_VERSION`/`APP_REVISION` are baked into the image and shown in /admin.
 - SQLite lives in the `grimwilder_storage` volume, with nightly `DatabaseSnapshot`s. Mail goes through an SMTP provider (name it only that way in docs). `ErrorNotifier` emails server errors and failed jobs when `ERROR_EMAIL_TO` is set.
 - Server setup and operations notes are kept locally, outside the repo, in `docs/ops/production-server.md`.
