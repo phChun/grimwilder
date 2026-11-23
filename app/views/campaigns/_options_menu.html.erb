@@ -1,0 +1,29 @@
+<%# locals: (campaign:, gm:) %>
+<%# The campaign page's ⋯: where to go and what to do with the campaign. The GM gets settings, history, scene prep, archive and delete (each as in settings); a player gets history, their journal and leaving. %>
+<details id="campaign-options" class="options-menu campaign-actions__end" data-controller="menu" data-action="toggle->menu#place">
+  <summary class="button options-menu__toggle" aria-label="Options for <%= campaign.name %>"><%= icon(:more, size: 18) %></summary>
+  <div class="options-menu__panel" data-menu-target="panel">
+    <%= render "shared/popover_head", title: campaign.name %>
+    <% if gm %>
+      <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button button--small" %>
+      <%= link_to "History", campaign_play_sessions_path(campaign), class: "button button--small" %>
+      <% unless campaign.archived? %>
+        <%= link_to "Scene prep", campaign_scene_plans_path(campaign), class: "button button--small" %>
+        <%= link_to "Journals", campaign_journals_path(campaign), class: "button button--small" %>
+      <% end %>
+      <% if campaign.archived? %>
+        <%= button_to "Unarchive", campaign_archive_path(campaign), method: :delete, class: "button button--small", "aria-label": "Unarchive #{campaign.name}" %>
+      <% elsif campaign.current_session %>
+        <button type="button" class="button button--small" disabled>Archive</button>
+        <p class="field__hint">End the session first.</p>
+      <% else %>
+        <%= button_to "Archive", campaign_archive_path(campaign), class: "button button--small", "aria-label": "Archive #{campaign.name}", form: { data: { turbo_confirm: archive_confirmation(campaign) } } %>
+      <% end %>
+      <%= button_to "Delete campaign", campaign_path(campaign), method: :delete, class: "button button--small button--delete", form: { data: { turbo_confirm: "Delete #{campaign.name} for everyone? This can't be undone." } } %>
+    <% else %>
+      <%= link_to "History", campaign_play_sessions_path(campaign), class: "button button--small" %>
+      <%= link_to "My journal", campaign_journal_path(campaign, Current.membership), class: "button button--small" %>
+      <%= button_to "Leave campaign", campaign_membership_path(campaign, Current.membership), method: :delete, class: "button button--ghost button--small button--danger-text", form: { data: { turbo_confirm: "Leave #{campaign.name}? Your characters stay yours, unseated." } } %>
+    <% end %>
+  </div>
+</details>

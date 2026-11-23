@@ -73,7 +73,7 @@ Rails.application.routes.draw do
       resource :feedback_access, only: %i[ create destroy ], module: :identities # lets the account send feedback, or stops it
     end
     resources :feedbacks, only: %i[ index destroy ], path: "feedback"
-    resources :campaigns, only: :index
+    resources :campaigns, only: %i[ index destroy ]
     resources :interests, only: %i[ index destroy ] do
       resource :account, only: :create, module: :interests
     end

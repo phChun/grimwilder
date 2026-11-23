@@ -35,7 +35,7 @@
       <% if membership.held? %>
         <%= button_to "Play this one", campaign_hold_path(campaign), method: :delete, class: "button button--small campaign-card__play", form: { data: { turbo_confirm: swap ? "Play #{campaign.name}? #{swap.campaign.name} goes on hold in its place." : "Play #{campaign.name} again?" } } %>
       <% end %>
-      <%# The GM's ⋯: archive from here (Campaigns::ArchivesController, back to this list). Players leave from the campaign page. %>
+      <%# The GM's ⋯: archive (Campaigns::ArchivesController, back to this list) or delete from here. Players leave from the campaign page. %>
       <% if membership.gm? %>
         <details id="<%= dom_id(campaign, :more) %>" class="campaign-card__more" data-controller="menu" data-action="toggle->menu#place">
           <summary class="button campaign-card__toggle" aria-label="More for <%= campaign.name %>"><%= icon(:more, size: 18) %></summary>
@@ -47,6 +47,7 @@
             <% else %>
               <%= button_to "Archive", campaign_archive_path(campaign), params: { return_to: "campaigns" }, class: "button button--small", form: { data: { turbo_confirm: archive_confirmation(campaign) } } %>
             <% end %>
+            <%= button_to "Delete", campaign_path(campaign), method: :delete, class: "button button--small button--delete", "aria-label": "Delete #{campaign.name}", form: { data: { turbo_confirm: "Delete #{campaign.name} for everyone? This can't be undone." } } %>
           </div>
         </details>
       <% end %>
@@ -74,7 +75,7 @@
   </li>
 </ul>
 
-<%# Archived campaigns (Campaign::Archive): read-only, each opening its page; the GM can unarchive from here. %>
+<%# Archived campaigns (Campaign::Archive): read-only, each opening its page; the GM's ⋯ unarchives or deletes. %>
 <% if archived.any? %>
   <section class="archive-list" aria-labelledby="campaigns-archived">
     <h2 id="campaigns-archived" class="farewells__title">Archived</h2>
@@ -87,7 +88,14 @@
             <span class="archive-list__meta"><%= membership.gm? ? "You're the GM" : "You're a player" %> · archived <%= l(campaign.archived_at.to_date, format: :long) %></span>
           </div>
           <% if membership.gm? %>
-            <%= button_to "Unarchive", campaign_archive_path(campaign), method: :delete, params: { return_to: "campaigns" }, class: "button button--small", "aria-label": "Unarchive #{campaign.name}" %>
+            <details id="<%= dom_id(campaign, :archived_more) %>" class="options-menu" data-controller="menu" data-action="toggle->menu#place">
+              <summary class="button options-menu__toggle" aria-label="More for <%= campaign.name %>"><%= icon(:more, size: 18) %></summary>
+              <div class="options-menu__panel" data-menu-target="panel">
+                <%= render "shared/popover_head", title: campaign.name %>
+                <%= button_to "Unarchive", campaign_archive_path(campaign), method: :delete, params: { return_to: "campaigns" }, class: "button button--small", "aria-label": "Unarchive #{campaign.name}" %>
+                <%= button_to "Delete", campaign_path(campaign), method: :delete, class: "button button--small button--delete", "aria-label": "Delete #{campaign.name}", form: { data: { turbo_confirm: "Delete #{campaign.name} for everyone? This can't be undone." } } %>
+              </div>
+            </details>
           <% end %>
         </li>
       <% end %>

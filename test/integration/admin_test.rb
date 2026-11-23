@@ -161,4 +161,29 @@ class AdminTest < ActionDispatch::IntegrationTest
     end
     assert_response :not_found
   end
+
+  test "an admin deletes a campaign for everyone; its characters stay, unseated" do
+    campaign = campaigns(:bramblewood)
+    sign_in_as identities(:ada)
+
+    get admin_campaigns_path
+    assert_select "tr", text: /#{campaign.name}/ do
+      assert_select "form[action=?] button[aria-label=?]", admin_campaign_path(campaign), "Delete #{campaign.name}"
+    end
+
+    assert_difference -> { Campaign.count }, -1 do
+      delete admin_campaign_path(campaign), params: { q: "Bramble" }
+    end
+    assert_redirected_to admin_campaigns_path(q: "Bramble")
+    assert_equal "#{campaign.name} deleted.", flash[:notice]
+    assert_nil characters(:tibbs).reload.campaign_id
+  end
+
+  test "only admins delete campaigns from admin" do
+    sign_in_as identities(:pip)
+    assert_no_difference -> { Campaign.count } do
+      delete admin_campaign_path(campaigns(:bramblewood))
+    end
+    assert_response :not_found
+  end
 end

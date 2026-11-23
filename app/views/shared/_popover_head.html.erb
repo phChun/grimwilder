@@ -1,7 +1,7 @@
 <%# locals: (title:, list: nil) %>
-<%# The top row of a floating <details> panel: its title, and the ✕ that closes it. In a <ul> menu pass list: true, so it's a <li>. %>
+<%# The top row of a floating <details> panel: its title, and the ✕ that closes it. In a <ul> menu pass list: true, so it's a <li>. A long title is cut to one line, in full on hover. %>
 <% if list %>
-  <li class="popover__head"><span class="popover__title"><%= title %></span><%= render "shared/close_button" %></li>
+  <li class="popover__head"><span class="popover__title" title="<%= title %>"><%= title %></span><%= render "shared/close_button" %></li>
 <% else %>
-  <div class="popover__head"><span class="popover__title"><%= title %></span><%= render "shared/close_button" %></div>
+  <div class="popover__head"><span class="popover__title" title="<%= title %>"><%= title %></span><%= render "shared/close_button" %></div>
 <% end %>

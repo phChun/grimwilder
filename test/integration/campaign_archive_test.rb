@@ -148,6 +148,7 @@ class CampaignArchiveTest < ActionDispatch::IntegrationTest
     sign_in_as identities(:gwen)
     get campaigns_path
     assert_select "##{dom_id(@campaign, :more)} form[action=?][data-turbo-confirm*=?] button", campaign_archive_path(@campaign), "nothing new is played there", "Archive"
+    assert_select "##{dom_id(@campaign, :more)} form[action=?] button.button--delete", campaign_path(@campaign), "Delete"
 
     post campaign_archive_path(@campaign), params: { return_to: "campaigns" }
     assert_redirected_to campaigns_path
@@ -155,7 +156,10 @@ class CampaignArchiveTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "##{dom_id(@campaign, :more)}", 0, "out of the grid"
     assert_select ".archive-list ##{dom_id(@campaign, :archived)} .archive-list__meta", /archived/
-    assert_select "##{dom_id(@campaign, :archived)} form[action=?] button", campaign_archive_path(@campaign), "Unarchive"
+    assert_select "##{dom_id(@campaign, :archived)} details.options-menu" do
+      assert_select "form[action=?] button", campaign_archive_path(@campaign), "Unarchive"
+      assert_select "form[action=?] button.button--delete", campaign_path(@campaign), "Delete"
+    end
 
     delete campaign_archive_path(@campaign), params: { return_to: "campaigns" }
     assert_redirected_to campaigns_path

@@ -50,7 +50,7 @@
         </p>
       <% end %>
 
-      <%# What to do here: the GM's table, invite link and settings, or a player's character. Campaign::Archive: a read-only archive; the history is the way back in, and the GM unarchives it from settings. %>
+      <%# What to do here: the GM's table and invite link, or a player's character, then the ⋯ options menu (campaigns/_options_menu). Campaign::Archive: a read-only archive; the history is the way back in, and the GM unarchives it from settings. %>
       <div class="campaign-actions" aria-label="Campaign actions" role="group">
         <% if campaign.archived? %>
           <%= link_to "Read the history", campaign_play_sessions_path(campaign), class: "button button--primary" %>
@@ -89,11 +89,7 @@
         <% else %>
           <span class="field__hint">The GM makes the characters here: pick one up for grabs.</span>
         <% end %>
-        <% if gm %>
-          <%= link_to "Campaign settings", edit_campaign_path(campaign), class: "button campaign-actions__end" %>
-        <% else %>
-          <%= button_to "Leave campaign", campaign_membership_path(campaign, Current.membership), method: :delete, class: "button button--ghost", form: { class: "campaign-actions__end", data: { turbo_confirm: "Leave #{campaign.name}? Your characters stay yours, unseated." } } %>
-        <% end %>
+        <%= render "campaigns/options_menu", campaign: campaign, gm: gm %>
       </div>
       <% if campaign.archived? %>
         <p class="campaign-actions__hint"><em class="campaign-actions__done">The story's told.</em> Everything here stays to look back on.<% if @mine %> Playing somewhere new? Move <%= @mine_all.map(&:short_name).to_sentence %> from <%= link_to "Edit sheet", edit_character_path(@mine, anchor: "at-the-table") %>.<% end %></p>

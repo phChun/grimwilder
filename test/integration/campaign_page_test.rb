@@ -21,7 +21,12 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
     assert_select ".campaign-hero__facts dd", "The Bramble Marches"
     assert_select ".campaign-actions a.button--primary[href=?]", campaign_table_path(@campaign), "Open the GM table"
     assert_select ".campaign-actions button[data-clipboard-text-value=?]", join_url(@campaign.join_code), text: /Copy invite link/
-    assert_select ".campaign-actions a[href=?]", edit_campaign_path(@campaign), "Campaign settings"
+    assert_select "#campaign-options" do
+      assert_select "a[href=?]", edit_campaign_path(@campaign), "Campaign settings"
+      assert_select "a[href=?]", campaign_play_sessions_path(@campaign), "History"
+      assert_select "form[action=?] button", campaign_archive_path(@campaign), "Archive"
+      assert_select "form[action=?] button", campaign_path(@campaign), "Delete campaign"
+    end
     assert_select ".campaign-hero__rule[data-tip]", @campaign.rules_in_play.size
   end
 
@@ -144,7 +149,12 @@ class CampaignPageTest < ActionDispatch::IntegrationTest
 
     get campaign_path(@campaign)
     assert_select "a[href=?]", edit_campaign_path(@campaign), 0, "settings are the GM's"
-    assert_select ".campaign-actions form[action=?] button", campaign_membership_path(@campaign, memberships(:pip_player)), "Leave campaign"
+    assert_select "#campaign-options" do
+      assert_select "form[action=?] button", campaign_membership_path(@campaign, memberships(:pip_player)), "Leave campaign"
+      assert_select "a[href=?]", campaign_journal_path(@campaign, memberships(:pip_player)), "My journal"
+      assert_select "form[action=?]", campaign_archive_path(@campaign), 0
+      assert_select "form[action=?]", campaign_path(@campaign), 0
+    end
     assert_select "[data-controller=kept-crucibles][hidden] button[data-action=?]", "kept-crucibles#clear", "Clear"
   end
 
