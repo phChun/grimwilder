@@ -2,6 +2,16 @@
 
 What changed in Grimwilder, one entry per merged pull request, grouped by the day it merged (UTC), newest first.
 
+## 2026-11-23
+
+- **A ⋯ menu on the campaign page**: the GM finds settings, history, scene prep, journals, archive and delete there; a player finds history, their journal and Leave campaign. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **A ⋯ menu on your character's sheet**, beside Edit sheet: move them to another table or take them out, end their story, archive or delete them. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **Delete from the lists**: the Campaigns and Characters pages' ⋯ menus can delete, and archived campaigns and characters get a ⋯ with Unarchive and Delete. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **Deleting stands out**: Delete buttons are solid red. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **Long names fit their menus**: a menu's title is cut to one line, with the full name on hover. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **Admins can delete a campaign** from the admin Campaigns list. ([#122](https://github.com/phChun/grimwilder/pull/122))
+- **Ruby 4.0.10** in production too, matching development. ([#122](https://github.com/phChun/grimwilder/pull/122))
+
 ## 2026-11-16
 
 - **Library updates**: passkey sign-in (webauthn), the web server proxy (Thruster) and other libraries are up to date. ([#119](https://github.com/phChun/grimwilder/pull/119))

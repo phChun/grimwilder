@@ -3,7 +3,7 @@
 <header class="page-header">
   <p class="eyebrow">Admin</p>
   <h1>Campaigns</h1>
-  <p class="page-header__lede">Active first. Read-only: admins don't get into campaigns they aren't in.</p>
+  <p class="page-header__lede">Active first. Admins don't get into campaigns they aren't in, but can delete one.</p>
   <%= render "admin/nav" %>
 </header>
 
@@ -20,6 +20,7 @@
         <th scope="col">Sessions</th>
         <th scope="col">Last roll</th>
         <th scope="col">Status</th>
+        <th scope="col"><span class="visually-hidden">Delete</span></th>
       </tr>
     </thead>
     <tbody>
@@ -33,6 +34,9 @@
           <td><%= @session_counts.fetch(campaign.id, 0) %></td>
           <td><%= (rolled = @last_rolls[campaign.id]) ? "#{time_ago_in_words(rolled)} ago" : "None" %></td>
           <td><%= campaign.archived? ? "Archived #{l(campaign.archived_at.to_date, format: :long)}" : "Active" %></td>
+          <td>
+            <%= button_to "Delete", admin_campaign_path(campaign), method: :delete, params: { q: search_query.presence, page: params[:page].presence }.compact, class: "button button--small button--delete", "aria-label": "Delete #{campaign.name}", form: { data: { turbo_confirm: "Delete #{campaign.name} for everyone? Its sessions, log, chat, pools and journals go; characters stay with their owners, unseated. This can't be undone." } } %>
+          </td>
         </tr>
       <% end %>
     </tbody>

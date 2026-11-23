@@ -75,6 +75,9 @@
 .button--quiet { background: none; border-color: transparent; color: var(--muted); }
 
 
+/* Deleting for good: solid red, in ⋯ menus and admin rows. (.button--danger, the outline, is for undoable or lesser harm.) */
+.button--delete { background: var(--delete); background-clip: padding-box; border-color: var(--delete); color: var(--ember-ink); } /* padding-box: no red seam under the lighter hover border's rounded edge */
+
 .button--suspense { background: var(--suspense); border-color: var(--suspense); color: var(--ember-ink); }
 
 .button--wide { flex: 1; }
@@ -280,6 +283,16 @@
 .campaign-card__menu .button_to,
 .campaign-card__menu .button { width: 100%; }
 .campaign-card__menu .field__hint { margin: 0; }
+
+/* A page's ⋯ options menu (campaigns/_options_menu, characters/_options_menu): a square toggle, a panel of full-width buttons under it. */
+.options-menu { position: relative; }
+.options-menu__toggle { width: var(--tap); padding: 0; list-style: none; }
+.options-menu__toggle::-webkit-details-marker { display: none; }
+.options-menu__panel { position: absolute; z-index: 15; right: 0; top: calc(100% + 4px); display: grid; gap: var(--space-2); width: min(16rem, calc(100vw - 2rem)); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); box-shadow: var(--shadow); }
+.options-menu__panel .button_to { margin: 0; }
+.options-menu__panel .button_to,
+.options-menu__panel .button { width: 100%; }
+.options-menu__panel .field__hint { margin: 0; }
 
 /* On hold (Campaign::Hold): dimmed, with "Play this one" in the bottom right when it's the viewer's seat that's held. */
 .campaign-card--on-hold .tool-card { opacity: 0.6; border-style: dashed; }
@@ -1572,6 +1585,7 @@ button.use-word:focus-visible { outline: 2px solid var(--focus); outline-offset:
 /* Spark, thread and XP the same width, wide enough for the longest ("3 of 3 thread"), the count centred between − and +. */
 .identity__meta--controls > .tally { flex: 0 0 13rem; }
 .identity__meta--controls > .tally .tally__count { flex: 1; justify-content: center; }
+.identity__options { display: flex; align-items: center; gap: var(--space-2); }
 
 .meter { display: grid; gap: 4px; }
 .meter__label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
@@ -2377,15 +2391,18 @@ a.party-card__name:hover { color: var(--link); text-decoration: underline; }
 /* menu_controller.js: a floating panel with no room below opens upward, and
    one that fits neither way scrolls. */
 [data-menu-target="panel"] { overflow-y: auto; }
+/* The fixed-width grid panels keep one column no wider than themselves, so a long one-line popover title is cut with an ellipsis instead of widening the column and pushing the buttons and ✕ out of view. */
+.options-menu__panel, .campaign-card__menu, .pool-card__menu, .talent-card__menu, .scene-plans__move-menu, .coming-up__menu, .nav-menu__panel { grid-template-columns: minmax(0, 1fr); }
 [data-menu-target="panel"].menu-panel--up { top: auto; bottom: calc(100% + 4px); }
 
 /* The ✕ in a floating panel or modal (shared/_close_button). A popover's top
    row (shared/_popover_head) is its title, with the ✕ in the corner. */
 .close-button { display: grid; flex: none; place-items: center; width: var(--tap); height: var(--tap); padding: 0; border: 0; border-radius: var(--radius-control); background: none; color: var(--muted); cursor: pointer; }
 .close-button:hover { background: var(--surface-2); color: var(--text); }
-.popover__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0 0; }
+.popover__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-width: 0; margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0 0; }
 li.popover__head { margin: 0; padding-left: var(--space-3); }
-.popover__title { min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.25; overflow-wrap: anywhere; }
+/* One line: a long name is cut with an ellipsis, in full on hover (title). */
+.popover__title { flex: 1; min-width: 0; overflow: hidden; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.25; white-space: nowrap; text-overflow: ellipsis; }
 .scene-bar .between-scenes__actions { flex-wrap: wrap; }
 /* The title row fills the first line: its negative right margin (tucking the ✕ into the corner)
    would otherwise leave a sliver there that a 0-basis button squeezes into, clipped. */
@@ -2887,6 +2904,14 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--suspense) 35%, transparent);
   }
 
+  /* Deleting goes a deeper red, its border lifting to the light grim, as the primary's does to --link. */
+  .button--delete:hover:not(:disabled) {
+    border-color: var(--grim);
+    background: var(--delete-deep);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--grim); /* 2px, like other buttons' hover; no outer glow, which read as the red spilling past the border */
+  }
+
   .segmented__option:hover:not(:has(input:checked)) .segmented__text {
     background: var(--surface-2);
     color: var(--text);
@@ -2914,6 +2939,14 @@ a.grabs__name:hover { color: var(--link); text-decoration: underline; }
 .mark-toggle:active {
   transform: scale(0.97);
   filter: brightness(0.85);
+}
+
+/* Pressing Delete: the deeper red, deeper still (touch screens get it without the hover). */
+.button--delete:active:not(:disabled) {
+  border-color: var(--grim);
+  background: var(--delete-deep);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--grim);
 }
 
 .segmented__option:active:not(:has(input:checked)) .segmented__text {

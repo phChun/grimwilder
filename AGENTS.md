@@ -14,12 +14,12 @@ Page numbers are the CE PDF's: talents, crucibles and the code's `pg.` reference
 
 | Piece | Choice |
 |---|---|
-| Ruby / Rails | Ruby **4.0.9**, Rails **8.2.0.alpha** (`main` from GitHub) |
+| Ruby / Rails | Ruby **4.0.10**, Rails **8.2.0.alpha** (`main` from GitHub) |
 | Views | `.html.erb` compiled by **Herb**, routed through **ReActionView 0.6** (reactionview.dev) |
 | JS | importmap-rails, Turbo, Stimulus, the `reactionview` client (pinned by the gem) |
 | CSS | Plain CSS via Propshaft. No Tailwind, no Sass |
 | DB / infra | SQLite, Solid Cache/Queue/Cable, Kamal to a droplet behind Cloudflare, images on ghcr.io (`ghcr.io/phchun/grimwilder`) |
-| Image | Docker Hardened Images (`dhi.io/ruby:4.0.9-debian13[-dev]`; `docker login dhi.io` first). See *Production* |
+| Image | Docker Hardened Images (`dhi.io/ruby:4.0.10-debian13[-dev]`; `docker login dhi.io` first). See *Production* |
 | Tests | Minitest (`bin/rails test`) plus Node's built-in test runner for pure JS |
 | Auth | Passwordless: emailed codes + passkeys (`webauthn`); no `has_secure_password` / bcrypt |
 
@@ -155,6 +155,7 @@ Two pure implementations (no DOM, no DB, randomness injected): `app/javascript/g
 - **Settings** (`campaigns#edit`, GM only): pitch, characters (`Campaign::CharacterSettings`), optional rules, schedule, invite link, members and blocks, reset, archive, delete. Each section saves alone.
 - **Redirects**: `back_to_table` sends the GM to the GM table, a player to the campaign page or their sheet (by referer). `campaign_play_path` sends a player to their seated sheet. Turbo drops a redirect's `#fragment` after a form post.
 - **Live banner** uses its own `[campaign, :live]` stream, not `:table`: `:table` carries refreshes, which would wipe half-typed forms on pages that don't morph. `Campaign#broadcast_table_refresh` sends both.
+- **Options menus** (⋯, `.options-menu`): `campaigns/_options_menu` on the campaign page (GM: settings, history, scene prep, journals, archive, delete; player: history, journal, leave) and `characters/_options_menu` beside Edit sheet (owner only: move/unseat, story end, archive, delete). The Campaigns and Characters pages' ⋯ menus (cards and archived rows) offer the same archive/unarchive and delete. They repeat actions whose full explanations stay on the settings and edit pages. Deleting for good is a solid red `.button--delete`; popover titles cut to one line with the full name on hover.
 - `details_memory_controller.js` remembers each `<details>`'s open state per campaign in localStorage and restores it after a morph. Floating menus use `menu_controller.js` (positions on screen; closes after a successful save).
 
 ## Sessions & scenes
@@ -187,7 +188,7 @@ Two pure implementations (no DOM, no DB, randomness injected): `app/javascript/g
 
 ## Admin
 
-`identities.admin` is set only from the console (`bin/kamal console`). `/admin` (`Admin::BaseController`; 404 for non-admins) has Stats, Interested, Accounts (plans via `apply_plan!`, Feedback access) and Campaigns (read-only), searchable (`AdminSearch`) and paged with pagy. Admins get no way into campaigns they aren't in. Last sign-in is `identities.last_signed_in_at` (not `sessions`, which sign-out deletes). **Removing an account** (`Identity::Removal`) deletes campaigns it's alone in and refuses while it's a campaign's only GM; its rolls, chat, roll calls and polls stay with `identity_id` nil (`OutlivesItsAccount` reads them as `Identity.removed`), and whispers to it are deleted. **Welcome emails** (`Interest#welcome!`, `WelcomeMailer`) go once (`interests.welcomed_at`) when an interest's email gets an account, on creation and in an hourly `Interest.welcome_all` sweep. **Feedback** (`Feedback`) is per-account opt-in and exports to Markdown without emails.
+`identities.admin` is set only from the console (`bin/kamal console`). `/admin` (`Admin::BaseController`; 404 for non-admins) has Stats, Interested, Accounts (plans via `apply_plan!`, Feedback access) and Campaigns (overview, plus Delete for everyone), searchable (`AdminSearch`) and paged with pagy. Admins get no way into campaigns they aren't in. Last sign-in is `identities.last_signed_in_at` (not `sessions`, which sign-out deletes). **Removing an account** (`Identity::Removal`) deletes campaigns it's alone in and refuses while it's a campaign's only GM; its rolls, chat, roll calls and polls stay with `identity_id` nil (`OutlivesItsAccount` reads them as `Identity.removed`), and whispers to it are deleted. **Welcome emails** (`Interest#welcome!`, `WelcomeMailer`) go once (`interests.welcomed_at`) when an interest's email gets an account, on creation and in an hourly `Interest.welcome_all` sweep. **Feedback** (`Feedback`) is per-account opt-in and exports to Markdown without emails.
 
 ## Pools
 
@@ -244,7 +245,7 @@ The repo is open source under O'Saasy (`LICENSE.md`).
 
 ## Production
 
-- **Image**: Docker Hardened Images with **no shell, no package manager and no `/usr/bin/env`**. `bin/docker-entrypoint` is Ruby and runs `db:prepare`; run commands as `ruby bin/rails …` inside a container (`docker run image bin/rails …` goes through the entrypoint and is fine). `BUNDLE_VERSION=system`. jemalloc and zoneinfo are copied from the build stage; there's no libvips, so images are never transformed (`variant_processor = :disabled`). Runs as uid 1000. Keep `.ruby-version` and the `RUBY_VERSION` build arg together.
+- **Image**: Docker Hardened Images with **no shell, no package manager and no `/usr/bin/env`**. `bin/docker-entrypoint` is Ruby and runs `db:prepare`; run commands as `ruby bin/rails …` inside a container (`docker run image bin/rails …` goes through the entrypoint and is fine). `BUNDLE_VERSION=system`. jemalloc and zoneinfo are copied from the build stage; there's no libvips, so images are never transformed (`variant_processor = :disabled`). Runs as uid 1000. Keep the Ruby version in `mise.toml`, the `RUBY_VERSION` build arg and `ruby-version` in `deploy.yml` together.
 - **Live** at https://grimwilder.com (`www.` redirects). `bin/kamal deploy|console|logs` from the Mac need secrets from 1Password; the server address and secrets never go in the repo. `APP_VERSION`/`APP_REVISION` are baked into the image and shown in /admin.
 - SQLite lives in the `grimwilder_storage` volume, with nightly `DatabaseSnapshot`s. Mail goes through an SMTP provider (name it only that way in docs). `ErrorNotifier` emails server errors and failed jobs when `ERROR_EMAIL_TO` is set.
 - Server setup and operations notes are kept locally, outside the repo, in `docs/ops/production-server.md`.

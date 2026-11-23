@@ -1,0 +1,29 @@
+<%# locals: (character:) %>
+<%# The owner's ⋯ beside Edit sheet: where they play, how their story ends, archiving and deleting, each as on the edit page (which explains them at more length). %>
+<% short = character.short_name %>
+<% campaign = character.campaign %>
+<details id="character-options" class="options-menu" data-controller="menu" data-action="toggle->menu#place">
+  <summary class="button options-menu__toggle" aria-label="Options for <%= character.name %>"><%= icon(:more, size: 18) %></summary>
+  <div class="options-menu__panel" data-menu-target="panel">
+    <%= render "shared/popover_head", title: character.name %>
+    <% if character.seatable_by?(Current.identity) %>
+      <%= link_to (campaign ? "Move to another table" : "Seat at a table"), edit_character_path(character, anchor: "at-the-table"), class: "button button--small" %>
+      <% if campaign %>
+        <%= button_to "Take #{short} out of #{campaign.name}", character_seat_path(character), method: :patch, params: { campaign_id: "" }, class: "button button--small", form: { data: { turbo_confirm: "Take #{character.name} out of #{campaign.name}?" } } %>
+      <% end %>
+    <% end %>
+    <% if character.gone? %>
+      <%= button_to "Return #{short} to play", character_story_end_path(character), method: :delete, class: "button button--small" %>
+    <% elsif !character.up_for_grabs? %>
+      <%= link_to "Their story ends…", edit_character_path(character, anchor: "story-ends"), class: "button button--small" %>
+    <% end %>
+    <% unless character.up_for_grabs? %>
+      <% if character.archived? %>
+        <%= button_to "Unarchive #{short}", character_archive_path(character), method: :delete, params: { return_to: "character" }, class: "button button--small" %>
+      <% else %>
+        <%= button_to "Archive #{short}", character_archive_path(character), class: "button button--small", form: { data: { turbo_confirm: archive_character_confirmation(character) } } %>
+      <% end %>
+    <% end %>
+    <%= button_to "Delete #{short}", character_path(character), method: :delete, class: "button button--small button--delete", form: { data: { turbo_confirm: "Delete #{character.name} for good?" } } %>
+  </div>
+</details>

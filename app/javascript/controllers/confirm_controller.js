@@ -4,8 +4,10 @@ import { Turbo } from "@hotwired/turbo-rails"
 // The confirmation dialog (shared/_confirm) in place of the browser's
 // confirm(): Turbo asks it for every data-turbo-confirm, on forms and on
 // button_to buttons. It shows the message, and a confirm button saying what was
-// clicked ("Delete", "Rest", "Give Tibbs back"), red when that deletes or
-// removes. It answers false for Cancel, Escape or a click outside.
+// clicked ("Delete", "Rest", "Give Tibbs back"): solid red (.button--delete,
+// deeper red on hover) when that deletes or removes, a red outline for other
+// risky ones (.button--danger, Reset, Mark fallen). It answers false for
+// Cancel, Escape or a click outside.
 export default class extends Controller {
   static targets = ["message", "cancelButton", "acceptButton"]
 
@@ -23,12 +25,14 @@ export default class extends Controller {
     this.answer(false)
     const button = submitter || form?.querySelector("button[type=submit], input[type=submit]")
     const label = (button?.textContent || button?.value || "").trim() || button?.getAttribute("aria-label") || "Continue"
-    const danger = Boolean(button?.matches(".button--danger, .button--danger-text")) || /^(delete|remove)\b/i.test(label)
+    const deletes = Boolean(button?.matches(".button--delete")) || /^(delete|remove)\b/i.test(label)
+    const danger = !deletes && Boolean(button?.matches(".button--danger, .button--danger-text"))
 
     this.messageTarget.textContent = message
     this.acceptButtonTarget.textContent = label
-    this.acceptButtonTarget.classList.toggle("button--primary", !danger)
+    this.acceptButtonTarget.classList.toggle("button--primary", !deletes && !danger)
     this.acceptButtonTarget.classList.toggle("button--danger", danger)
+    this.acceptButtonTarget.classList.toggle("button--delete", deletes)
 
     this.element.showModal()
     this.cancelButtonTarget.focus()

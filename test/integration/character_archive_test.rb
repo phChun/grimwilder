@@ -54,4 +54,37 @@ class CharacterArchiveTest < ActionDispatch::IntegrationTest
     options = css_select("#seat_#{@tibbs.id} option").map(&:text)
     assert_equal [ "Not in a campaign", "Zephyr Keep", "#{@campaign.name} (archived)" ], options, "by name, The Bramblewood Accord would come first"
   end
+
+  test "the sheet's options menu archives, moves and deletes, for the owner only" do
+    get character_path(@tibbs)
+    assert_select "#character-options" do
+      assert_select "a[href=?]", edit_character_path(@tibbs, anchor: "at-the-table"), "Move to another table"
+      assert_select "form[action=?] button", character_seat_path(@tibbs), "Take Tibbs out of #{@campaign.name}"
+      assert_select "a[href=?]", edit_character_path(@tibbs, anchor: "story-ends")
+      assert_select "form[action=?] button", character_archive_path(@tibbs), "Archive Tibbs"
+      assert_select "form[action=?] button", character_path(@tibbs), "Delete Tibbs"
+    end
+
+    sign_out
+    sign_in_as identities(:gwen)
+    get character_path(@tibbs)
+    assert_select "#character-options", 0, "the GM reads the sheet, without the owner's options"
+  end
+
+  test "the Characters page's ⋯ deletes, and an archived character's ⋯ unarchives or deletes" do
+    get characters_path
+    assert_select "##{dom_id(@tibbs, :more)} form[action=?] button.button--delete", character_path(@tibbs), "Delete"
+
+    post character_archive_path(@tibbs)
+    get characters_path
+    assert_select "##{dom_id(@tibbs, :archived_more)}" do
+      assert_select "form[action=?] button", character_archive_path(@tibbs), "Unarchive"
+      assert_select "form[action=?] button.button--delete", character_path(@tibbs), "Delete"
+    end
+
+    assert_difference -> { Character.count }, -1 do
+      delete character_path(@tibbs)
+    end
+    assert_redirected_to characters_path
+  end
 end
