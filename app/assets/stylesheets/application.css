@@ -49,6 +49,9 @@
   --grim-line: #5a2e28;
   --harm: #8a3a30;
   --disaster: #e58ab0;
+  /* Deleting for good (.button--delete): the grim red, solid, going deeper on hover and press with its border lifting to the light grim, as the primary's lifts to --link. */
+  --delete: var(--grim-ring);
+  --delete-deep: #9d4a40; /* --delete 70% toward black; --text on it is about 4.9:1 */
   --not-line: #8a5a6e; /* the trait and desire you aren't: a muted rose, apart from the grim reds */
 
   /* Meta-currencies */
